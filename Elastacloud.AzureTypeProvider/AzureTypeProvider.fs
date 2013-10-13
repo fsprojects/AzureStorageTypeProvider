@@ -32,7 +32,7 @@ type AzureAccountTypeProvider() as this =
         containerListingType.AddMembersDelayed
             (fun _ -> 
             AzureRepository.getBlobStorageAccountManifest (connectionString) 
-            |> List.map ContainerTypeFactory.createContainerType)
+            |> List.map(fun container -> ContainerTypeFactory.createContainerType(connectionString,container)))
         connectionAccountType
     
     let parameters = 
