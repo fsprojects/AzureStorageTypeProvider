@@ -1,10 +1,12 @@
-﻿module Elastacloud.FSharp.AzureTypeProvider.AzureRepository
+﻿module internal Elastacloud.FSharp.AzureTypeProvider.AzureRepository
+
 open Microsoft.WindowsAzure.Storage
 open Microsoft.WindowsAzure.Storage.Blob
 open System
 
 type LightweightContainer = { Name : string; Files : seq<string> }
 
+/// Generates a set a lightweight container lists for a blob storage account
 let getBlobStorageAccountManifest connection =
     CloudStorageAccount.Parse(connection)
                        .CreateCloudBlobClient()

@@ -1,4 +1,4 @@
-﻿module Elastacloud.FSharp.AzureTypeProvider.ContainerTypeFactory
+﻿module internal Elastacloud.FSharp.AzureTypeProvider.ContainerTypeFactory
 
 open System
 open System.Reflection
@@ -13,6 +13,7 @@ let private createFileType fileName =
                      IsStatic = false,
                      GetterCode = (fun args -> <@@ fileName @@>))
 
+/// Generates a property type for a specific container
 let createContainerType(assembly,namespaceName,(container:LightweightContainer)) =
     let containerType = ProvidedTypeDefinition(assembly, namespaceName, "ContainerFileListing", baseType = Some typeof<obj>)
     containerType.AddMembers(container.Files |> Seq.map createFileType |> Seq.toList)
@@ -21,5 +22,6 @@ let createContainerType(assembly,namespaceName,(container:LightweightContainer))
                                     propertyType = containerType,
                                     IsStatic = false,
                                     GetterCode = (fun args -> <@@ containerName @@>))
+
     property, containerType
 

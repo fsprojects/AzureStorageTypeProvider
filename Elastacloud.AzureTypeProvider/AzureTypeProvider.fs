@@ -7,25 +7,26 @@ open System
 open System.Reflection
 
 [<TypeProvider>]
-type blobStorageTypeProvider() as this = 
+type azureAccountTypeProvider() as this = 
     inherit TypeProviderForNamespaces()
-    let namespaceName = "Elastacloud.FSharp.AzureTypeProvider"
+    let namespaceName = "Elastacloud.FSharp"
     let thisAssembly = Assembly.GetExecutingAssembly()
-    let blobStorageType = ProvidedTypeDefinition(thisAssembly, namespaceName, "blobStorageType", baseType = Some typeof<obj>)
-    let filesPropType = ProvidedTypeDefinition(thisAssembly, namespaceName, "ContainerListing", baseType = Some typeof<obj>)
+    let azureAccountType = ProvidedTypeDefinition(thisAssembly, namespaceName, "AzureAccount", baseType = Some typeof<obj>)
+    let containerListingType = ProvidedTypeDefinition(thisAssembly, namespaceName, "ContainerListing", baseType = Some typeof<obj>)
+
     do 
         let connectionString = "UseDevelopmentStorage=true"
-        blobStorageType.AddMember(ProvidedConstructor(parameters = [], InvokeCode = (fun args -> <@@ "The object data" :> obj @@>)))
-        let fileProperties = 
-            AzureRepository.getBlobStorageAccountManifest(connectionString) |> List.map(fun container -> 
-                                                                                   let subNamespace = namespaceName + "." + container.Name
-                                                                                   let prop, containerType = ContainerTypeFactory.createContainerType(thisAssembly, subNamespace, container)
-                                                                                   this.AddNamespace(subNamespace, [ containerType ])
-                                                                                   prop)
-        filesPropType.AddMembers fileProperties
-        let filesProp = ProvidedProperty(propertyName = "Files", propertyType = filesPropType, GetterCode = (fun args -> <@@ null @@>))
-        blobStorageType.AddMember filesProp
-        this.AddNamespace(namespaceName, [ blobStorageType;filesPropType ])
+        azureAccountType.AddMember(ProvidedConstructor(parameters = [], InvokeCode = (fun args -> <@@ "The object data" :> obj @@>)))
+        let containerProps = AzureRepository.getBlobStorageAccountManifest(connectionString)
+                             |> List.map(fun container -> let subNamespace = sprintf "%s.%s" namespaceName container.Name
+                                                          let prop, containerType = ContainerTypeFactory.createContainerType(thisAssembly, subNamespace, container)
+                                                          this.AddNamespace(subNamespace, [ containerType ])
+                                                          prop)
+    
+        containerListingType.AddMembers containerProps
+        azureAccountType.AddMember(ProvidedProperty(propertyName = "Containers", propertyType = containerListingType, GetterCode = (fun args -> <@@ null @@>)))
+        
+        this.AddNamespace(namespaceName, [ azureAccountType;containerListingType ])
 
 [<TypeProviderAssembly>]
 do ()
