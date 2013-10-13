@@ -6,7 +6,7 @@ open System
 
 type LightweightContainer = 
     { Name : string
-      Files : seq<string> }
+      GetFiles : unit -> seq<string> }
 
 /// Generates a set a lightweight container lists for a blob storage account
 let getBlobStorageAccountManifest connection = 
@@ -14,6 +14,8 @@ let getBlobStorageAccountManifest connection =
     |> Seq.toList
     |> List.map (fun c -> 
            { Name = c.Name
-             Files = c.ListBlobs(useFlatBlobListing = true)
-                     |> Seq.map (fun b -> (b :?> CloudBlockBlob).Name)
-                     |> Seq.toList })
+             GetFiles = 
+                 (fun _ -> 
+                 c.ListBlobs(useFlatBlobListing = true)
+                 |> Seq.map (fun b -> (b :?> CloudBlockBlob).Name)
+                 |> Seq.cache) })

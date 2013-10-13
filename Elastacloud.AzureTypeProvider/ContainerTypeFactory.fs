@@ -16,7 +16,7 @@ let private createFileType fileName =
 /// Generates a property type for a specific container
 let createContainerType(assembly,namespaceName,(container:LightweightContainer)) =
     let containerType = ProvidedTypeDefinition(assembly, namespaceName, "ContainerFileListing", baseType = Some typeof<obj>)
-    containerType.AddMembers(container.Files |> Seq.map createFileType |> Seq.toList)
+    containerType.AddMembers(container.GetFiles() |> Seq.map createFileType |> Seq.toList)
     let containerName = container.Name
     let property = ProvidedProperty(propertyName = container.Name,
                                     propertyType = containerType,
