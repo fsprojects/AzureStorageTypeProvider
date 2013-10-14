@@ -24,10 +24,10 @@ let createDownloadFunction fileDetails =
         | Binary -> 
             let methodBody = 
                 (fun (args : Expr list) -> 
-                <@@ AzureRepository.downloadData connectionString container fileName %%args.[0] @@>)
+                <@@ AzureRepository.downloadData connectionString container fileName @@>)
             ProvidedMethod
-                (methodName = "Download", parameters = [ ProvidedParameter("destinationArray", typeof<byte []>) ], 
-                returnType = typeof<Async<int>>, InvokeCode = methodBody, IsStaticMethod = true)
+                (methodName = "Download", parameters = [], 
+                returnType = typeof<Async<Byte[]>>, InvokeCode = methodBody, IsStaticMethod = true)
 
 let createDownloadFileFunction fileDetails = 
     let connectionString,container,fileName = fileDetails

@@ -10,9 +10,9 @@ open System.Reflection
 let private createFileProvidedType fileDetails = 
     let _, _, fileName = fileDetails
     let fileProp = ProvidedTypeDefinition(fileName, Some typeof<obj>)
-    fileProp.AddMembers([ FileMemberFactory.createDownloadFunction fileDetails :> MemberInfo
-                          FileMemberFactory.createDownloadFileFunction fileDetails :> MemberInfo
-                          FileMemberFactory.CreateCopyStatusProperty fileDetails :> MemberInfo ])
+    fileProp.AddMembersDelayed(fun _ -> [ FileMemberFactory.createDownloadFunction fileDetails :> MemberInfo
+                                          FileMemberFactory.createDownloadFileFunction fileDetails :> MemberInfo
+                                          FileMemberFactory.CreateCopyStatusProperty fileDetails :> MemberInfo ])
     fileProp
 
 /// Generates a property type for a specific container

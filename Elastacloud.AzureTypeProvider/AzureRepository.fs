@@ -29,11 +29,16 @@ let downloadText connection container fileName =
     let blobRef = getBlobRef connection container fileName
     Async.AwaitTask(blobRef.DownloadTextAsync())
 
-let downloadData connection container fileName destinationArray = 
-    let blobRef = getBlobRef connection container fileName
-    Async.AwaitTask(blobRef.DownloadToByteArrayAsync(destinationArray, 0))
-
 let private awaitUnit = Async.AwaitIAsyncResult >> Async.Ignore
+
+let downloadData connection container fileName  = 
+    async {
+        let blobRef = getBlobRef connection container fileName
+        do! awaitUnit(blobRef.FetchAttributesAsync())
+        let destinationArray = Array.zeroCreate (int blobRef.Properties.Length)
+        do! awaitUnit(blobRef.DownloadToByteArrayAsync(destinationArray, 0))
+        return destinationArray
+    }
     
 let downloadToFile connection container fileName path = 
     let blobRef = getBlobRef connection container fileName
