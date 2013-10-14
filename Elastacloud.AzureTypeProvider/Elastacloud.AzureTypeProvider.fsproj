@@ -78,6 +78,7 @@
   <ItemGroup>
     <Compile Include="ProvidedTypes-0.4.fs" />
     <Compile Include="AzureRepository.fs" />
+    <Compile Include="FileMemberFactory.fs" />
     <Compile Include="ContainerTypeFactory.fs" />
     <Compile Include="AzureTypeProvider.fs" />
     <None Include="Script.fsx" />

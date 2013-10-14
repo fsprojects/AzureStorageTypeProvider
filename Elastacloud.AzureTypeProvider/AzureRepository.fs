@@ -4,7 +4,7 @@ open Microsoft.WindowsAzure.Storage
 open Microsoft.WindowsAzure.Storage.Blob
 open System
 
-type LightweightContainer = 
+type internal LightweightContainer = 
     { Name : string
       GetFiles : unit -> seq<string> }
 
@@ -14,7 +14,7 @@ let private getBlobRef connection container file =
     (getCloudClient connection).GetContainerReference(container).GetBlockBlobReference(file)
 
 /// Generates a set a lightweight container lists for a blob storage account
-let getBlobStorageAccountManifest connection = 
+let internal getBlobStorageAccountManifest connection = 
     (getCloudClient connection).ListContainers()
     |> Seq.toList
     |> List.map (fun c -> 
@@ -33,7 +33,7 @@ let downloadData connection container fileName destinationArray =
     let blobRef = getBlobRef connection container fileName
     Async.AwaitTask(blobRef.DownloadToByteArrayAsync(destinationArray, 0))
 
-let awaitUnit = Async.AwaitIAsyncResult >> Async.Ignore
+let private awaitUnit = Async.AwaitIAsyncResult >> Async.Ignore
     
 let downloadToFile connection container fileName path = 
     let blobRef = getBlobRef connection container fileName
