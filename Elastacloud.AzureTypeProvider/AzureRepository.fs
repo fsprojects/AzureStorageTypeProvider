@@ -44,6 +44,11 @@ let downloadToFile connection container fileName path =
     let blobRef = getBlobRef connection container fileName
     awaitUnit (blobRef.DownloadToFileAsync(path, IO.FileMode.Create))
 
+let uploadFile connection container path = 
+    let fileName = IO.Path.GetFileName path
+    let blobRef = getBlobRef connection container fileName
+    awaitUnit (blobRef.UploadFromFileAsync(path, IO.FileMode.Open))
+
 let getCopyState (blobRef : CloudBlockBlob) = 
     if (blobRef.CopyState <> null) then Some blobRef.CopyState
     else None

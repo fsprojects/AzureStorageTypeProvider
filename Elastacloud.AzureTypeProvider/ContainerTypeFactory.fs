@@ -10,9 +10,9 @@ open System.Reflection
 let private createFileProvidedType fileDetails = 
     let _, _, fileName = fileDetails
     let fileProp = ProvidedTypeDefinition(fileName, Some typeof<obj>)
-    fileProp.AddMembersDelayed(fun _ -> [ FileMemberFactory.createDownloadFunction fileDetails :> MemberInfo
-                                          FileMemberFactory.createDownloadFileFunction fileDetails :> MemberInfo
-                                          FileMemberFactory.CreateCopyStatusProperty fileDetails :> MemberInfo ])
+    fileProp.AddMembersDelayed(fun _ -> [ MemberFactory.createDownloadFunction fileDetails :> MemberInfo
+                                          MemberFactory.createDownloadFileFunction fileDetails :> MemberInfo
+                                          MemberFactory.createCopyStatusProperty fileDetails :> MemberInfo ])
     fileProp
 
 /// Generates a property type for a specific container
@@ -22,4 +22,5 @@ let createContainerType (connectionString, (container : LightweightContainer)) =
         container.GetFiles()
         |> Seq.map (fun file -> createFileProvidedType (connectionString, container.Name, file))
         |> Seq.toList)
+    individualContainerType.AddMember (MemberFactory.createUploadFileFunction(connectionString, container.Name))
     individualContainerType

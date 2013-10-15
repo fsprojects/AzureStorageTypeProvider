@@ -1,4 +1,4 @@
-﻿module internal Elastacloud.FSharp.AzureTypeProvider.FileMemberFactory
+﻿module internal Elastacloud.FSharp.AzureTypeProvider.MemberFactory
 
 open Elastacloud.FSharp.AzureTypeProvider.AzureRepository
 open Microsoft.FSharp.Core.CompilerServices
@@ -52,7 +52,20 @@ let createDownloadFileFunction fileDetails =
     output.AddXmlDocDelayed(fun () -> "Downloads this file to the local file system asynchronously.")
     output
 
-let CreateCopyStatusProperty fileDetails = 
+let createUploadFileFunction fileDetails = 
+    let connectionString, container = fileDetails
+    let output = ProvidedMethod
+                    (methodName = "UploadFile", parameters = [ ProvidedParameter("path", typeof<string>) ], 
+                     returnType = typeof<Async<unit>>, 
+         
+                     InvokeCode = (fun (args : Expr list) -> 
+                     <@@ AzureRepository.uploadFile connectionString container %%args.[0] @@>), 
+                     IsStaticMethod = true)
+    output.AddXmlDocDelayed(fun () -> "Uploads a file to this container.")
+    output
+
+
+let createCopyStatusProperty fileDetails = 
     let connectionString, container, fileName = fileDetails
     let uri, status = AzureRepository.getDetails connectionString container fileName
     let output = ProvidedProperty
