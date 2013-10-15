@@ -5,7 +5,11 @@ An F# Azure Type Provider which can be used to explore e.g. Blob Storage and eas
 
 The goal is to create a provider which allows lightweight access to your Azure assets within the context of e.g. F# scripts to allow CRUD operations quickly and easily.
 
+First, create a connection to your Azure account
+
 	type account = Elastacloud.FSharp.AzureTypeProvider.AzureAccount< "accountName","accountKey" >
+
+Download a file from Azure. Intellisense automatically prompts you for containers and files. There's a single Download() method on every file. It will return a different type depending on the extension of the file.
 
 	// Downloads LeagueTable.csv as an Async<string>
 	let textAsyncWorkflow = async {
@@ -28,6 +32,7 @@ The goal is to create a provider which allows lightweight access to your Azure a
 		return xmlDoc
 	}
 
+You can also download a file to the local file system
 
 	// Asynchronously downloads LeagueTable.csv to a file locally
 	account.Containers.container1.``LeagueTable.csv``.DownloadToFile(@"D:\LeagueTable.csv")
