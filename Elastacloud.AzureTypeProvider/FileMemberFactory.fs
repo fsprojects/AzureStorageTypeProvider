@@ -18,40 +18,45 @@ let private (|Text|Binary|XML|) (name : string) =
 let createDownloadFunction fileDetails = 
     let connectionString, container, fileName = fileDetails
     
-    let methodBody, returnType = 
+    let methodBody, returnType, comment = 
         match fileName with
         | Text -> 
             let methodBody = 
                 (fun _ -> <@@ AzureRepository.downloadText connectionString container fileName @@>)
-            methodBody, typeof<Async<string>>
+            methodBody, typeof<Async<string>>, "a string"
         | XML -> 
             let methodBody = (fun _ -> <@@ async { let! text = AzureRepository.downloadText 
                                                                    connectionString container 
                                                                    fileName
                                                    return XDocument.Parse text } @@>)
-            methodBody, typeof<Async<XDocument>>
+            methodBody, typeof<Async<XDocument>>, "an XDocument"
         | Binary -> 
             let methodBody = 
                 (fun (args : Expr list) -> 
                 <@@ AzureRepository.downloadData connectionString container fileName @@>)
-            methodBody, typeof<Async<Byte []>>
-    ProvidedMethod
-        (methodName = "Download", parameters = [], returnType = returnType, InvokeCode = methodBody, 
-         IsStaticMethod = true)
+            methodBody, typeof<Async<Byte []>>, "a byte array"
+    let output = ProvidedMethod(methodName = "Download", parameters = [], returnType = returnType, InvokeCode = methodBody, 
+                    IsStaticMethod = true)
+    output.AddXmlDocDelayed(fun () -> sprintf "Downloads this file asynchronously as %s." comment)
+    output
 
 let createDownloadFileFunction fileDetails = 
     let connectionString, container, fileName = fileDetails
-    ProvidedMethod
-        (methodName = "DownloadToFile", parameters = [ ProvidedParameter("path", typeof<string>) ], 
-         returnType = typeof<Async<unit>>, 
+    let output = ProvidedMethod
+                    (methodName = "DownloadToFile", parameters = [ ProvidedParameter("path", typeof<string>) ], 
+                     returnType = typeof<Async<unit>>, 
          
-         InvokeCode = (fun (args : Expr list) -> 
-         <@@ AzureRepository.downloadToFile connectionString container fileName %%args.[0] @@>), 
-         IsStaticMethod = true)
+                     InvokeCode = (fun (args : Expr list) -> 
+                     <@@ AzureRepository.downloadToFile connectionString container fileName %%args.[0] @@>), 
+                     IsStaticMethod = true)
+    output.AddXmlDocDelayed(fun () -> "Downloads this file to the local file system asynchronously.")
+    output
 
 let CreateCopyStatusProperty fileDetails = 
     let connectionString, container, fileName = fileDetails
     let uri, status = AzureRepository.getDetails connectionString container fileName
-    ProvidedProperty
-        (sprintf "Copy Status: %s" status, typeof<string>, GetterCode = (fun args -> <@@ status @@>), 
-         IsStatic = true)
+    let output = ProvidedProperty
+                     (sprintf "Copy Status: %s" status, typeof<string>, GetterCode = (fun args -> <@@ status @@>), 
+                      IsStatic = true)
+    output.AddXmlDocDelayed(fun () -> "Gives you details on the last upload operation performed on this file in Azure.")
+    output
