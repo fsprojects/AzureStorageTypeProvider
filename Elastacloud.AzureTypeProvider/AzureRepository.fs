@@ -31,24 +31,43 @@ let downloadText connection container fileName =
 
 let private awaitUnit = Async.AwaitIAsyncResult >> Async.Ignore
 
-let downloadData connection container fileName  = 
-    async {
+let downloadData connection container fileName = 
+    async { 
         let blobRef = getBlobRef connection container fileName
-        do! awaitUnit(blobRef.FetchAttributesAsync())
+        do! awaitUnit (blobRef.FetchAttributesAsync())
         let destinationArray = Array.zeroCreate (int blobRef.Properties.Length)
-        do! awaitUnit(blobRef.DownloadToByteArrayAsync(destinationArray, 0))
+        do! awaitUnit (blobRef.DownloadToByteArrayAsync(destinationArray, 0))
         return destinationArray
     }
-    
+
 let downloadToFile connection container fileName path = 
     let blobRef = getBlobRef connection container fileName
-    awaitUnit(blobRef.DownloadToFileAsync(path, IO.FileMode.Create))
+    awaitUnit (blobRef.DownloadToFileAsync(path, IO.FileMode.Create))
 
-let getDetails connection container fileName =
+let getCopyState (blobRef : CloudBlockBlob) = 
+    if (blobRef.CopyState <> null) then Some blobRef.CopyState
+    else None
+
+let getDetails connection container fileName = 
     let blobRef = getBlobRef connection container fileName
     blobRef.FetchAttributes()
-    let copyDescription = match blobRef.CopyState.Status with
-                          | CopyStatus.Success -> sprintf " (completed on %s)." (blobRef.CopyState.CompletionTime.Value.UtcDateTime.ToString())
-                          | CopyStatus.Pending -> sprintf " (%f complete)." (((float blobRef.CopyState.TotalBytes.Value) / 100.0) * float blobRef.CopyState.BytesCopied.Value)
-                          | _ -> String.Empty
-    blobRef.Uri.AbsoluteUri, sprintf "%s%s" (blobRef.CopyState.Status.ToString()) copyDescription
+    let copyState = getCopyState blobRef
+    
+    let copyDescription = 
+        match copyState with
+        | Some(copyState) -> 
+            sprintf "%s%s" (copyState.Status.ToString()) (match copyState.Status with
+                                                          | CopyStatus.Success -> 
+                                                              sprintf " (completed on %s)." 
+                                                                  (blobRef.CopyState.CompletionTime.Value.UtcDateTime.ToString
+                                                                       ())
+                                                          | CopyStatus.Pending -> 
+                                                              sprintf " (%f complete)." 
+                                                                  (((float 
+                                                                         blobRef.CopyState.TotalBytes.Value) 
+                                                                    / 100.0) 
+                                                                   * float 
+                                                                         blobRef.CopyState.BytesCopied.Value)
+                                                          | _ -> String.Empty)
+        | _ -> "Uknown"
+    blobRef.Uri.AbsoluteUri, copyDescription

@@ -25,10 +25,10 @@ let createDownloadFunction fileDetails =
                 (fun _ -> <@@ AzureRepository.downloadText connectionString container fileName @@>)
             methodBody, typeof<Async<string>>
         | XML -> 
-            let methodBody = 
-                (fun _ -> <@@ async { let! text = AzureRepository.downloadText connectionString 
-                                                      container fileName
-                                      return XDocument.Parse text } @@>)
+            let methodBody = (fun _ -> <@@ async { let! text = AzureRepository.downloadText 
+                                                                   connectionString container 
+                                                                   fileName
+                                                   return XDocument.Parse text } @@>)
             methodBody, typeof<Async<XDocument>>
         | Binary -> 
             let methodBody = 
