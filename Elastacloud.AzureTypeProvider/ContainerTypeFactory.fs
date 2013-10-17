@@ -7,12 +7,14 @@ open Samples.FSharp.ProvidedTypes
 open System
 open System.Reflection
 
-let private createFileProvidedType fileDetails = 
-    let _, _, fileName = fileDetails
+let private createFileItem connectionString containerName fileName = 
+    let fileDetails = connectionString, containerName, fileName
     let fileProp = ProvidedTypeDefinition(fileName, Some typeof<obj>)
     fileProp.AddMembersDelayed(fun _ -> [ MemberFactory.createDownloadFunction fileDetails :> MemberInfo
                                           MemberFactory.createDownloadFileFunction fileDetails :> MemberInfo
-                                          MemberFactory.createCopyStatusProperty fileDetails :> MemberInfo ])
+                                          MemberFactory.createCopyStatusProperty fileDetails :> MemberInfo
+                                          MemberFactory.createGenerateSasFunction fileDetails :> MemberInfo
+                                        ])                                          
     fileProp
 
 /// Generates a property type for a specific container
@@ -20,7 +22,7 @@ let createContainerType (connectionString, (container : LightweightContainer)) =
     let individualContainerType = ProvidedTypeDefinition(container.Name, Some typeof<obj>)
     individualContainerType.AddMembersDelayed(fun _ -> 
         container.GetFiles()
-        |> Seq.map (fun file -> createFileProvidedType (connectionString, container.Name, file))
+        |> Seq.map (createFileItem connectionString container.Name)
         |> Seq.toList)
     individualContainerType.AddMember (MemberFactory.createUploadFileFunction(connectionString, container.Name))
     individualContainerType

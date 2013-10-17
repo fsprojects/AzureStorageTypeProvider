@@ -76,3 +76,10 @@ let getDetails connection container fileName =
                                                           | _ -> String.Empty)
         | _ -> "Uknown"
     blobRef.Uri.AbsoluteUri, copyDescription
+
+let getSas connection container fileName duration =
+    let blobRef = getBlobRef connection container fileName
+    let expiry = Nullable<DateTimeOffset>(DateTimeOffset.UtcNow.Add(duration))
+    let policy = SharedAccessBlobPolicy(SharedAccessExpiryTime = expiry)
+    let sas = blobRef.GetSharedAccessSignature policy
+    Uri(sprintf "%s%s" (blobRef.Uri.ToString()) sas)
