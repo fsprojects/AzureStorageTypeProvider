@@ -71,34 +71,14 @@ let uploadFile connection container path =
     let blobRef = getBlobRef connection container fileName
     awaitUnit (blobRef.UploadFromFileAsync(path, IO.FileMode.Open))
 
-let getCopyState (blobRef : CloudBlockBlob) = 
-    if (blobRef.CopyState <> null) then Some blobRef.CopyState
-    else None
-
 let getDetails connection container fileName = 
     let blobRef = getBlobRef connection container fileName
     blobRef.FetchAttributes()
-    let copyState = getCopyState blobRef
-    
-    let copyDescription = 
-        match copyState with
-        | Some(copyState) -> 
-            sprintf "%s%s" (copyState.Status.ToString()) (match copyState.Status with
-                                                          | CopyStatus.Success -> 
-                                                              sprintf " (completed on %s)." 
-                                                                  (blobRef.CopyState.CompletionTime.Value.UtcDateTime.ToString
-                                                                       ())
-                                                          | CopyStatus.Pending -> 
-                                                              sprintf " (%f complete)." 
-                                                                  (((float blobRef.CopyState.TotalBytes.Value) / 100.0) 
-                                                                   * float blobRef.CopyState.BytesCopied.Value)
-                                                          | _ -> String.Empty)
-        | _ -> "Unknown"
-    blobRef.Uri.AbsoluteUri, copyDescription
+    blobRef.Uri.AbsoluteUri, blobRef.Properties
 
-let getSas connection container fileName duration = 
+let getSas connection container fileName duration permissions = 
     let blobRef = getBlobRef connection container fileName
     let expiry = Nullable<DateTimeOffset>(DateTimeOffset.UtcNow.Add(duration))
-    let policy = SharedAccessBlobPolicy(SharedAccessExpiryTime = expiry)
+    let policy = SharedAccessBlobPolicy(SharedAccessExpiryTime = expiry, Permissions = permissions)
     let sas = blobRef.GetSharedAccessSignature policy
     Uri(sprintf "%s%s" (blobRef.Uri.ToString()) sas)

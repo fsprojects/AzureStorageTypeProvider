@@ -7,21 +7,24 @@ open Samples.FSharp.ProvidedTypes
 open System
 open System.Reflection
 
-let rec private createFileItem connectionString containerName fileItem =
+let rec private createFileItem connectionString containerName fileItem = 
     match fileItem with
-    | Folder(path,name,contents) ->
-        let folderProp = ProvidedTypeDefinition(name, Some typeof<obj>)
-        folderProp.AddMembersDelayed(fun _ -> contents()
-                                              |> Array.map (createFileItem connectionString containerName)
-                                              |> Array.toList)                                             
+    | Folder(path, name, contents) -> 
+        let folderProp = ProvidedTypeDefinition("/" + name, Some typeof<obj>)
+        folderProp.AddMembersDelayed(fun _ -> 
+            [] @ (contents()
+                  |> Array.map (createFileItem connectionString containerName)
+                  |> Array.toList))
         folderProp :> MemberInfo
-    | Blob(path,name) -> let fileDetails = connectionString, containerName, path
-                         let fileProp = ProvidedTypeDefinition(name, Some typeof<obj>)
-                         fileProp.AddMembersDelayed(fun _ -> [ MemberFactory.createDownloadFunction fileDetails :> MemberInfo
-                                                               MemberFactory.createDownloadFileFunction fileDetails :> MemberInfo
-                                                               MemberFactory.createCopyStatusProperty fileDetails :> MemberInfo
-                                                               MemberFactory.createGenerateSasFunction fileDetails :> MemberInfo ])                                          
-                         fileProp :> MemberInfo
+    | Blob(path, name) -> 
+        let fileDetails = connectionString, containerName, path
+        let fileProp = ProvidedTypeDefinition(name, Some typeof<obj>)
+        fileProp.AddMembersDelayed(fun _ -> 
+            [ MemberFactory.createFileDetailsProperty fileDetails :> MemberInfo
+              MemberFactory.createDownloadFunction fileDetails :> MemberInfo
+              MemberFactory.createDownloadFileFunction fileDetails :> MemberInfo
+              MemberFactory.createGenerateSasFunction fileDetails :> MemberInfo ])
+        fileProp :> MemberInfo
 
 /// Generates a property type for a specific container
 let createContainerType (connectionString, (container : LightweightContainer)) = 
@@ -30,5 +33,5 @@ let createContainerType (connectionString, (container : LightweightContainer)) =
         container.GetFiles()
         |> Seq.map (createFileItem connectionString container.Name)
         |> Seq.toList)
-    individualContainerType.AddMember (MemberFactory.createUploadFileFunction(connectionString, container.Name))
+    individualContainerType.AddMember(MemberFactory.createUploadFileFunction (connectionString, container.Name))
     individualContainerType
