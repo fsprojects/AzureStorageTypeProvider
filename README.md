@@ -18,6 +18,9 @@ The goal is to create a provider which allows lightweight access to your Azure a
 		return text
 	}
 
+	// Can also do this
+	let text = account.Containers.container1.``LeagueTable.csv``.Download() |> Async.RunSynchronously
+
 	// Downloads binary.zip as an Async<Byte[]>
 	let binaryAsyncWorkflow = async {
 		let! binaryArray = account.Containers.container1.``binary.zip``.Download()
