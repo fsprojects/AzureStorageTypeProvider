@@ -96,7 +96,7 @@ let createFileDetailsProperty fileDetails =
                            | _ -> "TB", (fun x -> x / 1099511627776.0)
         let sizeText = String.Format("{0:0.0} {1}", getSize (float properties.Length), unit)
         ProvidedProperty
-            ((sprintf "%s (%s)." (properties.BlobType.ToString()) sizeText), typeof<string>, GetterCode = (fun args -> <@@ uri @@>), 
+            ((sprintf "%s (%s)" (properties.BlobType.ToString()) sizeText), typeof<string>, GetterCode = (fun args -> <@@ uri @@>), 
              IsStatic = true)
-    output.AddXmlDocDelayed(fun () -> "Gives you basic details on this file in Azure. The properties evaluates to the full URI of this blob.")
+    output.AddXmlDocDelayed(fun () -> "Gives you basic details on this file in Azure. The property evaluates to the full URI of this blob.")
     output
