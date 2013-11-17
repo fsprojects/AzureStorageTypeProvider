@@ -16,11 +16,11 @@ let rec private createFileItem connectionString containerName fileItem =
                   |> Array.map (createFileItem connectionString containerName)
                   |> Array.toList))
         folderProp :> MemberInfo
-    | Blob(path, name) -> 
+    | Blob(path, name, properties) -> 
         let fileDetails = connectionString, containerName, path
         let fileProp = ProvidedTypeDefinition(name, Some typeof<obj>)
         fileProp.AddMembersDelayed(fun _ -> 
-            [ MemberFactory.createFileDetailsProperty fileDetails :> MemberInfo
+            [ MemberFactory.createFileDetailsProperty path properties :> MemberInfo
               MemberFactory.createDownloadFunction fileDetails :> MemberInfo
               MemberFactory.createDownloadFileFunction fileDetails :> MemberInfo
               MemberFactory.createGenerateSasFunction fileDetails :> MemberInfo ])

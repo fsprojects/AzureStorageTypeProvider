@@ -6,7 +6,7 @@ open System
 
 type internal containerItem =
     | Folder of path:string * name:string * contents:(unit -> array<containerItem>)
-    | Blob of path:string * name:string
+    | Blob of path:string * name:string * properties:BlobProperties
 
 type internal LightweightContainer = 
     { Name : string
@@ -29,12 +29,14 @@ let rec private getContainerStructure wildcard (container : CloudBlobContainer) 
            match item with
            | :? CloudBlobDirectory as directory -> 
                let path,name = getItemName directory.Prefix directory.Parent
-               Some
-                   (Folder(path,name,(fun () -> container |> getContainerStructure directory.Prefix)))
-           | :? CloudBlockBlob as blob -> Some(Blob(getItemName blob.Name blob.Parent))
+               Some (Folder(path,name,(fun () -> container |> getContainerStructure directory.Prefix)))
+           | :? CloudBlockBlob as blob ->
+               let path, name = getItemName blob.Name blob.Parent
+               Some(Blob(path, name, blob.Properties))
            | :? CloudPageBlob -> None //todo: Handle page blobs!
            | _ -> failwith "unknown type")
     |> Seq.toArray
+
 
 let internal getBlobStorageAccountManifest connection = 
     (getCloudClient connection).ListContainers()

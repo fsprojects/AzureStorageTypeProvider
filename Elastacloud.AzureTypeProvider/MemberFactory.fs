@@ -3,6 +3,7 @@
 open Elastacloud.FSharp.AzureTypeProvider.AzureRepository
 open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Quotations
+open Microsoft.WindowsAzure.Storage.Blob
 open Samples.FSharp.ProvidedTypes
 open System
 open System.Reflection
@@ -84,9 +85,7 @@ let getFolderDetailsProperties folderDetails =
          ((sprintf "Files: %d, Folder size: %dgb" files folderSize), typeof<int * int>, IsStatic = true, 
          GetterCode = (fun args -> <@@ files, folderSize @@>))
 
-let createFileDetailsProperty fileDetails = 
-    let connectionString, container, fileName = fileDetails
-    let uri, properties = AzureRepository.getFileDetails connectionString container fileName
+let createFileDetailsProperty path (properties:BlobProperties) = 
     let output = 
         let unit,getSize = match properties.Length with
                            | _ when properties.Length < 1024L -> "B", (fun x -> x)
@@ -96,7 +95,7 @@ let createFileDetailsProperty fileDetails =
                            | _ -> "TB", (fun x -> x / 1099511627776.0)
         let sizeText = String.Format("{0:0.0} {1}", getSize (float properties.Length), unit)
         ProvidedProperty
-            ((sprintf "%s (%s)" (properties.BlobType.ToString()) sizeText), typeof<string>, GetterCode = (fun args -> <@@ uri @@>), 
+            ((sprintf "%s (%s)" (properties.BlobType.ToString()) sizeText), typeof<string>, GetterCode = (fun args -> <@@ path @@>), 
              IsStatic = true)
-    output.AddXmlDocDelayed(fun () -> "Gives you basic details on this file in Azure. The property evaluates to the full URI of this blob.")
+    output.AddXmlDocDelayed(fun () -> "Gives you basic details on this file in Azure. The property evaluates to the path of this blob.")
     output
