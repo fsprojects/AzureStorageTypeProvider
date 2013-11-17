@@ -86,7 +86,7 @@ let getFolderDetailsProperties folderDetails =
 
 let createFileDetailsProperty fileDetails = 
     let connectionString, container, fileName = fileDetails
-    let uri, properties = AzureRepository.getDetails connectionString container fileName
+    let uri, properties = AzureRepository.getFileDetails connectionString container fileName
     let output = 
         let unit,getSize = match properties.Length with
                            | _ when properties.Length < 1024L -> "B", (fun x -> x)

@@ -71,7 +71,7 @@ let uploadFile connection container path =
     let blobRef = getBlobRef connection container fileName
     awaitUnit (blobRef.UploadFromFileAsync(path, IO.FileMode.Open))
 
-let getDetails connection container fileName = 
+let getFileDetails connection container fileName = 
     let blobRef = getBlobRef connection container fileName
     blobRef.FetchAttributes()
     blobRef.Uri.AbsoluteUri, blobRef.Properties

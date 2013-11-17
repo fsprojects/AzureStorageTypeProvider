@@ -9,11 +9,12 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Elastacloud.AzureTypeProvider</RootNamespace>
     <AssemblyName>Elastacloud.AzureTypeProvider</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <Name>Elastacloud.AzureTypeProvider</Name>
     <TargetFSharpCoreVersion>4.3.0.0</TargetFSharpCoreVersion>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -76,7 +77,6 @@
     <None Include="Script.fsx" />
     <None Include="packages.config" />
     <None Include="App.config" />
-    <Compile Include="HelloWorldTypeProvider.fs" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
