@@ -9,12 +9,14 @@ open System.Reflection
 
 let rec private createFileItem connectionString containerName fileItem = 
     match fileItem with
-    | Folder(path, name, contents) -> 
+    | Folder(path, name, getContents) -> 
         let folderProp = ProvidedTypeDefinition("/" + name, Some typeof<obj>)
-        folderProp.AddMembersDelayed(fun _ -> 
-            [] @ (contents()
-                  |> Array.map (createFileItem connectionString containerName)
-                  |> Array.toList))
+        folderProp.AddMembersDelayed
+            (fun _ -> 
+            [ MemberFactory.createDownloadFolderFunction (connectionString, containerName, path) :> MemberInfo ] 
+            @ (getContents()
+               |> Array.map (createFileItem connectionString containerName)
+               |> Array.toList))
         folderProp :> MemberInfo
     | Blob(path, name, properties) -> 
         let fileDetails = connectionString, containerName, path

@@ -3,6 +3,7 @@
 open Microsoft.WindowsAzure.Storage
 open Microsoft.WindowsAzure.Storage.Blob
 open System
+open System.IO
 
 type internal containerItem =
     | Folder of path:string * name:string * contents:(unit -> array<containerItem>)
@@ -66,12 +67,25 @@ let downloadData connection container fileName =
 
 let downloadToFile connection container fileName path = 
     let blobRef = getBlobRef connection container fileName
-    awaitUnit (blobRef.DownloadToFileAsync(path, IO.FileMode.Create))
+
+    let targetDirectory = Path.GetDirectoryName(path)
+    if not (Directory.Exists targetDirectory) then Directory.CreateDirectory targetDirectory |> ignore
+    blobRef.DownloadToFileAsync(path, IO.FileMode.Create) |> awaitUnit
+
+let downloadFolder connection container folderPath path =
+    let containerRef = (getCloudClient connection).GetContainerReference(container)
+    containerRef.ListBlobs(prefix = folderPath, useFlatBlobListing = true)
+    |> Seq.choose(fun b -> match b with
+                           | :? CloudBlockBlob as b -> Some b
+                           | _ -> None)
+    |> Seq.map(fun blob -> downloadToFile connection container blob.Name (Path.Combine(path, blob.Name.Replace(folderPath, String.Empty))))
+    |> Async.Parallel
+    |> Async.Ignore
 
 let uploadFile connection container path = 
     let fileName = IO.Path.GetFileName path
     let blobRef = getBlobRef connection container fileName
-    awaitUnit (blobRef.UploadFromFileAsync(path, IO.FileMode.Open))
+    awaitUnit (blobRef.UploadFromFileAsync(path, FileMode.Open))
 
 let getFileDetails connection container fileName = 
     let blobRef = getBlobRef connection container fileName

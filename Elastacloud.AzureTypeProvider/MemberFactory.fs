@@ -54,6 +54,18 @@ let createDownloadFileFunction fileDetails =
     output.AddXmlDocDelayed(fun () -> "Downloads this file to the local file system asynchronously.")
     output
 
+let createDownloadFolderFunction (connectionString, container, folderPath) = 
+    let output = 
+        ProvidedMethod
+            (methodName = "DownloadFolder", parameters = [ ProvidedParameter("path", typeof<string>) ], 
+             returnType = typeof<Async<unit>>, 
+             
+             InvokeCode = (fun (args : Expr list) -> 
+             <@@ AzureRepository.downloadFolder connectionString container folderPath %%args.[0] @@>), 
+             IsStaticMethod = true)
+    output.AddXmlDocDelayed(fun () -> "Downloads the entire folder contents to the local file system asynchronously.")
+    output
+
 let createUploadFileFunction fileDetails = 
     let connectionString, container = fileDetails
     let output = 
@@ -82,20 +94,23 @@ let getFolderDetailsProperties folderDetails =
     let connectionString, container, folder = folderDetails
     let files, folderSize = 123, 1200
     ProvidedProperty
-         ((sprintf "Files: %d, Folder size: %dgb" files folderSize), typeof<int * int>, IsStatic = true, 
+        ((sprintf "Files: %d, Folder size: %dgb" files folderSize), typeof<int * int>, IsStatic = true, 
          GetterCode = (fun args -> <@@ files, folderSize @@>))
 
-let createFileDetailsProperty path (properties:BlobProperties) = 
+let createFileDetailsProperty path (properties : BlobProperties) = 
     let output = 
-        let unit,getSize = match properties.Length with
-                           | _ when properties.Length < 1024L -> "B", (fun x -> x)
-                           | _ when properties.Length < 1048576L -> "KB", (fun x -> x / 1024.0)
-                           | _ when properties.Length < 1073741824L -> "MB", (fun x -> x / 1048576.0)
-                           | _ when properties.Length < 1099511627776L -> "GB", (fun x -> x / 1073741824.0)
-                           | _ -> "TB", (fun x -> x / 1099511627776.0)
+        let unit, getSize = 
+            match properties.Length with
+            | _ when properties.Length < 1024L -> "B", (fun x -> x)
+            | _ when properties.Length < 1048576L -> "KB", (fun x -> x / 1024.0)
+            | _ when properties.Length < 1073741824L -> "MB", (fun x -> x / 1048576.0)
+            | _ when properties.Length < 1099511627776L -> "GB", (fun x -> x / 1073741824.0)
+            | _ -> "TB", (fun x -> x / 1099511627776.0)
+        
         let sizeText = String.Format("{0:0.0} {1}", getSize (float properties.Length), unit)
         ProvidedProperty
-            ((sprintf "%s (%s)" (properties.BlobType.ToString()) sizeText), typeof<string>, GetterCode = (fun args -> <@@ path @@>), 
-             IsStatic = true)
-    output.AddXmlDocDelayed(fun () -> "Gives you basic details on this file in Azure. The property evaluates to the path of this blob.")
+            ((sprintf "%s (%s)" (properties.BlobType.ToString()) sizeText), typeof<string>, 
+             GetterCode = (fun args -> <@@ path @@>), IsStatic = true)
+    output.AddXmlDocDelayed
+        (fun () -> "Gives you basic details on this file in Azure. The property evaluates to the path of this blob.")
     output
