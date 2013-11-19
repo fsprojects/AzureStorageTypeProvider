@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>@project@</id>
+        <version>@build.number@</version>
+        <title>Windows Azure Type Provider</title>
+        <authors>@authors@</authors>
+        <owners>@authors@</owners>
+        <language>en-US</language>
+        <projectUrl>https://github.com/isaacabraham/AzureTypeProvider</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>@description@</description>
+        <tags>azure, f#, type provider, blob, script</tags>
+        @dependencies@
+    </metadata>
+    <files>
+        <file src="..\src\nuget\init.ps1" target="tools" />
+    </files>
+</package>

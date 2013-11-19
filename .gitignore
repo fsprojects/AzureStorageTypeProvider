@@ -27,6 +27,10 @@ obj/
 [Rr]elease*/
 _ReSharper*/
 [Tt]est[Rr]esult*
-
 packages/*
 *.nupkg
+.build/
+build/
+deploy/
+docs/
+nuget/
