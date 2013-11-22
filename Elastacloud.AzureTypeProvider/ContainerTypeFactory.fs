@@ -32,8 +32,8 @@ let rec private createFileItem connectionString containerName fileItem =
 let createContainerType (connectionString, (container : LightweightContainer)) = 
     let individualContainerType = ProvidedTypeDefinition(container.Name, Some typeof<obj>)
     individualContainerType.AddMembersDelayed(fun _ -> 
-        container.GetFiles()
-        |> Seq.map (createFileItem connectionString container.Name)
-        |> Seq.toList)
-    individualContainerType.AddMember(MemberFactory.createUploadFileFunction (connectionString, container.Name))
+        (container.GetFiles()
+         |> Seq.map (createFileItem connectionString container.Name)
+         |> Seq.toList) @ [ MemberFactory.createUploadFileFunction (connectionString, container.Name)
+                            MemberFactory.createDownloadContainerFunction (connectionString, container.Name) ])
     individualContainerType

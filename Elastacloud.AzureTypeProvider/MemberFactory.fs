@@ -54,25 +54,30 @@ let createDownloadFileFunction fileDetails =
     output.AddXmlDocDelayed(fun () -> "Downloads this file to the local file system asynchronously.")
     output
 
-let createDownloadFolderFunction (connectionString, container, folderPath) = 
+let private createDownloadMultipleFilesFunction connectionString container folderPath methodName comment =
     let output = 
         ProvidedMethod
-            (methodName = "DownloadFolder", parameters = [ ProvidedParameter("path", typeof<string>) ], 
-             returnType = typeof<Async<unit>>, 
-             
+            (methodName = methodName,
+             parameters = [ ProvidedParameter("path", typeof<string>) ],
+             returnType = typeof<Async<unit>>,              
              InvokeCode = (fun (args : Expr list) -> 
              <@@ AzureRepository.downloadFolder connectionString container folderPath %%args.[0] @@>), 
              IsStaticMethod = true)
-    output.AddXmlDocDelayed(fun () -> "Downloads the entire folder contents to the local file system asynchronously.")
+    output.AddXmlDocDelayed(fun () -> comment)
     output
+
+let createDownloadFolderFunction (connectionString, container, folderPath) =
+    createDownloadMultipleFilesFunction connectionString container folderPath "DownloadFolder" "Downloads the entire folder contents to the local file system asynchronously."
+
+let createDownloadContainerFunction (connectionString, container) =
+    createDownloadMultipleFilesFunction connectionString container String.Empty "DownloadContainer" "Downloads the entire container contents to the local file system asynchronously."
 
 let createUploadFileFunction fileDetails = 
     let connectionString, container = fileDetails
     let output = 
         ProvidedMethod
             (methodName = "UploadFile", parameters = [ ProvidedParameter("path", typeof<string>) ], 
-             returnType = typeof<Async<unit>>, 
-             
+             returnType = typeof<Async<unit>>,              
              InvokeCode = (fun (args : Expr list) -> 
              <@@ AzureRepository.uploadFile connectionString container %%args.[0] @@>), IsStaticMethod = true)
     output.AddXmlDocDelayed(fun () -> "Uploads a file to this container.")

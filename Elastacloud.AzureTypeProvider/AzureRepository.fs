@@ -78,7 +78,11 @@ let downloadFolder connection container folderPath path =
     |> Seq.choose(fun b -> match b with
                            | :? CloudBlockBlob as b -> Some b
                            | _ -> None)
-    |> Seq.map(fun blob -> downloadToFile connection container blob.Name (Path.Combine(path, blob.Name.Replace(folderPath, String.Empty))))
+    |> Seq.map(fun blob ->
+        let targetName = match folderPath with
+                        | folderPath when String.IsNullOrEmpty folderPath -> blob.Name
+                        | _ -> blob.Name.Replace(folderPath, String.Empty)
+        downloadToFile connection container blob.Name (Path.Combine(path, targetName)))
     |> Async.Parallel
     |> Async.Ignore
 

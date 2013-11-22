@@ -15,7 +15,8 @@ type AzureAccountTypeProvider() as this =
     let buildConnectionString (args : obj []) = 
         let accountName = args.[0] :?> string
         let accountKey = args.[1] :?> string
-        if accountName = null || accountKey = null then "UseDevelopmentStorage=true"
+        let blankArgs = [ accountName; accountKey ] |> Seq.exists (fun param -> String.IsNullOrEmpty(param.Trim()))
+        if blankArgs then "UseDevelopmentStorage=true"
         else sprintf "DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;" accountName accountKey
     
     let buildTypes (typeName : string) (args : obj []) = 
