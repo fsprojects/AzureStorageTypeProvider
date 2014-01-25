@@ -1,4 +1,5 @@
-﻿module Elastacloud.FSharp.AzureTypeProvider.AzureRepository
+﻿///Contains helper functions for accessing blobs
+module Elastacloud.FSharp.AzureTypeProvider.Repositories.BlobRepository
 
 open Microsoft.WindowsAzure.Storage
 open Microsoft.WindowsAzure.Storage.Blob
@@ -13,9 +14,9 @@ type internal LightweightContainer =
     { Name : string
       GetFiles : unit -> seq<containerItem> }
 
-let private getCloudClient connection = CloudStorageAccount.Parse(connection).CreateCloudBlobClient()
+let private getBlobClient connection = CloudStorageAccount.Parse(connection).CreateCloudBlobClient()
 let private getBlobRef connection container file = 
-    (getCloudClient connection).GetContainerReference(container).GetBlockBlobReference(file)
+    (getBlobClient connection).GetContainerReference(container).GetBlockBlobReference(file)
 
 /// Generates a set of lightweight container lists for a blob storage account
 let private getItemName (item : string) (parent : CloudBlobDirectory) = 
@@ -40,7 +41,7 @@ let rec private getContainerStructure wildcard (container : CloudBlobContainer) 
 
 
 let internal getBlobStorageAccountManifest connection = 
-    (getCloudClient connection).ListContainers()
+    (getBlobClient connection).ListContainers()
     |> Seq.toList
     |> List.map (fun c -> 
            { Name = c.Name
@@ -73,7 +74,7 @@ let downloadToFile connection container fileName path =
     blobRef.DownloadToFileAsync(path, IO.FileMode.Create) |> awaitUnit
 
 let downloadFolder connection container folderPath path =
-    let containerRef = (getCloudClient connection).GetContainerReference(container)
+    let containerRef = (getBlobClient connection).GetContainerReference(container)
     containerRef.ListBlobs(prefix = folderPath, useFlatBlobListing = true)
     |> Seq.choose(fun b -> match b with
                            | :? CloudBlockBlob as b -> Some b

@@ -1,6 +1,7 @@
-﻿module internal Elastacloud.FSharp.AzureTypeProvider.MemberFactory
+﻿/// Responsible for generating invidual member functions for a single blob.
+module internal Elastacloud.FSharp.AzureTypeProvider.MemberFactories.BlobMemberFactory
 
-open Elastacloud.FSharp.AzureTypeProvider.AzureRepository
+open Elastacloud.FSharp.AzureTypeProvider.Repositories
 open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Quotations
 open Microsoft.WindowsAzure.Storage.Blob
@@ -22,16 +23,16 @@ let createDownloadFunction fileDetails =
     let methodBody, returnType, comment = 
         match fileName with
         | Text -> 
-            let methodBody = (fun _ -> <@@ AzureRepository.downloadText connectionString container fileName @@>)
+            let methodBody = (fun _ -> <@@ BlobRepository.downloadText connectionString container fileName @@>)
             methodBody, typeof<Async<string>>, "a string"
         | XML -> 
-            let methodBody = (fun _ -> <@@ async { let! text = AzureRepository.downloadText connectionString container 
+            let methodBody = (fun _ -> <@@ async { let! text = BlobRepository.downloadText connectionString container 
                                                                    fileName
                                                    return XDocument.Parse text } @@>)
             methodBody, typeof<Async<XDocument>>, "an XDocument"
         | Binary -> 
             let methodBody = 
-                (fun (args : Expr list) -> <@@ AzureRepository.downloadData connectionString container fileName @@>)
+                (fun (args : Expr list) -> <@@ BlobRepository.downloadData connectionString container fileName @@>)
             methodBody, typeof<Async<Byte []>>, "a byte array"
     
     let output = 
@@ -49,7 +50,7 @@ let createDownloadFileFunction fileDetails =
              returnType = typeof<Async<unit>>, 
              
              InvokeCode = (fun (args : Expr list) -> 
-             <@@ AzureRepository.downloadToFile connectionString container fileName %%args.[0] @@>), 
+             <@@ BlobRepository.downloadToFile connectionString container fileName %%args.[0] @@>), 
              IsStaticMethod = true)
     output.AddXmlDocDelayed(fun () -> "Downloads this file to the local file system asynchronously.")
     output
@@ -61,7 +62,7 @@ let private createDownloadMultipleFilesFunction connectionString container folde
              parameters = [ ProvidedParameter("path", typeof<string>) ],
              returnType = typeof<Async<unit>>,              
              InvokeCode = (fun (args : Expr list) -> 
-             <@@ AzureRepository.downloadFolder connectionString container folderPath %%args.[0] @@>), 
+             <@@ BlobRepository.downloadFolder connectionString container folderPath %%args.[0] @@>), 
              IsStaticMethod = true)
     output.AddXmlDocDelayed(fun () -> comment)
     output
@@ -79,7 +80,7 @@ let createUploadFileFunction fileDetails =
             (methodName = "UploadFile", parameters = [ ProvidedParameter("path", typeof<string>) ], 
              returnType = typeof<Async<unit>>,              
              InvokeCode = (fun (args : Expr list) -> 
-             <@@ AzureRepository.uploadFile connectionString container %%args.[0] @@>), IsStaticMethod = true)
+             <@@ BlobRepository.uploadFile connectionString container %%args.[0] @@>), IsStaticMethod = true)
     output.AddXmlDocDelayed(fun () -> "Uploads a file to this container.")
     output
 
@@ -91,7 +92,7 @@ let createGenerateSasFunction fileDetails =
              parameters = [ ProvidedParameter("duration", typeof<TimeSpan>) ], returnType = typeof<Uri>, 
              
              InvokeCode = (fun (args : Expr list) -> 
-             <@@ AzureRepository.getSas connectionString container fileName %%args.[0] @@>), IsStaticMethod = true)
+             <@@ BlobRepository.getSas connectionString container fileName %%args.[0] @@>), IsStaticMethod = true)
     output.AddXmlDocDelayed(fun () -> "Generates a full-access shared access signature URI for this blob.")
     output
 

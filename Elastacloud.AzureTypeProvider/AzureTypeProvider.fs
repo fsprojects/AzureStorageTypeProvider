@@ -18,20 +18,22 @@ type AzureAccountTypeProvider() as this =
         let blankArgs = [ accountName; accountKey ] |> Seq.exists (fun param -> String.IsNullOrEmpty(param.Trim()))
         if blankArgs then "UseDevelopmentStorage=true"
         else sprintf "DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;" accountName accountKey
-    
+            
     let buildTypes (typeName : string) (args : obj []) = 
-        let containerListingType = ProvidedTypeDefinition("Containers", Some typeof<obj>)
+        // Create the top level property
         let typeProviderForAccount = 
             ProvidedTypeDefinition(thisAssembly, namespaceName, typeName, baseType = Some typeof<obj>)
-        let connectionString = buildConnectionString args
         typeProviderForAccount.AddMember(ProvidedConstructor(parameters = [], InvokeCode = (fun args -> <@@ null @@>)))
-        typeProviderForAccount.AddMember(containerListingType)
-        containerListingType.AddMembersDelayed
-            (fun _ -> 
-            AzureRepository.getBlobStorageAccountManifest (connectionString) 
-            |> List.map (fun container -> ContainerTypeFactory.createContainerType (connectionString, container)))
+        let connectionString = buildConnectionString args
+        
+        // Now create child members e.g. containers, tables etc.
+        typeProviderForAccount.AddMembers
+            ([ ContainerTypeFactory.getBlobStorageMembers
+               ContainerTypeFactory.getTableStorageMembers ]
+            |> List.map (fun builder -> builder connectionString))
         typeProviderForAccount
     
+    // Parameterising the provider
     let parameters = 
         [ ProvidedStaticParameter("accountName", typeof<string>, String.Empty)
           ProvidedStaticParameter("accountKey", typeof<string>, String.Empty) ]
