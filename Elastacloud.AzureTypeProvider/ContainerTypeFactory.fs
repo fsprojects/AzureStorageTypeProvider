@@ -58,7 +58,8 @@ let private createTableType connectionString (domainType : ProvidedTypeDefinitio
     tableProperty.AddMembersDelayed(fun _ -> 
         let tableEntityType = ProvidedTypeDefinition(tableName + "Entity", Some typeof<LightweightTableEntity>)
         tableEntityType.HideObjectMethods <- true
-        getRowsForSchema 20 connectionString tableName
+        tableName
+        |> getRowsForSchema 5 connectionString
         |> setPropertiesForEntity tableEntityType
         
         domainType.AddMember(tableEntityType)
