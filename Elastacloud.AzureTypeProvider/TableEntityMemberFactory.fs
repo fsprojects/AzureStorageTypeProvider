@@ -1,21 +1,17 @@
 ﻿/// Responsible for creating members on an individual table entity.
-module Elastacloud.FSharp.AzureTypeProvider.MemberFactories.TableEntityMemberFactory
+module internal Elastacloud.FSharp.AzureTypeProvider.MemberFactories.TableEntityMemberFactory
 
 open Microsoft.WindowsAzure.Storage.Table
 open Samples.FSharp.ProvidedTypes
 open System
 open System.Reflection
 open Elastacloud.FSharp.AzureTypeProvider.Repositories.TableRepository
+open Elastacloud.FSharp.AzureTypeProvider.Utils
 
 let private getDistinctProperties (tableEntities : #seq<DynamicTableEntity>) = 
     tableEntities
     |> Seq.collect (fun x -> x.Properties)
     |> Seq.distinctBy (fun x -> x.Key)
-
-let asOption<'T when 'T:(new : unit -> 'T) and 'T:struct and 'T :> ValueType> (value:System.Nullable<'T>)  =
-    if value.HasValue then Some value.Value else None
-let toOption data = if data = null then None else Some data
-let toDefault data defaultValue = if data = null then defaultValue else data
 
 let setPropertiesForEntity (entityType:ProvidedTypeDefinition) (tableEntities:#seq<DynamicTableEntity>) = 
     let properties = tableEntities |> getDistinctProperties
@@ -32,5 +28,5 @@ let setPropertiesForEntity (entityType:ProvidedTypeDefinition) (tableEntities:#s
             | EdmType.Int32 -> ProvidedProperty(key, typeof<int option>, GetterCode = (fun args -> <@@ if (%%args.[0]:LightweightTableEntity).Values.ContainsKey(key) then (%%args.[0]:LightweightTableEntity).Values.[key].Int32Value |> asOption else None @@>))
             | EdmType.Int64 -> ProvidedProperty(key, typeof<int64 option>, GetterCode = (fun args -> <@@ if (%%args.[0]:LightweightTableEntity).Values.ContainsKey(key) then (%%args.[0]:LightweightTableEntity).Values.[key].Int64Value |> asOption else None @@>))
             | EdmType.String -> ProvidedProperty(key, typeof<string option>, GetterCode = (fun args -> <@@ if (%%args.[0]:LightweightTableEntity).Values.ContainsKey(key) then (%%args.[0]:LightweightTableEntity).Values.[key].StringValue |> toOption else None @@>))
-            | _ -> ProvidedProperty(key, typeof<obj>, GetterCode = (fun args -> <@@ (%%args.[0]:LightweightTableEntity).Values.[key].PropertyAsObject @@>)))
+            | _ -> ProvidedProperty(key, typeof<obj>, GetterCode = (fun args -> <@@ if (%%args.[0]:LightweightTableEntity).Values.ContainsKey(key) then Some ((%%args.[0]:LightweightTableEntity).Values.[key].PropertyAsObject) else None @@>)))
         |> Seq.toList)

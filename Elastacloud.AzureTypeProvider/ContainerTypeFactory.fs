@@ -66,7 +66,7 @@ let private createTableType connectionString (domainType : ProvidedTypeDefinitio
         let methods = 
             [ ProvidedMethod
                   ("GetPartition", [ ProvidedParameter("key", typeof<string>) ], tableEntityType.MakeArrayType(),
-                   InvokeCode = (fun args -> <@@ getRows connectionString tableName %%args.[0] @@>))]
+                   InvokeCode = (fun args -> <@@ getRows connectionString tableName %%args.[0] @@>)) ]
         for m in methods do
             m.IsStaticMethod <- true
         methods)
@@ -75,7 +75,7 @@ let private createTableType connectionString (domainType : ProvidedTypeDefinitio
 /// Builds up the Table Storage member
 let getTableStorageMembers connectionString domainType = 
     let tableListingType = ProvidedTypeDefinition("Tables", Some typeof<obj>)
-    tableListingType.AddMembersDelayed(fun _ -> 
+    tableListingType.AddMembersDelayed(fun _ ->
         TableRepository.getTables connectionString
         |> Seq.map (createTableType connectionString domainType)
         |> Seq.toList)
