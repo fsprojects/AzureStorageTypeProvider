@@ -11,7 +11,7 @@ type LightweightTableEntity =
     { PartitionKey : string
       RowKey : string
       Timestamp : System.DateTimeOffset
-      Values : Map<string,EntityProperty> }
+      Values : Map<string,obj> }
 
 let private getTable table connection = 
     let client = getTableClient connection
@@ -38,5 +38,5 @@ let getRows connection tableName partitionKey =
         |> Seq.map(fun dte -> { PartitionKey = dte.PartitionKey
                                 RowKey = dte.RowKey
                                 Timestamp = dte.Timestamp
-                                Values = dte.Properties |> Seq.map(fun p -> p.Key, p.Value) |> Map.ofSeq })
+                                Values = dte.Properties |> Seq.map(fun p -> p.Key, p.Value.PropertyAsObject) |> Map.ofSeq })
         |> Seq.toArray
