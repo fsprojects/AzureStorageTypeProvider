@@ -89,10 +89,9 @@ let createGenerateSasFunction fileDetails =
     let output = 
         ProvidedMethod
             (methodName = "GenerateSharedAccessSignature", 
-             parameters = [ ProvidedParameter("duration", typeof<TimeSpan>) ], returnType = typeof<Uri>, 
-             
-             InvokeCode = (fun (args : Expr list) -> 
-             <@@ BlobRepository.getSas connectionString container fileName %%args.[0] @@>), IsStaticMethod = true)
+             parameters = [ ProvidedParameter("duration", typeof<TimeSpan>) ],
+             returnType = typeof<Uri>,             
+             InvokeCode = (fun (args : Expr list) -> <@@ BlobRepository.getSas connectionString container fileName %%args.[0] @@>), IsStaticMethod = true)
     output.AddXmlDocDelayed(fun () -> "Generates a full-access shared access signature URI for this blob.")
     output
 

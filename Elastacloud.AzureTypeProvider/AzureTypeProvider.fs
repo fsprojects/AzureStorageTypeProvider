@@ -9,8 +9,10 @@ open System.Reflection
 [<TypeProvider>]
 type AzureAccountTypeProvider() as this = 
     inherit TypeProviderForNamespaces()
+
     let namespaceName = "Elastacloud.FSharp.AzureTypeProvider"
     let thisAssembly = Assembly.GetExecutingAssembly()
+    let azureAccountType = ProvidedTypeDefinition(thisAssembly, namespaceName, "AzureAccount", baseType = Some typeof<obj>)
     
     let buildConnectionString (args : obj []) = 
         let accountName = args.[0] :?> string
@@ -30,7 +32,7 @@ type AzureAccountTypeProvider() as this =
         typeProviderForAccount.AddMembers
             ([ ContainerTypeFactory.getBlobStorageMembers
                ContainerTypeFactory.getTableStorageMembers ]
-            |> List.map (fun builder -> builder connectionString))
+            |> List.map (fun builder -> builder connectionString azureAccountType))
         typeProviderForAccount
     
     // Parameterising the provider
@@ -38,8 +40,6 @@ type AzureAccountTypeProvider() as this =
         [ ProvidedStaticParameter("accountName", typeof<string>, String.Empty)
           ProvidedStaticParameter("accountKey", typeof<string>, String.Empty) ]
     
-    let azureAccountType = 
-        ProvidedTypeDefinition(thisAssembly, namespaceName, "AzureAccount", baseType = Some typeof<obj>)
     do azureAccountType.DefineStaticParameters(parameters, buildTypes)
     do this.AddNamespace(namespaceName, [ azureAccountType ])
 

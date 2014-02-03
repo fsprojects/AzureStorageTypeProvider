@@ -7,6 +7,12 @@ open Microsoft.WindowsAzure.Storage.Table.Queryable
 
 let private getTableClient connection = CloudStorageAccount.Parse(connection).CreateCloudTableClient()
 
+type LightweightTableEntity = 
+    { PartitionKey : string
+      RowKey : string
+      Timestamp : System.DateTimeOffset
+      Values : Map<string,EntityProperty> }
+
 let private getTable table connection = 
     let client = getTableClient connection
     client.GetTableReference table
@@ -16,26 +22,21 @@ let getTables connection =
     let client = getTableClient connection
     client.ListTables() |> Seq.map (fun table -> table.Name)
 
-/// Gets the top n rows from a table
-let getTopRows rowCount tableName connection = 
-    try 
+let getRowsForSchema rowCount connection tableName = 
+    let table = getTable tableName connection
+    let query = table.CreateQuery<DynamicTableEntity>()
+    query.TakeCount <- System.Nullable<int>(rowCount)
+    query.Execute()
+    |> Seq.take rowCount
+    |> Seq.toArray
+
+let getRows connection tableName partitionKey = 
         let table = getTable tableName connection
-        
-//        let tableQuery = 
-//            query { 
-//                for row in table.CreateQuery<DynamicTableEntity>() do
-//                    take rowCount
-//                    select row
-//            }
-        table.CreateQuery<DynamicTableEntity>()
-        |> Seq.map (fun row -> 
-                    row.PartitionKey, row.RowKey, row.Timestamp,
-                    row.Properties
-                    |> Seq.filter (fun p -> p.Key <> "Token")
-                    |> Seq.map (fun p -> p.Key, p.Value.PropertyAsObject)
-                    |> Seq.toList)
+        query { for row in table.CreateQuery<DynamicTableEntity>() do
+                where (row.PartitionKey = partitionKey) }
         |> Seq.toList
-    with ex -> 
-        [ "Exception", "0", System.DateTimeOffset(), 
-          [ "Type", ex.GetType().FullName :> obj
-            "Message", ex.Message :> obj ] ]
+        |> Seq.map(fun dte -> { PartitionKey = dte.PartitionKey
+                                RowKey = dte.RowKey
+                                Timestamp = dte.Timestamp
+                                Values = dte.Properties |> Seq.map(fun p -> p.Key, p.Value) |> Map.ofSeq })
+        |> Seq.toArray
