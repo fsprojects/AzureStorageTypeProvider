@@ -2,10 +2,10 @@
 module internal Elastacloud.FSharp.AzureTypeProvider.ContainerTypeFactory
 
 open Elastacloud.FSharp.AzureTypeProvider.MemberFactories
+open Elastacloud.FSharp.AzureTypeProvider.MemberFactories.TableEntityMemberFactory
 open Elastacloud.FSharp.AzureTypeProvider.Repositories
 open Elastacloud.FSharp.AzureTypeProvider.Repositories.BlobRepository
 open Elastacloud.FSharp.AzureTypeProvider.Repositories.TableRepository
-open Elastacloud.FSharp.AzureTypeProvider.MemberFactories.TableEntityMemberFactory
 open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Quotations
 open Microsoft.WindowsAzure.Storage.Table
@@ -55,27 +55,30 @@ let getBlobStorageMembers connectionString _ =
 // Creates an individual Table member
 let private createTableType connectionString (domainType : ProvidedTypeDefinition) tableName = 
     let tableProperty = ProvidedTypeDefinition(tableName, Some typeof<obj>)
-    tableProperty.AddMembersDelayed(fun _ -> 
+    tableProperty.AddMembersDelayed
+        (fun _ -> 
         let tableEntityType = ProvidedTypeDefinition(tableName + "Entity", Some typeof<LightweightTableEntity>)
         tableEntityType.HideObjectMethods <- true
         tableName
         |> getRowsForSchema 5 connectionString
         |> setPropertiesForEntity tableEntityType
-        
         domainType.AddMember(tableEntityType)
-        let methods = 
-            [ ProvidedMethod
-                  ("GetPartition", [ ProvidedParameter("key", typeof<string>) ], tableEntityType.MakeArrayType(),
-                   InvokeCode = (fun args -> <@@ getRows connectionString tableName %%args.[0] @@>)) ]
-        for m in methods do
-            m.IsStaticMethod <- true
-        methods)
+        let partitionType = createPartitionType connectionString domainType tableName tableEntityType
+        [ ProvidedMethod
+              ("GetPartition", [ ProvidedParameter("key", typeof<string>) ], partitionType, 
+               InvokeCode = (fun args -> <@@ (%%args.[0] : string) @@>), IsStaticMethod = true)
+                    
+          ProvidedMethod
+              ("GetEntity", 
+               [ ProvidedParameter("key", typeof<string>)
+                 ProvidedParameter("partition", typeof<string>, optionalValue = null) ], (typeof<option<_>>).GetGenericTypeDefinition().MakeGenericType(tableEntityType),
+               InvokeCode = (fun args -> <@@ getEntity connectionString tableName (%%args.[0]:string) (%%args.[1]:string) @@>), IsStaticMethod = true) ])
     tableProperty
 
 /// Builds up the Table Storage member
 let getTableStorageMembers connectionString domainType = 
     let tableListingType = ProvidedTypeDefinition("Tables", Some typeof<obj>)
-    tableListingType.AddMembersDelayed(fun _ ->
+    tableListingType.AddMembersDelayed(fun _ -> 
         TableRepository.getTables connectionString
         |> Seq.map (createTableType connectionString domainType)
         |> Seq.toList)
