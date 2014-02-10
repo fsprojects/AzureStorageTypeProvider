@@ -53,7 +53,7 @@ let getBlobStorageMembers connectionString _ =
     containerListingType
 
 // Creates an individual Table member
-let private createTableType connectionString (domainType : ProvidedTypeDefinition) tableName = 
+let private createTableType (domainType : ProvidedTypeDefinition) connectionString tableName = 
     let tableProperty = ProvidedTypeDefinition(tableName, Some typeof<obj>)
     tableProperty.AddMembersDelayed
         (fun _ -> 
@@ -63,16 +63,20 @@ let private createTableType connectionString (domainType : ProvidedTypeDefinitio
         |> getRowsForSchema 5 connectionString
         |> setPropertiesForEntity tableEntityType
         domainType.AddMember(tableEntityType)
-        let partitionType = createPartitionType connectionString domainType tableName tableEntityType
+        let partitionType = createPartitionType domainType tableEntityType connectionString tableName
         [ ProvidedMethod
               ("GetPartition", [ ProvidedParameter("key", typeof<string>) ], partitionType, 
                InvokeCode = (fun args -> <@@ (%%args.[0] : string) @@>), IsStaticMethod = true)
+
+          ProvidedMethod
+              ("ExecuteQuery", [ ProvidedParameter("queryPairs", typeof<seq<string*string>>) ], (tableEntityType.MakeArrayType()),
+               InvokeCode = (fun args -> <@@ executeWeakQuery (%%args.[0] : seq<string*string>) connectionString tableName @@>), IsStaticMethod = true)
                     
           ProvidedMethod
               ("GetEntity", 
                [ ProvidedParameter("key", typeof<string>)
                  ProvidedParameter("partition", typeof<string>, optionalValue = null) ], (typeof<option<_>>).GetGenericTypeDefinition().MakeGenericType(tableEntityType),
-               InvokeCode = (fun args -> <@@ getEntity connectionString tableName (%%args.[0]:string) (%%args.[1]:string) @@>), IsStaticMethod = true) ])
+               InvokeCode = (fun args -> <@@ getEntity (%%args.[0]:string) (%%args.[1]:string) connectionString tableName @@>), IsStaticMethod = true) ])
     tableProperty
 
 /// Builds up the Table Storage member
@@ -80,6 +84,6 @@ let getTableStorageMembers connectionString domainType =
     let tableListingType = ProvidedTypeDefinition("Tables", Some typeof<obj>)
     tableListingType.AddMembersDelayed(fun _ -> 
         TableRepository.getTables connectionString
-        |> Seq.map (createTableType connectionString domainType)
+        |> Seq.map (createTableType domainType connectionString)
         |> Seq.toList)
     tableListingType

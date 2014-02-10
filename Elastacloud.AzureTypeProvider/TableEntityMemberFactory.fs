@@ -14,13 +14,12 @@ let private getDistinctProperties (tableEntities : #seq<DynamicTableEntity>) =
     |> Seq.distinctBy (fun x -> x.Key)
 
 /// Creates a type for a partition for a specific entity
-let createPartitionType connectionString (domainType : ProvidedTypeDefinition) tableName 
-    (tableEntityType : ProvidedTypeDefinition) = 
+let createPartitionType (domainType : ProvidedTypeDefinition) (tableEntityType : ProvidedTypeDefinition) connectionString tableName = 
     let partitionType = ProvidedTypeDefinition(tableName + "Partition", Some typeof<obj>)
     domainType.AddMember partitionType
     partitionType.HideObjectMethods <- true
-    let dataProperty = ProvidedMethod("LoadRows", [], tableEntityType.MakeArrayType())
-    dataProperty.InvokeCode <- (fun args -> <@@ getRows connectionString tableName ((%%args.[0] : obj) :?> string) @@>)
+    let dataProperty = ProvidedMethod("GetAll", [], tableEntityType.MakeArrayType())
+    dataProperty.InvokeCode <- (fun args -> <@@ getPartitionRows ((%%args.[0] : obj) :?> string) connectionString tableName @@>)
     partitionType.AddMember dataProperty
     partitionType
 
