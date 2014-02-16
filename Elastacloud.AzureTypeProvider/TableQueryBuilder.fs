@@ -23,7 +23,7 @@ let private buildPropertyOperatorsType tableName propertyName propertyType paren
         | EdmType.String -> GenericProp (typeof<string>, fun fieldValue (args:Expr list) -> <@@ buildFilter (propertyName, fieldValue, (%%args.[1]:string)) :: ((%%args.[0]:obj) :?> string list) @@>)
         | EdmType.Boolean -> CustomProp [ "IsTrue", (fun args -> <@@ buildFilter(propertyName, QueryComparisons.Equal, true) :: ((%%args.[0]:obj) :?> string list) @@>)
                                           "IsFalse", (fun args -> <@@ buildFilter(propertyName, QueryComparisons.Equal, false) :: ((%%args.[0]:obj) :?> string list) @@>) ]
-        | EdmType.DateTime -> GenericProp (typeof<DateTimeOffset>, fun fieldValue (args:Expr list) -> <@@ buildFilter (propertyName, fieldValue, (%%args.[1]:DateTimeOffset)) :: ((%%args.[0]:obj) :?> string list) @@>)
+        | EdmType.DateTime -> GenericProp (typeof<DateTime>, fun fieldValue (args:Expr list) -> <@@ buildFilter (propertyName, fieldValue, (%%args.[1]:DateTime)) :: ((%%args.[0]:obj) :?> string list) @@>)
         | EdmType.Double -> GenericProp (typeof<float>, fun fieldValue (args:Expr list) -> <@@ buildFilter (propertyName, fieldValue, (%%args.[1]:float)) :: ((%%args.[0]:obj) :?> string list) @@>)
         | EdmType.Int32 -> GenericProp (typeof<int32>, fun fieldValue (args:Expr list) -> <@@ buildFilter (propertyName, fieldValue, (%%args.[1]:int)) :: ((%%args.[0]:obj) :?> string list) @@>)
         | EdmType.Int64 -> GenericProp (typeof<int64>, fun fieldValue (args:Expr list) -> <@@ buildFilter (propertyName, fieldValue, (%%args.[1]:int64)) :: ((%%args.[0]:obj) :?> string list) @@>)
@@ -49,5 +49,5 @@ let createTableQueryType (domainType : ProvidedTypeDefinition) (tableEntityType 
         let operatorsType = buildPropertyOperatorsType tableName name value.PropertyType tableQueryType
         domainType.AddMember operatorsType
         tableQueryType.AddMember <| ProvidedProperty(name, operatorsType, GetterCode = (fun args -> <@@ (%%args.[0]:obj) :?> (string list) @@>))
-    tableQueryType.AddMember <| ProvidedMethod("Execute", [], tableEntityType.MakeArrayType(), InvokeCode = (fun args -> <@@ executeQuery (composeAllFilters ((%%args.[0]:obj) :?> string list)) connection tableName @@>))
+    tableQueryType.AddMember <| ProvidedMethod("Execute", [], tableEntityType.MakeArrayType(), InvokeCode = (fun args -> <@@ executeQuery connection tableName (composeAllFilters ((%%args.[0]:obj) :?> string list)) @@>))
     tableQueryType

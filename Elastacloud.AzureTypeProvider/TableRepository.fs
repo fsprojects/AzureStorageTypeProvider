@@ -32,7 +32,7 @@ let internal getRowsForSchema (rowCount:int) connection tableName =
     |> Seq.truncate rowCount
     |> Seq.toArray
 
-let executeQuery filterString connection tableName =
+let executeQuery connection tableName filterString =
     (getTable connection tableName).ExecuteQuery(DynamicQuery()
                                    .Where(filterString))
                                    |> Seq.map(fun dte -> { PartitionKey = dte.PartitionKey
@@ -41,31 +41,10 @@ let executeQuery filterString connection tableName =
                                                            Values = dte.Properties |> Seq.map(fun p -> p.Key, p.Value.PropertyAsObject) |> Map.ofSeq })
                                    |> Seq.toArray    
 
-let internal executeWeakQuery queryPairs connection tableName =
-    let filterString = (None, queryPairs)
-                       ||> Seq.fold(fun state (key,value) ->
-                                   let newQuery = DynamicQuery.GenerateFilterCondition(key, QueryComparisons.Equal, value)
-                                   match state with
-                                   | Some filter -> Some <| DynamicQuery.CombineFilters(filter, TableOperators.And, newQuery)
-                                   | None -> Some newQuery)
-
-    match filterString with
-    | Some filterString -> executeQuery filterString connection tableName
-    | None -> failwith "no query pairs supplied to build a filter"
-
-let getEntity entityKey partitionKey connection tableName =
-    let queryParts = match partitionKey with
-                     | null -> [("RowKey", entityKey)]
-                     | partitionKey -> [("RowKey", entityKey); ("PartitionKey", partitionKey)]
-
-    executeWeakQuery queryParts connection tableName
-    |> Seq.tryFind (fun x -> true)
-
-let getPartitionRows partitionKey connection tableName = 
-    executeWeakQuery [("PartitionKey", partitionKey)] connection tableName
-
 let composeAllFilters filters =
-    filters |> Seq.reduce(fun acc filter -> TableQuery.CombineFilters(acc, TableOperators.And, filter))                    
+    match filters with
+    | [] -> String.Empty
+    | _ -> filters |> Seq.reduce(fun acc filter -> TableQuery.CombineFilters(acc, TableOperators.And, filter))                    
 
 let buildFilter(propertyName,comparison,value) =
     match box value with
@@ -74,6 +53,19 @@ let buildFilter(propertyName,comparison,value) =
     | :? int64 as value -> TableQuery.GenerateFilterConditionForLong(propertyName, comparison, value)
     | :? float as value -> TableQuery.GenerateFilterConditionForDouble(propertyName, comparison, value)
     | :? bool as value -> TableQuery.GenerateFilterConditionForBool(propertyName, comparison, value)
-    | :? DateTimeOffset as value -> TableQuery.GenerateFilterConditionForDate(propertyName, comparison, value)
+    | :? DateTime as value -> TableQuery.GenerateFilterConditionForDate(propertyName, comparison, DateTimeOffset(value))
     | :? Guid as value -> TableQuery.GenerateFilterConditionForGuid(propertyName, comparison, value)
     | _ -> TableQuery.GenerateFilterCondition(propertyName, comparison, value.ToString())
+
+let getEntity entityKey partitionKey connection tableName =
+    match partitionKey with
+    | null -> [("RowKey", entityKey)]
+    | partitionKey -> [("RowKey", entityKey); ("PartitionKey", partitionKey)]
+    |> List.map(fun (prop,value) -> buildFilter(prop, QueryComparisons.Equal, value))
+    |> composeAllFilters
+    |> executeQuery connection tableName
+    |> Seq.tryFind (fun x -> true)
+
+let getPartitionRows partitionKey connection tableName = 
+    buildFilter("PartitionKey", QueryComparisons.Equal, partitionKey)
+    |> executeQuery connection tableName

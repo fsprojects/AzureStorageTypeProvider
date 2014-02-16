@@ -73,7 +73,7 @@ let private createTableType (domainType : ProvidedTypeDefinition) connectionStri
           
           ProvidedMethod
               ("ExecuteQuery", [ ProvidedParameter("rawQuery", typeof<string>) ], (tableEntityType.MakeArrayType()), 
-               InvokeCode = (fun args -> <@@ executeQuery (%%args.[0] : string) connectionString tableName @@>), 
+               InvokeCode = (fun args -> <@@ executeQuery connectionString tableName (%%args.[0] : string) @@>), 
                IsStaticMethod = true)
           
           ProvidedMethod

@@ -43,10 +43,10 @@ let setPropertiesForEntity (entityType : ProvidedTypeDefinition) (tableEntities 
                                             Some((%%args.[0] : LightweightTableEntity).Values.[key] :?> bool)
                                         else None @@>))
                | EdmType.DateTime -> 
-                   ProvidedProperty(key, typeof<System.DateTimeOffset option>, 
+                   ProvidedProperty(key, typeof<System.DateTime option>, 
                                     GetterCode = (fun args -> 
                                     <@@ if (%%args.[0] : LightweightTableEntity).Values.ContainsKey(key) then 
-                                            Some((%%args.[0] : LightweightTableEntity).Values.[key] :?> System.DateTimeOffset)
+                                            Some((%%args.[0] : LightweightTableEntity).Values.[key] :?> System.DateTime)
                                         else None @@>))
                | EdmType.Double -> 
                    ProvidedProperty(key, typeof<double option>, 
