@@ -81,9 +81,9 @@
     <Compile Include="ProvidedTypes-0.4.fs" />
     <Compile Include="BlobRepository.fs" />
     <Compile Include="TableRepository.fs" />
+    <Compile Include="TableQueryBuilder.fs" />
     <Compile Include="BlobMemberFactory.fs" />
     <Compile Include="TableEntityMemberFactory.fs" />
-    <Compile Include="TableQueryBuilder.fs" />
     <Compile Include="ContainerTypeFactory.fs" />
     <Compile Include="AzureTypeProvider.fs" />
     <None Include="Script.fsx" />

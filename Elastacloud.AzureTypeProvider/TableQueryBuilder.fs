@@ -1,4 +1,4 @@
-﻿module internal Elastacloud.FSharp.AzureTypeProvider.TableQueryBuilder
+﻿module internal Elastacloud.FSharp.AzureTypeProvider.MemberFactories.TableQueryBuilder
 
 open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Quotations
@@ -10,44 +10,36 @@ open System.Reflection
 
 let private queryComparisons = typeof<QueryComparisons>.GetFields() |> Seq.map (fun f -> f.Name, f.GetValue(null) :?> string) |> Seq.cache
 
-type QueryProperty =
-| GenericProp of System.Type * (string -> Expr list -> Expr)
-| CustomProp of (string * (Expr list -> Expr)) list
-| None
+let private buildGenericProp<'a> (propertyOperatorsType:ProvidedTypeDefinition) parentQueryType propertyName =
+    [ for compName, compValue in queryComparisons ->
+        let invokeCode = fun (args:Expr list) -> <@@ buildFilter (propertyName, compValue, (%%args.[1]:'a)) :: ((%%args.[0]:obj) :?> string list) @@>
+        ProvidedMethod (compName, [ ProvidedParameter("arg", typeof<'a>) ], parentQueryType, InvokeCode = invokeCode) ]
 
+let private buildCustomProp (propertyOperatorsType:ProvidedTypeDefinition) parentQueryType propertyName methodName exectedResult =
+    let invoker = fun (args:Expr list) -> <@@ buildFilter(propertyName, QueryComparisons.Equal, exectedResult) :: ((%%args.[0]:obj) :?> string list) @@>
+    ProvidedMethod(methodName, [], parentQueryType, InvokeCode = invoker )    
+    
 /// Generates strongly-type query provided properties for an entity property e.g. Equal, GreaterThan etc. etc.
 let private buildPropertyOperatorsType tableName propertyName propertyType parentQueryType = 
-    let propertyOperatorsType = ProvidedTypeDefinition(sprintf "%s.%sQueryOperators" tableName propertyName, Some typeof<obj>)
-    let argType = 
-        match propertyType with
-        | EdmType.String -> GenericProp (typeof<string>, fun fieldValue (args:Expr list) -> <@@ buildFilter (propertyName, fieldValue, (%%args.[1]:string)) :: ((%%args.[0]:obj) :?> string list) @@>)
-        | EdmType.Boolean -> CustomProp [ "IsTrue", (fun args -> <@@ buildFilter(propertyName, QueryComparisons.Equal, true) :: ((%%args.[0]:obj) :?> string list) @@>)
-                                          "IsFalse", (fun args -> <@@ buildFilter(propertyName, QueryComparisons.Equal, false) :: ((%%args.[0]:obj) :?> string list) @@>) ]
-        | EdmType.DateTime -> GenericProp (typeof<DateTime>, fun fieldValue (args:Expr list) -> <@@ buildFilter (propertyName, fieldValue, (%%args.[1]:DateTime)) :: ((%%args.[0]:obj) :?> string list) @@>)
-        | EdmType.Double -> GenericProp (typeof<float>, fun fieldValue (args:Expr list) -> <@@ buildFilter (propertyName, fieldValue, (%%args.[1]:float)) :: ((%%args.[0]:obj) :?> string list) @@>)
-        | EdmType.Int32 -> GenericProp (typeof<int32>, fun fieldValue (args:Expr list) -> <@@ buildFilter (propertyName, fieldValue, (%%args.[1]:int)) :: ((%%args.[0]:obj) :?> string list) @@>)
-        | EdmType.Int64 -> GenericProp (typeof<int64>, fun fieldValue (args:Expr list) -> <@@ buildFilter (propertyName, fieldValue, (%%args.[1]:int64)) :: ((%%args.[0]:obj) :?> string list) @@>)
-        | EdmType.Guid -> GenericProp (typeof<Guid>, fun fieldValue (args:Expr list) -> <@@ buildFilter (propertyName, fieldValue, (%%args.[1]:Guid)) :: ((%%args.[0]:obj) :?> string list) @@>)
-        | _ -> None
-    match argType with
-    | None -> ()
-    | GenericProp (propertyType, expressionGenerator) ->
-        for (compName, compValue) in queryComparisons do
-            propertyOperatorsType.AddMember
-            <| ProvidedMethod (compName, [ ProvidedParameter("arg", propertyType) ], parentQueryType, InvokeCode = expressionGenerator(compValue) )
-    | CustomProp props ->
-        for (compName, invoker) in props do
-            propertyOperatorsType.AddMember <| ProvidedMethod(compName, [], parentQueryType, InvokeCode = invoker )
-    propertyOperatorsType.HideObjectMethods <- true
+    let propertyOperatorsType = ProvidedTypeDefinition(sprintf "%s.%sQueryOperators" tableName propertyName, Some typeof<obj>, HideObjectMethods = true)
+
+    propertyOperatorsType.AddMembersDelayed(fun () -> match propertyType with
+                                                      | EdmType.String -> buildGenericProp<string> propertyOperatorsType parentQueryType propertyName
+                                                      | EdmType.Boolean -> [ buildCustomProp propertyOperatorsType parentQueryType propertyName "IsTrue" true
+                                                                             buildCustomProp propertyOperatorsType parentQueryType propertyName "IsFalse" false ]
+                                                      | EdmType.DateTime -> buildGenericProp<DateTime> propertyOperatorsType parentQueryType propertyName
+                                                      | EdmType.Double -> buildGenericProp<float> propertyOperatorsType parentQueryType propertyName
+                                                      | EdmType.Int32 -> buildGenericProp<int> propertyOperatorsType parentQueryType propertyName
+                                                      | EdmType.Int64 -> buildGenericProp<int64> propertyOperatorsType parentQueryType propertyName
+                                                      | EdmType.Guid -> buildGenericProp<Guid> propertyOperatorsType parentQueryType propertyName
+                                                      | _ -> [])
     propertyOperatorsType
 
-let createTableQueryType (domainType : ProvidedTypeDefinition) (tableEntityType : ProvidedTypeDefinition) connection tableName 
-    (properties : seq<string * EntityProperty>) = 
-    let tableQueryType = ProvidedTypeDefinition(tableName + "QueryPropertyBuilder", Some typeof<obj>)
-    tableQueryType.HideObjectMethods <- true
-    for (name, value) in properties do
-        let operatorsType = buildPropertyOperatorsType tableName name value.PropertyType tableQueryType
-        domainType.AddMember operatorsType
-        tableQueryType.AddMember <| ProvidedProperty(name, operatorsType, GetterCode = (fun args -> <@@ (%%args.[0]:obj) :?> (string list) @@>))
-    tableQueryType.AddMember <| ProvidedMethod("Execute", [], tableEntityType.MakeArrayType(), InvokeCode = (fun args -> <@@ executeQuery connection tableName (composeAllFilters ((%%args.[0]:obj) :?> string list)) @@>))
-    tableQueryType
+/// Creates a query property (and child methods etc.) for a given entity
+let createTableQueryType (tableEntityType : ProvidedTypeDefinition) connection tableName (properties : seq<string * EntityProperty>) = 
+    let tableQueryType = ProvidedTypeDefinition(tableName + "QueryPropertyBuilder", Some typeof<obj>, HideObjectMethods = true)
+    let operatorTypes = [ for (name, value) in properties -> name, buildPropertyOperatorsType tableName name value.PropertyType tableQueryType ]
+    tableQueryType.AddMembersDelayed(fun () ->
+        ProvidedMethod("Execute", [], tableEntityType.MakeArrayType(), InvokeCode = (fun args -> <@@ executeQuery connection tableName (composeAllFilters ((%%args.[0]:obj) :?> string list)) @@>)) :> MemberInfo ::
+        [ for (name, operatorType) in operatorTypes -> ProvidedProperty(name, operatorType, GetterCode = (fun args -> <@@ (%%args.[0]:obj) :?> (string list) @@>)) :> MemberInfo ] )
+    tableQueryType, operatorTypes |> List.unzip |> snd
