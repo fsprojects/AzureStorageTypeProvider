@@ -31,58 +31,58 @@ let setPropertiesForEntity (entityType : ProvidedTypeDefinition) (tableEntities 
         |> Seq.map (fun (key,value) -> 
                match value.PropertyType with
                | EdmType.Binary -> 
-                   ProvidedProperty(key, typeof<byte [] option>, 
+                   ProvidedProperty(key, typeof<byte []>, 
                                     GetterCode = (fun args -> 
                                     <@@ if (%%args.[0] : LightweightTableEntity).Values.ContainsKey(key) then 
-                                            Some((%%args.[0] : LightweightTableEntity).Values.[key] :?> byte [])
-                                        else None @@>))
+                                            (%%args.[0] : LightweightTableEntity).Values.[key] :?> byte []
+                                        else Unchecked.defaultof<byte[]> @@>))
                | EdmType.Boolean -> 
-                   ProvidedProperty(key, typeof<bool option>, 
+                   ProvidedProperty(key, typeof<bool>, 
                                     GetterCode = (fun args -> 
                                     <@@ if (%%args.[0] : LightweightTableEntity).Values.ContainsKey(key) then 
-                                            Some((%%args.[0] : LightweightTableEntity).Values.[key] :?> bool)
-                                        else None @@>))
+                                            (%%args.[0] : LightweightTableEntity).Values.[key] :?> bool
+                                        else Unchecked.defaultof<bool> @@>))
                | EdmType.DateTime -> 
-                   ProvidedProperty(key, typeof<System.DateTime option>, 
+                   ProvidedProperty(key, typeof<System.DateTime>, 
                                     GetterCode = (fun args -> 
                                     <@@ if (%%args.[0] : LightweightTableEntity).Values.ContainsKey(key) then 
-                                            Some((%%args.[0] : LightweightTableEntity).Values.[key] :?> System.DateTime)
-                                        else None @@>))
+                                            (%%args.[0] : LightweightTableEntity).Values.[key] :?> System.DateTime
+                                        else Unchecked.defaultof<System.DateTime> @@>))
                | EdmType.Double -> 
-                   ProvidedProperty(key, typeof<double option>, 
+                   ProvidedProperty(key, typeof<double>, 
                                     GetterCode = (fun args -> 
                                     <@@ if (%%args.[0] : LightweightTableEntity).Values.ContainsKey(key) then 
-                                            Some((%%args.[0] : LightweightTableEntity).Values.[key] :?> float)
-                                        else None @@>))
+                                            (%%args.[0] : LightweightTableEntity).Values.[key] :?> float
+                                        else Unchecked.defaultof<float> @@>))
                | EdmType.Guid -> 
-                   ProvidedProperty(key, typeof<System.Guid option>, 
+                   ProvidedProperty(key, typeof<System.Guid>, 
                                     GetterCode = (fun args -> 
                                     <@@ if (%%args.[0] : LightweightTableEntity).Values.ContainsKey(key) then 
-                                            Some((%%args.[0] : LightweightTableEntity).Values.[key] :?> System.Guid)
-                                        else None @@>))
+                                            (%%args.[0] : LightweightTableEntity).Values.[key] :?> System.Guid
+                                        else Unchecked.defaultof<System.Guid> @@>))
                | EdmType.Int32 -> 
-                   ProvidedProperty(key, typeof<int option>, 
+                   ProvidedProperty(key, typeof<int>, 
                                     GetterCode = (fun args -> 
                                     <@@ if (%%args.[0] : LightweightTableEntity).Values.ContainsKey(key) then 
-                                            Some((%%args.[0] : LightweightTableEntity).Values.[key] :?> int)
-                                        else None @@>))
+                                            (%%args.[0] : LightweightTableEntity).Values.[key] :?> int
+                                        else Unchecked.defaultof<int> @@>))
                | EdmType.Int64 -> 
-                   ProvidedProperty(key, typeof<int64 option>, 
+                   ProvidedProperty(key, typeof<int64>, 
                                     GetterCode = (fun args -> 
                                     <@@ if (%%args.[0] : LightweightTableEntity).Values.ContainsKey(key) then 
-                                            Some((%%args.[0] : LightweightTableEntity).Values.[key] :?> int64)
-                                        else None @@>))
+                                            (%%args.[0] : LightweightTableEntity).Values.[key] :?> int64
+                                        else Unchecked.defaultof<int64> @@>))
                | EdmType.String -> 
-                   ProvidedProperty(key, typeof<string option>, 
+                   ProvidedProperty(key, typeof<string>, 
                                     GetterCode = (fun args -> 
                                     <@@ if (%%args.[0] : LightweightTableEntity).Values.ContainsKey(key) then 
-                                            Some((%%args.[0] : LightweightTableEntity).Values.[key] :?> string)
-                                        else None @@>))
+                                            (%%args.[0] : LightweightTableEntity).Values.[key] :?> string
+                                        else Unchecked.defaultof<string> @@>))
                | _ -> 
                    ProvidedProperty(key, typeof<obj>, 
                                     GetterCode = (fun args -> 
                                     <@@ if (%%args.[0] : LightweightTableEntity).Values.ContainsKey(key) then 
-                                            Some((%%args.[0] : LightweightTableEntity).Values.[key])
-                                        else None @@>)))
+                                            (%%args.[0] : LightweightTableEntity).Values.[key]
+                                        else Unchecked.defaultof<obj> @@>)))
         |> Seq.toList)
     properties
