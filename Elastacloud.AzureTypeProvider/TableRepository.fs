@@ -29,7 +29,7 @@ type DynamicQuery = TableQuery<DynamicTableEntity>
 let internal getRowsForSchema (rowCount:int) connection tableName = 
     let table = getTable connection tableName
     table.ExecuteQuery(DynamicQuery().Take(Nullable<_>(rowCount)))
-    |> Seq.take rowCount
+    |> Seq.truncate rowCount
     |> Seq.toArray
 
 let executeQuery filterString connection tableName =
@@ -64,8 +64,16 @@ let getEntity entityKey partitionKey connection tableName =
 let getPartitionRows partitionKey connection tableName = 
     executeWeakQuery [("PartitionKey", partitionKey)] connection tableName
 
-let composeFilter ((existingFilter:string,propertyName:string),(operator:string),givenValue,builder) =
-    let newFilter = builder(propertyName,operator,givenValue)
-    match existingFilter with
-    | null -> newFilter
-    | existingFilter -> TableQuery.CombineFilters(existingFilter, TableOperators.And, newFilter)
+let composeAllFilters filters =
+    filters |> Seq.reduce(fun acc filter -> TableQuery.CombineFilters(acc, TableOperators.And, filter))                    
+
+let buildFilter(propertyName,comparison,value) =
+    match box value with
+    | :? string as value -> TableQuery.GenerateFilterCondition(propertyName, comparison, value)
+    | :? int as value -> TableQuery.GenerateFilterConditionForInt(propertyName, comparison, value)
+    | :? int64 as value -> TableQuery.GenerateFilterConditionForLong(propertyName, comparison, value)
+    | :? float as value -> TableQuery.GenerateFilterConditionForDouble(propertyName, comparison, value)
+    | :? bool as value -> TableQuery.GenerateFilterConditionForBool(propertyName, comparison, value)
+    | :? DateTimeOffset as value -> TableQuery.GenerateFilterConditionForDate(propertyName, comparison, value)
+    | :? Guid as value -> TableQuery.GenerateFilterConditionForGuid(propertyName, comparison, value)
+    | _ -> TableQuery.GenerateFilterCondition(propertyName, comparison, value.ToString())

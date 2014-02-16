@@ -65,8 +65,7 @@ let private createTableType (domainType : ProvidedTypeDefinition) connectionStri
             |> setPropertiesForEntity tableEntityType
         domainType.AddMember tableEntityType
         let partitionType = createPartitionType tableEntityType connectionString tableName
-        let queryBuilderType = 
-            TableQueryBuilder.createTableQueryType domainType tableEntityType connectionString tableName propertiesCreated
+        let queryBuilderType = TableQueryBuilder.createTableQueryType domainType tableEntityType connectionString tableName propertiesCreated
         domainType.AddMembers [ partitionType; queryBuilderType ]
         [ ProvidedMethod
               ("GetPartition", [ ProvidedParameter("key", typeof<string>) ], partitionType, 
@@ -78,7 +77,7 @@ let private createTableType (domainType : ProvidedTypeDefinition) connectionStri
                IsStaticMethod = true)
           
           ProvidedMethod
-              ("Where", [], queryBuilderType, InvokeCode = (fun args -> <@@ Option<string>.None @@>), IsStaticMethod = true)
+              ("Where", [], queryBuilderType, InvokeCode = (fun args -> <@@ ([] : string list) @@>), IsStaticMethod = true)
           
           ProvidedMethod
               ("GetEntity", 
