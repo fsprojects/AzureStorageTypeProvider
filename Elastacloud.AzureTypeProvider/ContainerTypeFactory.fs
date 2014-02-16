@@ -59,24 +59,36 @@ let private createTableType (domainType : ProvidedTypeDefinition) connectionStri
         (fun _ -> 
         let tableEntityType = ProvidedTypeDefinition(tableName + "Entity", Some typeof<LightweightTableEntity>)
         tableEntityType.HideObjectMethods <- true
-        tableName
-        |> getRowsForSchema 5 connectionString
-        |> setPropertiesForEntity tableEntityType
-        domainType.AddMember(tableEntityType)
-        let partitionType = createPartitionType domainType tableEntityType connectionString tableName
+        let propertiesCreated = 
+            tableName
+            |> getRowsForSchema 5 connectionString
+            |> setPropertiesForEntity tableEntityType
+        domainType.AddMember tableEntityType
+        let partitionType = createPartitionType tableEntityType connectionString tableName
+        let queryBuilderType = 
+            TableQueryBuilder.createTableQueryType domainType tableEntityType connectionString tableName propertiesCreated
+        domainType.AddMembers [ partitionType; queryBuilderType ]
         [ ProvidedMethod
               ("GetPartition", [ ProvidedParameter("key", typeof<string>) ], partitionType, 
                InvokeCode = (fun args -> <@@ (%%args.[0] : string) @@>), IsStaticMethod = true)
-
+          
           ProvidedMethod
-              ("ExecuteQuery", [ ProvidedParameter("queryPairs", typeof<seq<string*string>>) ], (tableEntityType.MakeArrayType()),
-               InvokeCode = (fun args -> <@@ executeWeakQuery (%%args.[0] : seq<string*string>) connectionString tableName @@>), IsStaticMethod = true)
-                    
+              ("ExecuteQuery", [ ProvidedParameter("rawQuery", typeof<string>) ], (tableEntityType.MakeArrayType()), 
+               InvokeCode = (fun args -> <@@ executeQuery (%%args.[0] : string) connectionString tableName @@>), 
+               IsStaticMethod = true)
+          
+          ProvidedMethod
+              ("Where", [], queryBuilderType, InvokeCode = (fun args -> <@@ Option<string>.None @@>), IsStaticMethod = true)
+          
           ProvidedMethod
               ("GetEntity", 
                [ ProvidedParameter("key", typeof<string>)
-                 ProvidedParameter("partition", typeof<string>, optionalValue = null) ], (typeof<option<_>>).GetGenericTypeDefinition().MakeGenericType(tableEntityType),
-               InvokeCode = (fun args -> <@@ getEntity (%%args.[0]:string) (%%args.[1]:string) connectionString tableName @@>), IsStaticMethod = true) ])
+                 ProvidedParameter("partition", typeof<string>, optionalValue = null) ], 
+               (typeof<option<_>>).GetGenericTypeDefinition().MakeGenericType(tableEntityType), 
+               
+               InvokeCode = (fun args -> 
+               <@@ getEntity (%%args.[0] : string) (%%args.[1] : string) connectionString tableName @@>), 
+               IsStaticMethod = true) ])
     tableProperty
 
 /// Builds up the Table Storage member

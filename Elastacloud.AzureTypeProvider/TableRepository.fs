@@ -20,19 +20,28 @@ let private getTable connection tableName =
     client.GetTableReference tableName
 
 /// Gets all tables
-let getTables connection = 
+let internal getTables connection = 
     let client = getTableClient connection
     client.ListTables() |> Seq.map (fun table -> table.Name)
 
 type DynamicQuery = TableQuery<DynamicTableEntity>
 
-let getRowsForSchema (rowCount:int) connection tableName = 
+let internal getRowsForSchema (rowCount:int) connection tableName = 
     let table = getTable connection tableName
     table.ExecuteQuery(DynamicQuery().Take(Nullable<_>(rowCount)))
     |> Seq.take rowCount
     |> Seq.toArray
 
-let executeWeakQuery queryPairs connection tableName =
+let executeQuery filterString connection tableName =
+    (getTable connection tableName).ExecuteQuery(DynamicQuery()
+                                   .Where(filterString))
+                                   |> Seq.map(fun dte -> { PartitionKey = dte.PartitionKey
+                                                           RowKey = dte.RowKey
+                                                           Timestamp = dte.Timestamp
+                                                           Values = dte.Properties |> Seq.map(fun p -> p.Key, p.Value.PropertyAsObject) |> Map.ofSeq })
+                                   |> Seq.toArray    
+
+let internal executeWeakQuery queryPairs connection tableName =
     let filterString = (None, queryPairs)
                        ||> Seq.fold(fun state (key,value) ->
                                    let newQuery = DynamicQuery.GenerateFilterCondition(key, QueryComparisons.Equal, value)
@@ -41,12 +50,7 @@ let executeWeakQuery queryPairs connection tableName =
                                    | None -> Some newQuery)
 
     match filterString with
-    | Some filterString -> (getTable connection tableName).ExecuteQuery(DynamicQuery().Where(filterString))
-                           |> Seq.map(fun dte -> { PartitionKey = dte.PartitionKey
-                                                   RowKey = dte.RowKey
-                                                   Timestamp = dte.Timestamp
-                                                   Values = dte.Properties |> Seq.map(fun p -> p.Key, p.Value.PropertyAsObject) |> Map.ofSeq })
-                           |> Seq.toArray
+    | Some filterString -> executeQuery filterString connection tableName
     | None -> failwith "no query pairs supplied to build a filter"
 
 let getEntity entityKey partitionKey connection tableName =
@@ -59,3 +63,9 @@ let getEntity entityKey partitionKey connection tableName =
 
 let getPartitionRows partitionKey connection tableName = 
     executeWeakQuery [("PartitionKey", partitionKey)] connection tableName
+
+let composeFilter ((existingFilter:string,propertyName:string),(operator:string),givenValue,builder) =
+    let newFilter = builder(propertyName,operator,givenValue)
+    match existingFilter with
+    | null -> newFilter
+    | existingFilter -> TableQuery.CombineFilters(existingFilter, TableOperators.And, newFilter)

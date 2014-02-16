@@ -95,13 +95,6 @@ let createGenerateSasFunction fileDetails =
     output.AddXmlDocDelayed(fun () -> "Generates a full-access shared access signature URI for this blob.")
     output
 
-let getFolderDetailsProperties folderDetails = 
-    let connectionString, container, folder = folderDetails
-    let files, folderSize = 123, 1200
-    ProvidedProperty
-        ((sprintf "Files: %d, Folder size: %dgb" files folderSize), typeof<int * int>, IsStatic = true, 
-         GetterCode = (fun args -> <@@ files, folderSize @@>))
-
 let createFileDetailsProperty path (properties : BlobProperties) = 
     let output = 
         let unit, getSize = 

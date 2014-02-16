@@ -12,11 +12,11 @@ let private getDistinctProperties (tableEntities : #seq<DynamicTableEntity>) =
     tableEntities
     |> Seq.collect (fun x -> x.Properties)
     |> Seq.distinctBy (fun x -> x.Key)
+    |> Seq.map(fun x -> x.Key, x.Value)
 
 /// Creates a type for a partition for a specific entity
-let createPartitionType (domainType : ProvidedTypeDefinition) (tableEntityType : ProvidedTypeDefinition) connectionString tableName = 
+let createPartitionType (tableEntityType : ProvidedTypeDefinition) connectionString tableName = 
     let partitionType = ProvidedTypeDefinition(tableName + "Partition", Some typeof<obj>)
-    domainType.AddMember partitionType
     partitionType.HideObjectMethods <- true
     let dataProperty = ProvidedMethod("GetAll", [], tableEntityType.MakeArrayType())
     dataProperty.InvokeCode <- (fun args -> <@@ getPartitionRows ((%%args.[0] : obj) :?> string) connectionString tableName @@>)
@@ -25,16 +25,16 @@ let createPartitionType (domainType : ProvidedTypeDefinition) (tableEntityType :
 
 let setPropertiesForEntity (entityType : ProvidedTypeDefinition) (tableEntities : #seq<DynamicTableEntity>) = 
     let properties = tableEntities |> getDistinctProperties
+
     entityType.AddMembersDelayed(fun _ -> 
         properties
-        |> Seq.map (fun prop -> 
-               let key = prop.Key
-               match prop.Value.PropertyType with
+        |> Seq.map (fun (key,value) -> 
+               match value.PropertyType with
                | EdmType.Binary -> 
                    ProvidedProperty(key, typeof<byte [] option>, 
                                     GetterCode = (fun args -> 
                                     <@@ if (%%args.[0] : LightweightTableEntity).Values.ContainsKey(key) then 
-                                            Some((%%args.[0] : LightweightTableEntity).Values.[key] :?> byte array)
+                                            Some((%%args.[0] : LightweightTableEntity).Values.[key] :?> byte [])
                                         else None @@>))
                | EdmType.Boolean -> 
                    ProvidedProperty(key, typeof<bool option>, 
@@ -46,8 +46,7 @@ let setPropertiesForEntity (entityType : ProvidedTypeDefinition) (tableEntities 
                    ProvidedProperty(key, typeof<System.DateTimeOffset option>, 
                                     GetterCode = (fun args -> 
                                     <@@ if (%%args.[0] : LightweightTableEntity).Values.ContainsKey(key) then 
-                                            Some
-                                                ((%%args.[0] : LightweightTableEntity).Values.[key] :?> System.DateTimeOffset)
+                                            Some((%%args.[0] : LightweightTableEntity).Values.[key] :?> System.DateTimeOffset)
                                         else None @@>))
                | EdmType.Double -> 
                    ProvidedProperty(key, typeof<double option>, 
@@ -86,3 +85,4 @@ let setPropertiesForEntity (entityType : ProvidedTypeDefinition) (tableEntities 
                                             Some((%%args.[0] : LightweightTableEntity).Values.[key])
                                         else None @@>)))
         |> Seq.toList)
+    properties
