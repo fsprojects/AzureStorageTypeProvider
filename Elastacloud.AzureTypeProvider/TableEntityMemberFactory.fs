@@ -20,8 +20,8 @@ let private getDistinctProperties (tableEntities : #seq<DynamicTableEntity>) =
 let private createPartitionType (tableEntityType : ProvidedTypeDefinition) connectionString tableName = 
     let partitionType = ProvidedTypeDefinition(tableName + "Partition", Some typeof<obj>)
     partitionType.HideObjectMethods <- true
-    let dataProperty = ProvidedMethod("GetAll", [], tableEntityType.MakeArrayType())
-    dataProperty.InvokeCode <- (fun args -> <@@ getPartitionRows ((%%args.[0] : obj) :?> string) connectionString tableName @@>)
+    let dataProperty = ProvidedMethod("GetAll", [], tableEntityType.MakeArrayType(), InvokeCode = (fun args -> <@@ getPartitionRows ((%%args.[0] : obj) :?> string) connectionString tableName @@>))
+    dataProperty.AddXmlDocDelayed <| fun _ -> "Eagerly returns all of the entities in this partition."
     partitionType.AddMember dataProperty
     partitionType
 
@@ -61,20 +61,24 @@ let buildTableEntityMembers parentEntityType connectionString tableName =
     let partitionType = createPartitionType parentEntityType connectionString tableName
     let queryBuilderType, childTypes = TableQueryBuilder.createTableQueryType parentEntityType connectionString tableName propertiesCreated
 
-    [ partitionType; queryBuilderType ] @ childTypes,
-    [ ProvidedMethod
-        ("GetPartition", [ ProvidedParameter("key", typeof<string>) ], partitionType, 
-        InvokeCode = (fun args -> <@@ (%%args.[0] : string) @@>), IsStaticMethod = true)
+    let getPartition = ProvidedMethod
+                        ("GetPartition", [ ProvidedParameter("key", typeof<string>) ], partitionType, 
+                        InvokeCode = (fun args -> <@@ (%%args.[0] : string) @@>), IsStaticMethod = true)
+    getPartition.AddXmlDocDelayed <| fun _ -> "Retrieves a table partition by its key."
           
-      ProvidedMethod
-        ("ExecuteQuery", [ ProvidedParameter("rawQuery", typeof<string>) ], (parentEntityType.MakeArrayType()), 
-        InvokeCode = (fun args -> <@@ executeQuery connectionString tableName (%%args.[0] : string) @@>), 
-        IsStaticMethod = true)
-          
-      ProvidedMethod
-        ("Where", [], queryBuilderType, InvokeCode = (fun args -> <@@ ([] : string list) @@>), IsStaticMethod = true)
-        
-      ProvidedMethod
-        ("GetEntity", 
-        [ ProvidedParameter("key", typeof<string>)
-          ProvidedParameter("partition", typeof<string>, optionalValue = null) ], (typeof<option<_>>).GetGenericTypeDefinition().MakeGenericType(parentEntityType), InvokeCode = (fun args -> <@@ getEntity (%%args.[0] : string) (%%args.[1] : string) connectionString tableName @@>), IsStaticMethod = true) ]
+    let executeQuery =  ProvidedMethod
+                         ("ExecuteQuery", [ ProvidedParameter("rawQuery", typeof<string>) ], (parentEntityType.MakeArrayType()), 
+                         InvokeCode = (fun args -> <@@ executeQuery connectionString tableName (%%args.[0] : string) @@>), 
+                         IsStaticMethod = true)
+    executeQuery.AddXmlDocDelayed <| fun _ -> "Executes a weakly-type query and returns the results in the shape for this table."
+    
+    let where =  ProvidedMethod ("Where", [], queryBuilderType, InvokeCode = (fun args -> <@@ ([] : string list) @@>), IsStaticMethod = true)
+    where.AddXmlDocDelayed <| fun _ -> "Begins creating a strongly-typed query against the table."
+
+    let getEntity = ProvidedMethod
+                      ("GetEntity", 
+                      [ ProvidedParameter("rowKey", typeof<string>)
+                        ProvidedParameter("partitionKey", typeof<string>, optionalValue = null) ], (typeof<option<_>>).GetGenericTypeDefinition().MakeGenericType(parentEntityType), InvokeCode = (fun args -> <@@ getEntity (%%args.[0] : string) (%%args.[1] : string) connectionString tableName @@>), IsStaticMethod = true)
+    getEntity.AddXmlDocDelayed <| fun _ -> "Gets a single entity based on the row key and optionally the partition key."
+
+    [ partitionType; queryBuilderType ] @ childTypes, [ getPartition; executeQuery; where; getEntity ]

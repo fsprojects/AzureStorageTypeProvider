@@ -13,7 +13,9 @@ let private queryComparisons = typeof<QueryComparisons>.GetFields() |> Seq.map (
 let private buildGenericProp<'a> (propertyOperatorsType:ProvidedTypeDefinition) parentQueryType propertyName =
     [ for compName, compValue in queryComparisons ->
         let invokeCode = fun (args:Expr list) -> <@@ buildFilter (propertyName, compValue, (%%args.[1]:'a)) :: ((%%args.[0]:obj) :?> string list) @@>
-        ProvidedMethod (compName, [ ProvidedParameter("arg", typeof<'a>) ], parentQueryType, InvokeCode = invokeCode) ]
+        let providedMethod = ProvidedMethod (compName, [ ProvidedParameter(propertyName.ToLower(), typeof<'a>) ], parentQueryType, InvokeCode = invokeCode)
+        providedMethod.AddXmlDocDelayed <| fun _ -> (sprintf "Compares the %s property against the supplied value using the '%s' operator" propertyName compValue)
+        providedMethod ]
 
 let private buildCustomProp (propertyOperatorsType:ProvidedTypeDefinition) parentQueryType propertyName methodName exectedResult =
     let invoker = fun (args:Expr list) -> <@@ buildFilter(propertyName, QueryComparisons.Equal, exectedResult) :: ((%%args.[0]:obj) :?> string list) @@>
