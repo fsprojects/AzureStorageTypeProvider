@@ -44,7 +44,7 @@ let executeQuery connection tableName filterString =
 let composeAllFilters filters =
     match filters with
     | [] -> String.Empty
-    | _ -> filters |> Seq.reduce(fun acc filter -> TableQuery.CombineFilters(acc, TableOperators.And, filter))                    
+    | _ -> filters |> List.rev |> List.reduce(fun acc filter -> TableQuery.CombineFilters(acc, TableOperators.And, filter))                    
 
 let buildFilter(propertyName,comparison,value) =
     match box value with

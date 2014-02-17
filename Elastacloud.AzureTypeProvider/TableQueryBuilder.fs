@@ -17,12 +17,11 @@ let private buildGenericProp<'a> (propertyOperatorsType:ProvidedTypeDefinition) 
 
 let private buildCustomProp (propertyOperatorsType:ProvidedTypeDefinition) parentQueryType propertyName methodName exectedResult =
     let invoker = fun (args:Expr list) -> <@@ buildFilter(propertyName, QueryComparisons.Equal, exectedResult) :: ((%%args.[0]:obj) :?> string list) @@>
-    ProvidedMethod(methodName, [], parentQueryType, InvokeCode = invoker )    
+    ProvidedMethod(methodName, [], parentQueryType, InvokeCode = invoker )
     
 /// Generates strongly-type query provided properties for an entity property e.g. Equal, GreaterThan etc. etc.
 let private buildPropertyOperatorsType tableName propertyName propertyType parentQueryType = 
     let propertyOperatorsType = ProvidedTypeDefinition(sprintf "%s.%sQueryOperators" tableName propertyName, Some typeof<obj>, HideObjectMethods = true)
-
     propertyOperatorsType.AddMembersDelayed(fun () -> match propertyType with
                                                       | EdmType.String -> buildGenericProp<string> propertyOperatorsType parentQueryType propertyName
                                                       | EdmType.Boolean -> [ buildCustomProp propertyOperatorsType parentQueryType propertyName "IsTrue" true
@@ -39,6 +38,8 @@ let private buildPropertyOperatorsType tableName propertyName propertyType paren
 let createTableQueryType (tableEntityType : ProvidedTypeDefinition) connection tableName (properties : seq<string * EntityProperty>) = 
     let tableQueryType = ProvidedTypeDefinition(tableName + "QueryPropertyBuilder", Some typeof<obj>, HideObjectMethods = true)
     let operatorTypes = [ for (name, value) in properties -> name, buildPropertyOperatorsType tableName name value.PropertyType tableQueryType ]
+    let partitionKeyType = "PartitionKey", buildPropertyOperatorsType tableName "PartitionKey" EdmType.String tableQueryType
+    let operatorTypes = partitionKeyType :: operatorTypes
     tableQueryType.AddMembersDelayed(fun () ->
         ProvidedMethod("Execute", [], tableEntityType.MakeArrayType(), InvokeCode = (fun args -> <@@ executeQuery connection tableName (composeAllFilters ((%%args.[0]:obj) :?> string list)) @@>)) :> MemberInfo ::
         [ for (name, operatorType) in operatorTypes -> ProvidedProperty(name, operatorType, GetterCode = (fun args -> <@@ (%%args.[0]:obj) :?> (string list) @@>)) :> MemberInfo ] )
