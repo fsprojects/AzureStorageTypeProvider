@@ -17,15 +17,16 @@ let private getDistinctProperties(tableEntities: #seq<DynamicTableEntity>) =
     |> Seq.toList
 
 /// Creates a type for a partition for a specific entity
-let private createPartitionType (tableEntityType: ProvidedTypeDefinition) connectionString tableName = 
+let private createPartitionType (tableEntityType: ProvidedTypeDefinition) connection tableName = 
     let partitionType = ProvidedTypeDefinition(tableName + "Partition", Some typeof<obj>)
     partitionType.HideObjectMethods <- true
     let dataProperty = 
         ProvidedMethod
-            ("GetAll", [], tableEntityType.MakeArrayType(), 
+            ("GetAll", [ ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], 
+             tableEntityType.MakeArrayType(), 
              
              InvokeCode = (fun args -> 
-             <@@ getPartitionRows ((%%args.[0]: obj) :?> string) connectionString tableName @@>))
+             <@@ getPartitionRows ((%%args.[0]: obj) :?> string) (%%args.[1]: string) tableName @@>))
     dataProperty.AddXmlDocDelayed <| fun _ -> "Eagerly returns all of the entities in this partition."
     partitionType.AddMember dataProperty
     partitionType
@@ -62,26 +63,27 @@ let setPropertiesForEntity (entityType: ProvidedTypeDefinition) (sampleEntities:
     properties
 
 /// Gets all the members for a Table Entity type
-let buildTableEntityMembers parentEntityType connectionString tableName = 
+let buildTableEntityMembers parentEntityType connection tableName = 
     let propertiesCreated = 
         tableName
-        |> getRowsForSchema 5 connectionString
+        |> getRowsForSchema 5 connection
         |> setPropertiesForEntity parentEntityType
     
-    let partitionType = createPartitionType parentEntityType connectionString tableName
+    let partitionType = createPartitionType parentEntityType connection tableName
     let queryBuilderType, childTypes = 
-        TableQueryBuilder.createTableQueryType parentEntityType connectionString tableName propertiesCreated
+        TableQueryBuilder.createTableQueryType parentEntityType connection tableName propertiesCreated
     let getPartition = 
         ProvidedMethod
-            ("GetPartition", [ProvidedParameter("key", typeof<string>)], partitionType, 
+            ("GetPartition", [ ProvidedParameter("key", typeof<string>) ], partitionType, 
              InvokeCode = (fun args -> <@@ (%%args.[0]: string) @@>), IsStaticMethod = true)
     getPartition.AddXmlDocDelayed <| fun _ -> "Retrieves a table partition by its key."
     let executeQuery = 
         ProvidedMethod
             ("ExecuteQuery", 
-             [ProvidedParameter("rawQuery", typeof<string>) ], 
+             [ ProvidedParameter("rawQuery", typeof<string>)
+               ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], 
              (parentEntityType.MakeArrayType()), 
-             InvokeCode = (fun args -> <@@ executeQuery connectionString tableName (%%args.[0]: string) @@>), 
+             InvokeCode = (fun args -> <@@ executeQuery (%%args.[1]: string) tableName (%%args.[0]: string) @@>), 
              IsStaticMethod = true)
     executeQuery.AddXmlDocDelayed 
     <| fun _ -> "Executes a weakly-type query and returns the results in the shape for this table."
@@ -92,12 +94,13 @@ let buildTableEntityMembers parentEntityType connectionString tableName =
     let getEntity = 
         ProvidedMethod
             ("GetEntity", 
-             [ProvidedParameter("rowKey", typeof<string>)
-              ProvidedParameter("partitionKey", typeof<string>, optionalValue = null)], 
+             [ ProvidedParameter("rowKey", typeof<string>)
+               ProvidedParameter("partitionKey", typeof<string>, optionalValue = null)
+               ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], 
              (typeof<option<_>>).GetGenericTypeDefinition().MakeGenericType(parentEntityType), 
              
              InvokeCode = (fun args -> 
-             <@@ getEntity (%%args.[0]: string) (%%args.[1]: string) connectionString tableName @@>), 
+             <@@ getEntity (%%args.[0]: string) (%%args.[1]: string) (%%args.[2]: string) tableName @@>), 
              IsStaticMethod = true)
     getEntity.AddXmlDocDelayed <| fun _ -> "Gets a single entity based on the row key and optionally the partition key."
-    [partitionType;queryBuilderType] @ childTypes, [getPartition;executeQuery;where;getEntity]
+    [ partitionType;queryBuilderType ] @ childTypes, [ getPartition;executeQuery;where;getEntity ]
