@@ -3,43 +3,53 @@ module internal Elastacloud.FSharp.AzureTypeProvider.MemberFactories.TableEntity
 
 open Elastacloud.FSharp.AzureTypeProvider.Repositories.TableRepository
 open Elastacloud.FSharp.AzureTypeProvider.Utils
+open Microsoft.FSharp.Quotations
 open Microsoft.WindowsAzure.Storage.Table
 open Samples.FSharp.ProvidedTypes
 open System
 open System.Reflection
-open Microsoft.FSharp.Quotations
 
-let private getDistinctProperties (tableEntities : #seq<DynamicTableEntity>) = 
+let private getDistinctProperties(tableEntities: #seq<DynamicTableEntity>) = 
     tableEntities
-    |> Seq.collect (fun x -> x.Properties)
-    |> Seq.distinctBy (fun x -> x.Key)
+    |> Seq.collect(fun x -> x.Properties)
+    |> Seq.distinctBy(fun x -> x.Key)
     |> Seq.map(fun x -> x.Key, x.Value)
     |> Seq.toList
 
 /// Creates a type for a partition for a specific entity
-let private createPartitionType (tableEntityType : ProvidedTypeDefinition) connectionString tableName = 
+let private createPartitionType (tableEntityType: ProvidedTypeDefinition) connectionString tableName = 
     let partitionType = ProvidedTypeDefinition(tableName + "Partition", Some typeof<obj>)
     partitionType.HideObjectMethods <- true
-    let dataProperty = ProvidedMethod("GetAll", [], tableEntityType.MakeArrayType(), InvokeCode = (fun args -> <@@ getPartitionRows ((%%args.[0] : obj) :?> string) connectionString tableName @@>))
+    let dataProperty = 
+        ProvidedMethod
+            ("GetAll", [], tableEntityType.MakeArrayType(), 
+             
+             InvokeCode = (fun args -> 
+             <@@ getPartitionRows ((%%args.[0]: obj) :?> string) connectionString tableName @@>))
     dataProperty.AddXmlDocDelayed <| fun _ -> "Eagerly returns all of the entities in this partition."
     partitionType.AddMember dataProperty
     partitionType
 
 /// Builds a property for a single entity for a specific type
-let private buildEntityProperty<'a> key =
-    let getter = fun (args:Expr list) -> <@@ let entity = (%%args.[0] : LightweightTableEntity)
-                                             if entity.Values.ContainsKey(key) then entity.Values.[key] :?> 'a
-                                             else Unchecked.defaultof<'a> @@>
-    ProvidedProperty(key, typeof<'a>, GetterCode = getter)
+let private buildEntityProperty<'a> key = 
+    let getter = 
+        fun (args: Expr list) -> 
+            <@@ let entity = (%%args.[0]: LightweightTableEntity)
+                if entity.Values.ContainsKey(key) then entity.Values.[key] :?> 'a
+                else Unchecked.defaultof<'a> @@>
+    
+    let prop = ProvidedProperty(key, typeof<'a>, GetterCode = getter)
+    prop.AddXmlDocDelayed <| fun _ -> (sprintf "Returns the value of the %s property" key)
+    prop
 
 /// Sets the properties on a specific entity based on the inferred schema from the sample provided
-let setPropertiesForEntity (entityType : ProvidedTypeDefinition) (sampleEntities : #seq<DynamicTableEntity>) = 
+let setPropertiesForEntity (entityType: ProvidedTypeDefinition) (sampleEntities: #seq<DynamicTableEntity>) = 
     let properties = sampleEntities |> getDistinctProperties
     entityType.AddMembersDelayed(fun _ -> 
         properties
-        |> Seq.map (fun (key,value) -> 
+        |> Seq.map(fun (key, value) -> 
                match value.PropertyType with
-               | EdmType.Binary -> buildEntityProperty<byte[]> key
+               | EdmType.Binary -> buildEntityProperty<byte []> key
                | EdmType.Boolean -> buildEntityProperty<bool> key
                | EdmType.DateTime -> buildEntityProperty<DateTime> key
                | EdmType.Double -> buildEntityProperty<float> key
@@ -52,33 +62,42 @@ let setPropertiesForEntity (entityType : ProvidedTypeDefinition) (sampleEntities
     properties
 
 /// Gets all the members for a Table Entity type
-let buildTableEntityMembers parentEntityType connectionString tableName =
+let buildTableEntityMembers parentEntityType connectionString tableName = 
     let propertiesCreated = 
         tableName
         |> getRowsForSchema 5 connectionString
         |> setPropertiesForEntity parentEntityType
-
-    let partitionType = createPartitionType parentEntityType connectionString tableName
-    let queryBuilderType, childTypes = TableQueryBuilder.createTableQueryType parentEntityType connectionString tableName propertiesCreated
-
-    let getPartition = ProvidedMethod
-                        ("GetPartition", [ ProvidedParameter("key", typeof<string>) ], partitionType, 
-                        InvokeCode = (fun args -> <@@ (%%args.[0] : string) @@>), IsStaticMethod = true)
-    getPartition.AddXmlDocDelayed <| fun _ -> "Retrieves a table partition by its key."
-          
-    let executeQuery =  ProvidedMethod
-                         ("ExecuteQuery", [ ProvidedParameter("rawQuery", typeof<string>) ], (parentEntityType.MakeArrayType()), 
-                         InvokeCode = (fun args -> <@@ executeQuery connectionString tableName (%%args.[0] : string) @@>), 
-                         IsStaticMethod = true)
-    executeQuery.AddXmlDocDelayed <| fun _ -> "Executes a weakly-type query and returns the results in the shape for this table."
     
-    let where =  ProvidedMethod ("Where", [], queryBuilderType, InvokeCode = (fun args -> <@@ ([] : string list) @@>), IsStaticMethod = true)
+    let partitionType = createPartitionType parentEntityType connectionString tableName
+    let queryBuilderType, childTypes = 
+        TableQueryBuilder.createTableQueryType parentEntityType connectionString tableName propertiesCreated
+    let getPartition = 
+        ProvidedMethod
+            ("GetPartition", [ProvidedParameter("key", typeof<string>)], partitionType, 
+             InvokeCode = (fun args -> <@@ (%%args.[0]: string) @@>), IsStaticMethod = true)
+    getPartition.AddXmlDocDelayed <| fun _ -> "Retrieves a table partition by its key."
+    let executeQuery = 
+        ProvidedMethod
+            ("ExecuteQuery", 
+             [ProvidedParameter("rawQuery", typeof<string>) ], 
+             (parentEntityType.MakeArrayType()), 
+             InvokeCode = (fun args -> <@@ executeQuery connectionString tableName (%%args.[0]: string) @@>), 
+             IsStaticMethod = true)
+    executeQuery.AddXmlDocDelayed 
+    <| fun _ -> "Executes a weakly-type query and returns the results in the shape for this table."
+    let where = 
+        ProvidedMethod
+            ("Where", [], queryBuilderType, InvokeCode = (fun args -> <@@ ([]: string list) @@>), IsStaticMethod = true)
     where.AddXmlDocDelayed <| fun _ -> "Begins creating a strongly-typed query against the table."
-
-    let getEntity = ProvidedMethod
-                      ("GetEntity", 
-                      [ ProvidedParameter("rowKey", typeof<string>)
-                        ProvidedParameter("partitionKey", typeof<string>, optionalValue = null) ], (typeof<option<_>>).GetGenericTypeDefinition().MakeGenericType(parentEntityType), InvokeCode = (fun args -> <@@ getEntity (%%args.[0] : string) (%%args.[1] : string) connectionString tableName @@>), IsStaticMethod = true)
+    let getEntity = 
+        ProvidedMethod
+            ("GetEntity", 
+             [ProvidedParameter("rowKey", typeof<string>)
+              ProvidedParameter("partitionKey", typeof<string>, optionalValue = null)], 
+             (typeof<option<_>>).GetGenericTypeDefinition().MakeGenericType(parentEntityType), 
+             
+             InvokeCode = (fun args -> 
+             <@@ getEntity (%%args.[0]: string) (%%args.[1]: string) connectionString tableName @@>), 
+             IsStaticMethod = true)
     getEntity.AddXmlDocDelayed <| fun _ -> "Gets a single entity based on the row key and optionally the partition key."
-
-    [ partitionType; queryBuilderType ] @ childTypes, [ getPartition; executeQuery; where; getEntity ]
+    [partitionType;queryBuilderType] @ childTypes, [getPartition;executeQuery;where;getEntity]

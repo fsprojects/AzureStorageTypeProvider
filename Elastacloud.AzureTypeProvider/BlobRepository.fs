@@ -63,8 +63,7 @@ let downloadData connection container fileName =
         do! awaitUnit (blobRef.FetchAttributesAsync())
         let destinationArray = Array.zeroCreate (int blobRef.Properties.Length)
         do! awaitUnit (blobRef.DownloadToByteArrayAsync(destinationArray, 0))
-        return destinationArray
-    }
+        return destinationArray }
 
 let downloadToFile connection container fileName path = 
     let blobRef = getBlobRef connection container fileName

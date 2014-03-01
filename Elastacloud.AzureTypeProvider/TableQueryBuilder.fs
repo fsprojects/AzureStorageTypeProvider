@@ -43,6 +43,12 @@ let createTableQueryType (tableEntityType : ProvidedTypeDefinition) connection t
     let partitionKeyType = "PartitionKey", buildPropertyOperatorsType tableName "PartitionKey" EdmType.String tableQueryType
     let operatorTypes = partitionKeyType :: operatorTypes
     tableQueryType.AddMembersDelayed(fun () ->
-        ProvidedMethod("Execute", [], tableEntityType.MakeArrayType(), InvokeCode = (fun args -> <@@ executeQuery connection tableName (composeAllFilters ((%%args.[0]:obj) :?> string list)) @@>)) :> MemberInfo ::
-        [ for (name, operatorType) in operatorTypes -> ProvidedProperty(name, operatorType, GetterCode = (fun args -> <@@ (%%args.[0]:obj) :?> (string list) @@>)) :> MemberInfo ] )
+        let executeQueryMethod = ProvidedMethod("Execute", [ ], tableEntityType.MakeArrayType(), InvokeCode = (fun args -> <@@ executeQuery connection tableName (composeAllFilters ((%%args.[0]:obj) :?> string list)) @@>))
+        executeQueryMethod.AddXmlDocDelayed <| fun _ -> "Executes the custom query."
+        let customQueryProperties =
+            [ for (name, operatorType) in operatorTypes ->
+                let queryProperty = ProvidedProperty(name, operatorType, GetterCode = (fun args -> <@@ (%%args.[0]:obj) :?> (string list) @@>))
+                queryProperty.AddXmlDocDelayed <| fun _ -> sprintf "Creates a query part for the %s property." name
+                queryProperty :> MemberInfo ]                 
+        (executeQueryMethod :> MemberInfo) :: customQueryProperties)
     tableQueryType, operatorTypes |> List.unzip |> snd
