@@ -1,6 +1,7 @@
 ﻿/// Responsible for creating members on an individual table entity.
 module internal Elastacloud.FSharp.AzureTypeProvider.MemberFactories.TableEntityMemberFactory
 
+open Elastacloud.FSharp.AzureTypeProvider
 open Elastacloud.FSharp.AzureTypeProvider.Repositories.TableRepository
 open Elastacloud.FSharp.AzureTypeProvider.Utils
 open Microsoft.FSharp.Quotations
@@ -43,6 +44,20 @@ let private buildEntityProperty<'a> key =
     prop.AddXmlDocDelayed <| fun _ -> (sprintf "Returns the value of the %s property" key)
     prop
 
+let buildEdmParameter edmType builder = 
+    match edmType with
+    | EdmType.Binary -> builder typeof<byte []>
+    | EdmType.Boolean -> builder typeof<bool>
+    | EdmType.DateTime -> builder typeof<DateTime>
+    | EdmType.Double -> builder typeof<float>
+    | EdmType.Guid -> builder typeof<Guid>
+    | EdmType.Int32 -> builder typeof<int>
+    | EdmType.Int64 -> builder typeof<int64>
+    | EdmType.String -> builder typeof<string>
+    | _ -> builder typeof<obj>
+
+let buildParameter name buildType = ProvidedParameter(name, buildType)
+
 /// Sets the properties on a specific entity based on the inferred schema from the sample provided
 let setPropertiesForEntity (entityType: ProvidedTypeDefinition) (sampleEntities: #seq<DynamicTableEntity>) = 
     let properties = sampleEntities |> getDistinctProperties
@@ -60,6 +75,29 @@ let setPropertiesForEntity (entityType: ProvidedTypeDefinition) (sampleEntities:
                | EdmType.String -> buildEntityProperty<string> key
                | _ -> buildEntityProperty<obj> key)
         |> Seq.toList)
+    entityType.AddMemberDelayed
+        (fun () -> 
+        let parameters = 
+            [ ProvidedParameter("PartitionKey", typeof<string>)
+              ProvidedParameter("RowKey", typeof<string>) ] 
+            @ [ for (name, entityProp) in properties |> Seq.sortBy fst -> buildEdmParameter entityProp.PropertyType (buildParameter name) ]
+        ProvidedConstructor
+            (parameters, 
+             
+             InvokeCode = fun args -> 
+                 let fieldNames = 
+                     properties
+                     |> Seq.map fst
+                     |> Seq.toList
+                 
+                 let fieldValues = 
+                     args
+                     |> Seq.skip 2
+                     |> Seq.map(fun arg -> Expr.Coerce(arg, typeof<obj>))
+                     |> Seq.toList
+                 
+                 <@@ buildTableEntity (%%args.[0]: string) (%%args.[1]: string) fieldNames 
+                         (%%(Expr.NewArray(typeof<obj>, fieldValues))) @@>))
     properties
 
 /// Gets all the members for a Table Entity type
@@ -99,8 +137,38 @@ let buildTableEntityMembers parentEntityType connection tableName =
                ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], 
              (typeof<option<_>>).GetGenericTypeDefinition().MakeGenericType(parentEntityType), 
              
-             InvokeCode = (fun args -> 
-             <@@ getEntity (%%args.[0]: string) (%%args.[1]: string) (%%args.[2]: string) tableName @@>), 
+             InvokeCode = (fun args -> <@@ getEntity (%%args.[0]: string) (%%args.[1]: string) (%%args.[2]: string) tableName @@>), 
              IsStaticMethod = true)
     getEntity.AddXmlDocDelayed <| fun _ -> "Gets a single entity based on the row key and optionally the partition key."
-    [ partitionType;queryBuilderType ] @ childTypes, [ getPartition;executeQuery;where;getEntity ]
+    let insertEntity = 
+        ProvidedMethod
+            ("InsertEntity", 
+             [ ProvidedParameter("entity", parentEntityType)
+               ProvidedParameter("connectionString", typeof<string>, optionalValue = connection)
+               ProvidedParameter("insertMode", typeof<TableInsertMode>, optionalValue = TableInsertMode.Insert) ], 
+             returnType = typeof<TableResult>, 
+             
+             InvokeCode = (fun args -> <@@ insertEntity (%%args.[1]: string) tableName %%args.[2] (%%args.[0]: LightweightTableEntity) @@>), 
+             IsStaticMethod = true)
+    
+    let insertEntityObject = 
+        ProvidedMethod
+            ("InsertEntity", 
+             [ ProvidedParameter("partitionKey", typeof<string>)
+               ProvidedParameter("rowKey", typeof<string>)
+               ProvidedParameter("entity", typeof<obj>)
+               ProvidedParameter("connectionString", typeof<string>, optionalValue = connection)
+               ProvidedParameter("insertMode", typeof<TableInsertMode>, optionalValue = TableInsertMode.Insert) ], 
+             returnType = typeof<TableResult>, InvokeCode = (fun args -> <@@ insertEntityObject %%args.[3] tableName %%args.[0] %%args.[1] %%args.[4] %%args.[2] @@>), IsStaticMethod = true)
+    
+    let insertEntityBatchObject = 
+        ProvidedMethod
+            ("InsertEntityBatch", 
+             [ ProvidedParameter("entities", typeof<seq<string * string * obj>>)
+               ProvidedParameter("connectionString", typeof<string>, optionalValue = connection)
+               ProvidedParameter("insertMode", typeof<TableInsertMode>, optionalValue = TableInsertMode.Insert) ], 
+             returnType = typeof<TableResult seq>, InvokeCode = (fun args -> <@@ insertEntityObjectBatch %%args.[1] tableName %%args.[2] %%args.[0] @@>), IsStaticMethod = true)
+    
+
+    [ partitionType; queryBuilderType ] @ childTypes, 
+    [ getPartition; executeQuery; where; getEntity; insertEntity; insertEntityObject; insertEntityBatchObject ]
