@@ -44,7 +44,8 @@ let private buildEntityProperty<'a> key =
     prop.AddXmlDocDelayed <| fun _ -> (sprintf "Returns the value of the %s property" key)
     prop
 
-let buildEdmParameter edmType builder = 
+/// builds a single EDM parameter
+let private buildEdmParameter edmType builder = 
     match edmType with
     | EdmType.Binary -> builder typeof<byte []>
     | EdmType.Boolean -> builder typeof<bool>
@@ -148,9 +149,10 @@ let buildTableEntityMembers parentEntityType connection tableName =
                ProvidedParameter("insertMode", typeof<TableInsertMode>, optionalValue = TableInsertMode.Insert) ], 
              returnType = typeof<TableResult>, 
              
-             InvokeCode = (fun args -> <@@ insertEntity (%%args.[1]: string) tableName %%args.[2] (%%args.[0]: LightweightTableEntity) @@>), 
+             InvokeCode = (fun args -> <@@ insertEntity (%%args.[1]: string) tableName %%args.[2] (%%args.[0]: LightweightTableEntity) @@>),
              IsStaticMethod = true)
-    
+    insertEntity.AddXmlDocDelayed <| fun _ -> "Inserts a single entity with the inferred table schema into the table."
+
     let insertEntityObject = 
         ProvidedMethod
             ("InsertEntity", 
@@ -160,15 +162,17 @@ let buildTableEntityMembers parentEntityType connection tableName =
                ProvidedParameter("connectionString", typeof<string>, optionalValue = connection)
                ProvidedParameter("insertMode", typeof<TableInsertMode>, optionalValue = TableInsertMode.Insert) ], 
              returnType = typeof<TableResult>, InvokeCode = (fun args -> <@@ insertEntityObject %%args.[3] tableName %%args.[0] %%args.[1] %%args.[4] %%args.[2] @@>), IsStaticMethod = true)
+    insertEntity.AddXmlDocDelayed <| fun _ -> "Inserts in a single entity into the table, using public properties on the object as fields."
     
-    let insertEntityBatchObject = 
+    let insertEntitiesObject = 
         ProvidedMethod
-            ("InsertEntityBatch", 
+            ("InsertEntities", 
              [ ProvidedParameter("entities", typeof<seq<string * string * obj>>)
                ProvidedParameter("connectionString", typeof<string>, optionalValue = connection)
                ProvidedParameter("insertMode", typeof<TableInsertMode>, optionalValue = TableInsertMode.Insert) ], 
              returnType = typeof<TableResult seq>, InvokeCode = (fun args -> <@@ insertEntityObjectBatch %%args.[1] tableName %%args.[2] %%args.[0] @@>), IsStaticMethod = true)
-    
+    insertEntitiesObject.AddXmlDocDelayed <| fun _ -> "Inserts a batch of entities into the table, using public properties on the object as fields."
 
-    [ partitionType; queryBuilderType ] @ childTypes, 
-    [ getPartition; executeQuery; where; getEntity; insertEntity; insertEntityObject; insertEntityBatchObject ]
+    // Return back out all types and methods generated.
+    [ partitionType; queryBuilderType ] @ childTypes,
+    [ getPartition; executeQuery; where; getEntity; insertEntity; insertEntityObject; insertEntitiesObject ]
