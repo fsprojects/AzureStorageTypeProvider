@@ -38,8 +38,11 @@ let internal getRowsForSchema (rowCount: int) connection tableName =
     |> Seq.truncate rowCount
     |> Seq.toArray
 
-let executeQuery connection tableName filterString = 
-    (getTable connection tableName).ExecuteQuery(DynamicQuery().Where(filterString))
+let executeQuery connection tableName maxResults filterString = 
+    let query = DynamicQuery().Where(filterString)
+    let query = if maxResults > 0 then query.Take(Nullable(maxResults)) else query
+
+    (getTable connection tableName).ExecuteQuery(query)
     |> Seq.map(fun dte -> 
            { PartitionKey = dte.PartitionKey
              RowKey = dte.RowKey
@@ -118,6 +121,7 @@ let composeAllFilters filters =
         |> List.reduce(fun acc filter -> TableQuery.CombineFilters(acc, TableOperators.And, filter))
 
 let buildFilter(propertyName, comparison, value) = 
+    
     match box value with
     | :? string as value -> TableQuery.GenerateFilterCondition(propertyName, comparison, value)
     | :? int as value -> TableQuery.GenerateFilterConditionForInt(propertyName, comparison, value)
@@ -136,11 +140,11 @@ let getEntity rowKey partitionKey connection tableName =
                         ("PartitionKey", partitionKey) ]
                   |> List.map(fun (prop, value) -> buildFilter(prop, QueryComparisons.Equal, value))
                   |> composeAllFilters
-                  |> executeQuery connection tableName
+                  |> executeQuery connection tableName 0
     match results with
     | [| exactMatch |] -> Some exactMatch
     | [||] -> None
     | _ -> failwith <| sprintf "More than one row identified with the row key '%s'." rowKey
 
 let getPartitionRows partitionKey connection tableName = 
-    buildFilter("PartitionKey", QueryComparisons.Equal, partitionKey) |> executeQuery connection tableName
+    buildFilter("PartitionKey", QueryComparisons.Equal, partitionKey) |> executeQuery connection tableName 0

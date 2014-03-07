@@ -37,7 +37,7 @@ let private buildCustomProp (propertyOperatorsType: ProvidedTypeDefinition) pare
 
 /// Generates strongly-type query provided properties for an entity property e.g. Equal, GreaterThan etc. etc.
 let private buildPropertyOperatorsType tableName propertyName propertyType parentQueryType = 
-    let propertyOperatorsType = 
+    let propertyOperatorsType =  
         ProvidedTypeDefinition
             (sprintf "%s.%sQueryOperators" tableName propertyName, Some typeof<obj>, HideObjectMethods = true)
     propertyOperatorsType.AddMembersDelayed(fun () -> 
@@ -66,9 +66,10 @@ let createTableQueryType (tableEntityType: ProvidedTypeDefinition) connection ta
     tableQueryType.AddMembersDelayed(fun () -> 
         let executeQueryMethod = 
             ProvidedMethod
-                ("Execute", [ ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], 
+                ("Execute", [ ProvidedParameter("maxResults", typeof<int>, optionalValue = 0)
+                              ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], 
                  tableEntityType.MakeArrayType(), 
-                 InvokeCode = (fun args -> <@@ executeQuery (%%args.[1] : string) tableName (composeAllFilters((%%args.[0]: obj) :?> string list)) @@>))
+                 InvokeCode = (fun args -> <@@ executeQuery (%%args.[2] : string) tableName %%args.[1] (composeAllFilters((%%args.[0]: obj) :?> string list)) @@>))
         executeQueryMethod.AddXmlDocDelayed <| fun _ -> "Executes the custom query."
         let customQueryProperties = 
             [ for (name, operatorType) in operatorTypes -> 
