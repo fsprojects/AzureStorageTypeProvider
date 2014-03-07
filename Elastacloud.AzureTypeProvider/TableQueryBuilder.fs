@@ -59,14 +59,10 @@ let createTableQueryType (tableEntityType: ProvidedTypeDefinition) connection ta
     (properties: seq<string * EntityProperty>) = 
     let tableQueryType = 
         ProvidedTypeDefinition(tableName + "QueryPropertyBuilder", Some typeof<obj>, HideObjectMethods = true)
-    
-    let operatorTypes = 
-        [ for (name, value) in properties -> 
-              name, buildPropertyOperatorsType tableName name value.PropertyType tableQueryType ]
-    
-    let partitionKeyType = 
-        "PartitionKey", buildPropertyOperatorsType tableName "PartitionKey" EdmType.String tableQueryType
-    let operatorTypes = partitionKeyType :: operatorTypes
+                      
+    let operatorTypes = [ "PartitionKey", buildPropertyOperatorsType tableName "PartitionKey" EdmType.String tableQueryType
+                          "RowKey", buildPropertyOperatorsType tableName "RowKey" EdmType.String tableQueryType  ] @
+                        [ for (name, value) in properties -> name, buildPropertyOperatorsType tableName name value.PropertyType tableQueryType ]    
     tableQueryType.AddMembersDelayed(fun () -> 
         let executeQueryMethod = 
             ProvidedMethod

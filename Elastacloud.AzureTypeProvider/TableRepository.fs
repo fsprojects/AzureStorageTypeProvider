@@ -128,16 +128,19 @@ let buildFilter(propertyName, comparison, value) =
     | :? Guid as value -> TableQuery.GenerateFilterConditionForGuid(propertyName, comparison, value)
     | _ -> TableQuery.GenerateFilterCondition(propertyName, comparison, value.ToString())
 
-let getEntity entityKey partitionKey connection tableName = 
-    match partitionKey with
-    | null -> [ ("RowKey", entityKey) ]
-    | partitionKey -> 
-        [ ("RowKey", entityKey)
-          ("PartitionKey", partitionKey) ]
-    |> List.map(fun (prop, value) -> buildFilter(prop, QueryComparisons.Equal, value))
-    |> composeAllFilters
-    |> executeQuery connection tableName
-    |> Seq.tryFind(fun x -> true)
+let getEntity rowKey partitionKey connection tableName = 
+    let results = match partitionKey with
+                  | null -> [ ("RowKey", rowKey) ]
+                  | partitionKey -> 
+                      [ ("RowKey", rowKey)
+                        ("PartitionKey", partitionKey) ]
+                  |> List.map(fun (prop, value) -> buildFilter(prop, QueryComparisons.Equal, value))
+                  |> composeAllFilters
+                  |> executeQuery connection tableName
+    match results with
+    | [| exactMatch |] -> Some exactMatch
+    | [||] -> None
+    | _ -> failwith <| sprintf "More than one row identified with the row key '%s'." rowKey
 
 let getPartitionRows partitionKey connection tableName = 
     buildFilter("PartitionKey", QueryComparisons.Equal, partitionKey) |> executeQuery connection tableName
