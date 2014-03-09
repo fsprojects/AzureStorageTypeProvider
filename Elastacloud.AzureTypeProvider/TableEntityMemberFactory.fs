@@ -177,6 +177,7 @@ let buildTableEntityMembers parentEntityType connection tableName =
              [ ProvidedParameter("entity", parentEntityType)
                ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ],
              returnType = typeof<TableResult>, InvokeCode = (fun args -> <@@ deleteEntity %%args.[1] tableName %%args.[0] @@>), IsStaticMethod = true)
+    deleteEntity.AddXmlDocDelayed <| fun _ -> "Deletes a single entity from the table."
 
     let deleteEntities =
         ProvidedMethod
@@ -184,6 +185,7 @@ let buildTableEntityMembers parentEntityType connection tableName =
              [ ProvidedParameter("entities", parentEntityType.MakeArrayType())
                ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ],
              returnType = typeof<TableResult seq>, InvokeCode = (fun args -> <@@ deleteEntities %%args.[1] tableName %%args.[0] @@>), IsStaticMethod = true)
+    deleteEntities.AddXmlDocDelayed <| fun _ -> "Deletes a batch of entities from the table."
 
     let deleteEntitiesObject =
         ProvidedMethod
@@ -191,6 +193,7 @@ let buildTableEntityMembers parentEntityType connection tableName =
              [ ProvidedParameter("entities", typeof<(string * string) seq>)
                ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ],
              returnType = typeof<TableResult seq>, InvokeCode = (fun args -> <@@ deleteEntitiesTuple %%args.[1] tableName %%args.[0] @@>), IsStaticMethod = true)
+    deleteEntitiesObject.AddXmlDocDelayed <| fun _ -> "Deletes a batch of entities from the table using the supplied pairs of Partition and Row keys."
 
     // Return back out all types and methods generated.
     [ partitionType; queryBuilderType ] @ childTypes,
