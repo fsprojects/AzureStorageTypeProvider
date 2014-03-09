@@ -173,5 +173,5 @@ let getEntity rowKey partitionKey connection tableName =
     | [||] -> None
     | _ -> failwith <| sprintf "More than one row identified with the row key '%s'." rowKey
 
-let getPartitionRows partitionKey connection tableName = 
+let getPartitionRows (partitionKey:string) connection tableName = 
     buildFilter("PartitionKey", QueryComparisons.Equal, partitionKey) |> executeQuery connection tableName 0

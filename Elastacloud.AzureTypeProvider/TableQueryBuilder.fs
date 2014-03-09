@@ -70,7 +70,7 @@ let createTableQueryType (tableEntityType: ProvidedTypeDefinition) connection ta
                               ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], 
                  tableEntityType.MakeArrayType(), 
                  InvokeCode = (fun args -> <@@ executeQuery (%%args.[2] : string) tableName %%args.[1] (composeAllFilters((%%args.[0]: obj) :?> string list)) @@>))
-        executeQueryMethod.AddXmlDocDelayed <| fun _ -> "Executes the custom query."
+        executeQueryMethod.AddXmlDocDelayed <| fun _ -> "Executes the current query."
         let customQueryProperties = 
             [ for (name, operatorType) in operatorTypes -> 
                   let queryProperty = 
