@@ -53,8 +53,8 @@ let executeQuery connection tableName maxResults filterString =
                  |> Map.ofSeq })
     |> Seq.toArray
 
-let private createInsertOperation insertMode entity = 
-    let tableEntity = DynamicTableEntity(entity.PartitionKey, entity.RowKey)
+let private buildDynamicTableEntity entity =
+    let tableEntity = DynamicTableEntity(entity.PartitionKey, entity.RowKey, ETag = "*")
     for (key, value) in entity.Values |> Map.toArray do
         tableEntity.Properties.[key] <- match value with
                                         | :? (byte []) as value -> EntityProperty.GeneratePropertyForByteArray(value)
@@ -70,14 +70,49 @@ let private createInsertOperation insertMode entity =
                                             EntityProperty.GeneratePropertyForGuid(Nullable(value))
                                         | :? int64 as value -> EntityProperty.GeneratePropertyForLong(Nullable(value))
                                         | _ -> EntityProperty.CreateEntityPropertyFromObject(value)
-    tableEntity |> match insertMode with
-                   | TableInsertMode.Insert -> TableOperation.Insert
-                   | TableInsertMode.InsertOrReplace -> TableOperation.InsertOrReplace
-                   | _ -> failwith "unknown insertion mode"
+    tableEntity
 
+let private createInsertOperation insertMode = 
+    match insertMode with
+    | TableInsertMode.Insert -> TableOperation.Insert
+    | TableInsertMode.InsertOrReplace -> TableOperation.InsertOrReplace
+    | _ -> failwith "unknown insertion mode"
+
+let private executeBatchOperation operation (table:CloudTable) entities =
+    entities
+    |> Seq.groupBy(fun (entity:DynamicTableEntity) -> entity.PartitionKey)
+    |> Seq.map(fun (key, entities) -> 
+           let batchForPartition = TableBatchOperation()
+           for entity in entities do
+               entity
+               |> operation
+               |> batchForPartition.Add
+           batchForPartition)
+    |> Seq.collect table.ExecuteBatch
+
+let deleteEntities connection tableName entities =
+    let table = getTable connection tableName    
+    entities
+    |> Array.map buildDynamicTableEntity
+    |> executeBatchOperation TableOperation.Delete table
+    |> Seq.toArray
+
+let deleteEntity connection tableName entity =
+    deleteEntities connection tableName [| entity |] |> Seq.head
+
+let deleteEntitiesTuple connection tableName entities =
+    let table = getTable connection tableName
+    entities
+    |> Seq.map (fun (partitionKey, rowKey) -> DynamicTableEntity(partitionKey, rowKey, ETag = "*"))
+    |> executeBatchOperation TableOperation.Delete table
+    |> Seq.toArray
+    
 let insertEntity connection tableName insertMode entity = 
     let table = getTable connection tableName
-    createInsertOperation insertMode entity |> table.Execute
+    entity
+    |> buildDynamicTableEntity
+    |> createInsertOperation insertMode
+    |> table.Execute
 
 let insertEntityObject connection tableName partitionKey rowKey entity insertMode = 
     insertEntity connection tableName insertMode { PartitionKey = partitionKey
@@ -101,15 +136,8 @@ let insertEntityObjectBatch connection tableName insertMode entities =
                  entity.GetType().GetProperties(Reflection.BindingFlags.Public ||| Reflection.BindingFlags.Instance)
                  |> Seq.map(fun prop -> prop.Name, prop.GetValue(entity, null))
                  |> Map.ofSeq })
-    |> Seq.groupBy(fun entity -> entity.PartitionKey)
-    |> Seq.map(fun (key, entities) -> 
-           let batchForPartition = TableBatchOperation()
-           for entity in entities do
-               entity
-               |> createInsertOperation insertMode
-               |> batchForPartition.Add
-           batchForPartition)
-    |> Seq.collect table.ExecuteBatch
+    |> Seq.map buildDynamicTableEntity
+    |> executeBatchOperation (createInsertOperation insertMode) table
     |> Seq.toArray
 
 let composeAllFilters filters = 
@@ -121,8 +149,7 @@ let composeAllFilters filters =
         |> List.reduce(fun acc filter -> TableQuery.CombineFilters(acc, TableOperators.And, filter))
 
 let buildFilter(propertyName, comparison, value) = 
-    
-    match box value with
+        match box value with
     | :? string as value -> TableQuery.GenerateFilterCondition(propertyName, comparison, value)
     | :? int as value -> TableQuery.GenerateFilterConditionForInt(propertyName, comparison, value)
     | :? int64 as value -> TableQuery.GenerateFilterConditionForLong(propertyName, comparison, value)
