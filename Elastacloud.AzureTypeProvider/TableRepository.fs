@@ -94,10 +94,9 @@ let private executeBatchOperation operation (table:CloudTable) entities =
            |> batch 100
            |> Seq.map(fun entityBatch ->
                 let batchForPartition = TableBatchOperation()
-                for entity in entityBatch do
-                    entity
-                    |> operation
-                    |> batchForPartition.Add
+                entityBatch
+                |> Seq.map operation
+                |> Seq.iter batchForPartition.Add
                 batchForPartition))
     |> Seq.collect table.ExecuteBatch
 
@@ -142,6 +141,7 @@ let insertEntityObjectBatch connection tableName insertMode entities =
 
 let insertEntityObject connection tableName partitionKey rowKey insertMode entity =
     insertEntityObjectBatch connection tableName insertMode [ partitionKey, rowKey, entity ]
+    |> Seq.head
 
 let composeAllFilters filters = 
     match filters with

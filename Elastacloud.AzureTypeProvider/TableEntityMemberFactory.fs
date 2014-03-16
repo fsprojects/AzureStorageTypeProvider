@@ -153,7 +153,7 @@ let buildTableEntityMembers parentEntityType connection tableName =
              [ ProvidedParameter("entities", typeof<(string * string * obj) seq>)
                ProvidedParameter("connectionString", typeof<string>, optionalValue = connection)
                ProvidedParameter("insertMode", typeof<TableInsertMode>, optionalValue = TableInsertMode.Insert) ], 
-             returnType = typeof<TableResult seq>, InvokeCode = (fun args -> <@@ insertEntityObjectBatch %%args.[1] tableName %%args.[2] %%args.[0] @@>), IsStaticMethod = true)
+             returnType = typeof<TableResult []>, InvokeCode = (fun args -> <@@ insertEntityObjectBatch %%args.[1] tableName %%args.[2] %%args.[0] @@>), IsStaticMethod = true)
     insertEntitiesObject.AddXmlDocDelayed <| fun _ -> "Inserts a batch of entities into the table, using all public properties on the object as fields."
 
     let deleteEntity =
