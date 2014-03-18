@@ -10,24 +10,24 @@ The blob storage provider is geared for ad-hoc querying of your data, rather tha
 
 ##Create a connection to your Azure account
 	type account = Elastacloud.FSharp.AzureTypeProvider.AzureAccount< "accountName","accountKey" >
-##Download a file from Azure into memory
+##Reading a file from Azure into memory
 Intellisense automatically prompts you for containers and files. There's a single Download() method on every file. It will return a different type depending on the extension of the file.
 
 	// Downloads LeagueTable.csv as an Async<string>
 	let textAsyncWorkflow = async {
-		let! text = account.Containers.container1.``LeagueTable.csv``.DownloadAsync()
+		let! text = account.Containers.container1.``LeagueTable.csv``.ReadAsync()
 		printfn "%s" (text.ToLower())
 		return text
 	}
 
 	// Can also do this
-	let text = account.Containers.container1.``LeagueTable.csv``.DownloadAsync() |> Async.RunSynchronously
+	let text = account.Containers.container1.``LeagueTable.csv``.ReadAsync() |> Async.RunSynchronously
 	
 	// Or this - don't use on large files though, will lock up FSI whilst downloading...
-	let text = account.Container.container1.``LeagueTable.csv``.Download()
+	let text = account.Container.container1.``LeagueTable.csv``.Read()
 
 	// Downloads document.xml as an XDocument
-	let xmlDoc = account.Containers.container1.``document.xml``.Download()
+	let xmlDoc = account.Containers.container1.``document.xml``.Read()
 	// xmlDoc is an XDocument, NOT a plain string
 	printfn "First element is %A" xmlDoc.Elements() |> Seq.head
 	xmlDoc
@@ -39,17 +39,17 @@ Intellisense automatically prompts you for containers and files. There's a singl
 	let firstLine = textStream.ReadLine()
 	// etc. etc.
 
-For non-text and xml files, you will get a ```DownloadString()``` function that can be used, although there is no guarantee that the contents of the file will be text :)
+For non-text and xml files, you will get a ```ReadAsString()``` function that can be used, although there is no guarantee that the contents of the file will be text :)
 
 ##Downloading files to the local file system
 	// Downloads LeagueTable.csv to a file locally
-	account.Containers.container1.``LeagueTable.csv``.DownloadToFile(@"D:\LeagueTable.csv")
+	account.Containers.container1.``LeagueTable.csv``.Download(@"D:\LeagueTable.csv")
 	
 	// Downloads an entire folder locally
-	account.Containers.container1.``myfolder``.DownloadFolder(@"D:\MyFolder")
+	account.Containers.container1.``myfolder``.Download(@"D:\MyFolder")
 	
 	// Downloads an entire container locally
-	account.Containers.container1.DownloadContainer(@"D:\MyContainer")
+	account.Containers.container1.Download(@"D:\MyContainer")
 	
 #Table Storage
 ##Get a list of tables
