@@ -15,7 +15,7 @@ type internal LightweightContainer =
       GetFiles : unit -> seq<containerItem> }
 
 let private getBlobClient connection = CloudStorageAccount.Parse(connection).CreateCloudBlobClient()
-let private getBlobRef connection container file = 
+let private getBlobRef (connection,container,file) = 
     (getBlobClient connection).GetContainerReference(container).GetBlockBlobReference(file)
 
 /// Generates a set of lightweight container lists for a blob storage account
@@ -51,26 +51,26 @@ let internal getBlobStorageAccountManifest connection =
                  |> getContainerStructure null
                  |> Seq.cache) })
 
-let downloadText connection container fileName = 
-    let blobRef = getBlobRef connection container fileName
+let downloadText connection container file = 
+    let blobRef = getBlobRef (connection,container,file)
+    blobRef.DownloadText()
+
+let downloadTextAsync connection container file = 
+    let blobRef = getBlobRef (connection,container,file)
     Async.AwaitTask(blobRef.DownloadTextAsync())
 
 let private awaitUnit = Async.AwaitIAsyncResult >> Async.Ignore
 
-let downloadData connection container fileName = 
-    async { 
-        let blobRef = getBlobRef connection container fileName
-        do! awaitUnit (blobRef.FetchAttributesAsync())
-        let destinationArray = Array.zeroCreate (int blobRef.Properties.Length)
-        do! awaitUnit (blobRef.DownloadToByteArrayAsync(destinationArray, 0))
-        return destinationArray }
+let downloadStream connection container file = 
+    let blobRef = getBlobRef (connection,container,file)
+    blobRef.OpenRead()
 
-let downloadToFile connection container fileName path = 
-    let blobRef = getBlobRef connection container fileName
+let downloadToFile connection container file path = 
+    let blobRef = getBlobRef (connection,container,file)
 
     let targetDirectory = Path.GetDirectoryName(path)
     if not (Directory.Exists targetDirectory) then Directory.CreateDirectory targetDirectory |> ignore
-    blobRef.DownloadToFileAsync(path, IO.FileMode.Create) |> awaitUnit
+    blobRef.DownloadToFileAsync(path, FileMode.Create) |> awaitUnit
 
 let downloadFolder connection container folderPath path =
     let containerRef = (getBlobClient connection).GetContainerReference(container)
@@ -87,17 +87,17 @@ let downloadFolder connection container folderPath path =
     |> Async.Ignore
 
 let uploadFile connection container path = 
-    let fileName = IO.Path.GetFileName path
-    let blobRef = getBlobRef connection container fileName
+    let fileName = Path.GetFileName path
+    let blobRef = getBlobRef(connection,container,fileName)
     awaitUnit (blobRef.UploadFromFileAsync(path, FileMode.Open))
 
-let getFileDetails connection container fileName = 
-    let blobRef = getBlobRef connection container fileName
+let getFileDetails connection container file = 
+    let blobRef = getBlobRef (connection,container,file)
     blobRef.FetchAttributes()
     blobRef.Uri.AbsoluteUri, blobRef.Properties
 
-let getSas connection container fileName duration permissions = 
-    let blobRef = getBlobRef connection container fileName
+let getSas connection container file duration permissions = 
+    let blobRef = getBlobRef (connection,container,file)
     let expiry = Nullable<DateTimeOffset>(DateTimeOffset.UtcNow.Add(duration))
     let policy = SharedAccessBlobPolicy(SharedAccessExpiryTime = expiry, Permissions = permissions)
     let sas = blobRef.GetSharedAccessSignature policy

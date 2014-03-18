@@ -29,9 +29,9 @@ let rec private createFileItem connectionString containerName fileItem =
         let fileProp = ProvidedTypeDefinition(name, Some typeof<obj>)
         fileProp.AddMembersDelayed(fun _ -> 
             [ BlobMemberFactory.createFileDetailsProperty path properties :> MemberInfo
-              BlobMemberFactory.createDownloadFunction fileDetails :> MemberInfo
               BlobMemberFactory.createDownloadFileFunction fileDetails :> MemberInfo
-              BlobMemberFactory.createGenerateSasFunction fileDetails :> MemberInfo ])
+              BlobMemberFactory.createGenerateSasFunction fileDetails :> MemberInfo ]
+              @ BlobMemberFactory.createDownloadFunctions fileDetails)
         fileProp :> MemberInfo
 
 let private createContainerType connectionString (container : LightweightContainer) = 
