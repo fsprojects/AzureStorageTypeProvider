@@ -32,7 +32,7 @@ let createDownloadFileFunction fileDetails =
     let connection, container, file = fileDetails
     let output = 
         ProvidedMethod
-            (methodName = "DownloadToFile", parameters = [ ProvidedParameter("path", typeof<string>) ], 
+            (methodName = "Download", parameters = [ ProvidedParameter("path", typeof<string>) ], 
              returnType = typeof<Async<unit>>, 
              
              InvokeCode = (fun (args: Expr list) -> 
@@ -54,17 +54,17 @@ let private createDownloadMultipleFilesFunction folderDetails methodName comment
     output
 
 let createDownloadFolderFunction(folderDetails) = 
-    createDownloadMultipleFilesFunction folderDetails "DownloadFolder" 
+    createDownloadMultipleFilesFunction folderDetails "Download" 
         "Downloads the entire folder contents to the local file system asynchronously."
 let createDownloadContainerFunction(connectionString, container) = 
-    createDownloadMultipleFilesFunction (connectionString, container, String.Empty) "DownloadContainer" 
+    createDownloadMultipleFilesFunction (connectionString, container, String.Empty) "Download" 
         "Downloads the entire container contents to the local file system asynchronously."
 
 let createUploadFileFunction fileDetails = 
     let connectionString, container = fileDetails
     let output = 
         ProvidedMethod
-            (methodName = "UploadFile", parameters = [ ProvidedParameter("path", typeof<string>) ], 
+            (methodName = "Upload", parameters = [ ProvidedParameter("path", typeof<string>) ], 
              returnType = typeof<Async<unit>>, 
              
              InvokeCode = (fun (args: Expr list) -> 
