@@ -85,6 +85,7 @@ let downloadFolder connection container folderPath path =
         downloadToFile connection container blob.Name (Path.Combine(path, targetName)))
     |> Async.Parallel
     |> Async.Ignore
+    |> Async.Start
 
 let uploadFile connection container path = 
     let fileName = Path.GetFileName path
