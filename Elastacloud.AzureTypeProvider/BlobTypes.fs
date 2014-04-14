@@ -19,10 +19,10 @@ open System.Xml.Linq
 /// Represents a file in blob storage.
 type BlobFile(connectionDetails) = 
     let connection, container, file = connectionDetails
+    let blobRef = getBlobRef(connectionDetails)
     
     /// Generates a full-access shared-access signature for the supplied duration.
     member x.GenerateSharedAccessSignature(duration) = 
-        let blobRef = getBlobRef (connection, container, file)
         let expiry = Nullable(DateTimeOffset.UtcNow.Add(duration))
         let policy = 
             SharedAccessBlobPolicy
@@ -34,54 +34,46 @@ type BlobFile(connectionDetails) =
     
     /// Downloads this file to the specified path.
     member x.Download(path) =
-        let blobRef = getBlobRef (connection, container, file)
         let targetDirectory = Path.GetDirectoryName(path)
         if not (Directory.Exists targetDirectory) then Directory.CreateDirectory targetDirectory |> ignore
         blobRef.DownloadToFileAsync(path, FileMode.Create) |> awaitUnit
     
     /// Opens this file as a stream for reading.
-    member x.OpenStream() =
-        getBlobRef(connection, container, file).OpenRead()
+    member x.OpenStream() = blobRef.OpenRead()
     
     /// Gets the blob size in bytes.
-    member x.Size with get () = let blobRef = getBlobRef (connection, container, file)
-                                blobRef.FetchAttributes()
+    member x.Size with get () = blobRef.FetchAttributes()
                                 blobRef.Properties.Length
 
 /// Represents a file stored in blob storage that can be read as text file.
 type TextFile(connectionDetails) = 
     inherit BlobFile(connectionDetails)
-    
+    let blobRef = getBlobRef(connectionDetails)
+
     /// Reads this file as a string.
-    member x.ReadAsString() =
-        getBlobRef(connectionDetails).DownloadText()
+    member x.ReadAsString() = blobRef.DownloadText()
     
     /// Reads this file as a string asynchronously.
-    member x.ReadAsStringAsync() =
-        let blobRef = getBlobRef(connectionDetails)
-        Async.AwaitTask(blobRef.DownloadTextAsync())
+    member x.ReadAsStringAsync() = Async.AwaitTask(blobRef.DownloadTextAsync())
 
 /// Represents a file stored in blob storage that can be read as a XDocument.
 type XmlFile(connectionDetails) = 
     inherit BlobFile(connectionDetails)
+    let blobRef = getBlobRef(connectionDetails)
     
     /// Reads this file as an XDocument.
-    member x.ReadAsXDocument() =
-        getBlobRef(connectionDetails).DownloadText() |> XDocument.Parse
+    member x.ReadAsXDocument() = blobRef.DownloadText() |> XDocument.Parse
     
     /// Reads this file as an XDocument asynchronously.
     member x.ReadAsXDocumentAsync() =
-        async { let blobRef = getBlobRef(connectionDetails)
-                let! text = blobRef.DownloadTextAsync() |> Async.AwaitTask
+        async { let! text = blobRef.DownloadTextAsync() |> Async.AwaitTask
                 return XDocument.Parse text }
 
 type BlobFolder(connectionDetails) = 
     /// Downloads the entire folder contents to the local file system asynchronously.
-    member x.Download(path) =
-        downloadFolder (connectionDetails, path)
+    member x.Download(path) = downloadFolder (connectionDetails, path)
 
 type BlobContainer(connectionString, container) = 
-    
     /// Downloads the entire container contents to the local file system asynchronously.
     member x.Download(path) = 
         let connectionDetails = connectionString, container, String.Empty

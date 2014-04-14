@@ -24,8 +24,7 @@ let rec private createFileItem (domainType : ProvidedTypeDefinition) connectionS
              |> Array.toList))
         ProvidedProperty("/" + name, folderProp, GetterCode = fun _ -> <@@ Builder.createBlobFolder connectionString containerName path @@>)
     | Blob(path, name, properties) -> 
-        let fileDetails = connectionString, containerName, path
-        
+        let fileDetails = connectionString, containerName, path        
         let fileType = 
             match path with
             | Builder.Text -> ProvidedTypes.TextFileProvidedType

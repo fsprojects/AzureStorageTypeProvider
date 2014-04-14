@@ -36,7 +36,7 @@ type AzureAccountTypeProvider() as this =
         // Now create child members e.g. containers, tables etc.
         typeProviderForAccount.AddMembers
             ([ ContainerTypeFactory.getBlobStorageMembers 
-               (* ContainerTypeFactory.getTableStorageMembers *) ]
+               ContainerTypeFactory.getTableStorageMembers ]
             |> List.map (fun builder -> builder connectionString domainTypes))
         typeProviderForAccount
     
