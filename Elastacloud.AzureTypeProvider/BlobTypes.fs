@@ -85,10 +85,11 @@ type BlobContainer(connectionString, container) =
         let blobRef = getBlobRef(connectionString, container, fileName)
         awaitUnit (blobRef.UploadFromFileAsync(path, FileMode.Open))
 
-module ProvidedTypes = 
-    let BlobFileProvidedType = ProvidedTypeDefinition("BlobFile", Some typeof<BlobFile>, HideObjectMethods = true)
-    let TextFileProvidedType = ProvidedTypeDefinition("TextFile", Some typeof<TextFile>, HideObjectMethods = true)
-    let XmlFileProvidedType = ProvidedTypeDefinition("XmlFile", Some typeof<XmlFile>, HideObjectMethods = true)
+module ProvidedTypes =
+    let generateTypes() = 
+        [ ProvidedTypeDefinition("BlobFile", Some typeof<BlobFile>, HideObjectMethods = true)
+          ProvidedTypeDefinition("TextFile", Some typeof<TextFile>, HideObjectMethods = true)
+          ProvidedTypeDefinition("XmlFile", Some typeof<XmlFile>, HideObjectMethods = true) ]
 
 // Builder methods to construct blobs etc..
 module Builder = 

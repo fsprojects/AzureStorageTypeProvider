@@ -14,9 +14,6 @@ type AzureAccountTypeProvider() as this =
     let thisAssembly = Assembly.GetExecutingAssembly()
     let azureAccountType = ProvidedTypeDefinition(thisAssembly, namespaceName, "AzureAccount", baseType = Some typeof<obj>)
 
-    do
-        azureAccountType.AddMembers [ ProvidedTypes.BlobFileProvidedType; ProvidedTypes.TextFileProvidedType; ProvidedTypes.XmlFileProvidedType ]
-    
     let buildConnectionString (args : obj []) = 
         let accountName = args.[0] :?> string
         let accountKey = args.[1] :?> string
@@ -31,6 +28,7 @@ type AzureAccountTypeProvider() as this =
         typeProviderForAccount.AddMember(ProvidedConstructor(parameters = [], InvokeCode = (fun args -> <@@ null @@>)))
         let connectionString = buildConnectionString args
         let domainTypes = ProvidedTypeDefinition("DomainTypes", Some typeof<obj>)
+        domainTypes.AddMembers <| ProvidedTypes.generateTypes()
         typeProviderForAccount.AddMember(domainTypes)
 
         // Now create child members e.g. containers, tables etc.

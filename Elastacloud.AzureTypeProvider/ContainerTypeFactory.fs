@@ -27,10 +27,11 @@ let rec private createFileItem (domainType : ProvidedTypeDefinition) connectionS
         let fileDetails = connectionString, containerName, path        
         let fileType = 
             match path with
-            | Builder.Text -> ProvidedTypes.TextFileProvidedType
-            | Builder.XML -> ProvidedTypes.XmlFileProvidedType
-            | Builder.Binary -> ProvidedTypes.BlobFileProvidedType
-        ProvidedProperty(name, fileType, GetterCode = fun _ -> <@@ Builder.createBlobFile connectionString containerName path @@>)
+            | Builder.Text -> "TextFile"
+            | Builder.XML -> "XmlFile"
+            | Builder.Binary -> "BlobFile"
+        let fileTypeDefinition = domainType.GetMember(fileType).[0] :?> ProvidedTypeDefinition
+        ProvidedProperty(name, fileTypeDefinition, GetterCode = fun _ -> <@@ Builder.createBlobFile connectionString containerName path @@>)
 
 let private createContainerType (domainType : ProvidedTypeDefinition) connectionString (container : LightweightContainer) = 
     let individualContainerType = ProvidedTypeDefinition(container.Name, Some typeof<BlobContainer>, HideObjectMethods = true)
