@@ -68,8 +68,7 @@ let setPropertiesForEntity (entityType: ProvidedTypeDefinition) (sampleEntities:
               ProvidedParameter("RowKey", typeof<string>) ] 
             @ [ for (name, entityProp) in properties |> Seq.sortBy fst -> buildEdmParameter entityProp.PropertyType (buildParameter name) ]
         ProvidedConstructor
-            (parameters, 
-             
+            (parameters,              
              InvokeCode = fun args -> 
                  let fieldNames = 
                      properties
@@ -107,20 +106,18 @@ let buildTableEntityMembers parentEntityType connection tableName =
              (parentEntityType.MakeArrayType()), 
              InvokeCode = (fun args -> <@@ executeQuery (%%args.[1]: string) tableName 0 (%%args.[0]: string) @@>), 
              IsStaticMethod = true)
-    executeQuery.AddXmlDocDelayed 
-    <| fun _ -> "Executes a weakly-type query and returns the results in the shape for this table."
+    executeQuery.AddXmlDocDelayed <| fun _ -> "Executes a weakly-type query and returns the results in the shape for this table."
     let where = 
         ProvidedMethod
             ("Query", [], queryBuilderType, InvokeCode = (fun args -> <@@ ([]: string list) @@>), IsStaticMethod = true)
-    where.AddXmlDocDelayed <| fun _ -> "Creating a strongly-typed query against the table."
+    where.AddXmlDocDelayed <| fun _ -> "Creates a strongly-typed query against the table."
     let getEntity = 
         ProvidedMethod
             ("Get", 
              [ ProvidedParameter("rowKey", typeof<string>)
                ProvidedParameter("partitionKey", typeof<string>, optionalValue = null)
                ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], 
-             (typeof<option<_>>).GetGenericTypeDefinition().MakeGenericType(parentEntityType), 
-             
+             (typeof<option<_>>).GetGenericTypeDefinition().MakeGenericType(parentEntityType),             
              InvokeCode = (fun args -> <@@ getEntity (%%args.[0]: string) (%%args.[1]: string) (%%args.[2]: string) tableName @@>), 
              IsStaticMethod = true)
     getEntity.AddXmlDocDelayed <| fun _ -> "Gets a single entity based on the row key and optionally the partition key. If more than one entity is returned, an exception is raised."
@@ -131,7 +128,6 @@ let buildTableEntityMembers parentEntityType connection tableName =
                ProvidedParameter("connectionString", typeof<string>, optionalValue = connection)
                ProvidedParameter("insertMode", typeof<TableInsertMode>, optionalValue = TableInsertMode.Insert) ], 
              returnType = typeof<TableResult>, 
-             
              InvokeCode = (fun args -> <@@ insertEntity (%%args.[1]: string) tableName %%args.[2] (%%args.[0]: LightweightTableEntity) @@>),
              IsStaticMethod = true)
     insertEntity.AddXmlDocDelayed <| fun _ -> "Inserts a single entity with the inferred table schema into the table."

@@ -13,6 +13,9 @@ type AzureAccountTypeProvider() as this =
     let namespaceName = "Elastacloud.FSharp.AzureTypeProvider"
     let thisAssembly = Assembly.GetExecutingAssembly()
     let azureAccountType = ProvidedTypeDefinition(thisAssembly, namespaceName, "AzureAccount", baseType = Some typeof<obj>)
+
+    do
+        azureAccountType.AddMembers [ ProvidedTypes.BlobFileProvidedType; ProvidedTypes.TextFileProvidedType; ProvidedTypes.XmlFileProvidedType ]
     
     let buildConnectionString (args : obj []) = 
         let accountName = args.[0] :?> string
@@ -27,12 +30,14 @@ type AzureAccountTypeProvider() as this =
             ProvidedTypeDefinition(thisAssembly, namespaceName, typeName, baseType = Some typeof<obj>)
         typeProviderForAccount.AddMember(ProvidedConstructor(parameters = [], InvokeCode = (fun args -> <@@ null @@>)))
         let connectionString = buildConnectionString args
-        
+        let domainTypes = ProvidedTypeDefinition("DomainTypes", Some typeof<obj>)
+        typeProviderForAccount.AddMember(domainTypes)
+
         // Now create child members e.g. containers, tables etc.
         typeProviderForAccount.AddMembers
-            ([ ContainerTypeFactory.getBlobStorageMembers
-               ContainerTypeFactory.getTableStorageMembers ]
-            |> List.map (fun builder -> builder connectionString azureAccountType))
+            ([ ContainerTypeFactory.getBlobStorageMembers 
+               (* ContainerTypeFactory.getTableStorageMembers *) ]
+            |> List.map (fun builder -> builder connectionString domainTypes))
         typeProviderForAccount
     
     // Parameterising the provider

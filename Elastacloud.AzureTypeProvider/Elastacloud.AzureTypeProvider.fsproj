@@ -84,13 +84,11 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Types.fs" />
-    <Compile Include="Utils.fs" />
     <Compile Include="ProvidedTypes-0.4.fs" />
     <Compile Include="BlobRepository.fs" />
+    <Compile Include="Types.fs" />
+    <Compile Include="Utils.fs" />
     <Compile Include="TableRepository.fs" />
-    <Compile Include="BlobDownloadFunctionFactory.fs" />
-    <Compile Include="BlobMemberFactory.fs" />
     <Compile Include="TableQueryBuilder.fs" />
     <Compile Include="TableEntityMemberFactory.fs" />
     <Compile Include="ContainerTypeFactory.fs" />
