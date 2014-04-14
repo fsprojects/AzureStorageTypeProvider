@@ -3,7 +3,6 @@ module internal Elastacloud.FSharp.AzureTypeProvider.MemberFactories.TableEntity
 
 open Elastacloud.FSharp.AzureTypeProvider
 open Elastacloud.FSharp.AzureTypeProvider.Repositories.TableRepository
-open Elastacloud.FSharp.AzureTypeProvider.Utils
 open Microsoft.FSharp.Quotations
 open Microsoft.WindowsAzure.Storage.Table
 open Samples.FSharp.ProvidedTypes

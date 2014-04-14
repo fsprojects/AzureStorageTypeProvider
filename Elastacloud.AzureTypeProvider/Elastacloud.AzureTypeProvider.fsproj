@@ -86,8 +86,7 @@
   <ItemGroup>
     <Compile Include="ProvidedTypes-0.4.fs" />
     <Compile Include="BlobRepository.fs" />
-    <Compile Include="Types.fs" />
-    <Compile Include="Utils.fs" />
+    <Compile Include="BlobTypes.fs" />
     <Compile Include="TableRepository.fs" />
     <Compile Include="TableQueryBuilder.fs" />
     <Compile Include="TableEntityMemberFactory.fs" />
