@@ -105,6 +105,7 @@ let deleteEntities connection tableName entities =
     entities
     |> Array.map buildDynamicTableEntity
     |> executeBatchOperation TableOperation.Delete table
+    |> Seq.map(fun result -> result.HttpStatusCode)
     |> Seq.toArray
 
 let deleteEntity connection tableName entity =
@@ -115,14 +116,15 @@ let deleteEntitiesTuple connection tableName entities =
     entities
     |> Seq.map (fun (partitionKey, rowKey) -> DynamicTableEntity(partitionKey, rowKey, ETag = "*"))
     |> executeBatchOperation TableOperation.Delete table
+    |> Seq.map(fun result -> result.HttpStatusCode)
     |> Seq.toArray
     
 let insertEntity connection tableName insertMode entity = 
     let table = getTable connection tableName
-    entity
-    |> buildDynamicTableEntity
-    |> createInsertOperation insertMode
-    |> table.Execute
+    (entity
+     |> buildDynamicTableEntity
+     |> createInsertOperation insertMode
+     |> table.Execute).HttpStatusCode
 
 let insertEntityObjectBatch connection tableName insertMode entities = 
     let table = getTable connection tableName
@@ -137,6 +139,7 @@ let insertEntityObjectBatch connection tableName insertMode entities =
                  |> Map.ofSeq })
     |> Seq.map buildDynamicTableEntity
     |> executeBatchOperation (createInsertOperation insertMode) table
+    |> Seq.map(fun result -> result.HttpStatusCode)
     |> Seq.toArray
 
 let insertEntityObject connection tableName partitionKey rowKey insertMode entity =

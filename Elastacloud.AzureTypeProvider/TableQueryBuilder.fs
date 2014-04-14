@@ -32,12 +32,14 @@ let private buildGenericProp<'a> (propertyOperatorsType: ProvidedTypeDefinition)
                    compValue)
           providedMethod ]
 
-let private buildCustomProp (propertyOperatorsType: ProvidedTypeDefinition) parentQueryType propertyName methodName 
+let private buildCustomProp (propertyOperatorsType: ProvidedTypeDefinition) parentQueryType propertyName methodName documentation
     exectedResult = 
     let invoker = 
         fun (args: Expr list) -> 
             <@@ buildFilter(propertyName, QueryComparisons.Equal, exectedResult) :: ((%%args.[0]: obj) :?> string list) @@>
-    ProvidedMethod(methodName, [], parentQueryType, InvokeCode = invoker)
+    let providedMethod = ProvidedMethod(methodName, [], parentQueryType, InvokeCode = invoker)
+    providedMethod.AddXmlDocDelayed <| fun _ -> documentation
+    providedMethod
 
 /// Generates strongly-type query provided properties for an entity property e.g. Equal, GreaterThan etc. etc.
 let private buildPropertyOperatorsType tableName propertyName propertyType parentQueryType = 
@@ -48,8 +50,9 @@ let private buildPropertyOperatorsType tableName propertyName propertyType paren
         match propertyType with
         | EdmType.String -> buildGenericProp<string> propertyOperatorsType parentQueryType propertyName
         | EdmType.Boolean -> 
-            [ buildCustomProp propertyOperatorsType parentQueryType propertyName "IsTrue" true
-              buildCustomProp propertyOperatorsType parentQueryType propertyName "IsFalse" false ]
+            let buildDescription expected = sprintf "Tests whether %s is %s." propertyName expected
+            [ buildCustomProp propertyOperatorsType parentQueryType propertyName "Is True" (buildDescription "true") true
+              buildCustomProp propertyOperatorsType parentQueryType propertyName "Is False" (buildDescription "false") false ]
         | EdmType.DateTime -> buildGenericProp<DateTime> propertyOperatorsType parentQueryType propertyName
         | EdmType.Double -> buildGenericProp<float> propertyOperatorsType parentQueryType propertyName
         | EdmType.Int32 -> buildGenericProp<int> propertyOperatorsType parentQueryType propertyName
