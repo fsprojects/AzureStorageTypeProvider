@@ -20,23 +20,27 @@ let rec private createFileItem (domainType : ProvidedTypeDefinition) connectionS
         domainType.AddMember(folderProp)
         folderProp.AddMembersDelayed(fun _ -> 
             (getContents()
-             |> Array.map (createFileItem domainType connectionString containerName)
+             |> Array.choose (createFileItem domainType connectionString containerName)
              |> Array.toList))
-        ProvidedProperty("/" + name, folderProp, GetterCode = fun _ -> <@@ Builder.createBlobFolder connectionString containerName path @@>)
+        Some <| ProvidedProperty("/" + name, folderProp, GetterCode = fun _ -> <@@ Builder.createBlobFolder connectionString containerName path @@>)
     | Blob(path, name, properties) -> 
-        let fileDetails = connectionString, containerName, path        
+        let fileDetails = connectionString, containerName, path
+        
         let fileType = 
             match path with
             | Builder.XML -> "XmlFile"
             | Builder.Binary | Builder.Text -> "BlobFile"
+        
         let fileTypeDefinition = domainType.GetMember(fileType).[0] :?> ProvidedTypeDefinition
-        ProvidedProperty(name, fileTypeDefinition, GetterCode = fun _ -> <@@ Builder.createBlobFile connectionString containerName path @@>)
+        match BlobFile(connectionString, containerName, path).Size with
+        | 0L -> None
+        | _ -> Some <| ProvidedProperty(name, fileTypeDefinition, GetterCode = fun _ -> <@@ Builder.createBlobFile connectionString containerName path @@>)
 
 let private createContainerType (domainType : ProvidedTypeDefinition) connectionString (container : LightweightContainer) = 
     let individualContainerType = ProvidedTypeDefinition(container.Name, Some typeof<BlobContainer>, HideObjectMethods = true)
     individualContainerType.AddMembersDelayed(fun _ -> 
         (container.GetFiles()
-         |> Seq.map (createFileItem domainType connectionString container.Name)
+         |> Seq.choose (createFileItem domainType connectionString container.Name)
          |> Seq.toList))
     domainType.AddMember(individualContainerType)
     // this local binding is required for the quotation.
@@ -47,8 +51,8 @@ let private createContainerType (domainType : ProvidedTypeDefinition) connection
 /// Builds up the Blob Storage container members
 let getBlobStorageMembers connectionString (domainType : ProvidedTypeDefinition) = 
     let containerListingType = ProvidedTypeDefinition("Containers", Some typeof<obj>)
-    containerListingType.AddMembersDelayed(fun _ -> BlobRepository.getBlobStorageAccountManifest (connectionString)
-                                                    |> List.map (createContainerType domainType connectionString))
+    containerListingType.AddMembersDelayed
+        (fun _ -> BlobRepository.getBlobStorageAccountManifest (connectionString) |> List.map (createContainerType domainType connectionString))
     containerListingType
 
 // Creates an individual Table member

@@ -20,6 +20,7 @@ open System.Xml.Linq
 type BlobFile(connectionDetails) = 
     let connection, container, file = connectionDetails
     let blobRef = getBlobRef(connectionDetails)
+    let details = blobRef.FetchAttributes()
     
     /// Generates a full-access shared-access signature for the supplied duration.
     member x.GenerateSharedAccessSignature(duration) = 
@@ -42,8 +43,7 @@ type BlobFile(connectionDetails) =
     member x.OpenStream() = blobRef.OpenRead()
     
     /// Gets the blob size in bytes.
-    member x.Size with get () = blobRef.FetchAttributes()
-                                blobRef.Properties.Length
+    member x.Size with get () = blobRef.Properties.Length
 
     /// Reads this file as a string.
     member x.ReadAsString() = blobRef.DownloadText()
@@ -99,6 +99,6 @@ module Builder =
         match path with
         | XML -> new XmlFile(details) :> BlobFile
         | Binary | Text -> new BlobFile(details)
-    
+
     let createContainer connectionString containerName = BlobContainer(connectionString, containerName)
     let createBlobFolder connectionString containerName path = BlobFolder(connectionString, containerName, path)
