@@ -27,9 +27,8 @@ let rec private createFileItem (domainType : ProvidedTypeDefinition) connectionS
         let fileDetails = connectionString, containerName, path        
         let fileType = 
             match path with
-            | Builder.Text -> "TextFile"
             | Builder.XML -> "XmlFile"
-            | Builder.Binary -> "BlobFile"
+            | Builder.Binary | Builder.Text -> "BlobFile"
         let fileTypeDefinition = domainType.GetMember(fileType).[0] :?> ProvidedTypeDefinition
         ProvidedProperty(name, fileTypeDefinition, GetterCode = fun _ -> <@@ Builder.createBlobFile connectionString containerName path @@>)
 
