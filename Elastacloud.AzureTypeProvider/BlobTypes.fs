@@ -45,11 +45,6 @@ type BlobFile(connectionDetails) =
     member x.Size with get () = blobRef.FetchAttributes()
                                 blobRef.Properties.Length
 
-/// Represents a file stored in blob storage that can be read as text file.
-type TextFile(connectionDetails) = 
-    inherit BlobFile(connectionDetails)
-    let blobRef = getBlobRef(connectionDetails)
-
     /// Reads this file as a string.
     member x.ReadAsString() = blobRef.DownloadText()
     
@@ -88,7 +83,6 @@ type BlobContainer(connectionString, container) =
 module ProvidedTypes =
     let generateTypes() = 
         [ ProvidedTypeDefinition("BlobFile", Some typeof<BlobFile>, HideObjectMethods = true)
-          ProvidedTypeDefinition("TextFile", Some typeof<TextFile>, HideObjectMethods = true)
           ProvidedTypeDefinition("XmlFile", Some typeof<XmlFile>, HideObjectMethods = true) ]
 
 // Builder methods to construct blobs etc..
@@ -103,9 +97,8 @@ module Builder =
     let createBlobFile connectionString containerName path = 
         let details = connectionString, containerName, path
         match path with
-        | Text -> new TextFile(details) :> BlobFile
         | XML -> new XmlFile(details) :> BlobFile
-        | Binary -> new BlobFile(details)
+        | Binary | Text -> new BlobFile(details)
     
     let createContainer connectionString containerName = BlobContainer(connectionString, containerName)
     let createBlobFolder connectionString containerName path = BlobFolder(connectionString, containerName, path)
