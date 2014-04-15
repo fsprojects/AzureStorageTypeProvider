@@ -68,3 +68,10 @@ For non-text and xml files, you will get a ```ReadAsString()``` function that ca
 	|> Seq.map(fun customer -> row.RowKey, customer.Name, customer.Address)
 	
 	// customer shape is inferred from EDM metadata 
+##Get a single entity
+	let joeBloggs = account.Tables.Customers.Get("joe.bloggs@hotmail.com", "London")
+##Search for entities
+	let ukCustomers = account.Tables.Customers.Query("Country eq 'UK'")
+	let ukCustomers = account.Tables.Customers.Query().``Where Country``.Equals("UK").Execute()
+##Insert entity
+	account.Tables.Customers.Insert(new Customer("fred.smith@live.co.uk", "UK", "London"))
