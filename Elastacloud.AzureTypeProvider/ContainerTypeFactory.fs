@@ -49,27 +49,27 @@ let private createContainerType (domainType : ProvidedTypeDefinition) connection
         (container.Name, individualContainerType, IsStatic = true, GetterCode = fun _ -> <@@ Builder.createContainer connectionString containerName @@>)
 
 /// Builds up the Blob Storage container members
-let getBlobStorageMembers connectionString (domainType : ProvidedTypeDefinition) = 
+let getBlobStorageMembers (connectionString, domainType : ProvidedTypeDefinition) = 
     let containerListingType = ProvidedTypeDefinition("Containers", Some typeof<obj>)
     containerListingType.AddMembersDelayed
         (fun _ -> BlobRepository.getBlobStorageAccountManifest (connectionString) |> List.map (createContainerType domainType connectionString))
     containerListingType
 
-// Creates an individual Table member
-let private createTableType (domainType : ProvidedTypeDefinition) connectionString tableName = 
-    let tableProperty = ProvidedTypeDefinition(tableName, Some typeof<obj>)
-    tableProperty.AddMembersDelayed(fun _ -> 
-        let tableEntityType = ProvidedTypeDefinition(tableName + "Entity", Some typeof<LightweightTableEntity>, HideObjectMethods = true)
-        let createdTypes, createdMembers = TableEntityMemberFactory.buildTableEntityMembers tableEntityType connectionString tableName
-        domainType.AddMembers(tableEntityType :: createdTypes)
-        createdMembers)
-    tableProperty
-
 /// Builds up the Table Storage member
-let getTableStorageMembers connectionString domainType = 
+let getTableStorageMembers (connectionString, domainType:ProvidedTypeDefinition) = 
+    /// Creates an individual Table member
+    let createTableType connectionString tableName = 
+        let tableProperty = ProvidedTypeDefinition(tableName, Some typeof<obj>)
+        tableProperty.AddMembersDelayed(fun _ -> 
+            let tableEntityType = ProvidedTypeDefinition(tableName + "Entity", Some typeof<LightweightTableEntity>, HideObjectMethods = true)
+            let createdTypes, createdMembers = TableEntityMemberFactory.buildTableEntityMembers tableEntityType connectionString tableName
+            domainType.AddMembers(tableEntityType :: createdTypes)
+            createdMembers)
+        tableProperty
+
     let tableListingType = ProvidedTypeDefinition("Tables", Some typeof<obj>)
     tableListingType.AddMembersDelayed(fun _ -> 
         TableRepository.getTables connectionString
-        |> Seq.map (createTableType domainType connectionString)
+        |> Seq.map (createTableType connectionString)
         |> Seq.toList)
     tableListingType

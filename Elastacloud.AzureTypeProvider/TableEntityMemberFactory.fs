@@ -153,8 +153,8 @@ let buildTableEntityMembers parentEntityType connection tableName =
                 ProvidedMethod
                     ("Insert", 
                         [ ProvidedParameter("entity", parentEntityType)
-                          ProvidedParameter("connectionString", typeof<string>, optionalValue = connection)
-                          ProvidedParameter("insertMode", typeof<TableInsertMode>, optionalValue = TableInsertMode.Insert) ], 
+                          ProvidedParameter("insertMode", typeof<TableInsertMode>, optionalValue = TableInsertMode.Insert)
+                          ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ],
                           returnType = typeof<int>, 
                           InvokeCode = (fun args -> <@@ insertEntity (%%args.[1]: string) tableName %%args.[2] (%%args.[0]: LightweightTableEntity) @@>),
                           IsStaticMethod = true)

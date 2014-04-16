@@ -35,7 +35,7 @@ type AzureAccountTypeProvider() as this =
         typeProviderForAccount.AddMembers
             ([ ContainerTypeFactory.getBlobStorageMembers 
                ContainerTypeFactory.getTableStorageMembers ]
-            |> List.map (fun builder -> builder connectionString domainTypes))
+            |> List.map (fun builder -> builder(connectionString,domainTypes)))
         typeProviderForAccount
     
     // Parameterising the provider

@@ -50,7 +50,7 @@ let private buildPropertyOperatorsType tableName propertyName propertyType paren
         match propertyType with
         | EdmType.String -> buildGenericProp<string> propertyOperatorsType parentQueryType propertyName
         | EdmType.Boolean -> 
-            let buildDescription expected = sprintf "Tests whether %s is %s." propertyName expected
+            let buildDescription = sprintf "Tests whether %s is %s." propertyName
             [ buildCustomProp propertyOperatorsType parentQueryType propertyName "Is True" (buildDescription "true") true
               buildCustomProp propertyOperatorsType parentQueryType propertyName "Is False" (buildDescription "false") false ]
         | EdmType.DateTime -> buildGenericProp<DateTime> propertyOperatorsType parentQueryType propertyName

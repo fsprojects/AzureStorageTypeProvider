@@ -40,22 +40,21 @@ let rec private getContainerStructure wildcard (container : CloudBlobContainer) 
 let getBlobStorageAccountManifest connection = 
     (getBlobClient connection).ListContainers()
     |> Seq.toList
-    |> List.map (fun c -> 
-           { Name = c.Name
-             GetFiles = 
-                 (fun _ -> c
-                           |> getContainerStructure null
-                           |> Seq.cache) })
+    |> List.map (fun container -> 
+           { Name = container.Name
+             GetFiles = (fun _ -> container
+                                  |> getContainerStructure null
+                                  |> Seq.cache) })
 
 let awaitUnit = Async.AwaitIAsyncResult >> Async.Ignore
 
-let downloadFile(connectionDetails, destination) =
-    let blobRef = getBlobRef (connectionDetails)
-    let targetDirectory = Path.GetDirectoryName(destination)
-    if not (Directory.Exists targetDirectory) then Directory.CreateDirectory targetDirectory |> ignore
-    blobRef.DownloadToFileAsync(destination, FileMode.Create) |> awaitUnit
-
 let downloadFolder (connectionDetails, path) =
+    let downloadFile(connectionDetails, destination) =
+        let blobRef = getBlobRef (connectionDetails)
+        let targetDirectory = Path.GetDirectoryName(destination)
+        if not (Directory.Exists targetDirectory) then Directory.CreateDirectory targetDirectory |> ignore
+        blobRef.DownloadToFileAsync(destination, FileMode.Create) |> awaitUnit
+
     let connection, container, folderPath = connectionDetails
     let containerRef = (getBlobClient connection).GetContainerReference(container)
     containerRef.ListBlobs(prefix = folderPath, useFlatBlobListing = true)
@@ -72,3 +71,4 @@ let downloadFolder (connectionDetails, path) =
     |> Async.Parallel
     |> Async.Ignore
     |> Async.Start
+

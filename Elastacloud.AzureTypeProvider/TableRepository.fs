@@ -75,7 +75,7 @@ let private buildDynamicTableEntity entity =
 let private createInsertOperation insertMode = 
     match insertMode with
     | TableInsertMode.Insert -> TableOperation.Insert
-    | TableInsertMode.InsertOrReplace -> TableOperation.InsertOrReplace
+    | TableInsertMode.Upsert -> TableOperation.InsertOrReplace
     | _ -> failwith "unknown insertion mode"
 
 let private batch size source =
