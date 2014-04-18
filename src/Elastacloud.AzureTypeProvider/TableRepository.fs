@@ -155,7 +155,7 @@ let composeAllFilters filters =
         |> List.reduce(fun acc filter -> TableQuery.CombineFilters(acc, TableOperators.And, filter))
 
 let buildFilter(propertyName, comparison, value) = 
-        match box value with
+    match box value with
     | :? string as value -> TableQuery.GenerateFilterCondition(propertyName, comparison, value)
     | :? int as value -> TableQuery.GenerateFilterConditionForInt(propertyName, comparison, value)
     | :? int64 as value -> TableQuery.GenerateFilterConditionForLong(propertyName, comparison, value)

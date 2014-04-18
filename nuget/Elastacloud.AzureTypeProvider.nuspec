@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>Elastacloud.AzureTypeProvider</id>
-        <version>0.3.0</version>
+        <version>0.9</version>
         <title>Windows Azure Type Provider</title>
         <authors>Isaac Abraham</authors>
         <owners>Isaac Abraham</owners>
@@ -15,6 +15,6 @@
         </dependencies>
     </metadata>
     <files>
-        <file src="nuget\init.ps1" target="tools" />
+        <file src="init.ps1" target="tools" />
     </files>
 </package>

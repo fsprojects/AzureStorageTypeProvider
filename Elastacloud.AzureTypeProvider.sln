@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.30110.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Elastacloud.AzureTypeProvider", "Elastacloud.AzureTypeProvider\Elastacloud.AzureTypeProvider.fsproj", "{FB7CA8F3-C158-49E9-B816-501741E2921F}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{5CDF4537-EDC7-4EDD-830C-00E23DD1BD87}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
@@ -13,6 +11,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{5CDF45
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B7A3503A-B8A9-4C26-8DCD-8E66425AFC91}"
+	ProjectSection(SolutionItems) = preProject
+		build.fsx = build.fsx
+	EndProjectSection
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Elastacloud.AzureTypeProvider", "src\Elastacloud.AzureTypeProvider\Elastacloud.AzureTypeProvider.fsproj", "{FB7CA8F3-C158-49E9-B816-501741E2921F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
