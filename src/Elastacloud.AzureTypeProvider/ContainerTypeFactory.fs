@@ -38,6 +38,7 @@ let rec private createFileItem (domainType : ProvidedTypeDefinition) connectionS
 
 let private createContainerType (domainType : ProvidedTypeDefinition) connectionString (container : LightweightContainer) = 
     let individualContainerType = ProvidedTypeDefinition(container.Name, Some typeof<BlobContainer>, HideObjectMethods = true)
+    individualContainerType.AddXmlDoc <| sprintf "Provides access to the '%s' container." container.Name
     individualContainerType.AddMembersDelayed(fun _ -> 
         (container.GetFiles()
          |> Seq.choose (createFileItem domainType connectionString container.Name)
@@ -45,14 +46,14 @@ let private createContainerType (domainType : ProvidedTypeDefinition) connection
     domainType.AddMember(individualContainerType)
     // this local binding is required for the quotation.
     let containerName = container.Name
-    ProvidedProperty
-        (container.Name, individualContainerType, IsStatic = true, GetterCode = fun _ -> <@@ Builder.createContainer connectionString containerName @@>)
+    ProvidedProperty (container.Name, individualContainerType, IsStatic = true, GetterCode = fun _ -> <@@ Builder.createContainer connectionString containerName @@>)
 
 /// Builds up the Blob Storage container members
 let getBlobStorageMembers (connectionString, domainType : ProvidedTypeDefinition) = 
     let containerListingType = ProvidedTypeDefinition("Containers", Some typeof<obj>)
-    containerListingType.AddMembersDelayed
-        (fun _ -> BlobRepository.getBlobStorageAccountManifest (connectionString) |> List.map (createContainerType domainType connectionString))
+    containerListingType.AddMembersDelayed (fun _ -> BlobRepository.getBlobStorageAccountManifest (connectionString)
+                                                     |> List.map (createContainerType domainType connectionString))
+    containerListingType.AddXmlDoc "Gets the list of all containers in this storage account."
     containerListingType
 
 /// Builds up the Table Storage member
@@ -65,6 +66,7 @@ let getTableStorageMembers (connectionString, domainType:ProvidedTypeDefinition)
             let createdTypes, createdMembers = TableEntityMemberFactory.buildTableEntityMembers tableEntityType connectionString tableName
             domainType.AddMembers(tableEntityType :: createdTypes)
             createdMembers)
+        tableProperty.AddXmlDoc <| sprintf "Provides access to the '%s' table." tableName
         tableProperty
 
     let tableListingType = ProvidedTypeDefinition("Tables", Some typeof<obj>)
@@ -72,4 +74,5 @@ let getTableStorageMembers (connectionString, domainType:ProvidedTypeDefinition)
         TableRepository.getTables connectionString
         |> Seq.map (createTableType connectionString)
         |> Seq.toList)
+    tableListingType.AddXmlDoc "Gets the list of all tables in this storage account."
     tableListingType

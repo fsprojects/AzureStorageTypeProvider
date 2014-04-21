@@ -5,14 +5,18 @@ param($installPath, $toolsPath, $package)
 $destPath = $installPath + "\lib\net40\"
 
 # Get the Windows Storage folder
-$deps = Get-ChildItem -Path ($installPath + "\..") | Where-Object { $_.Name.Contains("WindowsAzure.Storage") }
-Foreach($d in $deps)
+$folders = ("WindowsAzure.Storage", "Microsoft.Data.Services.Client", "Microsoft.Data.OData", "Microsoft.Data.Edm", "System.Spatial")
+
+Foreach($folder in $folders)
 {
-    # Find files in "<package-name>\lib\net40"
-    $files = Get-ChildItem ($d.FullName + "\lib\net40") | where {$_.PSIsContainer -eq $False}
-    Foreach ($file in $files)
-    {
-        # This gets executed each time project is loaded, so skip files if they exist already
-        Copy-Item $file.FullName ($destPath + $file.Name) -Force -ErrorAction SilentlyContinue
-    }
+	$deps = Get-ChildItem -Path ($installPath + "\..\") | Where-Object { $_.Name.Contains($folder) }
+	Foreach($d in $deps)
+	{
+	    $files = Get-ChildItem ($d.FullName + "\lib\net40") | where {$_.PSIsContainer -eq $False}
+	    Foreach ($file in $files)
+	    {
+		# This gets executed each time project is loaded, so skip files if they exist already
+		Copy-Item $file.FullName ($destPath + $file.Name) -Force -ErrorAction SilentlyContinue
+	    }
+	}
 }

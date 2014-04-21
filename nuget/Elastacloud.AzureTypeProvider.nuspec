@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
-        <id>Elastacloud.AzureTypeProvider</id>
-        <version>0.9</version>
-        <title>Windows Azure Type Provider</title>
-        <authors>Isaac Abraham</authors>
-        <owners>Isaac Abraham</owners>
+        <id>@project@</id>
+        <version>@build.number@</version>
+        <title>@title@</title>
+        <authors>@authors@</authors>
+        <owners>@authors@</owners>
         <projectUrl>https://github.com/isaacabraham/AzureTypeProvider</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>Allows easy access to Azure assets such as Blob Storage through F# scripts.</description>
-        <tags>azure, f#, type provider, blob, script</tags>
-        <dependencies>
-            <dependency id="WindowsAzure.Storage" version="[3.0.2.0]" />
-        </dependencies>
+        <description>@description@</description>
+        <tags>@tags@</tags>
+        <summary>@summary@</summary>
+        <releaseNotes>@releaseNotes@</releaseNotes>
+        @dependencies@
     </metadata>
-    <files>
-        <file src="init.ps1" target="tools" />
-    </files>
+    @files@
 </package>
