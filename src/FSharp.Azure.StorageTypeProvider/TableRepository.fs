@@ -1,7 +1,7 @@
 ﻿///Contains helper functions for accessing tables
-module Elastacloud.FSharp.AzureTypeProvider.Repositories.TableRepository
+module FSharp.Azure.StorageTypeProvider.Repositories.TableRepository
 
-open Elastacloud.FSharp.AzureTypeProvider
+open FSharp.Azure.StorageTypeProvider.Types
 open Microsoft.WindowsAzure.Storage
 open Microsoft.WindowsAzure.Storage.Table
 open Microsoft.WindowsAzure.Storage.Table.Queryable
@@ -30,7 +30,7 @@ let internal getTables connection =
     let client = getTableClient connection
     client.ListTables() |> Seq.map(fun table -> table.Name)
 
-type DynamicQuery = TableQuery<DynamicTableEntity>
+type private DynamicQuery = TableQuery<DynamicTableEntity>
 
 let internal getRowsForSchema (rowCount: int) connection tableName = 
     let table = getTable connection tableName

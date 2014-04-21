@@ -1,5 +1,5 @@
 ﻿///Contains reusable helper functions for accessing blobs
-module internal Elastacloud.FSharp.AzureTypeProvider.Repositories.BlobRepository
+module internal FSharp.Azure.StorageTypeProvider.Repositories.BlobRepository
 
 open Microsoft.WindowsAzure.Storage
 open Microsoft.WindowsAzure.Storage.Blob
@@ -71,4 +71,3 @@ let downloadFolder (connectionDetails, path) =
     |> Async.Parallel
     |> Async.Ignore
     |> Async.Start
-

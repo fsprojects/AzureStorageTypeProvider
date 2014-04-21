@@ -8,9 +8,9 @@
     <ProjectGuid>fb7ca8f3-c158-49e9-b816-501741e2921f</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>Elastacloud.AzureTypeProvider</RootNamespace>
-    <AssemblyName>Elastacloud.AzureTypeProvider</AssemblyName>
+    <AssemblyName>FSharp.Azure.StorageTypeProvider</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <Name>Elastacloud.AzureTypeProvider</Name>
+    <Name>FSharp.Azure.StorageTypeProvider</Name>
     <TargetFSharpCoreVersion>4.3.0.0</TargetFSharpCoreVersion>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
@@ -33,7 +33,7 @@
     <OutputPath>..\..\bin</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>..\..\bin\Elastacloud.AzureTypeProvider.XML</DocumentationFile>
+    <DocumentationFile>..\..\bin\FSharp.Azure.StorageTypeProvider.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -92,7 +92,6 @@
     <Compile Include="TableEntityMemberFactory.fs" />
     <Compile Include="ContainerTypeFactory.fs" />
     <Compile Include="AzureTypeProvider.fs" />
-    <None Include="Script.fsx" />
     <None Include="packages.config" />
     <None Include="App.config" />
   </ItemGroup>

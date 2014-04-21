@@ -1,11 +1,12 @@
 ﻿/// Generates top-level blob containers folders.
-module internal Elastacloud.FSharp.AzureTypeProvider.ContainerTypeFactory
+module internal FSharp.Azure.StorageTypeProvider.ContainerTypeFactory
 
-open Elastacloud.FSharp.AzureTypeProvider.MemberFactories
-open Elastacloud.FSharp.AzureTypeProvider.MemberFactories.TableEntityMemberFactory
-open Elastacloud.FSharp.AzureTypeProvider.Repositories
-open Elastacloud.FSharp.AzureTypeProvider.Repositories.BlobRepository
-open Elastacloud.FSharp.AzureTypeProvider.Repositories.TableRepository
+open FSharp.Azure.StorageTypeProvider.Types
+open FSharp.Azure.StorageTypeProvider.MemberFactories
+open FSharp.Azure.StorageTypeProvider.MemberFactories.TableEntityMemberFactory
+open FSharp.Azure.StorageTypeProvider.Repositories
+open FSharp.Azure.StorageTypeProvider.Repositories.BlobRepository
+open FSharp.Azure.StorageTypeProvider.Repositories.TableRepository
 open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Quotations
 open Microsoft.WindowsAzure.Storage.Table

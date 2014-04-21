@@ -1,8 +1,8 @@
 ﻿/// Responsible for creating members on an individual table entity.
-module internal Elastacloud.FSharp.AzureTypeProvider.MemberFactories.TableEntityMemberFactory
+module internal FSharp.Azure.StorageTypeProvider.MemberFactories.TableEntityMemberFactory
 
-open Elastacloud.FSharp.AzureTypeProvider
-open Elastacloud.FSharp.AzureTypeProvider.Repositories.TableRepository
+open FSharp.Azure.StorageTypeProvider.Types
+open FSharp.Azure.StorageTypeProvider.Repositories.TableRepository
 open Microsoft.FSharp.Quotations
 open Microsoft.WindowsAzure.Storage.Table
 open Samples.FSharp.ProvidedTypes

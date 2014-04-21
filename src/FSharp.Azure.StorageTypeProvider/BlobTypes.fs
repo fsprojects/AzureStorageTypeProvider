@@ -1,6 +1,6 @@
-﻿namespace Elastacloud.FSharp.AzureTypeProvider
+﻿namespace FSharp.Azure.StorageTypeProvider.Types
 
-open Elastacloud.FSharp.AzureTypeProvider.Repositories.BlobRepository
+open FSharp.Azure.StorageTypeProvider.Repositories.BlobRepository
 open Microsoft.WindowsAzure.Storage
 open Microsoft.WindowsAzure.Storage.Blob
 open Samples.FSharp.ProvidedTypes
@@ -9,7 +9,7 @@ open Samples.FSharp.ProvidedTypes
 type TableInsertMode = 
     /// Insert if the entity does not already exist.
     | Insert = 0
-    /// Insert if the entity does not already exist; otherwise overwrite with this entity.
+    /// Insert if the entity does not already exist; otherwise overwrite the entity.
     | Upsert = 1
 
 open System
@@ -17,7 +17,7 @@ open System.IO
 open System.Xml.Linq
 
 /// Represents a file in blob storage.
-type BlobFile(connectionDetails) = 
+type BlobFile internal (connectionDetails) = 
     let connection, container, file = connectionDetails
     let blobRef = getBlobRef(connectionDetails)
     let details = blobRef.FetchAttributes()
@@ -52,7 +52,7 @@ type BlobFile(connectionDetails) =
     member x.ReadAsStringAsync() = Async.AwaitTask(blobRef.DownloadTextAsync())
 
 /// Represents a file stored in blob storage that can be read as a XDocument.
-type XmlFile(connectionDetails) = 
+type XmlFile internal (connectionDetails) = 
     inherit BlobFile(connectionDetails)
     let blobRef = getBlobRef(connectionDetails)
     
@@ -64,11 +64,13 @@ type XmlFile(connectionDetails) =
         async { let! text = blobRef.DownloadTextAsync() |> Async.AwaitTask
                 return XDocument.Parse text }
 
-type BlobFolder(connectionDetails) = 
+/// Represents a pseudo-folder in blob storage.
+type BlobFolder internal (connectionDetails) = 
     /// Downloads the entire folder contents to the local file system asynchronously.
     member x.Download(path) = downloadFolder (connectionDetails, path)
 
-type BlobContainer(connectionString, container) = 
+/// Represents a container in blob storage.
+type BlobContainer internal (connectionString, container) = 
     /// Downloads the entire container contents to the local file system asynchronously.
     member x.Download(path) = 
         let connectionDetails = connectionString, container, String.Empty
@@ -80,25 +82,27 @@ type BlobContainer(connectionString, container) =
         let blobRef = getBlobRef(connectionString, container, fileName)
         awaitUnit (blobRef.UploadFromFileAsync(path, FileMode.Open))
 
-module ProvidedTypes =
+module internal ProvidedTypeGenerator =
     let generateTypes() = 
         [ ProvidedTypeDefinition("BlobFile", Some typeof<BlobFile>, HideObjectMethods = true)
           ProvidedTypeDefinition("XmlFile", Some typeof<XmlFile>, HideObjectMethods = true) ]
 
-// Builder methods to construct blobs etc..
+/// Builder methods to construct blobs etc..
 module Builder = 
     let internal (|Text|Binary|XML|) (name : string) = 
         let endsWith extension = name.EndsWith(extension, StringComparison.InvariantCultureIgnoreCase)
         match name with
         | _ when [ ".txt"; ".csv" ] |> Seq.exists endsWith -> Text
         | _ when endsWith ".xml" -> XML
-        | _ -> Binary
-    
+        | _ -> Binary  
+
+    /// Creates a blob file object.
     let createBlobFile connectionString containerName path = 
         let details = connectionString, containerName, path
         match path with
         | XML -> new XmlFile(details) :> BlobFile
         | Binary | Text -> new BlobFile(details)
-
+    /// Creates a blob container object.
     let createContainer connectionString containerName = BlobContainer(connectionString, containerName)
+    /// Creates a blob folder object.
     let createBlobFolder connectionString containerName path = BlobFolder(connectionString, containerName, path)

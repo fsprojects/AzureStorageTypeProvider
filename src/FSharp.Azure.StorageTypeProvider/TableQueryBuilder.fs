@@ -1,6 +1,6 @@
-﻿module internal Elastacloud.FSharp.AzureTypeProvider.MemberFactories.TableQueryBuilder
+﻿module internal FSharp.Azure.StorageTypeProvider.MemberFactories.TableQueryBuilder
 
-open Elastacloud.FSharp.AzureTypeProvider.Repositories.TableRepository
+open FSharp.Azure.StorageTypeProvider.Repositories.TableRepository
 open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Quotations
 open Microsoft.WindowsAzure.Storage.Table

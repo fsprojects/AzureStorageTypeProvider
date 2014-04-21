@@ -1,5 +1,6 @@
-﻿namespace Elastacloud.FSharp.AzureTypeProvider
+﻿namespace FSharp.Azure.StorageTypeProvider
 
+open FSharp.Azure.StorageTypeProvider.Types
 open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Quotations
 open Samples.FSharp.ProvidedTypes
@@ -7,12 +8,13 @@ open System
 open System.Reflection
 
 [<TypeProvider>]
-type AzureAccountTypeProvider() as this = 
+/// The type provider for connecting to Azure Storage.
+type AzureTypeProvider() as this = 
     inherit TypeProviderForNamespaces()
 
-    let namespaceName = "Elastacloud.FSharp.AzureTypeProvider"
+    let namespaceName = "FSharp.Azure.StorageTypeProvider"
     let thisAssembly = Assembly.GetExecutingAssembly()
-    let azureAccountType = ProvidedTypeDefinition(thisAssembly, namespaceName, "AzureAccount", baseType = Some typeof<obj>)
+    let azureAccountType = ProvidedTypeDefinition(thisAssembly, namespaceName, "AzureTypeProvider", baseType = Some typeof<obj>)
 
     let buildConnectionString (args : obj []) = 
         let accountName = args.[0] :?> string
@@ -28,7 +30,7 @@ type AzureAccountTypeProvider() as this =
         typeProviderForAccount.AddMember(ProvidedConstructor(parameters = [], InvokeCode = (fun args -> <@@ null @@>)))
         let connectionString = buildConnectionString args
         let domainTypes = ProvidedTypeDefinition("DomainTypes", Some typeof<obj>)
-        domainTypes.AddMembers <| ProvidedTypes.generateTypes()
+        domainTypes.AddMembers <| ProvidedTypeGenerator.generateTypes()
         typeProviderForAccount.AddMember(domainTypes)
 
         // Now create child members e.g. containers, tables etc.

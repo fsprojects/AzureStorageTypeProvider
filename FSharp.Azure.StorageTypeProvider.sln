@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.30110.0
@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		build.fsx = build.fsx
 	EndProjectSection
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Elastacloud.AzureTypeProvider", "src\Elastacloud.AzureTypeProvider\Elastacloud.AzureTypeProvider.fsproj", "{FB7CA8F3-C158-49E9-B816-501741E2921F}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Azure.StorageTypeProvider", "src\FSharp.Azure.StorageTypeProvider\FSharp.Azure.StorageTypeProvider.fsproj", "{FB7CA8F3-C158-49E9-B816-501741E2921F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -19,7 +19,7 @@ open System
 //  - for documentation, you also need to edit info in "docs/tools/generate.fsx"
 // The name of the project 
 // (used by attributes in AssemblyInfo, name of a NuGet package and directory in 'src')
-let project = "Elastacloud.AzureTypeProvider"
+let project = "FSharp.Azure.StorageTypeProvider"
 // Short summary of the project
 // (used as description in AssemblyInfo and as a short summary for NuGet package)
 let summary = "Allows easy access to Azure Storage assets through F# scripts."
@@ -34,7 +34,7 @@ let authors = [ "Isaac Abraham" ]
 let tags = "azure, f#, fsharp, type provider, blob, table, script"
 // File system information 
 // (<solutionFile>.sln is built during the building process)
-let solutionFile = "Elastacloud.AzureTypeProvider"
+let solutionFile = "FSharp.Azure.StorageTypeProvider"
 // Pattern specifying assemblies to be tested using NUnit
 let testAssemblies = "tests/**/bin/Release/*Tests*.dll"
 // Git configuration (used for publishing documentation in gh-pages branch)
@@ -85,7 +85,8 @@ Target "NuGet" (fun _ ->
                  OutputPath = "bin"
                  Dependencies = [ "WindowsAzure.Storage", "3.0.2.0" ]
                  Files = [ "init.ps1", Some "tools/", None
-                           "..\\bin\\Elastacloud.AzureTypeProvider.dll", Some "lib/net40", None ] })
+                           "..\\bin\\FSharp.Azure.StorageTypeProvider.xml", Some "lib/net40", None
+                           "..\\bin\\FSharp.Azure.StorageTypeProvider.dll", Some "lib/net40", None ] })
                  ("nuget/" + project + ".nuspec")
                  )
 // --------------------------------------------------------------------------------------
