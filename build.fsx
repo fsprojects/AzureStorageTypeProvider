@@ -70,6 +70,7 @@ Target "Build" (fun _ ->
     !!(solutionFile + "*.sln")
     |> MSBuildRelease "" "Rebuild"
     |> ignore)
+
 // --------------------------------------------------------------------------------------
 // Build a NuGet package
 Target "NuGet" (fun _ -> 
@@ -83,10 +84,11 @@ Target "NuGet" (fun _ ->
                  ReleaseNotes = String.Join(Environment.NewLine, release.Notes)
                  Tags = tags
                  OutputPath = "bin"
-                 Dependencies = [ "WindowsAzure.Storage", "3.0.2.0" ]
-                 Files = [ "init.ps1", Some "tools/", None
-                           "..\\bin\\FSharp.Azure.StorageTypeProvider.xml", Some "lib/net40", None
-                           "..\\bin\\FSharp.Azure.StorageTypeProvider.dll", Some "lib/net40", None ] })
+                 Files = [ "FSharp.Azure.StorageTypeProvider.xml"
+                           "*.dll"
+                         ] |> List.filter (not << (=) "FSharp.Core.dll")
+                           |> List.map(fun file -> "..\\bin\\" + file, Some "lib/net40", None)
+                         })
                  ("nuget/" + project + ".nuspec")
                  )
 // --------------------------------------------------------------------------------------

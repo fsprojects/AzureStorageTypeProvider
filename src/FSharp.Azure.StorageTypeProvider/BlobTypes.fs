@@ -28,7 +28,9 @@ type BlobFile internal (connectionDetails) =
         let policy = 
             SharedAccessBlobPolicy
                 (SharedAccessExpiryTime = expiry, 
-                 Permissions = (SharedAccessBlobPermissions.Read ||| SharedAccessBlobPermissions.Write ||| SharedAccessBlobPermissions.Delete 
+                 Permissions = (SharedAccessBlobPermissions.Read
+                                ||| SharedAccessBlobPermissions.Write
+                                ||| SharedAccessBlobPermissions.Delete 
                                 ||| SharedAccessBlobPermissions.List))
         let sas = blobRef.GetSharedAccessSignature policy
         Uri(sprintf "%s%s" (blobRef.Uri.ToString()) sas)
@@ -51,7 +53,13 @@ type BlobFile internal (connectionDetails) =
     /// Reads this file as a string asynchronously.
     member x.ReadAsStringAsync() = Async.AwaitTask(blobRef.DownloadTextAsync())
 
-/// Represents a file stored in blob storage that can be read as a XDocument.
+/// Represents a text file stored in blob storage.
+type TextFile internal (connectionDetails) =
+    inherit BlobFile(connectionDetails)
+    /// Opens this file as a text stream for reading.
+    member x.OpenStreamAsText() = new StreamReader(base.OpenStream())
+
+/// Represents an XML file stored in blob storage.
 type XmlFile internal (connectionDetails) = 
     inherit BlobFile(connectionDetails)
     let blobRef = getBlobRef(connectionDetails)
@@ -78,13 +86,14 @@ type BlobContainer internal (connectionString, container) =
     
     /// Uploads a file to this container.
     member x.Upload(path) =
-        let fileName = path |> Path.GetFileName 
+        let fileName = path |> Path.GetFileName
         let blobRef = getBlobRef(connectionString, container, fileName)
         awaitUnit (blobRef.UploadFromFileAsync(path, FileMode.Open))
 
 module internal ProvidedTypeGenerator =
     let generateTypes() = 
         [ ProvidedTypeDefinition("BlobFile", Some typeof<BlobFile>, HideObjectMethods = true)
+          ProvidedTypeDefinition("TextFile", Some typeof<TextFile>, HideObjectMethods = true)
           ProvidedTypeDefinition("XmlFile", Some typeof<XmlFile>, HideObjectMethods = true) ]
 
 /// Builder methods to construct blobs etc..
@@ -94,14 +103,15 @@ module Builder =
         match name with
         | _ when [ ".txt"; ".csv" ] |> Seq.exists endsWith -> Text
         | _ when endsWith ".xml" -> XML
-        | _ -> Binary  
+        | _ -> Binary
 
     /// Creates a blob file object.
     let createBlobFile connectionString containerName path = 
         let details = connectionString, containerName, path
         match path with
         | XML -> new XmlFile(details) :> BlobFile
-        | Binary | Text -> new BlobFile(details)
+        | Text -> new TextFile(details) :> BlobFile
+        | Binary -> new BlobFile(details)
     /// Creates a blob container object.
     let createContainer connectionString containerName = BlobContainer(connectionString, containerName)
     /// Creates a blob folder object.
