@@ -70,11 +70,12 @@ Target "Build" (fun _ ->
     !!(solutionFile + "*.sln")
     |> MSBuildRelease "" "Rebuild"
     |> ignore)
-
 // --------------------------------------------------------------------------------------
 // Build a NuGet package
-Target "NuGet" (fun _ -> 
-    NuGet (fun p -> 
+Target "NuGet" 
+    (fun _ -> 
+    NuGet 
+        (fun p -> 
         { p with Authors = authors
                  Project = project
                  Title = "Microsoft Azure Storage Type Provider"
@@ -84,13 +85,13 @@ Target "NuGet" (fun _ ->
                  ReleaseNotes = String.Join(Environment.NewLine, release.Notes)
                  Tags = tags
                  OutputPath = "bin"
-                 Files = [ "FSharp.Azure.StorageTypeProvider.xml"
-                           "*.dll"
-                         ] |> List.filter (not << (=) "FSharp.Core.dll")
-                           |> List.map(fun file -> "..\\bin\\" + file, Some "lib/net40", None)
-                         })
-                 ("nuget/" + project + ".nuspec")
-                 )
+                 Files = 
+                     [ "FSharp.Azure.StorageTypeProvider.xml"; "FSharp.Azure.StorageTypeProvider.dll"; 
+                       "Microsoft.Data.Edm.dll"; "Microsoft.Data.OData.dll"; "Microsoft.Data.Services.Client.dll"; 
+                       "Microsoft.WindowsAzure.Configuration.dll"; "Microsoft.WindowsAzure.Storage.dll"; 
+                       "Newtonsoft.Json.dll"; "System.Spatial.dll" ] 
+                     |> List.map (fun file -> @"..\bin\" + file, Some "lib/net40", None) }) 
+        ("nuget/" + project + ".nuspec"))
 // --------------------------------------------------------------------------------------
 // Generate the documentation
 Target "GenerateDocs" (fun _ -> executeFSIWithArgs "docs/tools" "generate.fsx" [ "--define:RELEASE" ] [] |> ignore)
