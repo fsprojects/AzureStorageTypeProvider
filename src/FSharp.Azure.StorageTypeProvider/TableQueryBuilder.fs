@@ -24,7 +24,7 @@ let private buildGenericProp<'a> (propertyOperatorsType: ProvidedTypeDefinition)
                   <@@ buildFilter(propertyName, compValue, (%%args.[1]: 'a)) :: ((%%args.[0]: obj) :?> string list) @@>
           let providedMethod = 
               ProvidedMethod
-                  (compName |> splitOnCaps, [ ProvidedParameter(propertyName.ToLower(), typeof<'a>) ], parentQueryType, 
+                  ("Is"+compName |> splitOnCaps, [ ProvidedParameter(propertyName.ToLower(), typeof<'a>) ], parentQueryType, 
                    InvokeCode = invokeCode)
           providedMethod.AddXmlDocDelayed 
           <| fun _ -> 

@@ -98,7 +98,7 @@ let buildTableEntityMembers parentEntityType connection tableName =
             let getPartition = 
                 ProvidedMethod
                     ("GetPartition", [ ProvidedParameter("key", typeof<string>); ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], parentEntityType.MakeArrayType(),
-                     InvokeCode = (fun args -> <@@ getPartitionRows %%args.[0] %%args.[1] tableName @@>), IsStaticMethod = true)
+                     InvokeCode = (fun args -> <@@ getPartitionRows %%args.[0] %%args.[1] tableName @@>))
             getPartition.AddXmlDocDelayed <| fun _ -> "Eagerly retrieves all entities in a table partition by its key."
             let queryBuilderType, childTypes = TableQueryBuilder.createTableQueryType parentEntityType connection tableName propertiesCreated
             let executeQuery = 
@@ -107,12 +107,11 @@ let buildTableEntityMembers parentEntityType connection tableName =
                      [ ProvidedParameter("rawQuery", typeof<string>)
                        ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], 
                      (parentEntityType.MakeArrayType()), 
-                     InvokeCode = (fun args -> <@@ executeQuery (%%args.[1]: string) tableName 0 (%%args.[0]: string) @@>), 
-                     IsStaticMethod = true)
+                     InvokeCode = (fun args -> <@@ executeQuery (%%args.[1]: string) tableName 0 (%%args.[0]: string) @@>))
             executeQuery.AddXmlDocDelayed <| fun _ -> "Executes a weakly-type query and returns the results in the shape for this table."
             let buildQuery = 
                 ProvidedMethod
-                    ("Query", [], queryBuilderType, InvokeCode = (fun args -> <@@ ([]: string list) @@>), IsStaticMethod = true)
+                    ("Query", [], queryBuilderType, InvokeCode = (fun args -> <@@ ([]: string list) @@>))
             buildQuery.AddXmlDocDelayed <| fun _ -> "Creates a strongly-typed query against the table."
             let getEntity = 
                 ProvidedMethod
@@ -121,8 +120,7 @@ let buildTableEntityMembers parentEntityType connection tableName =
                        ProvidedParameter("partitionKey", typeof<string>, optionalValue = null)
                        ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], 
                      (typeof<option<_>>).GetGenericTypeDefinition().MakeGenericType(parentEntityType),             
-                     InvokeCode = (fun args -> <@@ getEntity (%%args.[0]: string) (%%args.[1]: string) (%%args.[2]: string) tableName @@>), 
-                     IsStaticMethod = true)
+                     InvokeCode = (fun args -> <@@ getEntity (%%args.[0]: string) (%%args.[1]: string) (%%args.[2]: string) tableName @@>))
             getEntity.AddXmlDocDelayed <| fun _ -> "Gets a single entity based on the row key and optionally the partition key. If more than one entity is returned, an exception is raised."
 
             let deleteEntity =
@@ -130,7 +128,7 @@ let buildTableEntityMembers parentEntityType connection tableName =
                      ("Delete",
                       [ ProvidedParameter("entity", parentEntityType)
                         ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ],
-                      returnType = typeof<int>, InvokeCode = (fun args -> <@@ deleteEntity %%args.[1] tableName %%args.[0] @@>), IsStaticMethod = true)
+                      returnType = typeof<int>, InvokeCode = (fun args -> <@@ deleteEntity %%args.[1] tableName %%args.[0] @@>))
             deleteEntity.AddXmlDocDelayed <| fun _ -> "Deletes a single entity from the table."
             
             let deleteEntities =
@@ -138,7 +136,7 @@ let buildTableEntityMembers parentEntityType connection tableName =
                     ("Delete",
                      [ ProvidedParameter("entities", parentEntityType.MakeArrayType())
                        ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ],
-                     returnType = typeof<int []>, InvokeCode = (fun args -> <@@ deleteEntities %%args.[1] tableName %%args.[0] @@>), IsStaticMethod = true)
+                     returnType = typeof<int []>, InvokeCode = (fun args -> <@@ deleteEntities %%args.[1] tableName %%args.[0] @@>))
             deleteEntities.AddXmlDocDelayed <| fun _ -> "Deletes a batch of entities from the table."
             
             let deleteEntitiesObject =
@@ -146,7 +144,7 @@ let buildTableEntityMembers parentEntityType connection tableName =
                     ("Delete",
                      [ ProvidedParameter("entities", typeof<(string * string) seq>)
                        ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ],
-                     returnType = typeof<int []>, InvokeCode = (fun args -> <@@ deleteEntitiesTuple %%args.[1] tableName %%args.[0] @@>), IsStaticMethod = true)
+                     returnType = typeof<int []>, InvokeCode = (fun args -> <@@ deleteEntitiesTuple %%args.[1] tableName %%args.[0] @@>))
             deleteEntitiesObject.AddXmlDocDelayed <| fun _ -> "Deletes a batch of entities from the table using the supplied pairs of Partition and Row keys."
 
             let insertEntity = 
@@ -156,8 +154,7 @@ let buildTableEntityMembers parentEntityType connection tableName =
                           ProvidedParameter("insertMode", typeof<TableInsertMode>, optionalValue = TableInsertMode.Insert)
                           ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ],
                           returnType = typeof<int>, 
-                          InvokeCode = (fun args -> <@@ insertEntity (%%args.[2]: string) tableName %%args.[1] (%%args.[0]: LightweightTableEntity) @@>),
-                          IsStaticMethod = true)
+                          InvokeCode = (fun args -> <@@ insertEntity (%%args.[2]: string) tableName %%args.[1] (%%args.[0]: LightweightTableEntity) @@>))
             insertEntity.AddXmlDocDelayed <| fun _ -> "Inserts a single entity with the inferred table schema into the table."
 
             let insertEntities = 
@@ -167,8 +164,7 @@ let buildTableEntityMembers parentEntityType connection tableName =
                           ProvidedParameter("insertMode", typeof<TableInsertMode>, optionalValue = TableInsertMode.Insert)
                           ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ],
                           returnType = typeof<int[]>, 
-                          InvokeCode = (fun args -> <@@ insertEntityBatch (%%args.[2]: string) tableName %%args.[1] (%%args.[0]: LightweightTableEntity[]) @@>),
-                          IsStaticMethod = true)
+                          InvokeCode = (fun args -> <@@ insertEntityBatch (%%args.[2]: string) tableName %%args.[1] (%%args.[0]: LightweightTableEntity[]) @@>))
             insertEntities.AddXmlDocDelayed <| fun _ -> "Inserts a batch of entities with the inferred table schema into the table."
 
             queryBuilderType :: childTypes, [ getPartition; getEntity; buildQuery; executeQuery; deleteEntity; deleteEntities; deleteEntitiesObject; insertEntity; insertEntities ]
@@ -181,7 +177,7 @@ let buildTableEntityMembers parentEntityType connection tableName =
                ProvidedParameter("entity", typeof<obj>)
                ProvidedParameter("insertMode", typeof<TableInsertMode>, optionalValue = TableInsertMode.Insert)
                ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], 
-             returnType = typeof<int>, InvokeCode = (fun args -> <@@ insertEntityObject %%args.[4] tableName %%args.[0] %%args.[1] %%args.[3] %%args.[2] @@>), IsStaticMethod = true)
+             returnType = typeof<int>, InvokeCode = (fun args -> <@@ insertEntityObject %%args.[4] tableName %%args.[0] %%args.[1] %%args.[3] %%args.[2] @@>))
     insertEntityObject.AddXmlDocDelayed <| fun _ -> "Inserts a single entity into the table, using public properties on the object as fields."
     
     let insertEntitiesObject = 
@@ -190,7 +186,7 @@ let buildTableEntityMembers parentEntityType connection tableName =
              [ ProvidedParameter("entities", typeof<(string * string * obj) seq>)
                ProvidedParameter("insertMode", typeof<TableInsertMode>, optionalValue = TableInsertMode.Insert)
                ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ],
-             returnType = typeof<int []>, InvokeCode = (fun args -> <@@ insertEntityObjectBatch %%args.[2] tableName %%args.[1] %%args.[0] @@>), IsStaticMethod = true)
+             returnType = typeof<int []>, InvokeCode = (fun args -> <@@ insertEntityObjectBatch %%args.[2] tableName %%args.[1] %%args.[0] @@>))
     insertEntitiesObject.AddXmlDocDelayed <| fun _ -> "Inserts a batch of entities into the table, using all public properties on the object as fields."
  
     // Return back out all types and methods generated.

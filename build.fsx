@@ -78,7 +78,7 @@ Target "NuGet"
         (fun p -> 
         { p with Authors = authors
                  Project = project
-                 Title = "Microsoft Azure Storage Type Provider"
+                 Title = "F# Azure Storage Type Provider"
                  Summary = summary
                  Description = description
                  Version = release.NugetVersion

@@ -47,33 +47,41 @@ let private createContainerType (domainType : ProvidedTypeDefinition) connection
     domainType.AddMember(individualContainerType)
     // this local binding is required for the quotation.
     let containerName = container.Name
-    ProvidedProperty (container.Name, individualContainerType, IsStatic = true, GetterCode = fun _ -> <@@ Builder.createContainer connectionString containerName @@>)
+    let containerProp = ProvidedProperty (container.Name, individualContainerType, GetterCode = fun _ -> <@@ Builder.createContainer connectionString containerName @@>)
+    containerProp.AddXmlDocDelayed(fun () -> sprintf "Provides access to the '%s' container." containerName)
+    containerProp
 
 /// Builds up the Blob Storage container members
 let getBlobStorageMembers (connectionString, domainType : ProvidedTypeDefinition) = 
-    let containerListingType = ProvidedTypeDefinition("Containers", Some typeof<obj>)
+    let containerListingType = ProvidedTypeDefinition("Containers", Some typeof<obj>, HideObjectMethods = true)
     containerListingType.AddMembersDelayed (fun _ -> BlobRepository.getBlobStorageAccountManifest (connectionString)
                                                      |> List.map (createContainerType domainType connectionString))
-    containerListingType.AddXmlDoc "Gets the list of all containers in this storage account."
-    containerListingType
+    domainType.AddMember containerListingType
+    let containerListingProp = ProvidedProperty("Containers", containerListingType, IsStatic = true, GetterCode = (fun _ -> <@@ () @@>))
+    containerListingProp.AddXmlDoc "Gets the list of all containers in this storage account."
+    containerListingProp
 
 /// Builds up the Table Storage member
 let getTableStorageMembers (connectionString, domainType:ProvidedTypeDefinition) = 
     /// Creates an individual Table member
     let createTableType connectionString tableName = 
-        let tableProperty = ProvidedTypeDefinition(tableName, Some typeof<obj>)
-        tableProperty.AddMembersDelayed(fun _ -> 
+        let tableType = ProvidedTypeDefinition(tableName, Some typeof<obj>, HideObjectMethods = true)
+        tableType.AddMembersDelayed(fun _ -> 
             let tableEntityType = ProvidedTypeDefinition(tableName + "Entity", Some typeof<LightweightTableEntity>, HideObjectMethods = true)
             let createdTypes, createdMembers = TableEntityMemberFactory.buildTableEntityMembers tableEntityType connectionString tableName
             domainType.AddMembers(tableEntityType :: createdTypes)
             createdMembers)
-        tableProperty.AddXmlDoc <| sprintf "Provides access to the '%s' table." tableName
-        tableProperty
+        domainType.AddMember tableType
+        let tableProp = ProvidedProperty(tableName, tableType, GetterCode = (fun _ -> <@@ () @@>))
+        tableProp.AddXmlDoc <| sprintf "Provides access to the '%s' table." tableName
+        tableProp
 
-    let tableListingType = ProvidedTypeDefinition("Tables", Some typeof<obj>)
+    let tableListingType = ProvidedTypeDefinition("Tables", Some typeof<obj>, HideObjectMethods = true)
     tableListingType.AddMembersDelayed(fun _ -> 
         TableRepository.getTables connectionString
         |> Seq.map (createTableType connectionString)
         |> Seq.toList)
-    tableListingType.AddXmlDoc "Gets the list of all tables in this storage account."
-    tableListingType
+    domainType.AddMember tableListingType
+    let tableListingProp = ProvidedProperty("Tables", tableListingType, IsStatic = true, GetterCode = (fun _ -> <@@ () @@>))
+    tableListingProp.AddXmlDoc "Gets the list of all tables in this storage account."
+    tableListingProp
