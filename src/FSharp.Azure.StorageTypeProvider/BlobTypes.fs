@@ -1,9 +1,4 @@
-﻿namespace FSharp.Azure.StorageTypeProvider.Types
-
-open FSharp.Azure.StorageTypeProvider.Repositories.BlobRepository
-open Microsoft.WindowsAzure.Storage
-open Microsoft.WindowsAzure.Storage.Blob
-open Samples.FSharp.ProvidedTypes
+﻿namespace FSharp.Azure.StorageTypeProvider
 
 /// The different types of insertion mechanism to use.
 type TableInsertMode = 
@@ -11,6 +6,13 @@ type TableInsertMode =
     | Insert = 0
     /// Insert if the entity does not already exist; otherwise overwrite the entity.
     | Upsert = 1
+
+namespace FSharp.Azure.StorageTypeProvider.Types
+
+open FSharp.Azure.StorageTypeProvider.Repositories.BlobRepository
+open Microsoft.WindowsAzure.Storage
+open Microsoft.WindowsAzure.Storage.Blob
+open Samples.FSharp.ProvidedTypes
 
 open System
 open System.IO

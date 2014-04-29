@@ -1,7 +1,7 @@
 ﻿///Contains helper functions for accessing tables
 module FSharp.Azure.StorageTypeProvider.Repositories.TableRepository
 
-open FSharp.Azure.StorageTypeProvider.Types
+open FSharp.Azure.StorageTypeProvider
 open Microsoft.WindowsAzure.Storage
 open Microsoft.WindowsAzure.Storage.Table
 open Microsoft.WindowsAzure.Storage.Table.Queryable
@@ -126,8 +126,18 @@ let insertEntity connection tableName insertMode entity =
      |> createInsertOperation insertMode
      |> table.Execute).HttpStatusCode
 
+let insertEntityBatch connection tableName insertMode entities = 
+    let table = getTable connection tableName
+    let insertOp = createInsertOperation insertMode
+    entities
+    |> Seq.map buildDynamicTableEntity
+    |> executeBatchOperation insertOp table
+    |> Seq.map(fun result -> result.HttpStatusCode)
+    |> Seq.toArray
+
 let insertEntityObjectBatch connection tableName insertMode entities = 
     let table = getTable connection tableName
+    let insertOp = createInsertOperation insertMode
     entities
     |> Seq.map(fun (partitionKey, rowKey, entity) -> 
            { PartitionKey = partitionKey
@@ -138,7 +148,7 @@ let insertEntityObjectBatch connection tableName insertMode entities =
                  |> Seq.map(fun prop -> prop.Name, prop.GetValue(entity, null))
                  |> Map.ofSeq })
     |> Seq.map buildDynamicTableEntity
-    |> executeBatchOperation (createInsertOperation insertMode) table
+    |> executeBatchOperation insertOp table
     |> Seq.map(fun result -> result.HttpStatusCode)
     |> Seq.toArray
 

@@ -86,11 +86,13 @@ Target "NuGet"
                  Tags = tags
                  OutputPath = "bin"
                  Files = 
-                     [ "FSharp.Azure.StorageTypeProvider.xml"; "FSharp.Azure.StorageTypeProvider.dll"; 
-                       "Microsoft.Data.Edm.dll"; "Microsoft.Data.OData.dll"; "Microsoft.Data.Services.Client.dll"; 
-                       "Microsoft.WindowsAzure.Configuration.dll"; "Microsoft.WindowsAzure.Storage.dll"; 
-                       "Newtonsoft.Json.dll"; "System.Spatial.dll" ] 
-                     |> List.map (fun file -> @"..\bin\" + file, Some "lib/net40", None) }) 
+                     ([ "FSharp.Azure.StorageTypeProvider.xml"; "FSharp.Azure.StorageTypeProvider.dll"; 
+                        "Microsoft.Data.Edm.dll"; "Microsoft.Data.OData.dll"; "Microsoft.Data.Services.Client.dll"; 
+                        "Microsoft.WindowsAzure.Configuration.dll"; "Microsoft.WindowsAzure.Storage.dll"; 
+                        "Newtonsoft.Json.dll"; "System.Spatial.dll" ] 
+                     |> List.map (fun file -> @"..\bin\" + file, Some "lib/net40", None))
+                     @ [ "StorageTypeProvider.fsx", None, None ]
+                     }) 
         ("nuget/" + project + ".nuspec"))
 // --------------------------------------------------------------------------------------
 // Generate the documentation

@@ -1,7 +1,7 @@
 ﻿/// Responsible for creating members on an individual table entity.
 module internal FSharp.Azure.StorageTypeProvider.MemberFactories.TableEntityMemberFactory
 
-open FSharp.Azure.StorageTypeProvider.Types
+open FSharp.Azure.StorageTypeProvider
 open FSharp.Azure.StorageTypeProvider.Repositories.TableRepository
 open Microsoft.FSharp.Quotations
 open Microsoft.WindowsAzure.Storage.Table
@@ -160,7 +160,18 @@ let buildTableEntityMembers parentEntityType connection tableName =
                           IsStaticMethod = true)
             insertEntity.AddXmlDocDelayed <| fun _ -> "Inserts a single entity with the inferred table schema into the table."
 
-            queryBuilderType :: childTypes, [ getPartition; getEntity; buildQuery; executeQuery; deleteEntity; deleteEntities; deleteEntitiesObject; insertEntity ]
+            let insertEntities = 
+                ProvidedMethod
+                    ("Insert", 
+                        [ ProvidedParameter("entities", parentEntityType.MakeArrayType())
+                          ProvidedParameter("insertMode", typeof<TableInsertMode>, optionalValue = TableInsertMode.Insert)
+                          ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ],
+                          returnType = typeof<int[]>, 
+                          InvokeCode = (fun args -> <@@ insertEntityBatch (%%args.[2]: string) tableName %%args.[1] (%%args.[0]: LightweightTableEntity[]) @@>),
+                          IsStaticMethod = true)
+            insertEntities.AddXmlDocDelayed <| fun _ -> "Inserts a batch of entities with the inferred table schema into the table."
+
+            queryBuilderType :: childTypes, [ getPartition; getEntity; buildQuery; executeQuery; deleteEntity; deleteEntities; deleteEntitiesObject; insertEntity; insertEntities ]
 
     let insertEntityObject = 
         ProvidedMethod
