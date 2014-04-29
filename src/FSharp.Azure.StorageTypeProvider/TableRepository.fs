@@ -21,7 +21,7 @@ let buildTableEntity partitionKey rowKey names (values: obj []) =
       Timestamp = DateTimeOffset.MinValue
       Values = (Seq.zip names values) |> Map.ofSeq }
 
-let private getTable connection tableName = 
+let internal getTable connection tableName = 
     let client = getTableClient connection
     client.GetTableReference tableName
 
@@ -53,7 +53,7 @@ let executeQuery connection tableName maxResults filterString =
                  |> Map.ofSeq })
     |> Seq.toArray
 
-let private buildDynamicTableEntity entity =
+let internal buildDynamicTableEntity entity =
     let tableEntity = DynamicTableEntity(entity.PartitionKey, entity.RowKey, ETag = "*")
     for (key, value) in entity.Values |> Map.toArray do
         tableEntity.Properties.[key] <- match value with
@@ -72,7 +72,7 @@ let private buildDynamicTableEntity entity =
                                         | _ -> EntityProperty.CreateEntityPropertyFromObject(value)
     tableEntity
 
-let private createInsertOperation insertMode = 
+let internal createInsertOperation insertMode = 
     match insertMode with
     | TableInsertMode.Insert -> TableOperation.Insert
     | TableInsertMode.Upsert -> TableOperation.InsertOrReplace
@@ -86,7 +86,7 @@ let private batch size source =
         | head::tail -> doBatch output (head::currentBatch) (counter + 1) tail
     doBatch [] [] 0 (source |> Seq.toList)
 
-let private executeBatchOperation operation (table:CloudTable) entities =
+let internal executeBatchOperation operation (table:CloudTable) entities =
     entities
     |> Seq.groupBy(fun (entity:DynamicTableEntity) -> entity.PartitionKey)
     |> Seq.collect(fun (partitionKey, entities) -> 
@@ -110,14 +110,6 @@ let deleteEntities connection tableName entities =
 
 let deleteEntity connection tableName entity =
     deleteEntities connection tableName [| entity |] |> Seq.head
-
-let deleteEntitiesTuple connection tableName entities =
-    let table = getTable connection tableName
-    entities
-    |> Seq.map (fun (partitionKey, rowKey) -> DynamicTableEntity(partitionKey, rowKey, ETag = "*"))
-    |> executeBatchOperation TableOperation.Delete table
-    |> Seq.map(fun result -> result.HttpStatusCode)
-    |> Seq.toArray
     
 let insertEntity connection tableName insertMode entity = 
     let table = getTable connection tableName
@@ -134,27 +126,6 @@ let insertEntityBatch connection tableName insertMode entities =
     |> executeBatchOperation insertOp table
     |> Seq.map(fun result -> result.HttpStatusCode)
     |> Seq.toArray
-
-let insertEntityObjectBatch connection tableName insertMode entities = 
-    let table = getTable connection tableName
-    let insertOp = createInsertOperation insertMode
-    entities
-    |> Seq.map(fun (partitionKey, rowKey, entity) -> 
-           { PartitionKey = partitionKey
-             RowKey = rowKey
-             Timestamp = DateTimeOffset.MinValue
-             Values = 
-                 entity.GetType().GetProperties(Reflection.BindingFlags.Public ||| Reflection.BindingFlags.Instance)
-                 |> Seq.map(fun prop -> prop.Name, prop.GetValue(entity, null))
-                 |> Map.ofSeq })
-    |> Seq.map buildDynamicTableEntity
-    |> executeBatchOperation insertOp table
-    |> Seq.map(fun result -> result.HttpStatusCode)
-    |> Seq.toArray
-
-let insertEntityObject connection tableName partitionKey rowKey insertMode entity =
-    insertEntityObjectBatch connection tableName insertMode [ partitionKey, rowKey, entity ]
-    |> Seq.head
 
 let composeAllFilters filters = 
     match filters with

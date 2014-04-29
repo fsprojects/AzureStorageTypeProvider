@@ -95,7 +95,7 @@ module internal ProvidedTypeGenerator =
           ProvidedTypeDefinition("XmlFile", Some typeof<XmlFile>, HideObjectMethods = true) ]
 
 /// Builder methods to construct blobs etc..
-module Builder = 
+module ContainerBuilder = 
     let internal (|Text|Binary|XML|) (name : string) = 
         let endsWith extension = name.EndsWith(extension, StringComparison.InvariantCultureIgnoreCase)
         match name with
