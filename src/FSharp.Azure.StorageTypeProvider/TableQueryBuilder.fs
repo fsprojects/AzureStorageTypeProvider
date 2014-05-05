@@ -12,8 +12,9 @@ open System.Text.RegularExpressions
 let private queryComparisons = 
     typeof<QueryComparisons>.GetFields()
     |> Seq.map(fun f -> f.Name, f.GetValue(null) :?> string)
+    |> Seq.map(fun (f, n) -> (if f.EndsWith("Equal") then f + "To" else f), n)
     |> Seq.cache
-
+    
 let private splitOnCaps text =
     Regex.Replace(text, "((?<=[a-z])[A-Z]|[A-Z](?=[a-z]))", " $1").Trim()
 
@@ -24,7 +25,7 @@ let private buildGenericProp<'a> (propertyOperatorsType: ProvidedTypeDefinition)
                   <@@ buildFilter(propertyName, compValue, (%%args.[1]: 'a)) :: ((%%args.[0]: obj) :?> string list) @@>
           let providedMethod = 
               ProvidedMethod
-                  ("Is"+compName |> splitOnCaps, [ ProvidedParameter(propertyName.ToLower(), typeof<'a>) ], parentQueryType, 
+                  (compName |> splitOnCaps, [ ProvidedParameter(propertyName.ToLower(), typeof<'a>) ], parentQueryType, 
                    InvokeCode = invokeCode)
           providedMethod.AddXmlDocDelayed 
           <| fun _ -> 
@@ -62,11 +63,8 @@ let private buildPropertyOperatorsType tableName propertyName propertyType paren
     propertyOperatorsType
 
 /// Creates a query property (and child methods etc.) for a given entity
-let createTableQueryType (tableEntityType: ProvidedTypeDefinition) connection tableName 
-    (properties: seq<string * EntityProperty>) = 
-    let tableQueryType = 
-        ProvidedTypeDefinition(tableName + "QueryPropertyBuilder", Some typeof<obj>, HideObjectMethods = true)
-                      
+let createTableQueryType (tableEntityType: ProvidedTypeDefinition) connection tableName (properties: seq<string * EntityProperty>) = 
+    let tableQueryType = ProvidedTypeDefinition(tableName + "QueryBuilder", Some typeof<obj>, HideObjectMethods = true)                      
     let operatorTypes = [ "PartitionKey", buildPropertyOperatorsType tableName "PartitionKey" EdmType.String tableQueryType
                           "RowKey", buildPropertyOperatorsType tableName "RowKey" EdmType.String tableQueryType
                           "Timestamp", buildPropertyOperatorsType tableName "Timestamp" EdmType.DateTime tableQueryType ] @
@@ -83,7 +81,7 @@ let createTableQueryType (tableEntityType: ProvidedTypeDefinition) connection ta
             [ for (name, operatorType) in operatorTypes -> 
                   let queryProperty = 
                       ProvidedProperty
-                          ("Where " + name, operatorType, GetterCode = (fun args -> <@@ (%%args.[0]: obj) :?> string list @@>))
+                          ("Where" + name + "Is" |> splitOnCaps, operatorType, GetterCode = (fun args -> <@@ (%%args.[0]: obj) :?> string list @@>))
                   queryProperty.AddXmlDocDelayed <| fun _ -> sprintf "Creates a query part for the %s property." name
                   queryProperty :> MemberInfo ]
         (executeQueryMethod :> MemberInfo) :: customQueryProperties)

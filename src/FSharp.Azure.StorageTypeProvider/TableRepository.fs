@@ -72,7 +72,7 @@ let internal buildDynamicTableEntity entity =
                                         | _ -> EntityProperty.CreateEntityPropertyFromObject(value)
     tableEntity
 
-let internal createInsertOperation insertMode = 
+let internal createInsertOperation(insertMode) = 
     match insertMode with
     | TableInsertMode.Insert -> TableOperation.Insert
     | TableInsertMode.Upsert -> TableOperation.InsertOrReplace

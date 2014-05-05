@@ -29,7 +29,7 @@ type AzureTypeProvider() as this =
             ProvidedTypeDefinition(thisAssembly, namespaceName, typeName, baseType = Some typeof<obj>)
         typeProviderForAccount.AddMember(ProvidedConstructor(parameters = [], InvokeCode = (fun args -> <@@ null @@>)))
         let connectionString = buildConnectionString args
-        let domainTypes = ProvidedTypeDefinition("DomainTypes", Some typeof<obj>)
+        let domainTypes = ProvidedTypeDefinition("Domain", Some typeof<obj>)
         domainTypes.AddMembers <| ProvidedTypeGenerator.generateTypes()
         typeProviderForAccount.AddMember(domainTypes)
 
