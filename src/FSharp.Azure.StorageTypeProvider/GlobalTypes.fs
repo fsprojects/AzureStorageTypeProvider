@@ -7,9 +7,20 @@ type TableInsertMode =
     /// Insert if the entity does not already exist; otherwise overwrite the entity.
     | Upsert = 1
 
-type TableResponse =
-    | SuccessfulResponse of PartitionKey : string * RowKey : string * HttpCode : int
-    | EntityError of PartitionKey : string * RowKey : string * HttpCode : int * ErrorCode : string
-    | BatchOperationFailedError of PartitionKey : string * RowKey : string
-    | BatchError of PartitionKey : string * RowKey : string * HttpCode : int * ErrorCode : string
+/// The name of the partition.
+type Partition = | Partition of string
+/// The row key.
+type Row = | Row of string
+/// Represents a Partition and Row combined to key a single entity.
+type EntityId = Partition * Row
 
+/// Different responses from a table operation.
+type TableResponse =
+    /// The operation was successful.
+    | SuccessfulResponse of EntityId * HttpCode : int
+    /// The operation for this specific entity failed.
+    | EntityError of EntityId * HttpCode : int * ErrorCode : string
+    /// The operation for this specific entity was not carried out because an operation for another entity in the same batch failed.
+    | BatchOperationFailedError of EntityId
+    /// An unknown error occurred in this batch.
+    | BatchError of EntityId * HttpCode : int * ErrorCode : string

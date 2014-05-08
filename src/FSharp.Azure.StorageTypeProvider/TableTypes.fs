@@ -18,8 +18,7 @@ type AzureTable internal (defaultConnection, tableName) =
         let insertOp = createInsertOperation insertMode
         entities
         |> Seq.map (fun (partitionKey, rowKey, entity) -> 
-               { PartitionKey = partitionKey
-                 RowKey = rowKey
+               { EntityId = partitionKey, rowKey
                  Timestamp = DateTimeOffset.MinValue
                  Values = 
                      entity.GetType().GetProperties(Reflection.BindingFlags.Public ||| Reflection.BindingFlags.Instance)
@@ -37,7 +36,9 @@ type AzureTable internal (defaultConnection, tableName) =
     member x.Delete(entities, ?connectionString) = 
         let table = getTableForConnection (defaultArg connectionString defaultConnection)
         entities
-        |> Seq.map (fun (partitionKey, rowKey) -> DynamicTableEntity(partitionKey, rowKey, ETag = "*"))
+        |> Seq.map (fun (entityId) ->
+            let Partition(partitionKey),Row(rowKey) = entityId
+            DynamicTableEntity(partitionKey, rowKey, ETag = "*"))
         |> executeBatchOperation TableOperation.Delete table
 
 module TableBuilder = 

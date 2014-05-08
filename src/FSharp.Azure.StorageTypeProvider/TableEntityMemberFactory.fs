@@ -60,8 +60,8 @@ let setPropertiesForEntity (entityType : ProvidedTypeDefinition) (sampleEntities
         |> Seq.toList)
     entityType.AddMemberDelayed(fun () -> 
         let parameters = 
-            [ ProvidedParameter("PartitionKey", typeof<string>)
-              ProvidedParameter("RowKey", typeof<string>) ] 
+            [ ProvidedParameter("PartitionKey", typeof<Partition>)
+              ProvidedParameter("RowKey", typeof<Row>) ] 
             @ [ for (name, entityProp) in properties |> Seq.sortBy fst -> buildEdmParameter entityProp.PropertyType (buildParameter name) ]
         ProvidedConstructor(parameters, 
                             InvokeCode = fun args -> 
@@ -76,7 +76,7 @@ let setPropertiesForEntity (entityType : ProvidedTypeDefinition) (sampleEntities
                                     |> Seq.map (fun arg -> Expr.Coerce(arg, typeof<obj>))
                                     |> Seq.toList
                                 
-                                <@@ buildTableEntity (%%args.[0] : string) (%%args.[1] : string) fieldNames (%%(Expr.NewArray(typeof<obj>, fieldValues))) @@>))
+                                <@@ buildTableEntity (%%args.[0] : Partition) (%%args.[1] : Row) fieldNames (%%(Expr.NewArray(typeof<obj>, fieldValues))) @@>))
     properties
 
 /// Gets all the members for a Table Entity type
@@ -110,11 +110,11 @@ let buildTableEntityMembers (parentTableType:ProvidedTypeDefinition, parentTable
             let getEntity = 
                 ProvidedMethod
                     ("Get", 
-                     [ ProvidedParameter("rowKey", typeof<string>)
-                       ProvidedParameter("partitionKey", typeof<string>, optionalValue = null)
+                     [ ProvidedParameter("rowKey", typeof<Row>)
+                       ProvidedParameter("partitionKey", typeof<Partition>, optionalValue = "")
                        ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], 
                      (typeof<option<_>>).GetGenericTypeDefinition().MakeGenericType(parentTableEntityType), 
-                     InvokeCode = (fun args -> <@@ getEntity (%%args.[1] : string) (%%args.[2] : string) (%%args.[3] : string) tableName @@>))
+                     InvokeCode = (fun args -> <@@ getEntity (%%args.[1] : Row) (%%args.[2] : Partition) (%%args.[3] : string) tableName @@>))
             getEntity.AddXmlDocDelayed 
             <| fun _ -> "Gets a single entity based on the row key and optionally the partition key. If more than one entity is returned, an exception is raised."
             let deleteEntity = 

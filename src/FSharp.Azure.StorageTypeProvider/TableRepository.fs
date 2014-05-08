@@ -10,14 +10,12 @@ open System
 let private getTableClient connection = CloudStorageAccount.Parse(connection).CreateCloudTableClient()
 
 type LightweightTableEntity = 
-    { PartitionKey: string
-      RowKey: string
+    { EntityId: EntityId
       Timestamp: System.DateTimeOffset
       Values: Map<string, obj> }
 
 let buildTableEntity partitionKey rowKey names (values: obj []) = 
-    { PartitionKey = partitionKey
-      RowKey = rowKey
+    { EntityId = partitionKey, rowKey
       Timestamp = DateTimeOffset.MinValue
       Values = (Seq.zip names values) |> Map.ofSeq }
 
@@ -44,8 +42,7 @@ let executeQuery connection tableName maxResults filterString =
 
     (getTable tableName connection).ExecuteQuery(query)
     |> Seq.map(fun dte -> 
-           { PartitionKey = dte.PartitionKey
-             RowKey = dte.RowKey
+           { EntityId = Partition(dte.PartitionKey), Row(dte.RowKey)
              Timestamp = dte.Timestamp
              Values = 
                  dte.Properties
@@ -54,7 +51,9 @@ let executeQuery connection tableName maxResults filterString =
     |> Seq.toArray
 
 let internal buildDynamicTableEntity entity =
-    let tableEntity = DynamicTableEntity(entity.PartitionKey, entity.RowKey, ETag = "*")
+    let (Partition pkey),(Row rkey) = entity.EntityId
+
+    let tableEntity = DynamicTableEntity(pkey, rkey, ETag = "*")
     for (key, value) in entity.Values |> Map.toArray do
         tableEntity.Properties.[key] <- match value with
                                         | :? (byte []) as value -> EntityProperty.GeneratePropertyForByteArray(value)
@@ -97,10 +96,11 @@ let internal executeBatchOperation createTableOp (table:CloudTable) entities =
                 entityBatch |> Seq.iter (createTableOp >> batchForPartition.Add)
                 partitionKey, entityBatch, batchForPartition))
     |> Seq.map(fun (partitionKey, entityBatch, batchOperation) ->
+        let buildEntityId (entity:DynamicTableEntity) = Partition(entity.PartitionKey), Row(entity.RowKey)
         let responses = try
                            table.ExecuteBatch(batchOperation)
                                        |> Seq.zip entityBatch
-                                       |> Seq.map(fun (entity, res) -> SuccessfulResponse(entity.PartitionKey, entity.RowKey, res.HttpStatusCode))
+                                       |> Seq.map(fun (entity, res) -> SuccessfulResponse(buildEntityId entity, res.HttpStatusCode))
                         with
                             :? StorageException as ex ->
                                 let requestInformation = ex.RequestInformation
@@ -108,11 +108,11 @@ let internal executeBatchOperation createTableOp (table:CloudTable) entities =
                                 | [|index;message|] ->
                                     match Int32.TryParse(index) with
                                     | true, index -> entityBatch
-                                                     |> Seq.mapi(fun entityIndex entity -> if entityIndex = index then EntityError(entity.PartitionKey, entity.RowKey, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode)
-                                                                                           else BatchOperationFailedError(entity.PartitionKey, entity.RowKey))
-                                    | _ -> entityBatch |> Seq.map(fun entity -> BatchError(entity.PartitionKey, entity.RowKey, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
-                                | [|message|] -> entityBatch |> Seq.map(fun entity -> EntityError(entity.PartitionKey, entity.RowKey, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
-                                | _ -> entityBatch |> Seq.map(fun entity -> BatchError(entity.PartitionKey, entity.RowKey, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
+                                                     |> Seq.mapi(fun entityIndex entity -> if entityIndex = index then EntityError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode)
+                                                                                           else BatchOperationFailedError(buildEntityId entity))
+                                    | _ -> entityBatch |> Seq.map(fun entity -> BatchError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
+                                | [|message|] -> entityBatch |> Seq.map(fun entity -> EntityError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
+                                | _ -> entityBatch |> Seq.map(fun entity -> BatchError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
         partitionKey, responses |> Seq.toArray)
 
     |> Seq.toArray
@@ -156,9 +156,10 @@ let buildFilter(propertyName, comparison, value) =
     | _ -> TableQuery.GenerateFilterCondition(propertyName, comparison, value.ToString())
 
 let getEntity rowKey partitionKey connection tableName = 
+    let (Row rowKey) = rowKey
     let results = match partitionKey with
-                  | null -> [ ("RowKey", rowKey) ]
-                  | partitionKey -> 
+                  | Partition null -> [ ("RowKey", rowKey) ]
+                  | Partition partitionKey -> 
                       [ ("RowKey", rowKey)
                         ("PartitionKey", partitionKey) ]
                   |> List.map(fun (prop, value) -> buildFilter(prop, QueryComparisons.Equal, value))
