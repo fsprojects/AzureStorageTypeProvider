@@ -1,5 +1,5 @@
 ﻿///Contains reusable helper functions for accessing blobs
-module internal FSharp.Azure.StorageTypeProvider.Repositories.BlobRepository
+module internal FSharp.Azure.StorageTypeProvider.Blob.BlobRepository
 
 open Microsoft.WindowsAzure.Storage
 open Microsoft.WindowsAzure.Storage.Blob

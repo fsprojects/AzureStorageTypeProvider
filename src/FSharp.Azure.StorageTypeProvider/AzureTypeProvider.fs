@@ -1,8 +1,8 @@
 ﻿namespace FSharp.Azure.StorageTypeProvider
 
-open FSharp.Azure.StorageTypeProvider.Types
+open FSharp.Azure.StorageTypeProvider.Blob
+open FSharp.Azure.StorageTypeProvider.Table
 open Microsoft.FSharp.Core.CompilerServices
-open Microsoft.FSharp.Quotations
 open Samples.FSharp.ProvidedTypes
 open System
 open System.Reflection
@@ -35,8 +35,8 @@ type AzureTypeProvider() as this =
 
         // Now create child members e.g. containers, tables etc.
         typeProviderForAccount.AddMembers
-            ([ ContainerTypeFactory.getBlobStorageMembers 
-               ContainerTypeFactory.getTableStorageMembers ]
+            ([ BlobMemberFactory.getBlobStorageMembers 
+               TableMemberFactory.getTableStorageMembers ]
             |> List.map (fun builder -> builder(connectionString,domainTypes)))
         typeProviderForAccount
     

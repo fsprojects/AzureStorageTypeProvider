@@ -1,7 +1,7 @@
 ﻿///Contains helper functions for accessing tables
-module FSharp.Azure.StorageTypeProvider.Repositories.TableRepository
+module FSharp.Azure.StorageTypeProvider.Table.TableRepository
 
-open FSharp.Azure.StorageTypeProvider
+open FSharp.Azure.StorageTypeProvider.Table
 open Microsoft.WindowsAzure.Storage
 open Microsoft.WindowsAzure.Storage.Table
 open Microsoft.WindowsAzure.Storage.Table.Queryable

@@ -1,6 +1,6 @@
-﻿module internal FSharp.Azure.StorageTypeProvider.MemberFactories.TableQueryBuilder
+﻿module internal FSharp.Azure.StorageTypeProvider.Table.TableQueryBuilder
 
-open FSharp.Azure.StorageTypeProvider.Repositories.TableRepository
+open FSharp.Azure.StorageTypeProvider.Table.TableRepository
 open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Quotations
 open Microsoft.WindowsAzure.Storage.Table

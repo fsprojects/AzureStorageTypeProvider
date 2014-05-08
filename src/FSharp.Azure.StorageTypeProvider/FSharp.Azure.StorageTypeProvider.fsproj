@@ -85,13 +85,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ProvidedTypes-0.4.fs" />
+    <Compile Include="GlobalTypes.fs" />
     <Compile Include="BlobRepository.fs" />
     <Compile Include="BlobTypes.fs" />
     <Compile Include="TableRepository.fs" />
     <Compile Include="TableTypes.fs" />
     <Compile Include="TableQueryBuilder.fs" />
     <Compile Include="TableEntityMemberFactory.fs" />
-    <Compile Include="ContainerTypeFactory.fs" />
+    <Compile Include="TableMemberFactory.fs" />
+    <Compile Include="BlobMemberFactory.fs" />
     <Compile Include="AzureTypeProvider.fs" />
     <None Include="packages.config" />
     <None Include="App.config" />

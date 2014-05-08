@@ -1,7 +1,7 @@
-﻿namespace FSharp.Azure.StorageTypeProvider.Types
+﻿namespace FSharp.Azure.StorageTypeProvider.Table
 
 open FSharp.Azure.StorageTypeProvider
-open FSharp.Azure.StorageTypeProvider.Repositories.TableRepository
+open FSharp.Azure.StorageTypeProvider.Table.TableRepository
 open Microsoft.WindowsAzure.Storage.Table
 open Microsoft.WindowsAzure.Storage
 open System

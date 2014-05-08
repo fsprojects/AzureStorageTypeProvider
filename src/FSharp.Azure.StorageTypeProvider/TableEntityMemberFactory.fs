@@ -1,13 +1,11 @@
 ﻿/// Responsible for creating members on an individual table entity.
-module internal FSharp.Azure.StorageTypeProvider.MemberFactories.TableEntityMemberFactory
+module internal FSharp.Azure.StorageTypeProvider.Table.TableEntityMemberFactory
 
-open FSharp.Azure.StorageTypeProvider
-open FSharp.Azure.StorageTypeProvider.Repositories.TableRepository
+open FSharp.Azure.StorageTypeProvider.Table.TableRepository
 open Microsoft.FSharp.Quotations
 open Microsoft.WindowsAzure.Storage.Table
 open Samples.FSharp.ProvidedTypes
 open System
-open System.Reflection
 
 let private getDistinctProperties (tableEntities : #seq<DynamicTableEntity>) = 
     tableEntities
