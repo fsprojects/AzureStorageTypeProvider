@@ -123,14 +123,14 @@ let buildTableEntityMembers (parentTableType:ProvidedTypeDefinition, parentTable
                 ProvidedMethod
                     ("Delete", 
                      [ ProvidedParameter("entity", parentTableEntityType)
-                       ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], returnType = typeof<int>, 
+                       ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], returnType = typeof<TableResponse>, 
                      InvokeCode = (fun args -> <@@ deleteEntity %%args.[2] tableName %%args.[1] @@>))
             deleteEntity.AddXmlDocDelayed <| fun _ -> "Deletes a single entity from the table."
             let deleteEntities = 
                 ProvidedMethod
                     ("Delete", 
                      [ ProvidedParameter("entities", parentTableEntityType.MakeArrayType())
-                       ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], returnType = typeof<int []>, 
+                       ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], returnType = typeof<(string * TableResponse []) []>, 
                      InvokeCode = (fun args -> <@@ deleteEntities %%args.[2] tableName %%args.[1] @@>))
             deleteEntities.AddXmlDocDelayed <| fun _ -> "Deletes a batch of entities from the table."
             let insertEntity = 
@@ -138,7 +138,7 @@ let buildTableEntityMembers (parentTableType:ProvidedTypeDefinition, parentTable
                     ("Insert", 
                      [ ProvidedParameter("entity", parentTableEntityType)
                        ProvidedParameter("insertMode", typeof<TableInsertMode>, optionalValue = TableInsertMode.Insert)
-                       ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], returnType = typeof<int>, 
+                       ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], returnType = typeof<TableResponse>, 
                      InvokeCode = (fun args -> <@@ insertEntity (%%args.[3] : string) tableName %%args.[2] (%%args.[1] : LightweightTableEntity) @@>))
             insertEntity.AddXmlDocDelayed <| fun _ -> "Inserts a single entity with the inferred table schema into the table."
             let insertEntities = 
@@ -146,7 +146,7 @@ let buildTableEntityMembers (parentTableType:ProvidedTypeDefinition, parentTable
                     ("Insert", 
                      [ ProvidedParameter("entities", parentTableEntityType.MakeArrayType())
                        ProvidedParameter("insertMode", typeof<TableInsertMode>, optionalValue = TableInsertMode.Insert)
-                       ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], returnType = typeof<int []>, 
+                       ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], returnType = typeof<(string * TableResponse [])[]>, 
                      InvokeCode = (fun args -> <@@ insertEntityBatch (%%args.[3] : string) tableName %%args.[2] (%%args.[1] : LightweightTableEntity []) @@>))
             insertEntities.AddXmlDocDelayed <| fun _ -> "Inserts a batch of entities with the inferred table schema into the table."
             domainType.AddMembers(queryBuilderType :: childTypes)

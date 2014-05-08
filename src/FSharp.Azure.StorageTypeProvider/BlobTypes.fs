@@ -7,6 +7,12 @@ type TableInsertMode =
     /// Insert if the entity does not already exist; otherwise overwrite the entity.
     | Upsert = 1
 
+type TableResponse =
+    | SuccessfulResponse of PartitionKey : string * RowKey : string * HttpCode : int
+    | EntityError of PartitionKey : string * RowKey : string * HttpCode : int * ErrorCode : string
+    | BatchOperationFailedError of PartitionKey : string * RowKey : string
+    | BatchError of PartitionKey : string * RowKey : string * HttpCode : int * ErrorCode : string
+
 namespace FSharp.Azure.StorageTypeProvider.Types
 
 open FSharp.Azure.StorageTypeProvider.Repositories.BlobRepository

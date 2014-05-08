@@ -21,7 +21,7 @@ let buildTableEntity partitionKey rowKey names (values: obj []) =
       Timestamp = DateTimeOffset.MinValue
       Values = (Seq.zip names values) |> Map.ofSeq }
 
-let internal getTable connection tableName = 
+let internal getTable tableName connection = 
     let client = getTableClient connection
     client.GetTableReference tableName
 
@@ -33,7 +33,7 @@ let internal getTables connection =
 type private DynamicQuery = TableQuery<DynamicTableEntity>
 
 let internal getRowsForSchema (rowCount: int) connection tableName = 
-    let table = getTable connection tableName
+    let table = getTable tableName connection
     table.ExecuteQuery(DynamicQuery().Take(Nullable<_>(rowCount)))
     |> Seq.truncate rowCount
     |> Seq.toArray
@@ -42,7 +42,7 @@ let executeQuery connection tableName maxResults filterString =
     let query = DynamicQuery().Where(filterString)
     let query = if maxResults > 0 then query.Take(Nullable(maxResults)) else query
 
-    (getTable connection tableName).ExecuteQuery(query)
+    (getTable tableName connection).ExecuteQuery(query)
     |> Seq.map(fun dte -> 
            { PartitionKey = dte.PartitionKey
              RowKey = dte.RowKey
@@ -86,7 +86,7 @@ let private batch size source =
         | head::tail -> doBatch output (head::currentBatch) (counter + 1) tail
     doBatch [] [] 0 (source |> Seq.toList)
 
-let internal executeBatchOperation operation (table:CloudTable) entities =
+let internal executeBatchOperation createTableOp (table:CloudTable) entities =
     entities
     |> Seq.groupBy(fun (entity:DynamicTableEntity) -> entity.PartitionKey)
     |> Seq.collect(fun (partitionKey, entities) -> 
@@ -94,38 +94,47 @@ let internal executeBatchOperation operation (table:CloudTable) entities =
            |> batch 100
            |> Seq.map(fun entityBatch ->
                 let batchForPartition = TableBatchOperation()
-                entityBatch
-                |> Seq.map operation
-                |> Seq.iter batchForPartition.Add
-                batchForPartition))
-    |> Seq.collect table.ExecuteBatch
+                entityBatch |> Seq.iter (createTableOp >> batchForPartition.Add)
+                partitionKey, entityBatch, batchForPartition))
+    |> Seq.map(fun (partitionKey, entityBatch, batchOperation) ->
+        let responses = try
+                           table.ExecuteBatch(batchOperation)
+                                       |> Seq.zip entityBatch
+                                       |> Seq.map(fun (entity, res) -> SuccessfulResponse(entity.PartitionKey, entity.RowKey, res.HttpStatusCode))
+                        with
+                            :? StorageException as ex ->
+                                let requestInformation = ex.RequestInformation
+                                match requestInformation.ExtendedErrorInformation.ErrorMessage.Split('\n').[0].Split(':') with
+                                | [|index;message|] ->
+                                    match Int32.TryParse(index) with
+                                    | true, index -> entityBatch
+                                                     |> Seq.mapi(fun entityIndex entity -> if entityIndex = index then EntityError(entity.PartitionKey, entity.RowKey, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode)
+                                                                                           else BatchOperationFailedError(entity.PartitionKey, entity.RowKey))
+                                    | _ -> entityBatch |> Seq.map(fun entity -> BatchError(entity.PartitionKey, entity.RowKey, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
+                                | [|message|] -> entityBatch |> Seq.map(fun entity -> EntityError(entity.PartitionKey, entity.RowKey, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
+                                | _ -> entityBatch |> Seq.map(fun entity -> BatchError(entity.PartitionKey, entity.RowKey, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
+        partitionKey, responses |> Seq.toArray)
+
+    |> Seq.toArray
 
 let deleteEntities connection tableName entities =
-    let table = getTable connection tableName    
+    let table = getTable tableName connection
     entities
     |> Array.map buildDynamicTableEntity
     |> executeBatchOperation TableOperation.Delete table
-    |> Seq.map(fun result -> result.HttpStatusCode)
-    |> Seq.toArray
 
 let deleteEntity connection tableName entity =
-    deleteEntities connection tableName [| entity |] |> Seq.head
+    deleteEntities connection tableName [| entity |] |> Seq.head |> snd |> Seq.head
     
-let insertEntity connection tableName insertMode entity = 
-    let table = getTable connection tableName
-    (entity
-     |> buildDynamicTableEntity
-     |> createInsertOperation insertMode
-     |> table.Execute).HttpStatusCode
-
 let insertEntityBatch connection tableName insertMode entities = 
-    let table = getTable connection tableName
+    let table = getTable tableName connection
     let insertOp = createInsertOperation insertMode
     entities
     |> Seq.map buildDynamicTableEntity
     |> executeBatchOperation insertOp table
-    |> Seq.map(fun result -> result.HttpStatusCode)
-    |> Seq.toArray
+
+let insertEntity connection tableName insertMode entity = 
+    insertEntityBatch connection tableName insertMode [entity] |> Seq.head |> snd |> Seq.head    
 
 let composeAllFilters filters = 
     match filters with

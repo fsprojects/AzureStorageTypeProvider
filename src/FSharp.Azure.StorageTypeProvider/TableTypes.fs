@@ -3,16 +3,18 @@
 open FSharp.Azure.StorageTypeProvider
 open FSharp.Azure.StorageTypeProvider.Repositories.TableRepository
 open Microsoft.WindowsAzure.Storage.Table
+open Microsoft.WindowsAzure.Storage
 open System
 
 /// Represents a Table in Azure.
 type AzureTable internal (defaultConnection, tableName) = 
     let getConnectionDetails (insertMode, connectionString) = defaultArg insertMode TableInsertMode.Insert, defaultArg connectionString defaultConnection
-    
+    let getTableForConnection = getTable tableName
+
     /// Inserts a batch of entities into the table, using all public properties on the object as fields.
     member x.Insert(entities, ?insertMode, ?connectionString) = 
         let insertMode, connectionString = getConnectionDetails (insertMode, connectionString)
-        let table = getTable connectionString tableName
+        let table = getTableForConnection connectionString
         let insertOp = createInsertOperation insertMode
         entities
         |> Seq.map (fun (partitionKey, rowKey, entity) -> 
@@ -25,23 +27,18 @@ type AzureTable internal (defaultConnection, tableName) =
                      |> Map.ofSeq })
         |> Seq.map buildDynamicTableEntity
         |> executeBatchOperation insertOp table
-        |> Seq.map (fun result -> result.HttpStatusCode)
-        |> Seq.toArray
     
     /// Inserts a single entity into the table, using public properties on the object as fields.
     member x.Insert(partitionKey, rowKey, entity, ?insertMode, ?connectionString) = 
         let insertMode, connectionString = getConnectionDetails (insertMode, connectionString)
-        x.Insert([ partitionKey, rowKey, entity ], insertMode, connectionString) |> Seq.head
+        x.Insert([ partitionKey, rowKey, entity ], insertMode, connectionString) |> Seq.head |> snd |> Seq.head
 
     ///Deletes a batch of entities from the table using the supplied pairs of Partition and Row keys.
     member x.Delete(entities, ?connectionString) = 
-        let connectionString = defaultArg connectionString defaultConnection
-        let table = getTable connectionString tableName
+        let table = getTableForConnection (defaultArg connectionString defaultConnection)
         entities
         |> Seq.map (fun (partitionKey, rowKey) -> DynamicTableEntity(partitionKey, rowKey, ETag = "*"))
         |> executeBatchOperation TableOperation.Delete table
-        |> Seq.map (fun result -> result.HttpStatusCode)
-        |> Seq.toArray
 
 module TableBuilder = 
     /// Creates an Azure Table object.
