@@ -6,7 +6,7 @@
         <title>@title@</title>
         <authors>@authors@</authors>
         <owners>@authors@</owners>
-        <projectUrl>https://github.com/isaacabraham/AzureTypeProvider</projectUrl>
+        <projectUrl>https://github.com/isaacabraham/AzureStorageTypeProvider</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>@description@</description>
         <tags>@tags@</tags>
