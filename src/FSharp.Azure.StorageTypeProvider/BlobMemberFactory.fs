@@ -2,7 +2,7 @@
 module internal FSharp.Azure.StorageTypeProvider.Blob.BlobMemberFactory
 
 open FSharp.Azure.StorageTypeProvider.Blob.BlobRepository
-open Samples.FSharp.ProvidedTypes
+open ProviderImplementation.ProvidedTypes
 open System
 
 let rec private createBlobItem (domainType : ProvidedTypeDefinition) connectionString containerName fileItem = 

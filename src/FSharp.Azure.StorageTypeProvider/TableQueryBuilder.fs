@@ -4,7 +4,7 @@ open FSharp.Azure.StorageTypeProvider.Table.TableRepository
 open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Quotations
 open Microsoft.WindowsAzure.Storage.Table
-open Samples.FSharp.ProvidedTypes
+open ProviderImplementation.ProvidedTypes
 open System
 open System.Reflection
 open System.Text.RegularExpressions

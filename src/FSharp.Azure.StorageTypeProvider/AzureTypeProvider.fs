@@ -1,15 +1,15 @@
-﻿namespace FSharp.Azure.StorageTypeProvider
+﻿namespace ProviderImplementation
 
 open FSharp.Azure.StorageTypeProvider.Blob
 open FSharp.Azure.StorageTypeProvider.Table
 open Microsoft.FSharp.Core.CompilerServices
-open Samples.FSharp.ProvidedTypes
+open ProviderImplementation.ProvidedTypes
 open System
 open System.Reflection
 
 [<TypeProvider>]
 /// The type provider for connecting to Azure Storage.
-type AzureTypeProvider() as this = 
+type public AzureTypeProvider() as this = 
     inherit TypeProviderForNamespaces()
 
     let namespaceName = "FSharp.Azure.StorageTypeProvider"

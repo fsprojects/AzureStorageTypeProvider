@@ -4,7 +4,7 @@ module internal FSharp.Azure.StorageTypeProvider.Table.TableEntityMemberFactory
 open FSharp.Azure.StorageTypeProvider.Table.TableRepository
 open Microsoft.FSharp.Quotations
 open Microsoft.WindowsAzure.Storage.Table
-open Samples.FSharp.ProvidedTypes
+open ProviderImplementation.ProvidedTypes
 open System
 
 let private getDistinctProperties (tableEntities : #seq<DynamicTableEntity>) = 
