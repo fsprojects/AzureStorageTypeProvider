@@ -32,7 +32,7 @@ type AzureTable internal (defaultConnection, tableName) =
         let insertMode, connectionString = getConnectionDetails (insertMode, connectionString)
         x.Insert([ partitionKey, rowKey, entity ], insertMode, connectionString) |> Seq.head |> snd |> Seq.head
 
-    ///Deletes a batch of entities from the table using the supplied pairs of Partition and Row keys.
+    /// Deletes a batch of entities from the table using the supplied pairs of Partition and Row keys.
     member x.Delete(entities, ?connectionString) = 
         let table = getTableForConnection (defaultArg connectionString defaultConnection)
         entities
@@ -40,6 +40,9 @@ type AzureTable internal (defaultConnection, tableName) =
             let Partition(partitionKey),Row(rowKey) = entityId
             DynamicTableEntity(partitionKey, rowKey, ETag = "*"))
         |> executeBatchOperation TableOperation.Delete table
+
+    /// Gets the name of the table.
+    member x.Name with get() = tableName
 
 module TableBuilder = 
     /// Creates an Azure Table object.
