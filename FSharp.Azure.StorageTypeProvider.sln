@@ -12,6 +12,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B7A3503A-B8A9-4C26-8DCD-8E66425AFC91}"
 	ProjectSection(SolutionItems) = preProject
 		build.fsx = build.fsx
+		README.md = README.md
+		RELEASE_NOTES.md = RELEASE_NOTES.md
 	EndProjectSection
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Azure.StorageTypeProvider", "src\FSharp.Azure.StorageTypeProvider\FSharp.Azure.StorageTypeProvider.fsproj", "{FB7CA8F3-C158-49E9-B816-501741E2921F}"
