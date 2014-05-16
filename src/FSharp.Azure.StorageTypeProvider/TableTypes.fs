@@ -18,12 +18,9 @@ type AzureTable internal (defaultConnection, tableName) =
         let insertOp = createInsertOperation insertMode
         entities
         |> Seq.map (fun (partitionKey, rowKey, entity) -> 
-               { EntityId = partitionKey, rowKey
-                 Timestamp = DateTimeOffset.MinValue
-                 Values = 
-                     entity.GetType().GetProperties(Reflection.BindingFlags.Public ||| Reflection.BindingFlags.Instance)
-                     |> Seq.map (fun prop -> prop.Name, prop.GetValue(entity, null))
-                     |> Map.ofSeq })
+            LightweightTableEntity(partitionKey, rowKey, DateTimeOffset.MinValue, entity.GetType().GetProperties(Reflection.BindingFlags.Public ||| Reflection.BindingFlags.Instance)
+                                                                                  |> Seq.map (fun prop -> prop.Name, prop.GetValue(entity, null))
+                                                                                  |> Map.ofSeq))
         |> Seq.map buildDynamicTableEntity
         |> executeBatchOperation insertOp table
     

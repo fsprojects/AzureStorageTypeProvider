@@ -24,3 +24,15 @@ type TableResponse =
     | BatchOperationFailedError of EntityId
     /// An unknown error occurred in this batch.
     | BatchError of EntityId * HttpCode : int * ErrorCode : string
+
+/// Represents a single table entity.
+type LightweightTableEntity
+    internal (partitionKey:Partition, rowKey:Row, timestamp:System.DateTimeOffset, values:Map<string,obj>) =
+
+    let (Partition pkey) = partitionKey
+    let (Row rkey) = rowKey
+
+    member x.PartitionKey with get () = pkey
+    member x.RowKey with get () = rkey
+    member x.Timestamp with get () = timestamp
+    member x.Values with get () = values

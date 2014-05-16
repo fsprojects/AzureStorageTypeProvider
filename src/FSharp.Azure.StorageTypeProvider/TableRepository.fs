@@ -9,15 +9,8 @@ open System
 
 let private getTableClient connection = CloudStorageAccount.Parse(connection).CreateCloudTableClient()
 
-type LightweightTableEntity = 
-    { EntityId: EntityId
-      Timestamp: System.DateTimeOffset
-      Values: Map<string, obj> }
-
 let buildTableEntity partitionKey rowKey names (values: obj []) = 
-    { EntityId = partitionKey, rowKey
-      Timestamp = DateTimeOffset.MinValue
-      Values = (Seq.zip names values) |> Map.ofSeq }
+    LightweightTableEntity(partitionKey, rowKey, DateTimeOffset.MinValue, (Seq.zip names values) |> Map.ofSeq)
 
 let internal getTable tableName connection = 
     let client = getTableClient connection
@@ -41,19 +34,14 @@ let executeQuery connection tableName maxResults filterString =
     let query = if maxResults > 0 then query.Take(Nullable(maxResults)) else query
 
     (getTable tableName connection).ExecuteQuery(query)
-    |> Seq.map(fun dte -> 
-           { EntityId = Partition(dte.PartitionKey), Row(dte.RowKey)
-             Timestamp = dte.Timestamp
-             Values = 
-                 dte.Properties
-                 |> Seq.map(fun p -> p.Key, p.Value.PropertyAsObject)
-                 |> Map.ofSeq })
+    |> Seq.map(fun dte ->
+        LightweightTableEntity(Partition dte.PartitionKey, Row dte.RowKey, dte.Timestamp, dte.Properties
+                                                                                          |> Seq.map(fun p -> p.Key, p.Value.PropertyAsObject)
+                                                                                          |> Map.ofSeq))
     |> Seq.toArray
 
-let internal buildDynamicTableEntity entity =
-    let (Partition pkey),(Row rkey) = entity.EntityId
-
-    let tableEntity = DynamicTableEntity(pkey, rkey, ETag = "*")
+let internal buildDynamicTableEntity(entity:LightweightTableEntity) =
+    let tableEntity = DynamicTableEntity(entity.PartitionKey, entity.RowKey, ETag = "*")
     for (key, value) in entity.Values |> Map.toArray do
         tableEntity.Properties.[key] <- match value with
                                         | :? (byte []) as value -> EntityProperty.GeneratePropertyForByteArray(value)
