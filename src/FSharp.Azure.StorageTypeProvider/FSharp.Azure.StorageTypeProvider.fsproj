@@ -94,6 +94,7 @@
     <Compile Include="TableEntityMemberFactory.fs" />
     <Compile Include="TableMemberFactory.fs" />
     <Compile Include="BlobMemberFactory.fs" />
+    <Compile Include="QueueMemberFactory.fs" />
     <Compile Include="AzureTypeProvider.fs" />
     <None Include="packages.config" />
     <None Include="App.config" />
