@@ -18,12 +18,9 @@ type AzureTable internal (defaultConnection, tableName) =
         let insertOp = createInsertOperation insertMode
         entities
         |> Seq.map (fun (partitionKey, rowKey, entity) -> 
-               { EntityId = partitionKey, rowKey
-                 Timestamp = DateTimeOffset.MinValue
-                 Values = 
-                     entity.GetType().GetProperties(Reflection.BindingFlags.Public ||| Reflection.BindingFlags.Instance)
-                     |> Seq.map (fun prop -> prop.Name, prop.GetValue(entity, null))
-                     |> Map.ofSeq })
+            LightweightTableEntity(partitionKey, rowKey, DateTimeOffset.MinValue, entity.GetType().GetProperties(Reflection.BindingFlags.Public ||| Reflection.BindingFlags.Instance)
+                                                                                  |> Seq.map (fun prop -> prop.Name, prop.GetValue(entity, null))
+                                                                                  |> Map.ofSeq))
         |> Seq.map buildDynamicTableEntity
         |> executeBatchOperation insertOp table
     
@@ -32,7 +29,7 @@ type AzureTable internal (defaultConnection, tableName) =
         let insertMode, connectionString = getConnectionDetails (insertMode, connectionString)
         x.Insert([ partitionKey, rowKey, entity ], insertMode, connectionString) |> Seq.head |> snd |> Seq.head
 
-    ///Deletes a batch of entities from the table using the supplied pairs of Partition and Row keys.
+    /// Deletes a batch of entities from the table using the supplied pairs of Partition and Row keys.
     member x.Delete(entities, ?connectionString) = 
         let table = getTableForConnection (defaultArg connectionString defaultConnection)
         entities
@@ -40,6 +37,9 @@ type AzureTable internal (defaultConnection, tableName) =
             let Partition(partitionKey),Row(rowKey) = entityId
             DynamicTableEntity(partitionKey, rowKey, ETag = "*"))
         |> executeBatchOperation TableOperation.Delete table
+
+    /// Gets the name of the table.
+    member x.Name with get() = tableName
 
 module TableBuilder = 
     /// Creates an Azure Table object.

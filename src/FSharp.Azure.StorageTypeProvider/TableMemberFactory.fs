@@ -2,7 +2,7 @@
 
 open FSharp.Azure.StorageTypeProvider.Table.TableRepository
 open Microsoft.WindowsAzure.Storage.Table
-open Samples.FSharp.ProvidedTypes
+open ProviderImplementation.ProvidedTypes
 
 /// Builds up the Table Storage member
 let getTableStorageMembers (connectionString, domainType : ProvidedTypeDefinition) =     
