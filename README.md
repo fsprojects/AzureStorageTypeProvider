@@ -7,10 +7,10 @@ The goal is to create a provider which allows lightweight access to your Azure s
 
 # Install
 
-Use the the Nuget Package Manager to install the Type Provider
+Use the Nuget Package Manager to install the Type Provider (https://www.nuget.org/packages/FSharp.Azure.StorageTypeProvider) or through the console
 
 ``` 
-PM> Install-Package Elastacloud.AzureTypeProvider
+PM> Install-Package FSharp.Azure.StorageTypeProvider
 ```
 
 # Blob Storage
@@ -72,6 +72,6 @@ For non-text and xml files, you will get a ```ReadAsString()``` function that ca
 	let joeBloggs = account.Tables.Customers.Get("joe.bloggs@hotmail.com", "London")
 ##Search for entities
 	let ukCustomers = account.Tables.Customers.Query("Country eq 'UK'")
-	let ukCustomers = account.Tables.Customers.Query().``Where Country``.Equals("UK").Execute()
+	let ukCustomers = account.Tables.Customers.Query().``Where Country Is``.``Equal To``("UK").Execute()
 ##Insert entity
 	account.Tables.Customers.Insert(new Customer("fred.smith@live.co.uk", "UK", "London"))
