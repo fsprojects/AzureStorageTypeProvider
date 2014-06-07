@@ -69,8 +69,7 @@ type BlobFolder internal (connectionDetails) =
     member x.Download(path) = downloadFolder (connectionDetails, path)
 
 /// Represents a container in blob storage.
-type BlobContainer internal (connectionString, container) = 
-    
+type BlobContainer internal (connectionString, container) =  
     /// Downloads the entire container contents to the local file system asynchronously.
     member x.Download(path) = 
         let connectionDetails = connectionString, container, String.Empty

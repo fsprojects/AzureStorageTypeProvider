@@ -1,5 +1,7 @@
 ﻿namespace FSharp.Azure.StorageTypeProvider.Table
 
+open System
+
 /// The different types of insertion mechanism to use.
 type TableInsertMode = 
     /// Insert if the entity does not already exist.
@@ -27,7 +29,7 @@ type TableResponse =
 
 /// Represents a single table entity.
 type LightweightTableEntity
-    internal (partitionKey:Partition, rowKey:Row, timestamp:System.DateTimeOffset, values:Map<string,obj>) =
+    internal (partitionKey:Partition, rowKey:Row, timestamp:DateTimeOffset, values:Map<string,obj>) =
 
     let (Partition pkey) = partitionKey
     let (Row rkey) = rowKey

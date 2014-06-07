@@ -77,7 +77,7 @@ Target "NuGet"
     NuGet 
         (fun p -> 
         { p with Authors = authors
-                 Project = project
+                 Project = project                 
                  Title = "F# Azure Storage Type Provider"
                  Summary = summary
                  Description = description

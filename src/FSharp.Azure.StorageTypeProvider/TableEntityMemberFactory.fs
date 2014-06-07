@@ -12,6 +12,7 @@ let private getDistinctProperties (tableEntities : #seq<DynamicTableEntity>) =
     |> Seq.collect (fun x -> x.Properties)
     |> Seq.distinctBy (fun x -> x.Key)
     |> Seq.map (fun x -> x.Key, x.Value)
+    |> Seq.sortBy fst
     |> Seq.toList
 
 /// Builds a property for a single entity for a specific type
@@ -62,7 +63,7 @@ let setPropertiesForEntity (entityType : ProvidedTypeDefinition) (sampleEntities
         let parameters = 
             [ ProvidedParameter("PartitionKey", typeof<Partition>)
               ProvidedParameter("RowKey", typeof<Row>) ] 
-            @ [ for (name, entityProp) in properties |> Seq.sortBy fst -> buildEdmParameter entityProp.PropertyType (buildParameter name) ]
+            @ [ for (name, entityProp) in properties -> buildEdmParameter entityProp.PropertyType (buildParameter name) ]
         ProvidedConstructor(parameters, 
                             InvokeCode = fun args -> 
                                 let fieldNames = 
