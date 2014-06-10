@@ -10,6 +10,11 @@ type Local = AzureTypeProvider<"DevStorageAccount", "">
 
 let table = Local.Tables.tptest
 
+type ResetTableDataAttribute() =
+    inherit BeforeAfterTestAttribute()
+    override x.Before(methodUnderTest) = SampleTableTypes.resetData()
+    override x.After(methodUnderTest) = SampleTableTypes.resetData()
+
 [<Fact>]
 let ``Correctly identifies tables``() =
     // compiles!
@@ -32,7 +37,6 @@ let ``Non matching partition key returns None``() =
     match table.Get(Row "35", Partition "random") with
     | Some _ -> failwith "located a row that shouldn't have"
     | None -> ()
-
 
 [<Fact>]
 let ``Non matching row key returns None``() =
@@ -64,6 +68,7 @@ type MatchingTableRow =
       Dob : DateTime }
 
 [<Fact>]
+[<ResetTableData>]
 let ``Inserts and deletes a row using lightweight syntax correctly``() =
     let result = table.Insert(Partition "isaac", Row "500", { Name = "isaac"; Count = 500; Dob = DateTime.Now })
     match result with
@@ -75,6 +80,7 @@ let ``Inserts and deletes a row using lightweight syntax correctly``() =
     | _ -> failwith "error inserting"
     
 [<Fact>]
+[<ResetTableData>]
 let ``Inserts and deletes a batch on same partition using lightweight syntax correctly``() =
     let result = table.Insert( [ Partition "isaac", Row "500", { Name = "isaac"; Count = 500; Dob = DateTime.Now }
                                  Partition "isaac", Row "250", { Name = "isaac"; Count = 250; Dob = DateTime.Now }
@@ -87,3 +93,36 @@ let ``Inserts and deletes a batch on same partition using lightweight syntax cor
         | _ -> failwith "error deleting"
     | _ -> failwith "error inserting"
 
+[<Fact>]
+[<ResetTableData>]
+let ``Updates an existing row``() =
+    table.Insert(Partition "fred", Row "35", { Name = "fred"; Count = 35; Dob = DateTime.MaxValue }, TableInsertMode.Upsert) |> ignore
+    Assert.Equal(DateTime.MaxValue, table.Get(Row "35", Partition "fred").Value.Dob)
+
+[<Fact>]
+[<ResetTableData>]
+let ``Inserting an existing row returns an error``() =
+    let result = table.Insert(Partition "fred", Row "35", { Name = "fred"; Count = 35; Dob = DateTime.MaxValue })
+    match result with
+    | EntityError((Partition "fred", Row "35"), 409, "EntityAlreadyExists") -> ()
+    | _ -> failwith "Should have failed to insert"
+
+[<Fact>]
+[<ResetTableData>]
+let ``Inserts a row using provided types correctly``() =
+    table.Insert(Local.Domain.tptestEntity(Partition "sample", Row "x", 1, DateTime.MaxValue, "Hello")) |> ignore
+    let result = table.Get(Row "x", Partition "sample").Value
+    Assert.Equal<string>("sample", result.PartitionKey)
+    Assert.Equal<string>("x", result.RowKey)
+    Assert.Equal(1, result.Count)
+    Assert.Equal(DateTime.MaxValue, result.Dob)
+    Assert.Equal<string>("Hello", result.Name)
+
+[<Fact>]
+[<ResetTableData>]
+let ``Inserts many rows using provided types correctly``() =
+    table.Insert [| Local.Domain.tptestEntity(Partition "sample", Row "x", 1, DateTime.MaxValue, "Hello")
+                    Local.Domain.tptestEntity(Partition "sample", Row "y", 1, DateTime.MaxValue, "Hello") |] |> ignore
+    Assert.Equal(2, table.GetPartition("sample").Length)
+
+//TODO: Queries...
