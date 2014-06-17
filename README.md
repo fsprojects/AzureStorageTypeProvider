@@ -12,30 +12,36 @@ Use the Nuget Package Manager to install the Type Provider (https://www.nuget.or
 ``` 
 PM> Install-Package FSharp.Azure.StorageTypeProvider
 ```
-
 # Blob Storage
 The blob storage provider is geared for ad-hoc querying of your data, rather than programmatic access.
 
 ##Create a connection to your Azure account
-	type account = Elastacloud.FSharp.AzureTypeProvider.AzureAccount< "accountName","accountKey" >
+	open FSharp.Azure.StorageTypeProvider
+	
+	// Connect to a live Azure account
+	type account = AzureTypeProvider<"accountName","accountKey">
+	
+	// Connect to the local Storage emulator
+	type localAccount = AzureTypeProvider<"DevStorageAccount", "">
+
 ##Reading a file from Azure into memory
-Intellisense automatically prompts you for containers and files. There's a single Download() method on every file. It will return a different type depending on the extension of the file.
+Intellisense automatically prompts you for containers and files.
 
 	// Downloads LeagueTable.csv as an Async<string>
 	let textAsyncWorkflow = async {
-		let! text = account.Containers.container1.``LeagueTable.csv``.ReadAsync()
+		let! text = account.Containers.container1.``LeagueTable.csv``.ReadAsStringAsync()
 		printfn "%s" (text.ToLower())
 		return text
 	}
 
 	// Can also do this
-	let text = account.Containers.container1.``LeagueTable.csv``.ReadAsync() |> Async.RunSynchronously
+	let text = account.Containers.container1.``LeagueTable.csv``.ReadAsStringAsync() |> Async.RunSynchronously
 	
 	// Or this - don't use on large files though, will lock up FSI whilst downloading...
-	let text = account.Container.container1.``LeagueTable.csv``.Read()
+	let text = account.Container.container1.``LeagueTable.csv``.ReadAsString()
 
 	// Downloads document.xml as an XDocument
-	let xmlDoc = account.Containers.container1.``document.xml``.Read()
+	let xmlDoc = account.Containers.container1.``document.xml``.ReadAsXDocument()
 	// xmlDoc is an XDocument, NOT a plain string
 	printfn "First element is %A" xmlDoc.Elements() |> Seq.head
 	xmlDoc
@@ -43,11 +49,12 @@ Intellisense automatically prompts you for containers and files. There's a singl
 	// Open a file as a stream - ideal for binary data or large files that you want to process sequentially
 	// Works on any file
 	let stream = account.Containers.container1.``binary.zip``.OpenStream()
-	let textStream = new StreamReader(stream)
-	let firstLine = textStream.ReadLine()
 	// etc. etc.
+	
+	// Open a file as a text-based StreamReader.
+	let streamReader = account.Containers.container1.``largefile.txt``.OpenStreamAsText()
+	let firstLine = streamReader.ReadLine()
 
-For non-text and xml files, you will get a ```ReadAsString()``` function that can be used, although there is no guarantee that the contents of the file will be text :)
 
 ##Downloading files to the local file system
 	// Downloads LeagueTable.csv to a file locally
@@ -60,16 +67,18 @@ For non-text and xml files, you will get a ```ReadAsString()``` function that ca
 	account.Containers.container1.Download(@"D:\MyContainer")
 	
 #Table Storage
+	open FSharp.Azure.StorageTypeProvider.Table
+
 ##Get a list of tables
 	account.Tables. // list of tables are presented
 ##Download all rows for a partition
-	let londonCustomers = account.Tables.Customers.GetPartition("London").AllRows()
+	let londonCustomers = account.Tables.Customers.GetPartition("London")
 	londonCustomers
 	|> Seq.map(fun customer -> row.RowKey, customer.Name, customer.Address)
 	
 	// customer shape is inferred from EDM metadata 
-##Get a single entity
-	let joeBloggs = account.Tables.Customers.Get("joe.bloggs@hotmail.com", "London")
+##Get a single entity by RowKey and PartitionKey
+	let joeBloggs = account.Tables.Customers.Get(Row "joe.bloggs@hotmail.com", Partition "London")
 ##Search for entities
 	let ukCustomers = account.Tables.Customers.Query("Country eq 'UK'")
 	let ukCustomers = account.Tables.Customers.Query().``Where Country Is``.``Equal To``("UK").Execute()
