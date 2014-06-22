@@ -45,16 +45,6 @@ let ``Non matching row key returns None``() =
     | None -> ()
 
 [<Fact>]
-let ``Single match on Row Key returns Some row``() =
-    match table.Get(Row "99") with
-    | Some row -> ()
-    | None -> failwith "could not locate row"
-
-[<Fact>]
-let ``Duplicate match on Row Key throws an exception``() =
-    Assert.Throws<Exception>(fun () -> table.Get(Row "35") |> ignore)
-
-[<Fact>]
 let ``Gets all rows in a table``() =
     Assert.Equal(5, table.Query().Execute().Length)
 
@@ -110,19 +100,47 @@ let ``Inserting an existing row returns an error``() =
 [<Fact>]
 [<ResetTableData>]
 let ``Inserts a row using provided types correctly``() =
-    table.Insert(Local.Domain.tptestEntity(Partition "sample", Row "x", 1, DateTime.MaxValue, "Hello")) |> ignore
+    table.Insert(Local.Domain.tptestEntity(Partition "sample", Row "x", 1, DateTime.MaxValue, "Hello", 6.1)) |> ignore
     let result = table.Get(Row "x", Partition "sample").Value
     Assert.Equal<string>("sample", result.PartitionKey)
     Assert.Equal<string>("x", result.RowKey)
     Assert.Equal(1, result.Count)
     Assert.Equal(DateTime.MaxValue, result.Dob)
     Assert.Equal<string>("Hello", result.Name)
+    Assert.Equal(6.1, result.Score)
 
 [<Fact>]
 [<ResetTableData>]
 let ``Inserts many rows using provided types correctly``() =
-    table.Insert [| Local.Domain.tptestEntity(Partition "sample", Row "x", 1, DateTime.MaxValue, "Hello")
-                    Local.Domain.tptestEntity(Partition "sample", Row "y", 1, DateTime.MaxValue, "Hello") |] |> ignore
+    table.Insert [| Local.Domain.tptestEntity(Partition "sample", Row "x", 1, DateTime.MaxValue, "Hello", 5.2)
+                    Local.Domain.tptestEntity(Partition "sample", Row "y", 1, DateTime.MaxValue, "Hello", 1.8) |] |> ignore
     Assert.Equal(2, table.GetPartition("sample").Length)
 
-//TODO: Queries...
+[<Fact>]
+let ``Query without arguments brings back all rows``() =
+    Assert.Equal(5, table.Query().Execute().Length)
+
+[<Fact>]
+let ``Query with single query part brings back correct rows``() =
+    Assert.Equal(2, table.Query().``Where Name Is``.``Equal To``("fred").Execute().Length)
+
+[<Fact>]
+let ``Query with many query parts brings back correct rows``() =
+    Assert.Equal(1, table.Query().``Where Name Is``.``Equal To``("fred")
+                                 .``Where Count Is``.``Equal To``(35)
+                                 .Execute().Length)
+
+[<Fact>]
+let ``Query conditions are correctly mapped``() =
+    let baseQuery = table.Query().``Where Name Is``
+
+    Assert.Equal<string>("[Name eq 'fred']", baseQuery.``Equal To``("fred").ToString())
+    Assert.Equal<string>("[Name gt 'fred']", baseQuery.``Greater Than``("fred").ToString())
+    Assert.Equal<string>("[Name ge 'fred']", baseQuery.``Greater Than Or Equal To``("fred").ToString())
+    Assert.Equal<string>("[Name lt 'fred']", baseQuery.``Less Than``("fred").ToString())
+    Assert.Equal<string>("[Name le 'fred']", baseQuery.``Less Than Or Equal To``("fred").ToString())
+    Assert.Equal<string>("[Name ne 'fred']", baseQuery.``Not Equal To``("fred").ToString())
+
+[<Fact>]
+let ``Query restricts maximum results``() =
+    Assert.Equal(1, table.Query().Execute(maxResults = 1).Length)

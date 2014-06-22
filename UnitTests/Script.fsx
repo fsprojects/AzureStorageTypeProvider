@@ -1,4 +1,4 @@
-﻿// This script sets up local azure storage to a well-known state for tests.
+﻿// This script sets up local azure storage to a well-known state for integration tests.
 #r @"..\packages\WindowsAzure.Storage.3.0.2.0\lib\net40\Microsoft.WindowsAzure.Storage.dll"
 
 open Microsoft.WindowsAzure.Storage
