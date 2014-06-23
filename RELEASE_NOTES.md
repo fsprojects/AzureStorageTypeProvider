@@ -2,6 +2,7 @@
 * Fixed nuget package deployment
 * Sorted namespacing
 * Refactored lots of code
+* Added better error handling
 * Introduced F# scaffold project structure
 
 ### 0.9.1 - 16th May 2014
@@ -15,3 +16,6 @@
 
 ### 1.0.0 - 14th June 2014
 * Forced Get to provide a Partition Key as well as Row Key to semantically reflect that it can never return more than 1 result (this removes the exception path).
+
+### 1.1.0 - Unreleased
+* * Perf improvement for batch inserts when building lightweight table entities.
