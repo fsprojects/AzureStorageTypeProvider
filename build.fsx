@@ -35,7 +35,7 @@ let tags = "azure, f#, fsharp, type provider, blob, table, script"
 // File system information 
 // (<solutionFile>.sln is built during the building process)
 let solutionFile = "FSharp.Azure.StorageTypeProvider"
-// Pattern specifying assemblies to be tested using NUnit
+// Pattern specifying assemblies to be tested using XUnit
 let testAssemblies = "tests/**/bin/Release/*Tests*.dll"
 // Git configuration (used for publishing documentation in gh-pages branch)
 // The profile where the project is posted 
@@ -70,6 +70,10 @@ Target "Build" (fun _ ->
     !!(solutionFile + "*.sln")
     |> MSBuildRelease "" "Rebuild"
     |> ignore)
+// Run integration tests
+Target "Test" (fun _ ->
+    !!(testAssemblies)
+    |> xUnit (fun p -> { p with Verbose = true }))
 // --------------------------------------------------------------------------------------
 // Build a NuGet package
 Target "NuGet" 
@@ -77,7 +81,7 @@ Target "NuGet"
     NuGet 
         (fun p -> 
         { p with Authors = authors
-                 Project = project
+                 Project = project                 
                  Title = "F# Azure Storage Type Provider"
                  Summary = summary
                  Description = description
@@ -95,23 +99,8 @@ Target "NuGet"
                      }) 
         ("nuget/" + project + ".nuspec"))
 // --------------------------------------------------------------------------------------
-// Generate the documentation
-Target "GenerateDocs" (fun _ -> executeFSIWithArgs "docs/tools" "generate.fsx" [ "--define:RELEASE" ] [] |> ignore)
-// --------------------------------------------------------------------------------------
-// Release Scripts
-Target "ReleaseDocs" (fun _ -> 
-    let tempDocsDir = "temp/gh-pages"
-    CleanDir tempDocsDir
-    Repository.cloneSingleBranch "" (gitHome + "/" + gitName + ".git") "gh-pages" tempDocsDir
-    fullclean tempDocsDir
-    CopyRecursive "docs/output" tempDocsDir true |> tracefn "%A"
-    StageAll tempDocsDir
-    Commit tempDocsDir (sprintf "Update generated documentation for version %s" release.NugetVersion)
-    Branches.push tempDocsDir)
-Target "Release" DoNothing
-// --------------------------------------------------------------------------------------
 // Run all targets by default. Invoke 'build <Target>' to override
 Target "All" DoNothing
 "Clean" ==> "RestorePackages" ==> "AssemblyInfo" ==> "Build" ==> "All"
-"All" ==> "NuGet" ==> "Release"
+"All" ==> "Test" ==> "NuGet" 
 RunTargetOrDefault "NuGet"

@@ -12,6 +12,7 @@ let private getDistinctProperties (tableEntities : #seq<DynamicTableEntity>) =
     |> Seq.collect (fun x -> x.Properties)
     |> Seq.distinctBy (fun x -> x.Key)
     |> Seq.map (fun x -> x.Key, x.Value)
+    |> Seq.sortBy fst
     |> Seq.toList
 
 /// Builds a property for a single entity for a specific type
@@ -62,7 +63,7 @@ let setPropertiesForEntity (entityType : ProvidedTypeDefinition) (sampleEntities
         let parameters = 
             [ ProvidedParameter("PartitionKey", typeof<Partition>)
               ProvidedParameter("RowKey", typeof<Row>) ] 
-            @ [ for (name, entityProp) in properties |> Seq.sortBy fst -> buildEdmParameter entityProp.PropertyType (buildParameter name) ]
+            @ [ for (name, entityProp) in properties -> buildEdmParameter entityProp.PropertyType (buildParameter name) ]
         ProvidedConstructor(parameters, 
                             InvokeCode = fun args -> 
                                 let fieldNames = 
@@ -111,12 +112,11 @@ let buildTableEntityMembers (parentTableType:ProvidedTypeDefinition, parentTable
                 ProvidedMethod
                     ("Get", 
                      [ ProvidedParameter("rowKey", typeof<Row>)
-                       ProvidedParameter("partitionKey", typeof<Partition>, optionalValue = "")
+                       ProvidedParameter("partitionKey", typeof<Partition>)
                        ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], 
-                     (typeof<option<_>>).GetGenericTypeDefinition().MakeGenericType(parentTableEntityType), 
+                     (typeof<Option<_>>).GetGenericTypeDefinition().MakeGenericType(parentTableEntityType), 
                      InvokeCode = (fun args -> <@@ getEntity (%%args.[1] : Row) (%%args.[2] : Partition) (%%args.[3] : string) tableName @@>))
-            getEntity.AddXmlDocDelayed 
-            <| fun _ -> "Gets a single entity based on the row key and optionally the partition key. If more than one entity is returned, an exception is raised."
+            getEntity.AddXmlDocDelayed <| fun _ -> "Gets a single entity based on the row and partition key."
             let deleteEntity = 
                 ProvidedMethod
                     ("Delete", 

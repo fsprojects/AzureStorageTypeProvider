@@ -144,19 +144,15 @@ let buildFilter(propertyName, comparison, value) =
     | _ -> TableQuery.GenerateFilterCondition(propertyName, comparison, value.ToString())
 
 let getEntity rowKey partitionKey connection tableName = 
-    let (Row rowKey) = rowKey
-    let results = match partitionKey with
-                  | Partition null -> [ ("RowKey", rowKey) ]
-                  | Partition partitionKey -> 
-                      [ ("RowKey", rowKey)
-                        ("PartitionKey", partitionKey) ]
+    let (Row rowKey, Partition partitionKey) = rowKey, partitionKey
+    let results = [ ("RowKey", rowKey)
+                    ("PartitionKey", partitionKey) ]
                   |> List.map(fun (prop, value) -> buildFilter(prop, QueryComparisons.Equal, value))
                   |> composeAllFilters
                   |> executeQuery connection tableName 0
     match results with
     | [| exactMatch |] -> Some exactMatch
-    | [||] -> None
-    | _ -> failwith <| sprintf "More than one row identified with the row key '%s'." rowKey
+    | _ -> None
 
 let getPartitionRows (partitionKey:string) connection tableName = 
     buildFilter("PartitionKey", QueryComparisons.Equal, partitionKey) |> executeQuery connection tableName 0

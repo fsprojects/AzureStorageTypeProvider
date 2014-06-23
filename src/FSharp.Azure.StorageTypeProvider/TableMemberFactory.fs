@@ -26,5 +26,3 @@ let getTableStorageMembers (connectionString, domainType : ProvidedTypeDefinitio
     let tableListingProp = ProvidedProperty("Tables", tableListingType, IsStatic = true, GetterCode = (fun _ -> <@@ () @@>))
     tableListingProp.AddXmlDoc "Gets the list of all tables in this storage account."
     tableListingProp
-
-
