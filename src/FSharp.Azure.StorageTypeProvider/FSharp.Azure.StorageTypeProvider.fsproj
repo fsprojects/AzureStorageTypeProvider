@@ -86,16 +86,17 @@
   <ItemGroup>
     <Compile Include="ProvidedTypes-0.4.fs" />
     <Compile Include="GlobalTypes.fs" />
-    <Compile Include="BlobRepository.fs" />
-    <Compile Include="BlobTypes.fs" />
-    <Compile Include="TableRepository.fs" />
-    <Compile Include="TableTypes.fs" />
-    <Compile Include="TableQueryBuilder.fs" />
-    <Compile Include="TableEntityMemberFactory.fs" />
-    <Compile Include="TableMemberFactory.fs" />
-    <Compile Include="BlobMemberFactory.fs" />
-    <Compile Include="QueueRepository.fs" />
-    <Compile Include="QueueMemberFactory.fs" />
+    <Compile Include="Table\TableRepository.fs" />
+    <Compile Include="Table\TableTypes.fs" />
+    <Compile Include="Table\TableQueryBuilder.fs" />
+    <Compile Include="Table\TableEntityMemberFactory.fs" />
+    <Compile Include="Table\TableMemberFactory.fs" />
+    <Compile Include="Blob\BlobRepository.fs" />
+    <Compile Include="Blob\BlobTypes.fs" />
+    <Compile Include="Blob\BlobMemberFactory.fs" />
+    <Compile Include="Queue\QueueRepository.fs" />
+    <Compile Include="Queue\QueueTypes.fs" />
+    <Compile Include="Queue\QueueMemberFactory.fs" />
     <Compile Include="AzureTypeProvider.fs" />
     <None Include="packages.config" />
     <None Include="App.config" />

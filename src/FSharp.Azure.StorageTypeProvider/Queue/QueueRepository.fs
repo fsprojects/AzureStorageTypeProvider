@@ -8,4 +8,13 @@ let private getQueueClient connection = CloudStorageAccount.Parse(connection).Cr
 let getQueues connectionString =
     getQueueClient(connectionString).ListQueues()
     |> Seq.map(fun q -> q.Name)
-    |> Seq.toArray
+    |> Seq.toList
+
+let getQueueRef(connection,name) =
+    getQueueClient(connection).GetQueueReference(name)
+
+let peekMessages(connection,name,count) =
+    let queue = getQueueRef(connection,name)
+    queue.PeekMessages(count)
+    |> Seq.map(fun m -> m.AsString)
+    |> Seq.toList
