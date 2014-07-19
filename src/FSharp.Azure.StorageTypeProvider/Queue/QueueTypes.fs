@@ -17,3 +17,6 @@ type ProvidedQueue (connectionDetails, name) =
 
     /// Gets the name of the queue.
     member __.Name with get () = queueRef.Name
+
+type ProvidedQueueMessage() =
+    class end

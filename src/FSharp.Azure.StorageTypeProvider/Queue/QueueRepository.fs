@@ -16,5 +16,3 @@ let getQueueRef(connection,name) =
 let peekMessages(connection,name,count) =
     let queue = getQueueRef(connection,name)
     queue.PeekMessages(count)
-    |> Seq.map(fun m -> m.AsString)
-    |> Seq.toList
