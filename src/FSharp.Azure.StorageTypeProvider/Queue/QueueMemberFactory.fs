@@ -13,21 +13,22 @@ let createIndividualsForQueue (connectionString, domainType:ProvidedTypeDefiniti
         let messages = peekMessages(connectionString, queueName, 32)
         messages
         |> Seq.map(fun msg ->
-            let getData() = msg
             let messageType = ProvidedTypeDefinition(sprintf "%s.Queues.%s.Individuals.%s" connectionString queueName msg.Id, None, HideObjectMethods = true)
             domainType.AddMember messageType
             messageType.AddMembersDelayed(fun () ->
                 let contents = msg.AsString
                 let dequeueCount = msg.DequeueCount
+                let inserted = msg.InsertionTime
                 let expires = msg.ExpirationTime
                 let id = msg.Id
 
-                [ ProvidedProperty(sprintf "Contents: '%s'" msg.AsString, typeof<string>, GetterCode = (fun _ -> <@@ contents @@>))
-                  ProvidedProperty(sprintf "Dequeued %d times" msg.DequeueCount, typeof<int>, GetterCode = (fun args -> <@@ dequeueCount @@>))
+                [ ProvidedProperty(sprintf "Id: %s" msg.Id, typeof<string>, GetterCode = (fun _ -> <@@ id @@>))
+                  ProvidedProperty(sprintf "Contents: '%s'" msg.AsString, typeof<string>, GetterCode = (fun _ -> <@@ contents @@>))
+                  ProvidedProperty(sprintf "Dequeued %d times" msg.DequeueCount, typeof<int>, GetterCode = (fun _ -> <@@ dequeueCount @@>))
+                  ProvidedProperty(sprintf "Inserted on %A" msg.InsertionTime, typeof<Nullable<DateTimeOffset>>, GetterCode = (fun _ -> <@@ inserted @@>))
                   ProvidedProperty(sprintf "Expires at %A" msg.ExpirationTime, typeof<Nullable<DateTimeOffset>>, GetterCode = (fun _ -> <@@ expires @@>))
-                  ProvidedProperty(sprintf "Id: %s" msg.Id, typeof<string>, GetterCode = (fun _ -> <@@ id @@>))
                 ])
-            ProvidedProperty((String(msg.AsString.ToCharArray() |> Seq.truncate 32 |> Seq.toArray)), messageType, GetterCode = (fun _ -> <@@ () @@>)))
+            ProvidedProperty(sprintf "[%s] %s" msg.Id (String(msg.AsString.ToCharArray() |> Seq.truncate 32 |> Seq.toArray)), messageType, GetterCode = (fun _ -> <@@ () @@>)))
         |> Seq.toList)
     individualsType
 
