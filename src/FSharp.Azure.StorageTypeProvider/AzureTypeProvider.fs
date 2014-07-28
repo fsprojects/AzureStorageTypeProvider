@@ -26,8 +26,7 @@ type public AzureTypeProvider() as this =
             
     let buildTypes (typeName : string) (args : obj []) = 
         // Create the top level property
-        let typeProviderForAccount = 
-            ProvidedTypeDefinition(thisAssembly, namespaceName, typeName, baseType = Some typeof<obj>)
+        let typeProviderForAccount = ProvidedTypeDefinition(thisAssembly, namespaceName, typeName, baseType = Some typeof<obj>)
         typeProviderForAccount.AddMember(ProvidedConstructor(parameters = [], InvokeCode = (fun args -> <@@ null @@>)))
         let connectionString = buildConnectionString args
         let domainTypes = ProvidedTypeDefinition("Domain", Some typeof<obj>)
