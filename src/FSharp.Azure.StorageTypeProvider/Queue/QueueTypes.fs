@@ -44,41 +44,46 @@ module internal Factory =
         msg
 
 type ProvidedQueue(connectionDetails, name) = 
-    let queueRef = getQueueRef (connectionDetails, name)
+    let queueRef conn =
+        (match conn with
+         | Some conn -> conn
+         | None -> connectionDetails
+         |> getQueueRef) name
     
-    let enqueue message = queueRef.AddMessageAsync(message) |> Async.awaitTaskUnit            
+    let enqueue message = queueRef >> (fun q -> q.AddMessageAsync(message) |> Async.awaitTaskUnit)
 
     /// Gets the queue length.
-    member __.GetCurrentLength() = 
+    member __.GetCurrentLength(?connectionOverride) = 
+        let queueRef = queueRef connectionOverride
         queueRef.FetchAttributes()
         if queueRef.ApproximateMessageCount.HasValue then queueRef.ApproximateMessageCount.Value
         else 0
     
     /// Dequeues the next message.
-    member __.Dequeue() = 
+    member __.Dequeue(?connectionOverride) = 
         async { 
-            let! message = queueRef.GetMessageAsync() |> Async.AwaitTask
+            let! message = (queueRef connectionOverride).GetMessageAsync() |> Async.AwaitTask
             return match message with
                    | null -> None
                    | _ -> Some(message |> Factory.toProvidedQueueMessage)
         }
     
     /// Enqueues a new message.
-    member __.Enqueue(content : string) = enqueue(CloudQueueMessage(content))
+    member __.Enqueue(content : string, ?connectionOverride) = connectionOverride |> enqueue(CloudQueueMessage(content))
     
     /// Enqueues a new message.
-    member __.Enqueue(content : byte array) = enqueue(CloudQueueMessage(content))
+    member __.Enqueue(content : byte array, ?connectionOverride) = connectionOverride |> enqueue(CloudQueueMessage(content))
     
     /// Deletes an existing message.
-    member __.Delete(message) = queueRef.DeleteMessageAsync(message.Id, message.PopReceipt) |> Async.awaitTaskUnit
+    member __.Delete(message, ?connectionOverride) = (connectionOverride |> queueRef).DeleteMessageAsync(message.Id, message.PopReceipt) |> Async.awaitTaskUnit
     
     /// Updates an existing message.
-    member __.Update(message : ProvidedQueueMessage, newTimeout, updateType) = 
+    member __.Update(message : ProvidedQueueMessage, newTimeout, updateType, ?connectionOverride) = 
         let updateFields = 
             match updateType with
             | Visibility -> MessageUpdateFields.Visibility
             | VisibilityAndMessage -> MessageUpdateFields.Visibility ||| MessageUpdateFields.Content
-        queueRef.UpdateMessageAsync(message |> Factory.toAzureQueueMessage, newTimeout, updateFields) |> Async.awaitTaskUnit
+        (connectionOverride |> queueRef).UpdateMessageAsync(message |> Factory.toAzureQueueMessage, newTimeout, updateFields) |> Async.awaitTaskUnit
     
     /// Gets the name of the queue.
-    member __.Name = queueRef.Name
+    member __.Name = (None |> queueRef).Name

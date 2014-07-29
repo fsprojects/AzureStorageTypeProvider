@@ -3,16 +3,13 @@
 open Microsoft.WindowsAzure.Storage
 open Microsoft.WindowsAzure.Storage.Queue.Protocol
 
-let private getQueueClient connection = CloudStorageAccount.Parse(connection).CreateCloudQueueClient()
+let private getQueueClient = CloudStorageAccount.Parse >> (fun csa -> csa.CreateCloudQueueClient())
 
-let getQueues connectionString =
+let getQueues connectionString = 
     getQueueClient(connectionString).ListQueues()
-    |> Seq.map(fun q -> q.Name)
+    |> Seq.map (fun q -> q.Name)
     |> Seq.toList
 
-let getQueueRef(connection,name) =
-    getQueueClient(connection).GetQueueReference(name)
+let getQueueRef name = getQueueClient >> (fun q -> q.GetQueueReference name)
 
-let peekMessages(connection,name,count) =
-    let queue = getQueueRef(connection,name)
-    queue.PeekMessages(count)
+let peekMessages connectionString name = getQueueRef name connectionString |> (fun x -> x.PeekMessages)

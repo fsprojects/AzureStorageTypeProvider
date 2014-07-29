@@ -10,7 +10,7 @@ let createPeekForQueue (connectionString, domainType:ProvidedTypeDefinition, que
     let peekType = ProvidedTypeDefinition(sprintf "%s.Queues.%s.Peek" connectionString queueName, None, HideObjectMethods = true)
     domainType.AddMember peekType
     peekType.AddMembersDelayed(fun () ->
-        let messages = peekMessages(connectionString, queueName, 32)
+        let messages = peekMessages connectionString queueName 32
         messages
         |> Seq.map(fun msg ->
             let messageType = ProvidedTypeDefinition(sprintf "%s.Queues.%s.Peek.%s" connectionString queueName msg.Id, None, HideObjectMethods = true)
@@ -51,7 +51,8 @@ let getQueueStorageMembers (connectionString, domainType : ProvidedTypeDefinitio
     let queueListingType = ProvidedTypeDefinition("Queues", Some typeof<obj>, HideObjectMethods = true)
     let createQueueMember = createQueueMemberType connectionString domainType
     queueListingType.AddMembersDelayed(fun () ->
-        getQueues(connectionString)
+        connectionString
+        |> getQueues
         |> List.map createQueueMember 
         |> List.map(fun (name, queueType) ->
             ProvidedProperty(name, queueType, GetterCode = fun _ -> <@@ ProvidedQueue(connectionString, name) @@> )))
