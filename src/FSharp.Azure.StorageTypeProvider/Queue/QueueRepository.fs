@@ -1,7 +1,10 @@
 ﻿module internal FSharp.Azure.StorageTypeProvider.Queue.QueueRepository
 
+open FSharp.Azure.StorageTypeProvider.Utils
 open Microsoft.WindowsAzure.Storage
+open Microsoft.WindowsAzure.Storage.Queue
 open Microsoft.WindowsAzure.Storage.Queue.Protocol
+open System
 
 let private getQueueClient = CloudStorageAccount.Parse >> (fun csa -> csa.CreateCloudQueueClient())
 
@@ -13,3 +16,12 @@ let getQueues connectionString =
 let getQueueRef name = getQueueClient >> (fun q -> q.GetQueueReference name)
 
 let peekMessages connectionString name = getQueueRef name connectionString |> (fun x -> x.PeekMessages)
+
+let generateSas start duration (queue:CloudQueue) =
+    let policy = SharedAccessQueuePolicy(Permissions = (SharedAccessQueuePermissions.Add |||
+                                                        SharedAccessQueuePermissions.ProcessMessages |||
+                                                        SharedAccessQueuePermissions.Read |||
+                                                        SharedAccessQueuePermissions.Update),
+                                         SharedAccessStartTime = (start |> Option.bind(fun start -> Some <| DateTimeOffset start) |> toNullable),
+                                         SharedAccessExpiryTime = Nullable(DateTimeOffset.UtcNow.Add duration))
+    queue.GetSharedAccessSignature(policy, null)

@@ -24,9 +24,7 @@ module Async =
     let awaitTaskUnit = Async.AwaitIAsyncResult >> Async.Ignore
 
 module internal Factory = 
-    let toOption (value : Nullable<_>) = 
-        if value.HasValue then Some value.Value
-        else None
+    open FSharp.Azure.StorageTypeProvider.Utils
     
     let toProvidedQueueMessage (message : CloudQueueMessage) = 
         { Id = message.Id
@@ -44,14 +42,15 @@ module internal Factory =
         msg
 
 type ProvidedQueue(defaultConnectionString, name) = 
-    let queueRef connection = (defaultArg connection defaultConnectionString)
-                              |> getQueueRef name
+    let getConnectionString connection = defaultArg connection defaultConnectionString
+
+    let getQueue = getConnectionString >> getQueueRef name
             
-    let enqueue message = queueRef >> (fun q -> q.AddMessageAsync(message) |> Async.awaitTaskUnit)
+    let enqueue message = getQueue >> (fun q -> q.AddMessageAsync(message) |> Async.awaitTaskUnit)
 
     /// Gets the queue length.
     member __.GetCurrentLength(?connectionString) = 
-        let queueRef = queueRef connectionString
+        let queueRef = getQueue connectionString
         queueRef.FetchAttributes()
         if queueRef.ApproximateMessageCount.HasValue then queueRef.ApproximateMessageCount.Value
         else 0
@@ -59,11 +58,16 @@ type ProvidedQueue(defaultConnectionString, name) =
     /// Dequeues the next message.
     member __.Dequeue(?connectionString) =
         async { 
-            let! message = (queueRef connectionString).GetMessageAsync() |> Async.AwaitTask
+            let! message = (getQueue connectionString).GetMessageAsync() |> Async.AwaitTask
             return match message with
                    | null -> None
                    | _ -> Some(message |> Factory.toProvidedQueueMessage)
         }
+
+    /// Generates a full-access shared access signature, defaulting to start from now.
+    member __.GenerateSharedAccessSignature(duration, ?start, ?connectionString) =
+        getQueue connectionString
+        |> generateSas start duration
     
     /// Enqueues a new message.
     member __.Enqueue(content : string, ?connectionString) = connectionString |> enqueue(CloudQueueMessage(content))
@@ -72,7 +76,7 @@ type ProvidedQueue(defaultConnectionString, name) =
     member __.Enqueue(content : byte array, ?connectionString) = connectionString |> enqueue(CloudQueueMessage(content))
     
     /// Deletes an existing message.
-    member __.Delete(message, ?connectionString) = (connectionString |> queueRef).DeleteMessageAsync(message.Id, message.PopReceipt) |> Async.awaitTaskUnit
+    member __.Delete(message, ?connectionString) = (connectionString |> getQueue).DeleteMessageAsync(message.Id, message.PopReceipt) |> Async.awaitTaskUnit
     
     /// Updates an existing message.
     member __.Update(message : ProvidedQueueMessage, newTimeout, updateType, ?connectionOverride) = 
@@ -80,7 +84,7 @@ type ProvidedQueue(defaultConnectionString, name) =
             match updateType with
             | Visibility -> MessageUpdateFields.Visibility
             | VisibilityAndMessage -> MessageUpdateFields.Visibility ||| MessageUpdateFields.Content
-        (connectionOverride |> queueRef).UpdateMessageAsync(message |> Factory.toAzureQueueMessage, newTimeout, updateFields) |> Async.awaitTaskUnit
+        (connectionOverride |> getQueue).UpdateMessageAsync(message |> Factory.toAzureQueueMessage, newTimeout, updateFields) |> Async.awaitTaskUnit
     
     /// Gets the name of the queue.
-    member __.Name = (None |> queueRef).Name
+    member __.Name = (None |> getQueue).Name
