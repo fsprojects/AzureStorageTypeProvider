@@ -23,17 +23,17 @@ let createPeekForQueue (connectionString, domainType:ProvidedTypeDefinition, que
                     else out + "..."
 
                 let dequeueCount = msg.DequeueCount
-                let inserted = msg.InsertionTime
-                let expires = msg.ExpirationTime
+                let inserted = msg.InsertionTime.ToString()
+                let expires = msg.ExpirationTime.ToString()
                 let id = msg.Id
 
                 [ ProvidedProperty(sprintf "Id: %s" msg.Id, typeof<string>, GetterCode = (fun _ -> <@@ id @@>))
                   ProvidedProperty(sprintf "Contents: '%s'" contentsProp, typeof<string>, GetterCode = (fun _ -> <@@ contents @@>))
                   ProvidedProperty(sprintf "Dequeued %d times" msg.DequeueCount, typeof<int>, GetterCode = (fun _ -> <@@ dequeueCount @@>))
-                  ProvidedProperty(sprintf "Inserted on %A" msg.InsertionTime, typeof<Nullable<DateTimeOffset>>, GetterCode = (fun _ -> <@@ inserted @@>))
-                  ProvidedProperty(sprintf "Expires at %A" msg.ExpirationTime, typeof<Nullable<DateTimeOffset>>, GetterCode = (fun _ -> <@@ expires @@>))
+                  ProvidedProperty(sprintf "Inserted on %A" msg.InsertionTime, typeof<string>, GetterCode = (fun _ -> <@@ inserted @@>))
+                  ProvidedProperty(sprintf "Expires at %A" msg.ExpirationTime, typeof<string>, GetterCode = (fun _ -> <@@ expires @@>))
                 ])
-            ProvidedProperty(sprintf "[%s] %s" msg.Id (String(msg.AsString.ToCharArray() |> Seq.truncate 32 |> Seq.toArray)), messageType, GetterCode = (fun _ -> <@@ () @@>)))
+            ProvidedProperty(sprintf "%s (%s)" (String(msg.AsString.ToCharArray() |> Seq.truncate 32 |> Seq.toArray)) msg.Id, messageType, GetterCode = (fun _ -> <@@ () @@>)))
         |> Seq.toList)
     peekType
 

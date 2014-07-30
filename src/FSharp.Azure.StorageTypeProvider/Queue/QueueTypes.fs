@@ -16,8 +16,8 @@ type ProvidedQueueMessage =
       InsertionTime : DateTimeOffset option
       ExpirationTime : DateTimeOffset option
       NextVisibleTime : DateTimeOffset option
-      GetBytes : unit -> byte array
-      GetString : unit -> string
+      AsBytes : byte array
+      AsString : string
       PopReceipt : string }
 
 module Async = 
@@ -34,48 +34,45 @@ module internal Factory =
           InsertionTime = message.InsertionTime |> toOption
           ExpirationTime = message.ExpirationTime |> toOption
           NextVisibleTime = message.NextVisibleTime |> toOption
-          GetBytes = fun () -> message.AsBytes
-          GetString = fun () -> message.AsString
+          AsBytes = message.AsBytes
+          AsString = message.AsString
           PopReceipt = message.PopReceipt }
     
     let toAzureQueueMessage message = 
         let msg = CloudQueueMessage(message.Id, message.PopReceipt)
-        msg.SetMessageContent(message.GetBytes())
+        msg.SetMessageContent message.AsBytes
         msg
 
-type ProvidedQueue(connectionDetails, name) = 
-    let queueRef conn =
-        (match conn with
-         | Some conn -> conn
-         | None -> connectionDetails
-         |> getQueueRef) name
-    
+type ProvidedQueue(defaultConnectionString, name) = 
+    let queueRef connection = (defaultArg connection defaultConnectionString)
+                              |> getQueueRef name
+            
     let enqueue message = queueRef >> (fun q -> q.AddMessageAsync(message) |> Async.awaitTaskUnit)
 
     /// Gets the queue length.
-    member __.GetCurrentLength(?connectionOverride) = 
-        let queueRef = queueRef connectionOverride
+    member __.GetCurrentLength(?connectionString) = 
+        let queueRef = queueRef connectionString
         queueRef.FetchAttributes()
         if queueRef.ApproximateMessageCount.HasValue then queueRef.ApproximateMessageCount.Value
         else 0
     
     /// Dequeues the next message.
-    member __.Dequeue(?connectionOverride) = 
+    member __.Dequeue(?connectionString) =
         async { 
-            let! message = (queueRef connectionOverride).GetMessageAsync() |> Async.AwaitTask
+            let! message = (queueRef connectionString).GetMessageAsync() |> Async.AwaitTask
             return match message with
                    | null -> None
                    | _ -> Some(message |> Factory.toProvidedQueueMessage)
         }
     
     /// Enqueues a new message.
-    member __.Enqueue(content : string, ?connectionOverride) = connectionOverride |> enqueue(CloudQueueMessage(content))
+    member __.Enqueue(content : string, ?connectionString) = connectionString |> enqueue(CloudQueueMessage(content))
     
     /// Enqueues a new message.
-    member __.Enqueue(content : byte array, ?connectionOverride) = connectionOverride |> enqueue(CloudQueueMessage(content))
+    member __.Enqueue(content : byte array, ?connectionString) = connectionString |> enqueue(CloudQueueMessage(content))
     
     /// Deletes an existing message.
-    member __.Delete(message, ?connectionOverride) = (connectionOverride |> queueRef).DeleteMessageAsync(message.Id, message.PopReceipt) |> Async.awaitTaskUnit
+    member __.Delete(message, ?connectionString) = (connectionString |> queueRef).DeleteMessageAsync(message.Id, message.PopReceipt) |> Async.awaitTaskUnit
     
     /// Updates an existing message.
     member __.Update(message : ProvidedQueueMessage, newTimeout, updateType, ?connectionOverride) = 
