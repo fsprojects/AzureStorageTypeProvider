@@ -11,6 +11,7 @@ Use the Nuget Package Manager to install the Type Provider (https://www.nuget.or
 
 ``` 
 PM> Install-Package FSharp.Azure.StorageTypeProvider
+#load "StorageTypeProvider.fsx" // Load all azure references for use in .fsx files etc.
 ```
 # Blob Storage
 The blob storage provider is geared for ad-hoc querying of your data, rather than programmatic access.
