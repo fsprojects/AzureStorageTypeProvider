@@ -20,7 +20,7 @@ type ProvidedQueueMessage =
       AsString : string
       PopReceipt : string }
 
-module Async = 
+module internal Async = 
     let awaitTaskUnit = Async.AwaitIAsyncResult >> Async.Ignore
 
 module internal Factory = 

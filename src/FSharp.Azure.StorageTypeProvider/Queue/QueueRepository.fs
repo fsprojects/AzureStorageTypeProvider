@@ -22,6 +22,6 @@ let generateSas start duration (queue:CloudQueue) =
                                                         SharedAccessQueuePermissions.ProcessMessages |||
                                                         SharedAccessQueuePermissions.Read |||
                                                         SharedAccessQueuePermissions.Update),
-                                         SharedAccessStartTime = (start |> Option.bind(fun start -> Some <| DateTimeOffset start) |> toNullable),
+                                         SharedAccessStartTime = (start |> Option.map(fun start -> DateTimeOffset start) |> toNullable),
                                          SharedAccessExpiryTime = Nullable(DateTimeOffset.UtcNow.Add duration))
     queue.GetSharedAccessSignature(policy, null)
