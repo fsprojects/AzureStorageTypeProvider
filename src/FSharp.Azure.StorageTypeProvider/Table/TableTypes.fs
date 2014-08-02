@@ -49,7 +49,7 @@ type AzureTable internal (defaultConnection, tableName) =
         |> executeBatchOperation TableOperation.Delete table
     
     /// Gets the name of the table.
-    member x.Name = tableName
+    member __.Name = tableName
 
 module TableBuilder = 
     /// Creates an Azure Table object.

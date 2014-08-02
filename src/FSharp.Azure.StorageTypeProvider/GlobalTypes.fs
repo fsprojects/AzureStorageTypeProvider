@@ -34,7 +34,19 @@ type LightweightTableEntity
     let (Partition pkey) = partitionKey
     let (Row rkey) = rowKey
 
-    member x.PartitionKey with get () = pkey
-    member x.RowKey with get () = rkey
-    member x.Timestamp with get () = timestamp
-    member x.Values with get () = values
+    member __.PartitionKey with get () = pkey
+    member __.RowKey with get () = rkey
+    member __.Timestamp with get () = timestamp
+    member __.Values with get () = values
+
+namespace FSharp.Azure.StorageTypeProvider 
+    module internal Utils =
+        open System
+
+        let toOption (value : Nullable<_>) = 
+            if value.HasValue then Some value.Value
+            else None
+        
+        let toNullable = function
+                         | Some x -> Nullable x
+                         | None -> Nullable()

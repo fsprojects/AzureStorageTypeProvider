@@ -2,6 +2,7 @@
 
 open FSharp.Azure.StorageTypeProvider.Blob
 open FSharp.Azure.StorageTypeProvider.Table
+open FSharp.Azure.StorageTypeProvider.Queue
 open Microsoft.FSharp.Core.CompilerServices
 open ProviderImplementation.ProvidedTypes
 open System
@@ -25,8 +26,7 @@ type public AzureTypeProvider() as this =
             
     let buildTypes (typeName : string) (args : obj []) = 
         // Create the top level property
-        let typeProviderForAccount = 
-            ProvidedTypeDefinition(thisAssembly, namespaceName, typeName, baseType = Some typeof<obj>)
+        let typeProviderForAccount = ProvidedTypeDefinition(thisAssembly, namespaceName, typeName, baseType = Some typeof<obj>)
         typeProviderForAccount.AddMember(ProvidedConstructor(parameters = [], InvokeCode = (fun args -> <@@ null @@>)))
         let connectionString = buildConnectionString args
         let domainTypes = ProvidedTypeDefinition("Domain", Some typeof<obj>)
@@ -36,8 +36,9 @@ type public AzureTypeProvider() as this =
         // Now create child members e.g. containers, tables etc.
         typeProviderForAccount.AddMembers
             ([ BlobMemberFactory.getBlobStorageMembers 
-               TableMemberFactory.getTableStorageMembers ]
-            |> List.map (fun builder -> builder(connectionString,domainTypes)))
+               TableMemberFactory.getTableStorageMembers
+               QueueMemberFactory.getQueueStorageMembers ]
+            |> List.map (fun builder -> builder(connectionString, domainTypes)))
         typeProviderForAccount
     
     // Parameterising the provider
