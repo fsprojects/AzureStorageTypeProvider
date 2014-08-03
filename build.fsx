@@ -25,13 +25,12 @@ let project = "FSharp.Azure.StorageTypeProvider"
 let summary = "Allows easy access to Azure Storage assets through F# scripts."
 // Longer description of the project
 // (used as a description for NuGet package; line breaks are automatically cleaned up)
-let description = """
-  The F# Azure Storage Type Provider allows simple access to Blob and Table assets, using Azure Storage metadata to
-  intelligently infer schema where possible, whilst providing a simple API for common tasks."""
+let description = """The F# Azure Storage Type Provider allows simple access to Blob, Table and Queue assets, using Azure Storage metadata to
+intelligently infer schema where possible, whilst providing a simple API for common tasks."""
 // List of author names (for NuGet package)
 let authors = [ "Isaac Abraham" ]
 // Tags for your project (for NuGet package)
-let tags = "azure, f#, fsharp, type provider, blob, table, script"
+let tags = "azure, f#, fsharp, type provider, blob, table, queue, script"
 // File system information 
 // (<solutionFile>.sln is built during the building process)
 let solutionFile = "UnitTests"
