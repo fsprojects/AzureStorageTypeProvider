@@ -12,8 +12,8 @@ let table = Local.Tables.tptest
 
 type ResetTableDataAttribute() =
     inherit BeforeAfterTestAttribute()
-    override x.Before(methodUnderTest) = SampleTableTypes.resetData()
-    override x.After(methodUnderTest) = SampleTableTypes.resetData()
+    override x.Before(methodUnderTest) = TableHelpers.resetData()
+    override x.After(methodUnderTest) = TableHelpers.resetData()
 
 [<Fact>]
 let ``Correctly identifies tables``() =

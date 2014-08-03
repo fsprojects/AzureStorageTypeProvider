@@ -6,7 +6,7 @@ open Microsoft.WindowsAzure.Storage.Queue
 open ProviderImplementation.ProvidedTypes
 open System
 
-let createPeekForQueue (connectionString, domainType:ProvidedTypeDefinition, queueName) =
+let private createPeekForQueue (connectionString, domainType:ProvidedTypeDefinition, queueName) =
     let peekType = ProvidedTypeDefinition(sprintf "%s.Queues.%s.Peek" connectionString queueName, None, HideObjectMethods = true)
     domainType.AddMember peekType
     peekType.AddMembersDelayed(fun () ->

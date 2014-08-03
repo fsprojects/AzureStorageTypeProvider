@@ -25,6 +25,9 @@ createBlob "sample.txt" "the quick brown fox jumped over the lazy dog
 bananas"
 createBlob "data.xml" "<data><items><item>thing</item></items></data>"
 
-// table data
-#load "SampleTableTypes.fs"
-FSharp.Azure.StorageTypeProvider.SampleTableTypes.resetData()
+#load "TableHelpers.fs"
+#load "QueueHelpers.fs"
+
+open FSharp.Azure.StorageTypeProvider
+TableHelpers.resetData()
+QueueHelpers.resetData()

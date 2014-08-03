@@ -86,15 +86,21 @@
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="Unquote">
+      <HintPath>..\..\packages\Unquote.2.2.2\lib\net40\Unquote.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="xunit">
       <HintPath>..\..\packages\xunit.1.9.2\lib\net20\xunit.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="QueueHelpers.fs" />
+    <Compile Include="TableHelpers.fs" />
     <Compile Include="BlobUnitTests.fs" />
-    <Compile Include="SampleTableTypes.fs" />
     <Compile Include="TableUnitTests.fs" />
+    <Compile Include="QueueUnitTests.fs" />
     <None Include="Script.fsx" />
     <None Include="packages.config" />
     <None Include="app.config" />

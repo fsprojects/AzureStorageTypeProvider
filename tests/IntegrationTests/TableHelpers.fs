@@ -1,7 +1,6 @@
-﻿module FSharp.Azure.StorageTypeProvider.SampleTableTypes
+﻿module FSharp.Azure.StorageTypeProvider.TableHelpers
 
 open Microsoft.WindowsAzure.Storage
-open Microsoft.WindowsAzure.Storage.Blob
 open Microsoft.WindowsAzure.Storage.Table
 open System
 

@@ -13,34 +13,43 @@ type MessageUpdate =
     /// Update the visibility timeout of the message and the message content itself.
     | VisibilityAndMessage
 
+/// The unique identifier for this Azure queue message.
+type MessageId = | MessageId of string
+/// The unique identifier for this request of this Azure queue message.
+type PopReceipt = | PopReceipt of string
+/// The composite identifier of this Azure queue message.
+type ProvidedMessageId = | ProvidedMessageId of MessageId : MessageId * PopReceipt : PopReceipt
+
 /// Represents a single message that has been dequeued.
 type ProvidedQueueMessage = 
-    { Id : string
+    { /// The composite key of this message, containing both the message id and the pop receipt.
+      Id : ProvidedMessageId
       DequeueCount : int
       InsertionTime : DateTimeOffset option
       ExpirationTime : DateTimeOffset option
       NextVisibleTime : DateTimeOffset option
       AsBytes : byte array
-      AsString : string
-      PopReceipt : string }
+      AsString : string }
 
 module internal Factory = 
     open FSharp.Azure.StorageTypeProvider.Utils
     
+    let unpackId messageId =
+        let (ProvidedMessageId(MessageId messageId, PopReceipt popReceipt)) = messageId
+        messageId, popReceipt
+
     let toProvidedQueueMessage (message : CloudQueueMessage) = 
-        { Id = message.Id
+        { Id = ProvidedMessageId(MessageId message.Id, PopReceipt message.PopReceipt)
           DequeueCount = message.DequeueCount
           InsertionTime = message.InsertionTime |> toOption
           ExpirationTime = message.ExpirationTime |> toOption
           NextVisibleTime = message.NextVisibleTime |> toOption
           AsBytes = message.AsBytes
-          AsString = message.AsString
-          PopReceipt = message.PopReceipt }
+          AsString = message.AsString }
     
-    let toAzureQueueMessage message = 
-        let msg = CloudQueueMessage(message.Id, message.PopReceipt)
-        msg.SetMessageContent message.AsBytes
-        msg
+    let toAzureQueueMessage providedMessageId = 
+        let messageId, popReceipt = providedMessageId |> unpackId
+        CloudQueueMessage(messageId, popReceipt)
 
 module internal Async = 
     let AwaitTaskUnit = Async.AwaitIAsyncResult >> Async.Ignore
@@ -49,7 +58,13 @@ type ProvidedQueue(defaultConnectionString, name) =
     let getConnectionString connection = defaultArg connection defaultConnectionString
     let getQueue = getConnectionString >> getQueueRef name
     let enqueue message = getQueue >> (fun q -> q.AddMessageAsync(message) |> Async.AwaitTaskUnit)
-    
+    let updateMessage fields connectionString newTimeout message =
+        connectionString
+        |> getQueue
+        |> (fun queue -> queue.UpdateMessageAsync(message, newTimeout, fields) |> Async.AwaitTaskUnit)
+    let updateVisibility = updateMessage MessageUpdateFields.Visibility
+    let updateContents = updateMessage (MessageUpdateFields.Visibility ||| MessageUpdateFields.Content)
+
     /// Gets the queue length.
     member __.GetCurrentLength(?connectionString) = 
         let queueRef = getQueue connectionString
@@ -78,17 +93,25 @@ type ProvidedQueue(defaultConnectionString, name) =
         connectionString |> enqueue (CloudQueueMessage(content))
     
     /// Deletes an existing message.
-    member __.Delete(message, ?connectionString) = 
-        (connectionString |> getQueue).DeleteMessageAsync(message.Id, message.PopReceipt) |> Async.AwaitTaskUnit
+    member __.Delete(providedMessageId, ?connectionString) = 
+        let messageId, popReceipt = providedMessageId |> Factory.unpackId
+        (connectionString |> getQueue).DeleteMessageAsync(messageId, popReceipt) |> Async.AwaitTaskUnit
     
-    /// Updates an existing message.
-    member __.Update(message : ProvidedQueueMessage, newTimeout, updateType, ?connectionOverride) = 
-        let updateFields = 
-            match updateType with
-            | Visibility -> MessageUpdateFields.Visibility
-            | VisibilityAndMessage -> MessageUpdateFields.Visibility ||| MessageUpdateFields.Content
-        (connectionOverride |> getQueue)
-            .UpdateMessageAsync(message |> Factory.toAzureQueueMessage, newTimeout, updateFields) |> Async.AwaitTaskUnit
+    /// Update the visibility of an existing message.
+    member __.UpdateVisibility(messageId, newTimeout, ?connectionString) = 
+        updateVisibility connectionString newTimeout (messageId |> Factory.toAzureQueueMessage)
+
+    /// Updates the visibility and contents of existing message.
+    member __.UpdateMessageContent(messageId, newTimeout, contents:string, ?connectionString) = 
+        let message = messageId |> Factory.toAzureQueueMessage
+        message.SetMessageContent contents
+        updateContents connectionString newTimeout message
+
+    /// Updates the visibility and contents of existing message.
+    member __.UpdateMessageContent(messageId, newTimeout, contents:byte array, ?connectionString) = 
+        let message = messageId |> Factory.toAzureQueueMessage
+        message.SetMessageContent contents
+        updateContents connectionString newTimeout message
     
     /// Gets the name of the queue.
     member __.Name = (None |> getQueue).Name
