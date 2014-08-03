@@ -11,12 +11,13 @@ Use the Nuget Package Manager to install the Type Provider (https://www.nuget.or
 
 ``` 
 PM> Install-Package FSharp.Azure.StorageTypeProvider
-#load "StorageTypeProvider.fsx" // Load all azure references for use in .fsx files etc.
 ```
 # Blob Storage
 The blob storage provider is geared for ad-hoc querying of your data, rather than programmatic access.
 
-##Create a connection to your Azure account
+	// Automatically reference all required assemblies.
+	
+	#load "../packages/FSharp.Azure.StorageTypeProvider/StorageTypeProvider.fsx"
 	open FSharp.Azure.StorageTypeProvider
 	
 	// Connect to a live Azure account
@@ -25,11 +26,10 @@ The blob storage provider is geared for ad-hoc querying of your data, rather tha
 	// Connect to the local Storage emulator
 	type localAccount = AzureTypeProvider<"DevStorageAccount", "">
 
-##Reading a file from Azure into memory
-Intellisense automatically prompts you for containers and files.
-
+	// Reading a file from Azure into memory
 	// Downloads LeagueTable.csv as an Async<string>
 	let textAsyncWorkflow = async {
+		// Intellisense automatically prompts for all files.
 		let! text = account.Containers.container1.``LeagueTable.csv``.ReadAsStringAsync()
 		printfn "%s" (text.ToLower())
 		return text
@@ -56,8 +56,6 @@ Intellisense automatically prompts you for containers and files.
 	let streamReader = account.Containers.container1.``largefile.txt``.OpenStreamAsText()
 	let firstLine = streamReader.ReadLine()
 
-
-##Downloading files to the local file system
 	// Downloads LeagueTable.csv to a file locally
 	account.Containers.container1.``LeagueTable.csv``.Download(@"D:\LeagueTable.csv")
 	
@@ -68,20 +66,48 @@ Intellisense automatically prompts you for containers and files.
 	account.Containers.container1.Download(@"D:\MyContainer")
 	
 #Table Storage
-	open FSharp.Azure.StorageTypeProvider.Table
+The Table Storage API works equally when on ad-hoc queries as well as programmatic access.
 
-##Get a list of tables
+	open FSharp.Azure.StorageTypeProvider.Table
+	// Get a list of tables
 	account.Tables. // list of tables are presented
-##Download all rows for a partition
+
+	// Download all rows for a partition
 	let londonCustomers = account.Tables.Customers.GetPartition("London")
 	londonCustomers
 	|> Seq.map(fun customer -> row.RowKey, customer.Name, customer.Address)
-	
 	// customer shape is inferred from EDM metadata 
-##Get a single entity by RowKey and PartitionKey
+	
+	// Get a single entity by RowKey and PartitionKey
 	let joeBloggs = account.Tables.Customers.Get(Row "joe.bloggs@hotmail.com", Partition "London")
-##Search for entities
+	
+	//Search for entities
 	let ukCustomers = account.Tables.Customers.Query("Country eq 'UK'")
 	let ukCustomers = account.Tables.Customers.Query().``Where Country Is``.``Equal To``("UK").Execute()
-##Insert entity
+	
+	// Insert entity
 	account.Tables.Customers.Insert(new Customer("fred.smith@live.co.uk", "UK", "London"))
+
+#Azure Queues
+The Storage Queue API simplifies access to Azure Queues.
+
+	open FSharp.Azure.StorageTypeProvider.Queue
+	
+	// Access a queue (list of all queues are presented after Queues.)
+	let myQueue = account.Queues.MyQueue
+	
+	// Peek at a queue
+	myQueue.Peek. // List of top 32 messages are shown as read-only items.
+	
+	// Dequeue as async option
+	let message = myQueue.Dequeue() |> Async.RunSynchronously
+	
+	// Delete a message (obviously use pattern matching in production :)
+	myQueue.Delete(message.Value.Id)
+	
+	// Automatically builds a queue message from string or byte array
+	myQueue.Enqueue("Foo")
+	
+	// Update a message
+	let testMessage = myQueue.Dequeue() |> Async.RunSynchronously
+	myQueue.UpdateMessageContent(testMessage.Value.Id, TimeSpan.FromSeconds(10.), "Bar")
