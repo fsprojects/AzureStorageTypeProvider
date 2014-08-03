@@ -13,7 +13,7 @@ type AzureTable internal (defaultConnection, tableName) =
     let getTableForConnection = getTable tableName
     
     /// Inserts a batch of entities into the table, using all public properties on the object as fields.
-    member x.Insert(entities : seq<Partition * Row * 'b>, ?insertMode, ?connectionString) = 
+    member __.Insert(entities : seq<Partition * Row * 'b>, ?insertMode, ?connectionString) = 
         let insertMode, connectionString = getConnectionDetails (insertMode, connectionString)
         let table = getTableForConnection connectionString
         let insertOp = createInsertOperation insertMode
@@ -32,15 +32,15 @@ type AzureTable internal (defaultConnection, tableName) =
         |> executeBatchOperation insertOp table
     
     /// Inserts a single entity into the table, using public properties on the object as fields.
-    member x.Insert(partitionKey, rowKey, entity, ?insertMode, ?connectionString) = 
+    member this.Insert(partitionKey, rowKey, entity, ?insertMode, ?connectionString) = 
         let insertMode, connectionString = getConnectionDetails (insertMode, connectionString)
-        x.Insert([ partitionKey, rowKey, entity ], insertMode, connectionString)
+        this.Insert([ partitionKey, rowKey, entity ], insertMode, connectionString)
         |> Seq.head
         |> snd
         |> Seq.head
     
     /// Deletes a batch of entities from the table using the supplied pairs of Partition and Row keys.
-    member x.Delete(entities, ?connectionString) = 
+    member __.Delete(entities, ?connectionString) = 
         let table = getTableForConnection (defaultArg connectionString defaultConnection)
         entities
         |> Seq.map (fun entityId -> 

@@ -38,15 +38,3 @@ type LightweightTableEntity
     member __.RowKey with get () = rkey
     member __.Timestamp with get () = timestamp
     member __.Values with get () = values
-
-namespace FSharp.Azure.StorageTypeProvider 
-    module internal Utils =
-        open System
-
-        let toOption (value : Nullable<_>) = 
-            if value.HasValue then Some value.Value
-            else None
-        
-        let toNullable = function
-                         | Some x -> Nullable x
-                         | None -> Nullable()

@@ -85,17 +85,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ProvidedTypes-0.4.fs" />
-    <Compile Include="GlobalTypes.fs" />
+    <Compile Include="Shared.fs" />
+    <Compile Include="Table\SharedTableTypes.fs" />
     <Compile Include="Table\TableRepository.fs" />
-    <Compile Include="Table\TableTypes.fs" />
+    <Compile Include="Table\ProvidedTableTypes.fs" />
     <Compile Include="Table\TableQueryBuilder.fs" />
     <Compile Include="Table\TableEntityMemberFactory.fs" />
     <Compile Include="Table\TableMemberFactory.fs" />
     <Compile Include="Blob\BlobRepository.fs" />
-    <Compile Include="Blob\BlobTypes.fs" />
+    <Compile Include="Blob\ProvidedBlobTypes.fs" />
     <Compile Include="Blob\BlobMemberFactory.fs" />
     <Compile Include="Queue\QueueRepository.fs" />
-    <Compile Include="Queue\QueueTypes.fs" />
+    <Compile Include="Queue\ProvidedQueueTypes.fs" />
     <Compile Include="Queue\QueueMemberFactory.fs" />
     <Compile Include="AzureTypeProvider.fs" />
     <None Include="packages.config" />
