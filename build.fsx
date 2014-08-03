@@ -34,7 +34,7 @@ let authors = [ "Isaac Abraham" ]
 let tags = "azure, f#, fsharp, type provider, blob, table, script"
 // File system information 
 // (<solutionFile>.sln is built during the building process)
-let solutionFile = "FSharp.Azure.StorageTypeProvider"
+let solutionFile = "UnitTests"
 // Pattern specifying assemblies to be tested using XUnit
 let testAssemblies = "tests/**/bin/Release/*Tests*.dll"
 // Git configuration (used for publishing documentation in gh-pages branch)

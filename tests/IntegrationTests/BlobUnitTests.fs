@@ -2,6 +2,7 @@
 
 open FSharp.Azure.StorageTypeProvider
 open Xunit
+open Swensen.Unquote
 open System.Linq
 
 type Local = AzureTypeProvider<"DevStorageAccount", "">
@@ -27,12 +28,12 @@ let ``Correctly identifies blobs in a subfolder``() =
 
 [<Fact>]
 let ``Correctly gets size of a blob``() =
-    Assert.Equal(52L, container .``sample.txt``.Size)
+    container .``sample.txt``.Size =? 52L
 
 [<Fact>]
 let ``Reads a text file as text``() =
     let text = container .``sample.txt``.ReadAsString()
-    Assert.Equal<string>("the quick brown fox jumped over the lazy dog\nbananas", text)
+    text =? "the quick brown fox jumped over the lazy dog\nbananas"
 
 [<Fact>]
 let ``Streams a text file line-by-line``() =
@@ -40,9 +41,9 @@ let ``Streams a text file line-by-line``() =
     let text = seq { while not textStream.EndOfStream do
                         yield textStream.ReadLine() }
                |> Seq.toArray
-    Assert.Equal<string>("the quick brown fox jumped over the lazy dog", text.[0])
-    Assert.Equal<string>("bananas", text.[1])
-    Assert.Equal(2, text.Length)
+    text.[0] =? "the quick brown fox jumped over the lazy dog"
+    text.[1] =? "bananas"
+    text.Length =? 2
 
 [<Fact>]
 let ``Opens a file with xml extension as an XML document``() =
@@ -50,4 +51,4 @@ let ``Opens a file with xml extension as an XML document``() =
     let value = document.Elements().First()
                         .Elements().First()
                         .Value
-    Assert.Equal<string>("thing", value)
+    value =? "thing"

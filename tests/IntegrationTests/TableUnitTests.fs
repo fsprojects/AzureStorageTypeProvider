@@ -5,6 +5,7 @@ open FSharp.Azure.StorageTypeProvider.Table
 open Xunit
 open System
 open System.Linq
+open Swensen.Unquote
 
 type Local = AzureTypeProvider<"DevStorageAccount", "">
 
@@ -22,14 +23,14 @@ let ``Correctly identifies tables``() =
 
 [<Fact>]
 let ``Table name is correctly identified``() =
-    Assert.Equal<string>("tptest", table.Name)
+    table.Name =? "tptest"
 
 [<Fact>]
 let ``Matching row and partition key returns Some row``() =
     match table.Get(Row "35", Partition "fred") with
-    | Some row -> Assert.Equal<string>("fred", row.Name)
-                  Assert.Equal(35, row.Count)
-                  Assert.Equal(DateTime(1980, 4, 4), row.Dob)
+    | Some row -> row.Name =? "fred"
+                  row.Count =? 35
+                  row.Dob =? DateTime(1980, 4, 4)
     | None -> failwith "could not locate row"
 
 [<Fact>]
@@ -46,11 +47,11 @@ let ``Non matching row key returns None``() =
 
 [<Fact>]
 let ``Gets all rows in a table``() =
-    Assert.Equal(5, table.Query().Execute().Length)
+    table.Query().Execute().Length =? 5
 
 [<Fact>]
 let ``Gets all rows in a partition``() =
-    Assert.Equal(2, table.GetPartition("fred").Length)
+    table.GetPartition("fred").Length =? 2
 
 type MatchingTableRow =
     { Name : string
@@ -87,7 +88,7 @@ let ``Inserts and deletes a batch on same partition using lightweight syntax cor
 [<ResetTableData>]
 let ``Updates an existing row``() =
     table.Insert(Partition "fred", Row "35", { Name = "fred"; Count = 35; Dob = DateTime.MaxValue }, TableInsertMode.Upsert) |> ignore
-    Assert.Equal(DateTime.MaxValue, table.Get(Row "35", Partition "fred").Value.Dob)
+    table.Get(Row "35", Partition "fred").Value.Dob =? DateTime.MaxValue
 
 [<Fact>]
 [<ResetTableData>]
@@ -102,45 +103,45 @@ let ``Inserting an existing row returns an error``() =
 let ``Inserts a row using provided types correctly``() =
     table.Insert(Local.Domain.tptestEntity(Partition "sample", Row "x", 1, DateTime.MaxValue, "Hello", 6.1)) |> ignore
     let result = table.Get(Row "x", Partition "sample").Value
-    Assert.Equal<string>("sample", result.PartitionKey)
-    Assert.Equal<string>("x", result.RowKey)
-    Assert.Equal(1, result.Count)
-    Assert.Equal(DateTime.MaxValue, result.Dob)
-    Assert.Equal<string>("Hello", result.Name)
-    Assert.Equal(6.1, result.Score)
+    result.PartitionKey =? "sample"
+    result.RowKey =? "x"
+    result.Count =? 1
+    result.Dob =? DateTime.MaxValue
+    result.Name =? "Hello"
+    result.Score =? 6.1
 
 [<Fact>]
 [<ResetTableData>]
 let ``Inserts many rows using provided types correctly``() =
     table.Insert [| Local.Domain.tptestEntity(Partition "sample", Row "x", 1, DateTime.MaxValue, "Hello", 5.2)
                     Local.Domain.tptestEntity(Partition "sample", Row "y", 1, DateTime.MaxValue, "Hello", 1.8) |] |> ignore
-    Assert.Equal(2, table.GetPartition("sample").Length)
+    table.GetPartition("sample").Length =? 2
 
 [<Fact>]
 let ``Query without arguments brings back all rows``() =
-    Assert.Equal(5, table.Query().Execute().Length)
+    table.Query().Execute().Length =? 5
 
 [<Fact>]
 let ``Query with single query part brings back correct rows``() =
-    Assert.Equal(2, table.Query().``Where Name Is``.``Equal To``("fred").Execute().Length)
+    table.Query().``Where Name Is``.``Equal To``("fred").Execute().Length =? 2
 
 [<Fact>]
 let ``Query with many query parts brings back correct rows``() =
-    Assert.Equal(1, table.Query().``Where Name Is``.``Equal To``("fred")
-                                 .``Where Count Is``.``Equal To``(35)
-                                 .Execute().Length)
+     table.Query().``Where Name Is``.``Equal To``("fred")
+                  .``Where Count Is``.``Equal To``(35)
+                  .Execute().Length =? 1
 
 [<Fact>]
 let ``Query conditions are correctly mapped``() =
     let baseQuery = table.Query().``Where Name Is``
 
-    Assert.Equal<string>("[Name eq 'fred']", baseQuery.``Equal To``("fred").ToString())
-    Assert.Equal<string>("[Name gt 'fred']", baseQuery.``Greater Than``("fred").ToString())
-    Assert.Equal<string>("[Name ge 'fred']", baseQuery.``Greater Than Or Equal To``("fred").ToString())
-    Assert.Equal<string>("[Name lt 'fred']", baseQuery.``Less Than``("fred").ToString())
-    Assert.Equal<string>("[Name le 'fred']", baseQuery.``Less Than Or Equal To``("fred").ToString())
-    Assert.Equal<string>("[Name ne 'fred']", baseQuery.``Not Equal To``("fred").ToString())
+    baseQuery.``Equal To``("fred").ToString()                 =? "[Name eq 'fred']"
+    baseQuery.``Greater Than``("fred").ToString()             =? "[Name gt 'fred']"
+    baseQuery.``Greater Than Or Equal To``("fred").ToString() =? "[Name ge 'fred']"
+    baseQuery.``Less Than``("fred").ToString()                =? "[Name lt 'fred']"
+    baseQuery.``Less Than Or Equal To``("fred").ToString()    =? "[Name le 'fred']"
+    baseQuery.``Not Equal To``("fred").ToString()             =? "[Name ne 'fred']"
 
 [<Fact>]
 let ``Query restricts maximum results``() =
-    Assert.Equal(1, table.Query().Execute(maxResults = 1).Length)
+    table.Query().Execute(maxResults = 1).Length =? 1

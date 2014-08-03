@@ -15,7 +15,6 @@ type ResetQueueDataAttribute() =
     override x.Before(methodUnderTest) = QueueHelpers.resetData()
     override x.After(methodUnderTest) = QueueHelpers.resetData()
 
-
 [<Fact>]
 let ``Correctly identifies queues``() =
     // compiles!
