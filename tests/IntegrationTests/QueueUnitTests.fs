@@ -51,7 +51,7 @@ let ``Dequeues a message of bytes``() =
 let ``Deletes a message``() =
     async { do! queue.Enqueue "Foo"
             let! message = queue.Dequeue()
-            do! queue.Delete(message.Value.Id) }
+            do! queue.DeleteMessage(message.Value.Id) }
     |> Async.RunSynchronously
     queue.GetCurrentLength() =? 0
 
@@ -63,10 +63,10 @@ let ``Dequeue with nothing on the queue returns None``() =
 
 [<Fact>]
 [<ResetQueueData>]
-let ``UpdateMessageContent affects the message body``() =
-    let message = async { do! queue.Enqueue("Foo")
+let ``Update Message affects the text message body``() =
+    let message = async { do! queue.Enqueue "Foo"
                           let! message = queue.Dequeue()
-                          do! queue.UpdateMessageContent(message.Value.Id, TimeSpan.FromSeconds(0.), "Bar")
+                          do! queue.UpdateMessage(message.Value.Id, "Bar", TimeSpan.FromSeconds(0.))
                           return! queue.Dequeue() }
                   |> Async.RunSynchronously
 
@@ -74,23 +74,10 @@ let ``UpdateMessageContent affects the message body``() =
 
 [<Fact>]
 [<ResetQueueData>]
-let ``UpdateVisibility does not affect the text message body``() =
-    let message = async { do! queue.Enqueue("Foo")
-                          let! message = queue.Dequeue()
-                          let message = message.Value
-                          let message = { message with AsString = "Bar" }
-                          do! queue.UpdateVisibility(message.Id, TimeSpan.FromSeconds(0.))
-                          return! queue.Dequeue() }
-                  |> Async.RunSynchronously
-
-    message.Value.AsString =? "Foo"
-
-[<Fact>]
-[<ResetQueueData>]
-let ``UpdateMessageContent affects the bytes message body``() =
+let ``Update Message affects the bytes message body``() =
     let message = async { do! queue.Enqueue [| 0uy; 1uy; 2uy |]
                           let! message = queue.Dequeue()
-                          do! queue.UpdateMessageContent(message.Value.Id, TimeSpan.FromSeconds(0.), [| 2uy; 1uy; 0uy |])
+                          do! queue.UpdateMessage(message.Value.Id, [| 2uy; 1uy; 0uy |], TimeSpan.FromSeconds(0.))
                           return! queue.Dequeue() }
                   |> Async.RunSynchronously
 
@@ -98,26 +85,23 @@ let ``UpdateMessageContent affects the bytes message body``() =
 
 [<Fact>]
 [<ResetQueueData>]
-let ``UpdateVisibility does not affect the byte message body``() =
-    let message = async { do! queue.Enqueue [| 0uy; 1uy; 2uy |]
-                          let! message = queue.Dequeue()
-                          let message = message.Value
-                          let message = { message with AsBytes = [| 2uy; 1uy; 0uy |] }
-                          do! queue.UpdateVisibility(message.Id, TimeSpan.FromSeconds(0.))
-                          return! queue.Dequeue() }
-                  |> Async.RunSynchronously
-
-    message.Value.AsBytes =? [| 0uy; 1uy; 2uy |]
-
-[<Fact>]
-[<ResetQueueData>]
 let ``Dequeue Count is correctly emitted``() =
     let message = async {
             do! queue.Enqueue("Foo")
             let! message = queue.Dequeue()
-            do! queue.UpdateVisibility(message.Value.Id, TimeSpan.FromSeconds(0.))
+            do! queue.UpdateMessage(message.Value.Id, TimeSpan.FromSeconds(0.))
             let! message = queue.Dequeue()
-            do! queue.UpdateVisibility(message.Value.Id, TimeSpan.FromSeconds(0.))
+            do! queue.UpdateMessage(message.Value.Id, TimeSpan.FromSeconds(0.))
             return! queue.Dequeue() } |> Async.RunSynchronously
     message.Value.DequeueCount =? 3
+
+[<Fact>]
+[<ResetQueueData>]
+let ``Clear correctly empties the queue``() =
+    async {
+        do! queue.Enqueue "Foo"
+        do! queue.Enqueue "Bar"
+        do! queue.Enqueue "Test"
+        do! queue.Clear() } |> Async.Ignore |> Async.RunSynchronously
+    queue.GetCurrentLength() =? 0
 

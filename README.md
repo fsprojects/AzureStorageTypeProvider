@@ -103,11 +103,11 @@ The Storage Queue API simplifies access to Azure Queues.
 	let message = myQueue.Dequeue() |> Async.RunSynchronously
 	
 	// Delete a message (obviously use pattern matching in production :)
-	myQueue.Delete(message.Value.Id)
+	myQueue.DeleteMessage(message.Value.Id)
 	
 	// Automatically builds a queue message from string or byte array
 	myQueue.Enqueue("Foo")
 	
-	// Update a message
+	// Update a message which will become available in ten seconds
 	let testMessage = myQueue.Dequeue() |> Async.RunSynchronously
-	myQueue.UpdateMessageContent(testMessage.Value.Id, TimeSpan.FromSeconds(10.), "Bar")
+	myQueue.UpdateMessage(testMessage.Value.Id, "Bar", TimeSpan.FromSeconds(10.))

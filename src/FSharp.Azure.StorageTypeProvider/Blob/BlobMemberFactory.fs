@@ -15,9 +15,7 @@ let rec private createBlobItem (domainType : ProvidedTypeDefinition) connectionS
              |> Array.choose (createBlobItem domainType connectionString containerName)
              |> Array.toList))
         Some <| ProvidedProperty(name, folderProp, GetterCode = fun _ -> <@@ ContainerBuilder.createBlobFolder connectionString containerName path @@>)
-    | Blob(path, name, properties) -> 
-        let fileDetails = connectionString, containerName, path
-        
+    | Blob(path, name, _) -> 
         let fileType = 
             match path with
             | ContainerBuilder.XML -> "XmlFile"

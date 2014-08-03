@@ -6,13 +6,6 @@ open Microsoft.WindowsAzure.Storage.Queue
 open ProviderImplementation.ProvidedTypes
 open System
 
-/// The type of update that should be applied onto the queue.
-type MessageUpdate = 
-    /// Just update the visibility timeout of the message.
-    | Visibility
-    /// Update the visibility timeout of the message and the message content itself.
-    | VisibilityAndMessage
-
 /// The unique identifier for this Azure queue message.
 type MessageId = | MessageId of string
 /// The unique identifier for this request of this Azure queue message.
@@ -59,11 +52,10 @@ type ProvidedQueue(defaultConnectionString, name) =
     let getQueue = getConnectionString >> getQueueRef name
     let enqueue message = getQueue >> (fun q -> q.AddMessageAsync(message) |> Async.AwaitTaskUnit)
     let updateMessage fields connectionString newTimeout message =
+        let newTimeout = defaultArg newTimeout TimeSpan.Zero
         connectionString
         |> getQueue
         |> (fun queue -> queue.UpdateMessageAsync(message, newTimeout, fields) |> Async.AwaitTaskUnit)
-    let updateVisibility = updateMessage MessageUpdateFields.Visibility
-    let updateContents = updateMessage (MessageUpdateFields.Visibility ||| MessageUpdateFields.Content)
 
     /// Gets the queue length.
     member __.GetCurrentLength(?connectionString) = 
@@ -86,32 +78,41 @@ type ProvidedQueue(defaultConnectionString, name) =
         getQueue connectionString |> generateSas start duration
     
     /// Enqueues a new message.
-    member __.Enqueue(content : string, ?connectionString) = connectionString |> enqueue (CloudQueueMessage(content))
+    member __.Enqueue(content : string, ?connectionString) =
+        connectionString |> enqueue (CloudQueueMessage(content))
     
     /// Enqueues a new message.
     member __.Enqueue(content : byte array, ?connectionString) = 
         connectionString |> enqueue (CloudQueueMessage(content))
     
     /// Deletes an existing message.
-    member __.Delete(providedMessageId, ?connectionString) = 
+    member __.DeleteMessage(providedMessageId, ?connectionString) = 
         let messageId, popReceipt = providedMessageId |> Factory.unpackId
         (connectionString |> getQueue).DeleteMessageAsync(messageId, popReceipt) |> Async.AwaitTaskUnit
     
-    /// Update the visibility of an existing message.
-    member __.UpdateVisibility(messageId, newTimeout, ?connectionString) = 
-        updateVisibility connectionString newTimeout (messageId |> Factory.toAzureQueueMessage)
+    /// Updates the visibility and optionally the contents of an existing message.
+    member __.UpdateMessage(messageId, newTimeout, ?connectionString) = 
+        let message = messageId |> Factory.toAzureQueueMessage
+        message |> updateMessage MessageUpdateFields.Visibility connectionString (Some newTimeout)
 
-    /// Updates the visibility and contents of existing message.
-    member __.UpdateMessageContent(messageId, newTimeout, contents:string, ?connectionString) = 
+    /// Updates the visibility and the string contents of an existing message. If no timeout is provided, the update is immediately visible.
+    member __.UpdateMessage(messageId, contents:string, ?newTimeout, ?connectionString) = 
         let message = messageId |> Factory.toAzureQueueMessage
         message.SetMessageContent contents
-        updateContents connectionString newTimeout message
+        message |> updateMessage (MessageUpdateFields.Visibility ||| MessageUpdateFields.Content) connectionString newTimeout
 
-    /// Updates the visibility and contents of existing message.
-    member __.UpdateMessageContent(messageId, newTimeout, contents:byte array, ?connectionString) = 
+    /// Updates the visibility and the binary contents of an existing message. If no timeout is provided, the update is immediately visible.
+    member __.UpdateMessage(messageId, contents:byte array, ?newTimeout, ?connectionString) = 
         let message = messageId |> Factory.toAzureQueueMessage
         message.SetMessageContent contents
-        updateContents connectionString newTimeout message
-    
+        message |> updateMessage (MessageUpdateFields.Visibility ||| MessageUpdateFields.Content) connectionString newTimeout
+
+    /// Clears the queue of all messages.
+    member __.Clear(?connectionString) =
+        connectionString
+        |> getQueue
+        |> (fun q -> q.ClearAsync())
+        |> Async.AwaitTaskUnit
+
     /// Gets the name of the queue.
     member __.Name = (None |> getQueue).Name
