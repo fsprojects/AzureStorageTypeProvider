@@ -90,7 +90,7 @@ type ProvidedQueue(defaultConnectionString, name) =
         let messageId, popReceipt = providedMessageId |> Factory.unpackId
         (connectionString |> getQueue).DeleteMessageAsync(messageId, popReceipt) |> Async.AwaitTaskUnit
     
-    /// Updates the visibility and optionally the contents of an existing message.
+    /// Updates the visibility of an existing message.
     member __.UpdateMessage(messageId, newTimeout, ?connectionString) = 
         let message = messageId |> Factory.toAzureQueueMessage
         message |> updateMessage MessageUpdateFields.Visibility connectionString (Some newTimeout)

@@ -17,6 +17,6 @@
 ### 1.0.0 - 14th June 2014
 * Forced Get to provide a Partition Key as well as Row Key to semantically reflect that it can never return more than 1 result (this removes the exception path).
 
-### 1.1.0 - Unreleased
+### 1.1.0 - 13th August 2014
 * Perf improvement for batch inserts when building lightweight table entities.
 * Azure Storage Queue support.
