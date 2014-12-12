@@ -4,8 +4,12 @@ open Microsoft.WindowsAzure.Storage
 open Microsoft.WindowsAzure.Storage.Table
 open System
 
-let private tableClient = CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient()
-let private table = tableClient.GetTableReference("tptest")
+let private table =   
+    CloudStorageAccount
+        .DevelopmentStorageAccount
+        .CreateCloudTableClient()
+        .GetTableReference
+        "tptest"
 
 type RandomEntity() = 
     inherit TableEntity()

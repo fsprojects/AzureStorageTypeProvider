@@ -20,3 +20,6 @@
 ### 1.1.0 - 13th August 2014
 * Perf improvement for batch inserts when building lightweight table entities.
 * Azure Storage Queue support.
+
+### 1.2.0
+* Upgrade to Azure Storage 4.3.0 SDK.

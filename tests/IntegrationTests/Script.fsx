@@ -1,10 +1,7 @@
 ﻿// This script sets up local azure storage to a well-known state for integration tests.
-#r @"..\..\packages\WindowsAzure.Storage.3.0.2.0\lib\net40\Microsoft.WindowsAzure.Storage.dll"
+#r @"..\..\packages\WindowsAzure.Storage.4.3.0\lib\net40\Microsoft.WindowsAzure.Storage.dll"
 
 open Microsoft.WindowsAzure.Storage
-open Microsoft.WindowsAzure.Storage.Blob
-open Microsoft.WindowsAzure.Storage.Table
-open System
 
 // blob data
 let blobClient = CloudStorageAccount.DevelopmentStorageAccount.CreateCloudBlobClient()
