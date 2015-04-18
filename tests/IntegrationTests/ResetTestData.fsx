@@ -1,5 +1,5 @@
 ﻿// This script sets up local azure storage to a well-known state for integration tests.
-#r @"..\..\packages\WindowsAzure.Storage.4.3.0\lib\net40\Microsoft.WindowsAzure.Storage.dll"
+#r @"..\..\packages\WindowsAzure.Storage\lib\net40\Microsoft.WindowsAzure.Storage.dll"
 
 open Microsoft.WindowsAzure.Storage
 
@@ -11,14 +11,14 @@ let logWith entity func =
 fun () ->
     let blobClient = CloudStorageAccount.DevelopmentStorageAccount.CreateCloudBlobClient()
     let container = blobClient.GetContainerReference("tp-test")
-    
+
     if container.Exists() then container.Delete()
     container.Create()
-    
-    let createBlob fileName contents = 
+
+    let createBlob fileName contents =
         let blob = container.GetBlockBlobReference(fileName)
         blob.UploadText(contents)
-    
+
     createBlob "file1.txt" "stuff"
     createBlob "file2.txt" "stuff"
     createBlob "file3.txt" "stuff"

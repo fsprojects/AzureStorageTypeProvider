@@ -61,7 +61,6 @@ Target "AssemblyInfo" (fun _ ->
                                         Attribute.FileVersion release.AssemblyVersion ])
 // --------------------------------------------------------------------------------------
 // Clean build results & restore NuGet packages
-Target "RestorePackages" RestorePackages
 Target "Clean" (fun _ -> CleanDirs [ "bin"; "temp" ])
 Target "CleanDocs" (fun _ -> CleanDirs [ "docs/output" ])
 // --------------------------------------------------------------------------------------
