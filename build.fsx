@@ -8,6 +8,7 @@ open Fake.AssemblyInfoFile
 open Fake.Git
 open Fake.ReleaseNotesHelper
 open System
+open System.IO
 
 // --------------------------------------------------------------------------------------
 // START TODO: Provide project-specific details below
@@ -48,7 +49,7 @@ let gitName = "AzureStorageTypeProvider"
 // Read additional information from the release notes document
 Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
 
-let release = parseReleaseNotes (IO.File.ReadAllLines "RELEASE_NOTES.md")
+let release = parseReleaseNotes (File.ReadAllLines "RELEASE_NOTES.md")
 
 // Generate assembly info files with the right version & up-to-date information
 Target "AssemblyInfo" (fun _ -> 
@@ -70,7 +71,11 @@ Target "Build" (fun _ ->
     |> MSBuildRelease "" "Rebuild"
     |> ignore)
 // Run integration tests
-Target "Test" (fun _ ->
+Target "Integration Tests" (fun _ ->
+    FSIHelper.executeFSI (Path.Combine(__SOURCE_DIRECTORY__, @"tests\integrationtests")) "ResetTestData.fsx" []
+    |> snd
+    |> Seq.iter(fun x -> printfn "%s" x.Message)
+
     !!(testAssemblies)
     |> xUnit (fun p -> { p with Verbose = true }))
 // --------------------------------------------------------------------------------------
@@ -101,5 +106,5 @@ Target "NuGet"
 // Run all targets by default. Invoke 'build <Target>' to override
 Target "All" DoNothing
 "Clean" ==> "RestorePackages" ==> "AssemblyInfo" ==> "Build" ==> "All"
-"All" ==> "Test" ==> "NuGet" 
+"All" ==> "Integration Tests" ==> "NuGet" 
 RunTargetOrDefault "NuGet"

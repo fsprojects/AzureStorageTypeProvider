@@ -105,3 +105,14 @@ let ``Clear correctly empties the queue``() =
         do! queue.Clear() } |> Async.Ignore |> Async.RunSynchronously
     queue.GetCurrentLength() =? 0
 
+[<Fact>]
+[<ResetQueueData>]
+let ``Cloud Queue Client gives same results as the Type Provider``() =
+    let queues = Local.Queues
+    let queueNames = queues.CloudQueueClient.ListQueues() |> Seq.map(fun q -> q.Name) |> Set.ofSeq
+    queueNames =? ([ queues.second.Name; queues.third.Name; queues.tptest.Name ] |> Set.ofList)
+
+[<Fact>]
+[<ResetQueueData>]
+let ``Cloud Queue is the same queue as the Type Provider``() =
+    queue.AsCloudQueue().Name =? queue.Name

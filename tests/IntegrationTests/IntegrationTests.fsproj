@@ -101,7 +101,7 @@
     <Compile Include="BlobUnitTests.fs" />
     <Compile Include="TableUnitTests.fs" />
     <Compile Include="QueueUnitTests.fs" />
-    <None Include="Script.fsx" />
+    <None Include="ResetTestData.fsx" />
     <None Include="packages.config" />
     <None Include="app.config" />
   </ItemGroup>

@@ -10,12 +10,16 @@ open System.IO
 open System.Xml.Linq
 
 /// Represents a file in blob storage.
-type BlobFile internal (connectionDetails) = 
-    let blobRef = getBlobRef (connectionDetails)
-    let blobProperties = lazy
-                            blobRef.FetchAttributes()
-                            blobRef.Properties
+type BlobFile internal (defaultConnectionString, container, file) = 
+    let blobRef = getBlobRef (defaultConnectionString, container, file)
+    let blobProperties =
+        lazy
+            blobRef.FetchAttributes()
+            blobRef.Properties
     
+    /// Gets a handle to the Azure SDK client for this blob.
+    member __.AsCloudBlockBlob(?connectionString) = getBlobRef(defaultArg connectionString defaultConnectionString, container, file)
+
     /// Generates a full-access shared-access signature for the supplied duration.
     member __.GenerateSharedAccessSignature(duration) = 
         let expiry = Nullable(DateTimeOffset.UtcNow.Add(duration))
@@ -40,10 +44,10 @@ type BlobFile internal (connectionDetails) =
     member this.OpenStreamAsText() = new StreamReader(this.OpenStream())
 
     /// Reads this file as a string.
-    member __.ReadAsString() = blobRef.DownloadText()
+    member __.Read() = blobRef.DownloadText()
     
     /// Reads this file as a string asynchronously.
-    member __.ReadAsStringAsync() = Async.AwaitTask(blobRef.DownloadTextAsync())
+    member __.ReadAsync() = Async.AwaitTask(blobRef.DownloadTextAsync())
 
     /// Gets the blob size in bytes.
     member __.Size with get () = blobProperties.Value.Length
@@ -52,16 +56,16 @@ type BlobFile internal (connectionDetails) =
     member __.Name with get () = blobRef.Name
     
 /// Represents an XML file stored in blob storage.
-type XmlFile internal (connectionDetails) = 
-    inherit BlobFile(connectionDetails)
-    let blobRef = getBlobRef (connectionDetails)
+type XmlFile internal (connection, container, file) = 
+    inherit BlobFile(connection, container, file)
+    let blobRef = getBlobRef (connection, container, file)
     
     /// Reads this file as an XDocument.
     member __.ReadAsXDocument() = blobRef.DownloadText() |> XDocument.Parse
     
     /// Reads this file as an XDocument asynchronously.
     member __.ReadAsXDocumentAsync() = async { let! text = blobRef.DownloadTextAsync() |> Async.AwaitTask
-                                              return XDocument.Parse text }
+                                               return XDocument.Parse text }
 
 /// Represents a pseudo-folder in blob storage.
 type BlobFolder internal (connectionDetails) = 
@@ -69,16 +73,19 @@ type BlobFolder internal (connectionDetails) =
     member __.Download(path) = downloadFolder (connectionDetails, path)
 
 /// Represents a container in blob storage.
-type BlobContainer internal (connectionString, container) =  
+type BlobContainer internal (defaultConnectionString, container) =  
+    /// Gets a handle to the Azure SDK client for this container.
+    member __.AsCloudBlobContainer(?connectionString) = getContainerRef(defaultArg connectionString defaultConnectionString, container)
+
     /// Downloads the entire container contents to the local file system asynchronously.
     member __.Download(path) = 
-        let connectionDetails = connectionString, container, String.Empty
+        let connectionDetails = defaultConnectionString, container, String.Empty
         downloadFolder (connectionDetails, path)
     
     /// Uploads a file to this container.
     member __.Upload(path) = 
         let fileName = path |> Path.GetFileName
-        let blobRef = getBlobRef (connectionString, container, fileName)
+        let blobRef = getBlobRef (defaultConnectionString, container, fileName)
         awaitUnit (blobRef.UploadFromFileAsync(path, FileMode.Open))
 
 module internal ProvidedTypeGenerator = 
@@ -107,3 +114,5 @@ module ContainerBuilder =
     
     /// Creates a blob folder object.
     let createBlobFolder connectionString containerName path = BlobFolder(connectionString, containerName, path)
+
+    let createBlobClient connectionString = BlobRepository.getBlobClient connectionString

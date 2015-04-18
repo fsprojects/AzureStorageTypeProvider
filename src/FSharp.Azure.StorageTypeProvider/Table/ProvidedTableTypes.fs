@@ -12,6 +12,9 @@ type AzureTable internal (defaultConnection, tableName) =
         defaultArg insertMode TableInsertMode.Insert, defaultArg connectionString defaultConnection
     let getTableForConnection = getTable tableName
     
+    /// Gets a handle to the Azure SDK client for this table.
+    member __.AsCloudTable(?connectionString) = getTableForConnection (defaultArg connectionString defaultConnection)
+
     /// Inserts a batch of entities into the table, using all public properties on the object as fields.
     member __.Insert(entities : seq<Partition * Row * 'b>, ?insertMode, ?connectionString) = 
         let insertMode, connectionString = getConnectionDetails (insertMode, connectionString)
@@ -54,3 +57,4 @@ type AzureTable internal (defaultConnection, tableName) =
 module TableBuilder = 
     /// Creates an Azure Table object.
     let createAzureTable connectionString tableName = AzureTable(connectionString, tableName)
+    let createAzureTableRoot connectionString = TableRepository.getTableClient connectionString

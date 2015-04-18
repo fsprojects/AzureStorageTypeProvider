@@ -23,3 +23,5 @@
 
 ### 1.2.0
 * Upgrade to Azure Storage 4.3.0 SDK.
+* Added hooks into native Azure Storage SDK directly in the type provider.
+* Simplified some naming of methods on blobs.

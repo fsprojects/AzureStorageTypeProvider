@@ -4,6 +4,7 @@ module internal FSharp.Azure.StorageTypeProvider.Blob.BlobMemberFactory
 open FSharp.Azure.StorageTypeProvider.Blob.BlobRepository
 open ProviderImplementation.ProvidedTypes
 open System
+open Microsoft.WindowsAzure.Storage.Blob
 
 let rec private createBlobItem (domainType : ProvidedTypeDefinition) connectionString containerName fileItem = 
     match fileItem with
@@ -46,9 +47,13 @@ let private createContainerType (domainType : ProvidedTypeDefinition) connection
 /// Builds up the Blob Storage container members
 let getBlobStorageMembers (connectionString, domainType : ProvidedTypeDefinition) = 
     let containerListingType = ProvidedTypeDefinition("Containers", Some typeof<obj>, HideObjectMethods = true)
-    containerListingType.AddMembersDelayed
-        (fun _ -> getBlobStorageAccountManifest (connectionString) |> List.map (createContainerType domainType connectionString))
+    containerListingType.AddMembersDelayed(fun _ -> getBlobStorageAccountManifest (connectionString) |> List.map (createContainerType domainType connectionString))
     domainType.AddMember containerListingType
-    let containerListingProp = ProvidedProperty("Containers", containerListingType, IsStatic = true, GetterCode = (fun _ -> <@@ () @@>))
+
+    let cbcProp = ProvidedProperty("CloudBlobClient", typeof<CloudBlobClient>, GetterCode = (fun _ -> <@@ ContainerBuilder.createBlobClient connectionString @@>))
+    cbcProp.AddXmlDoc "Gets a handle to the Blob Azure SDK client for this storage account."
+    containerListingType.AddMember(cbcProp)
+
+    let containerListingProp = ProvidedProperty("Containers", containerListingType, GetterCode = (fun _ -> <@@ () @@>), IsStatic = true)
     containerListingProp.AddXmlDoc "Gets the list of all containers in this storage account."
     containerListingProp

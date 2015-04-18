@@ -6,6 +6,7 @@ open Xunit
 open System
 open System.Linq
 open Swensen.Unquote
+open Microsoft.WindowsAzure.Storage.Table
 
 type Local = AzureTypeProvider<"DevStorageAccount", "">
 
@@ -145,3 +146,10 @@ let ``Query conditions are correctly mapped``() =
 [<Fact>]
 let ``Query restricts maximum results``() =
     table.Query().Execute(maxResults = 1).Length =? 1
+
+[<Fact>]
+let ``Cloud Table Client relates to the same data as the type provider``() =
+    (Local.Tables.CloudTableClient.ListTables()
+     |> Seq.map(fun c -> c.Name)
+     |> Set.ofSeq
+     |> Set.contains "tptest") =? true
