@@ -65,6 +65,13 @@ Target "RestorePackages" RestorePackages
 Target "Clean" (fun _ -> CleanDirs [ "bin"; "temp" ])
 Target "CleanDocs" (fun _ -> CleanDirs [ "docs/output" ])
 // --------------------------------------------------------------------------------------
+// Reset test data in local azure storage
+Target "ResetTestData" (fun _ -> 
+    FSIHelper.executeFSI (Path.Combine(__SOURCE_DIRECTORY__, @"tests\integrationtests")) "ResetTestData.fsx" []
+    |> snd
+    |> Seq.iter(fun x -> printfn "%s" x.Message)
+)
+// --------------------------------------------------------------------------------------
 // Build library & test project
 Target "Build" (fun _ -> 
     !!(solutionFile + "*.sln")
@@ -72,10 +79,6 @@ Target "Build" (fun _ ->
     |> ignore)
 // Run integration tests
 Target "Integration Tests" (fun _ ->
-    FSIHelper.executeFSI (Path.Combine(__SOURCE_DIRECTORY__, @"tests\integrationtests")) "ResetTestData.fsx" []
-    |> snd
-    |> Seq.iter(fun x -> printfn "%s" x.Message)
-
     !!(testAssemblies)
     |> xUnit (fun p -> { p with Verbose = true }))
 // --------------------------------------------------------------------------------------
@@ -105,6 +108,6 @@ Target "NuGet"
 // --------------------------------------------------------------------------------------
 // Run all targets by default. Invoke 'build <Target>' to override
 Target "All" DoNothing
-"Clean" ==> "RestorePackages" ==> "AssemblyInfo" ==> "Build" ==> "All"
+"Clean" ==> "RestorePackages" ==> "AssemblyInfo" ==> "ResetTestData" ==> "Build" ==> "All"
 "All" ==> "Integration Tests" ==> "NuGet" 
 RunTargetOrDefault "NuGet"
