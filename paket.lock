@@ -1,0 +1,21 @@
+NUGET
+  remote: https://www.nuget.org/api/v2
+  specs:
+    FAKE (3.28.5)
+    FsUnit.xUnit (1.3.0.1) - framework: >= net451
+    Microsoft.Data.Edm (5.6.2) - framework: >= net451
+    Microsoft.Data.OData (5.6.2) - framework: >= net451
+      Microsoft.Data.Edm (5.6.2)
+      System.Spatial (5.6.2)
+    Microsoft.Data.Services.Client (5.6.2) - framework: >= net451
+      Microsoft.Data.OData (5.6.2)
+    Microsoft.WindowsAzure.ConfigurationManager (1.8.0.0) - framework: >= net451
+    Newtonsoft.Json (5.0.8) - framework: >= net451
+    NuGet.CommandLine (2.8.3)
+    System.Spatial (5.6.2) - framework: >= net451
+    Unquote (2.2.2) - framework: >= net451
+    WindowsAzure.Storage (4.3.0) - framework: >= net451
+      Microsoft.Data.OData (>= 5.6.2)
+      Newtonsoft.Json (>= 5.0.8) - framework: wpv8.0, >= net40
+    xunit (1.9.2) - framework: >= net451
+    xunit.runners (1.9.2)

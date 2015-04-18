@@ -61,7 +61,6 @@ Target "AssemblyInfo" (fun _ ->
                                         Attribute.FileVersion release.AssemblyVersion ])
 // --------------------------------------------------------------------------------------
 // Clean build results & restore NuGet packages
-Target "RestorePackages" RestorePackages
 Target "Clean" (fun _ -> CleanDirs [ "bin"; "temp" ])
 Target "CleanDocs" (fun _ -> CleanDirs [ "docs/output" ])
 // --------------------------------------------------------------------------------------
@@ -105,6 +104,6 @@ Target "NuGet"
 // --------------------------------------------------------------------------------------
 // Run all targets by default. Invoke 'build <Target>' to override
 Target "All" DoNothing
-"Clean" ==> "RestorePackages" ==> "AssemblyInfo" ==> "Build" ==> "All"
+"Clean" ==> "AssemblyInfo" ==> "Build" ==> "All"
 "All" ==> "Integration Tests" ==> "NuGet" 
 RunTargetOrDefault "NuGet"
