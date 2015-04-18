@@ -1,5 +1,6 @@
 ﻿module FSharp.Azure.StorageTypeProvider.``Blob Unit Tests``
 
+open Microsoft.WindowsAzure.Storage.Blob
 open FSharp.Azure.StorageTypeProvider
 open Xunit
 open Swensen.Unquote
@@ -32,7 +33,7 @@ let ``Correctly gets size of a blob``() =
 
 [<Fact>]
 let ``Reads a text file as text``() =
-    let text = container .``sample.txt``.ReadAsString()
+    let text = container .``sample.txt``.Read()
     text =? "the quick brown fox jumped over the lazy dog\nbananas"
 
 [<Fact>]
@@ -52,3 +53,21 @@ let ``Opens a file with xml extension as an XML document``() =
                         .Elements().First()
                         .Value
     value =? "thing"
+
+[<Fact>]
+let ``Cloud Blob Client relates to the same data as the type provider``() =
+    (Local.Containers.CloudBlobClient.ListContainers()
+     |> Seq.map(fun c -> c.Name)
+     |> Set.ofSeq
+     |> Set.contains "tp-test") =? true
+
+[<Fact>]
+let ``Cloud Blob Container relates to the same data as the type provider``() =
+    let client = container.AsCloudBlobContainer()
+    let blobs = client.ListBlobs() |> Seq.choose(function | :? CloudBlockBlob as b -> Some b | _ -> None) |> Seq.map(fun c -> c.Name) |> Seq.toList
+    blobs =? [ "data.xml"; "file1.txt"; "file2.txt"; "file3.txt"; "sample.txt" ]
+
+[<Fact>]
+let ``Cloud Block Blob relates to the same data as the type provider``() =
+    let blob = container.``data.xml``.AsCloudBlockBlob()
+    blob.Name =? "data.xml"

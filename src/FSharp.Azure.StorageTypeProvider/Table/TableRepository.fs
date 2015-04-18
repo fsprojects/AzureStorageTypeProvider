@@ -7,7 +7,7 @@ open Microsoft.WindowsAzure.Storage.Table
 open Microsoft.WindowsAzure.Storage.Table.Queryable
 open System
 
-let private getTableClient connection = CloudStorageAccount.Parse(connection).CreateCloudTableClient()
+let internal getTableClient connection = CloudStorageAccount.Parse(connection).CreateCloudTableClient()
 
 let buildTableEntity partitionKey rowKey names (values: obj []) = 
     LightweightTableEntity(partitionKey, rowKey, DateTimeOffset.MinValue, (Seq.zip names values) |> Map.ofSeq)

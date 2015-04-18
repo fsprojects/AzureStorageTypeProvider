@@ -6,7 +6,7 @@ open Microsoft.WindowsAzure.Storage.Queue
 open Microsoft.WindowsAzure.Storage.Queue.Protocol
 open System
 
-let private getQueueClient = CloudStorageAccount.Parse >> (fun csa -> csa.CreateCloudQueueClient())
+let internal getQueueClient connectionString = CloudStorageAccount.Parse(connectionString).CreateCloudQueueClient()
 
 let getQueues connectionString = 
     getQueueClient(connectionString).ListQueues()

@@ -57,6 +57,9 @@ type ProvidedQueue(defaultConnectionString, name) =
         |> getQueue
         |> (fun queue -> queue.UpdateMessageAsync(message, newTimeout, fields) |> Async.AwaitTaskUnit)
 
+    /// Gets a handle to the Azure SDK client for this queue.
+    member __.AsCloudQueue(?connectionString) = getQueue connectionString
+
     /// Gets the queue length.
     member __.GetCurrentLength(?connectionString) = 
         let queueRef = getQueue connectionString
@@ -116,3 +119,6 @@ type ProvidedQueue(defaultConnectionString, name) =
 
     /// Gets the name of the queue.
     member __.Name = (None |> getQueue).Name
+
+module QueueBuilder =
+    let getQueueClient connectionString = QueueRepository.getQueueClient connectionString

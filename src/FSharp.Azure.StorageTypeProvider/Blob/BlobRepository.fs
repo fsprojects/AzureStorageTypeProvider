@@ -15,7 +15,8 @@ type LightweightContainer =
       GetFiles : unit -> seq<containerItem> }
 
 let getBlobClient connection = CloudStorageAccount.Parse(connection).CreateCloudBlobClient()
-let getBlobRef (connection, container, file) = (getBlobClient connection).GetContainerReference(container).GetBlockBlobReference(file)
+let getContainerRef(connection, container) = (getBlobClient connection).GetContainerReference(container)
+let getBlobRef (connection, container, file) = getContainerRef(connection, container).GetBlockBlobReference(file)
 
 let private getItemName (item : string) (parent : CloudBlobDirectory) = 
     item, 

@@ -1,6 +1,7 @@
 ﻿module internal FSharp.Azure.StorageTypeProvider.Table.TableMemberFactory
 
 open FSharp.Azure.StorageTypeProvider.Table.TableRepository
+open Microsoft.WindowsAzure.Storage
 open Microsoft.WindowsAzure.Storage.Table
 open ProviderImplementation.ProvidedTypes
 
@@ -21,6 +22,10 @@ let getTableStorageMembers (connectionString, domainType : ProvidedTypeDefinitio
         getTables connectionString
         |> Seq.map (createTableType connectionString)
         |> Seq.toList)
+    
+    let ctcProp = ProvidedProperty("CloudTableClient", typeof<CloudTableClient>, GetterCode = (fun _ -> <@@ TableBuilder.createAzureTableRoot connectionString @@>))
+    ctcProp.AddXmlDoc "Gets a handle to the Table Azure SDK client for this storage account."
+    tableListingType.AddMember(ctcProp)
     
     domainType.AddMember tableListingType
     let tableListingProp = ProvidedProperty("Tables", tableListingType, IsStatic = true, GetterCode = (fun _ -> <@@ () @@>))
