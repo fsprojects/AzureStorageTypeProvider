@@ -17,12 +17,21 @@ type public AzureTypeProvider() as this =
     let thisAssembly = Assembly.GetExecutingAssembly()
     let azureAccountType = ProvidedTypeDefinition(thisAssembly, namespaceName, "AzureTypeProvider", baseType = Some typeof<obj>)
 
-    let buildConnectionString (args : obj []) = 
-        let accountName = args.[0] :?> string
-        let accountKey = args.[1] :?> string
-        let blankArgs = [ accountName; accountKey ] |> Seq.exists (fun param -> String.IsNullOrEmpty(param.Trim()))
-        if blankArgs then "UseDevelopmentStorage=true"
-        else sprintf "DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;" accountName accountKey
+    let buildConnectionString (args : obj []) =
+        let (|ConnectionString|TwoPart|DevelopmentStorage|) (args:obj []) =
+            let firstArg = args.[0] :?> string
+            let secondArg = args.[1] :?> string
+            let isBlank = String.IsNullOrWhiteSpace            
+
+            match firstArg, secondArg with
+            | _ when firstArg.StartsWith "DefaultEndpointsProtocol" -> ConnectionString firstArg
+            | _ when [ firstArg; secondArg ] |> Seq.exists isBlank -> DevelopmentStorage
+            | _ -> TwoPart (firstArg, secondArg)
+
+        match args with
+        | DevelopmentStorage -> "UseDevelopmentStorage=true"
+        | ConnectionString conn -> conn
+        | TwoPart (name, key) -> sprintf "DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;" name key
             
     let buildTypes (typeName : string) (args : obj []) = 
         // Create the top level property
