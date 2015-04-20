@@ -21,11 +21,10 @@ type public AzureTypeProvider() as this =
         let (|ConnectionString|TwoPart|DevelopmentStorage|) (args:obj []) =
             let firstArg = args.[0] :?> string
             let secondArg = args.[1] :?> string
-            let isBlank = String.IsNullOrWhiteSpace            
 
             match firstArg, secondArg with
             | _ when firstArg.StartsWith "DefaultEndpointsProtocol" -> ConnectionString firstArg
-            | _ when [ firstArg; secondArg ] |> Seq.exists isBlank -> DevelopmentStorage
+            | _ when [ firstArg; secondArg ] |> List.exists String.IsNullOrWhiteSpace -> DevelopmentStorage
             | _ -> TwoPart (firstArg, secondArg)
 
         match args with
