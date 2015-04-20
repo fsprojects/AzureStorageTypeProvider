@@ -11,11 +11,11 @@ type FirstBlank = AzureTypeProvider<"", "Foo">
 
 [<Fact>]
 let ``SecondBlank connection string works``() =
-    SecondBlank.Containers.CloudBlobClient.GetContainerReference("tptest").Exists() =? true
+    SecondBlank.Containers.CloudBlobClient.GetContainerReference("tp-test").Exists() =? true
 
 [<Fact>]
 let ``FirstBlank connection string works``() =
-    FirstBlank.Containers.CloudBlobClient.GetContainerReference("tptest").Exists() =? true
+    FirstBlank.Containers.CloudBlobClient.GetContainerReference("tp-test").Exists() =? true
 
 //[<Fact>]
 //let ``TwoPart connection string works``() =

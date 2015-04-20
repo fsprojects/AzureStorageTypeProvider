@@ -65,7 +65,11 @@ Target "Clean" (fun _ -> CleanDirs [ "bin"; "temp" ])
 Target "CleanDocs" (fun _ -> CleanDirs [ "docs/output" ])
 // --------------------------------------------------------------------------------------
 // Reset test data in local azure storage
-Target "ResetTestData" (fun _ -> 
+
+Target "ResetTestData" (fun _ ->
+    { defaultParams with
+        CommandLine = "start"
+        Program = combinePaths ProgramFilesX86 @"Microsoft SDKs\Azure\Storage Emulator\WAStorageEmulator.exe" } |> shellExec |> ignore
     FSIHelper.executeFSI (Path.Combine(__SOURCE_DIRECTORY__, @"tests\integrationtests")) "ResetTestData.fsx" []
     |> snd
     |> Seq.iter(fun x -> printfn "%s" x.Message)
@@ -107,6 +111,6 @@ Target "NuGet"
 // --------------------------------------------------------------------------------------
 // Run all targets by default. Invoke 'build <Target>' to override
 Target "All" DoNothing
-"Clean" ==> "RestorePackages" ==> "AssemblyInfo" ==> "ResetTestData" ==> "Build" ==> "All"
+"Clean" ==> "AssemblyInfo" ==> "Build" ==> "All"
 "All" ==> "Integration Tests" ==> "NuGet" 
 RunTargetOrDefault "NuGet"
