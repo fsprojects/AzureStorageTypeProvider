@@ -21,7 +21,7 @@
 * Perf improvement for batch inserts when building lightweight table entities.
 * Azure Storage Queue support.
 
-### 1.2.0
+### 1.2.0 - 20th April 2015
 * Upgrade to Azure Storage 4.3.0 SDK.
 * Added hooks into native Azure Storage SDK directly in the type provider.
 * Simplified some naming of methods on blobs.
