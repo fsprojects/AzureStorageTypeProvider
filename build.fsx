@@ -11,8 +11,6 @@ open System
 open System.IO
 
 // --------------------------------------------------------------------------------------
-// START TODO: Provide project-specific details below
-// --------------------------------------------------------------------------------------
 // Information about the project are used
 //  - for version and project name in generated AssemblyInfo file
 //  - by the generated NuGet package 
@@ -26,8 +24,7 @@ let project = "FSharp.Azure.StorageTypeProvider"
 let summary = "Allows easy access to Azure Storage assets through F# scripts."
 // Longer description of the project
 // (used as a description for NuGet package; line breaks are automatically cleaned up)
-let description = """The F# Azure Storage Type Provider allows simple access to Blob, Table and Queue assets, using Azure Storage metadata to
-intelligently infer schema where possible, whilst providing a simple API for common tasks."""
+let description = """The F# Azure Storage Type Provider allows simple access to Blob, Table and Queue assets, using Azure Storage metadata to intelligently infer schema where possible, whilst providing a simple API for common tasks."""
 // List of author names (for NuGet package)
 let authors = [ "Isaac Abraham" ]
 // Tags for your project (for NuGet package)
@@ -86,7 +83,7 @@ Target "Integration Tests" (fun _ ->
     |> xUnit (fun p -> { p with Verbose = true }))
 // --------------------------------------------------------------------------------------
 // Build a NuGet package
-Target "NuGet" 
+Target "Package" 
     (fun _ -> 
     NuGet 
         (fun p -> 
@@ -96,7 +93,7 @@ Target "NuGet"
                  Summary = summary
                  Description = description
                  Version = release.NugetVersion
-                 ReleaseNotes = String.Join(Environment.NewLine, release.Notes)
+                 ReleaseNotes = release.Notes |> String.concat Environment.NewLine
                  Tags = tags
                  OutputPath = "bin"
                  Files = 
@@ -111,6 +108,11 @@ Target "NuGet"
 // --------------------------------------------------------------------------------------
 // Run all targets by default. Invoke 'build <Target>' to override
 Target "All" DoNothing
-"Clean" ==> "AssemblyInfo" ==> "Build" ==> "All"
-"All" ==> "Integration Tests" ==> "NuGet" 
-RunTargetOrDefault "NuGet"
+"Clean" ==>
+    "AssemblyInfo" ==>
+    "ResetTestData" ==>
+    "Build" ==>
+    "Integration Tests" ==>
+    "Package" ==>
+    "All"
+RunTargetOrDefault "All"
