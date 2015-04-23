@@ -1,10 +1,10 @@
 ﻿module FSharp.Azure.StorageTypeProvider.``Blob Unit Tests``
 
-open Microsoft.WindowsAzure.Storage.Blob
 open FSharp.Azure.StorageTypeProvider
-open Xunit
+open Microsoft.WindowsAzure.Storage.Blob
 open Swensen.Unquote
 open System.Linq
+open Xunit
 
 type Local = AzureTypeProvider<"DevStorageAccount", "">
 
