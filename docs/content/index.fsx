@@ -2,48 +2,47 @@
 // This block of code is omitted in the generated HTML documentation. Use 
 // it to define helpers that you do not want to show in the documentation.
 
+#r @"..\..\bin\FSharp.Azure.StorageTypeProvider.dll"
 #r @"..\..\bin\Microsoft.Data.OData.dll"
 #r @"..\..\bin\Microsoft.Data.Services.Client.dll"
 #r @"..\..\bin\Microsoft.Data.Edm.dll"
-#r @"..\..\bin\System.Spatial.dll"
-#r @"..\..\bin\Newtonsoft.Json.dll"
 #r @"..\..\bin\Microsoft.WindowsAzure.Configuration.dll"
 #r @"..\..\bin\Microsoft.WindowsAzure.Storage.dll"
+#r @"..\..\bin\Newtonsoft.Json.dll"
+#r @"..\..\bin\System.Spatial.dll"
 #r @"System.Xml.Linq.dll"
-#r @"..\..\bin\FSharp.Azure.StorageTypeProvider.dll"
 
 (**
-FSharp.Azure.StorageTypeProvider
-================================
-
-Documentation
-
-<div class="row">
-  <div class="span1"></div>
-  <div class="span6">
-    <div class="well well-small" id="nuget">
-      The FSharp.Azure.StorageTypeProvider library can be <a href="https://nuget.org/packages/FSharp.Azure.StorageTypeProvider">installed from NuGet</a>:
-      <pre>PM> Install-Package FSharp.Azure.StorageTypeProvider</pre>
-    </div>
-  </div>
-  <div class="span1"></div>
-</div>
+About the Azure Storage Type Provider
+=====================================
+The F# Azure Storage Type Provider allows quick and easy exploration of your
+Azure Storage assets (Blobs, Tables and Queues) through the F# type system,
+allowing for rapid access to large amounts of data cheaply, both through
+scripts and applications. A fall-back to the standard .NET Azure SDK is also
+provided.
 
 Example
 -------
 
-This example demonstrates using a function defined in this sample library.
+This example illustrates some of the features available from the type provider.
 
 *)
 
 open FSharp.Azure.StorageTypeProvider
 
-/// Get a handle to my local storage emulator
-type StorageEmulator = AzureTypeProvider<"DevStoreAccount=true", "">
+// Get a handle to my local storage emulator
+type Azure = AzureTypeProvider<"DevStoreAccount=true", "">
 
-/// Navigate through the containers to a specific file and read the contents.
-let childFileContents =
-    StorageEmulator.Containers.``tp-test``.``folder/``.``childFile.txt``.Read()
+// Navigate through the containers to a specific file and read the contents.
+let blobContents =
+    Azure.Containers.``tp-test``.``folder/``.``childFile.txt``.Read()
+
+// Perform a strongly-typed query against a table with automatic schema generation.
+let results =
+    Azure.Tables.tptest.Query()
+         .``Where Name Is``.``Equal To``("fred")
+         .Execute()
+         |> Array.map(fun row -> row.Name, row.Dob)
 
 //printfn "hello = %i" <| Library.hello 0
 //
