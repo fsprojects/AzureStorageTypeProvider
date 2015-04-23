@@ -9,7 +9,7 @@
 // for binaries output to root bin folder please add the filename only to the 
 // referenceBinaries list below in order to generate documentation for the binaries.
 // (This is the original behaviour of ProjectScaffold prior to multi project support)
-let referenceBinaries = []
+let referenceBinaries = [ @"..\..\bin\FSharp.Azure.StorageTypeProvider.dll" ]
 // Web site location for the generated documentation
 let website = "FSharp.Azure.StorageTypeProvider"
 
@@ -91,27 +91,8 @@ let references =
     |> Some
   else None
 
-let binaries =
-    let manuallyAdded = 
-        referenceBinaries 
-        |> List.map (fun b -> bin @@ b)
-    
-    let conventionBased = 
-        directoryInfo bin 
-        |> subDirectories
-        |> Array.map (fun d -> d.FullName @@ (sprintf "%s.dll" d.Name))
-        |> List.ofArray
-
-    conventionBased @ manuallyAdded
-
-let libDirs =
-    let conventionBasedbinDirs =
-        directoryInfo bin 
-        |> subDirectories
-        |> Array.map (fun d -> d.FullName)
-        |> List.ofArray
-
-    conventionBasedbinDirs @ [bin]
+let binaries = referenceBinaries
+let libDirs = [ bin ]
 
 // Build API reference from XML comments
 let buildReference () =
@@ -122,7 +103,7 @@ let buildReference () =
       sourceRepo = githubLink @@ "tree/master",
       sourceFolder = __SOURCE_DIRECTORY__ @@ ".." @@ "..",
       ?assemblyReferences = references,
-      publicOnly = true,libDirs = libDirs )
+      publicOnly = true, libDirs = libDirs)
 
 // Build documentation from `fsx` and `md` files in `docs/content`
 let buildDocumentation () =

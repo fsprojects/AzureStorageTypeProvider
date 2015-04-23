@@ -50,11 +50,9 @@ let queueMessage = Azure.Queues.tptest.Dequeue()
 Samples & documentation
 -----------------------
 
-The library comes with comprehensible documentation. 
-It can include tutorials automatically generated from `*.fsx` files in [the content folder][content]. 
-The API reference is automatically generated from Markdown comments in the library implementation.
+The library comes with comprehensible documentation.
 
- * [Tutorial](tutorial.html) contains a further explanation of this sample library.
+ * [Tutorial](tutorial.html) contains further examples of how to get up and running as well the guiding principles for the library.
 
  * There are detailed tutorials for the [Blob](blobs.html), [Table](tables.html) and [Queue](queues.html)
    APIs.
