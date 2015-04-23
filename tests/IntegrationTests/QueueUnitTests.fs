@@ -2,11 +2,11 @@
 
 open FSharp.Azure.StorageTypeProvider
 open FSharp.Azure.StorageTypeProvider.Queue
-open Xunit
-open System
-open System.Linq
 open Swensen.Unquote
 open Swensen.Unquote.Operators
+open System
+open System.Linq
+open Xunit
 
 type Local = AzureTypeProvider<"DevStorageAccount", "">
 

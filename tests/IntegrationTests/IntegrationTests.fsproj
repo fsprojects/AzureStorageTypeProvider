@@ -34,6 +34,9 @@
     <DocumentationFile>bin\Release\IntegrationTests.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FSharp.Azure.StorageTypeProvider">
+      <HintPath>..\..\bin\FSharp.Azure.StorageTypeProvider.dll</HintPath>
+    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <Private>True</Private>
@@ -56,13 +59,6 @@
     <None Include="ResetTestData.fsx" />
     <None Include="paket.references" />
     <None Include="app.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\FSharp.Azure.StorageTypeProvider\FSharp.Azure.StorageTypeProvider.fsproj">
-      <Name>FSharp.Azure.StorageTypeProvider</Name>
-      <Project>{fb7ca8f3-c158-49e9-b816-501741e2921f}</Project>
-      <Private>True</Private>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>

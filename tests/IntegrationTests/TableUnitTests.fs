@@ -2,11 +2,11 @@
 
 open FSharp.Azure.StorageTypeProvider
 open FSharp.Azure.StorageTypeProvider.Table
-open Xunit
+open Microsoft.WindowsAzure.Storage.Table
+open Swensen.Unquote
 open System
 open System.Linq
-open Swensen.Unquote
-open Microsoft.WindowsAzure.Storage.Table
+open Xunit
 
 type Local = AzureTypeProvider<"DevStorageAccount", "">
 
@@ -131,6 +131,11 @@ let ``Query with many query parts brings back correct rows``() =
      table.Query().``Where Name Is``.``Equal To``("fred")
                   .``Where Count Is``.``Equal To``(35)
                   .Execute().Length =? 1
+
+//[<Fact>]
+//let ``Query conditions on floats are correctly generated``() =
+//     table.Query().``Where Score Is``.``Greater Than``(1.0)
+//                  .Execute().Length =? 5
 
 [<Fact>]
 let ``Query conditions are correctly mapped``() =

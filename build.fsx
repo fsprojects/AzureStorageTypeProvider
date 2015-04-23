@@ -58,7 +58,7 @@ Target "AssemblyInfo" (fun _ ->
                                         Attribute.FileVersion release.AssemblyVersion ])
 // --------------------------------------------------------------------------------------
 // Clean build results & restore NuGet packages
-Target "Clean" (fun _ -> CleanDirs [ "bin"; "temp" ])
+Target "Clean" (fun _ -> CleanDirs [ "bin"; "temp"; "tests/integrationtests/bin" ])
 Target "CleanDocs" (fun _ -> CleanDirs [ "docs/output" ])
 // --------------------------------------------------------------------------------------
 // Reset test data in local azure storage
@@ -67,14 +67,14 @@ Target "ResetTestData" (fun _ ->
     { defaultParams with
         CommandLine = "start"
         Program = combinePaths ProgramFilesX86 @"Microsoft SDKs\Azure\Storage Emulator\WAStorageEmulator.exe" } |> shellExec |> ignore
-    FSIHelper.executeFSI (Path.Combine(__SOURCE_DIRECTORY__, @"tests\integrationtests")) "ResetTestData.fsx" []
+    FSIHelper.executeFSI (Path.Combine(__SOURCE_DIRECTORY__, @"tests\IntegrationTests")) "ResetTestData.fsx" []
     |> snd
     |> Seq.iter(fun x -> printfn "%s" x.Message)
 )
 // --------------------------------------------------------------------------------------
 // Build library & test project
 Target "Build" (fun _ -> 
-    !!(solutionFile + "*.sln")
+    !!("*.sln")
     |> MSBuildRelease "" "Rebuild"
     |> ignore)
 // Run integration tests

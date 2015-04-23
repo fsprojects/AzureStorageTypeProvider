@@ -64,20 +64,19 @@ let setPropertiesForEntity (entityType : ProvidedTypeDefinition) (sampleEntities
             [ ProvidedParameter("PartitionKey", typeof<Partition>)
               ProvidedParameter("RowKey", typeof<Row>) ] 
             @ [ for (name, entityProp) in properties -> buildEdmParameter entityProp.PropertyType (buildParameter name) ]
-        ProvidedConstructor(parameters, 
-                            InvokeCode = fun args -> 
-                                let fieldNames = 
-                                    properties
-                                    |> Seq.map fst
-                                    |> Seq.toList
-                                
-                                let fieldValues = 
-                                    args
-                                    |> Seq.skip 2
-                                    |> Seq.map (fun arg -> Expr.Coerce(arg, typeof<obj>))
-                                    |> Seq.toList
-                                
-                                <@@ buildTableEntity (%%args.[0] : Partition) (%%args.[1] : Row) fieldNames (%%(Expr.NewArray(typeof<obj>, fieldValues))) @@>))
+        ProvidedConstructor(
+            parameters, 
+            InvokeCode = fun args -> 
+                let fieldNames = 
+                    properties
+                    |> Seq.map fst
+                    |> Seq.toList                
+                let fieldValues = 
+                    args
+                    |> Seq.skip 2
+                    |> Seq.map (fun arg -> Expr.Coerce(arg, typeof<obj>))
+                    |> Seq.toList                
+                <@@ buildTableEntity (%%args.[0] : Partition) (%%args.[1] : Row) fieldNames (%%(Expr.NewArray(typeof<obj>, fieldValues))) @@>))
     properties
 
 /// Gets all the members for a Table Entity type

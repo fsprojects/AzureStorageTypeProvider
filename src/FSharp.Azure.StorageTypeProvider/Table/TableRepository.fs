@@ -25,38 +25,39 @@ type private DynamicQuery = TableQuery<DynamicTableEntity>
 
 let internal getRowsForSchema (rowCount: int) connection tableName = 
     let table = getTable tableName connection
-    table.ExecuteQuery(DynamicQuery().Take(Nullable<_>(rowCount)))
+    table.ExecuteQuery(DynamicQuery().Take(Nullable rowCount))
     |> Seq.truncate rowCount
     |> Seq.toArray
 
 let executeQuery connection tableName maxResults filterString = 
     let query = DynamicQuery().Where(filterString)
-    let query = if maxResults > 0 then query.Take(Nullable(maxResults)) else query
+    let query = if maxResults > 0 then query.Take(Nullable maxResults) else query
 
     (getTable tableName connection).ExecuteQuery(query)
     |> Seq.map(fun dte ->
-        LightweightTableEntity(Partition dte.PartitionKey, Row dte.RowKey, dte.Timestamp, dte.Properties
-                                                                                          |> Seq.map(fun p -> p.Key, p.Value.PropertyAsObject)
-                                                                                          |> Map.ofSeq))
+        LightweightTableEntity(
+            Partition dte.PartitionKey,
+            Row dte.RowKey,
+            dte.Timestamp,
+            dte.Properties
+            |> Seq.map(fun p -> p.Key, p.Value.PropertyAsObject)
+            |> Map.ofSeq))
     |> Seq.toArray
 
 let internal buildDynamicTableEntity(entity:LightweightTableEntity) =
     let tableEntity = DynamicTableEntity(entity.PartitionKey, entity.RowKey, ETag = "*")
     for (key, value) in entity.Values |> Map.toArray do
-        tableEntity.Properties.[key] <- match value with
-                                        | :? (byte []) as value -> EntityProperty.GeneratePropertyForByteArray(value)
-                                        | :? string as value -> EntityProperty.GeneratePropertyForString(value)
-                                        | :? int as value -> EntityProperty.GeneratePropertyForInt(Nullable(value))
-                                        | :? bool as value -> EntityProperty.GeneratePropertyForBool(Nullable(value))
-                                        | :? DateTime as value -> 
-                                            EntityProperty.GeneratePropertyForDateTimeOffset
-                                                (Nullable(DateTimeOffset(value)))
-                                        | :? double as value -> 
-                                            EntityProperty.GeneratePropertyForDouble(Nullable(value))
-                                        | :? System.Guid as value -> 
-                                            EntityProperty.GeneratePropertyForGuid(Nullable(value))
-                                        | :? int64 as value -> EntityProperty.GeneratePropertyForLong(Nullable(value))
-                                        | _ -> EntityProperty.CreateEntityPropertyFromObject(value)
+        tableEntity.Properties.[key] <-
+            match value with
+            | :? (byte []) as value -> EntityProperty.GeneratePropertyForByteArray(value)
+            | :? string as value -> EntityProperty.GeneratePropertyForString(value)
+            | :? int as value -> EntityProperty.GeneratePropertyForInt(Nullable value)
+            | :? bool as value -> EntityProperty.GeneratePropertyForBool(Nullable value)
+            | :? DateTime as value -> EntityProperty.GeneratePropertyForDateTimeOffset(Nullable(DateTimeOffset value))
+            | :? double as value -> EntityProperty.GeneratePropertyForDouble(Nullable value)
+            | :? System.Guid as value -> EntityProperty.GeneratePropertyForGuid(Nullable value)
+            | :? int64 as value -> EntityProperty.GeneratePropertyForLong(Nullable value)
+            | _ -> EntityProperty.CreateEntityPropertyFromObject(value)
     tableEntity
 
 let internal createInsertOperation(insertMode) = 
@@ -85,22 +86,24 @@ let internal executeBatchOperation createTableOp (table:CloudTable) entities =
                 partitionKey, entityBatch, batchForPartition))
     |> Seq.map(fun (partitionKey, entityBatch, batchOperation) ->
         let buildEntityId (entity:DynamicTableEntity) = Partition(entity.PartitionKey), Row(entity.RowKey)
-        let responses = try
-                           table.ExecuteBatch(batchOperation)
-                                       |> Seq.zip entityBatch
-                                       |> Seq.map(fun (entity, res) -> SuccessfulResponse(buildEntityId entity, res.HttpStatusCode))
-                        with
-                            :? StorageException as ex ->
-                                let requestInformation = ex.RequestInformation
-                                match requestInformation.ExtendedErrorInformation.ErrorMessage.Split('\n').[0].Split(':') with
-                                | [|index;message|] ->
-                                    match Int32.TryParse(index) with
-                                    | true, index -> entityBatch
-                                                     |> Seq.mapi(fun entityIndex entity -> if entityIndex = index then EntityError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode)
-                                                                                           else BatchOperationFailedError(buildEntityId entity))
-                                    | _ -> entityBatch |> Seq.map(fun entity -> BatchError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
-                                | [|message|] -> entityBatch |> Seq.map(fun entity -> EntityError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
-                                | _ -> entityBatch |> Seq.map(fun entity -> BatchError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
+        let responses =
+            try
+            table.ExecuteBatch(batchOperation)
+            |> Seq.zip entityBatch
+            |> Seq.map(fun (entity, res) -> SuccessfulResponse(buildEntityId entity, res.HttpStatusCode))
+            with :? StorageException as ex ->
+            let requestInformation = ex.RequestInformation
+            match requestInformation.ExtendedErrorInformation.ErrorMessage.Split('\n').[0].Split(':') with
+            | [|index;message|] ->
+                match Int32.TryParse(index) with
+                | true, index ->
+                    entityBatch
+                    |> Seq.mapi(fun entityIndex entity ->
+                        if entityIndex = index then EntityError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode)
+                        else BatchOperationFailedError(buildEntityId entity))
+                | _ -> entityBatch |> Seq.map(fun entity -> BatchError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
+            | [|message|] -> entityBatch |> Seq.map(fun entity -> EntityError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
+            | _ -> entityBatch |> Seq.map(fun entity -> BatchError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
         partitionKey, responses |> Seq.toArray)
 
     |> Seq.toArray
@@ -139,17 +142,18 @@ let buildFilter(propertyName, comparison, value) =
     | :? int64 as value -> TableQuery.GenerateFilterConditionForLong(propertyName, comparison, value)
     | :? float as value -> TableQuery.GenerateFilterConditionForDouble(propertyName, comparison, value)
     | :? bool as value -> TableQuery.GenerateFilterConditionForBool(propertyName, comparison, value)
-    | :? DateTime as value -> TableQuery.GenerateFilterConditionForDate(propertyName, comparison, DateTimeOffset(value))
+    | :? DateTime as value -> TableQuery.GenerateFilterConditionForDate(propertyName, comparison, DateTimeOffset value)
     | :? Guid as value -> TableQuery.GenerateFilterConditionForGuid(propertyName, comparison, value)
     | _ -> TableQuery.GenerateFilterCondition(propertyName, comparison, value.ToString())
 
 let getEntity rowKey partitionKey connection tableName = 
     let (Row rowKey, Partition partitionKey) = rowKey, partitionKey
-    let results = [ ("RowKey", rowKey)
-                    ("PartitionKey", partitionKey) ]
-                  |> List.map(fun (prop, value) -> buildFilter(prop, QueryComparisons.Equal, value))
-                  |> composeAllFilters
-                  |> executeQuery connection tableName 0
+    let results =
+        [ ("RowKey", rowKey)
+          ("PartitionKey", partitionKey) ]
+        |> List.map(fun (prop, value) -> buildFilter(prop, QueryComparisons.Equal, value))
+        |> composeAllFilters
+        |> executeQuery connection tableName 0
     match results with
     | [| exactMatch |] -> Some exactMatch
     | _ -> None
