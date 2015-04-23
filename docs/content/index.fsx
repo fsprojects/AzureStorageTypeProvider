@@ -1,6 +1,4 @@
 (*** hide ***)
-// This block of code is omitted in the generated HTML documentation. Use 
-// it to define helpers that you do not want to show in the documentation.
 
 #r @"..\..\bin\FSharp.Azure.StorageTypeProvider.dll"
 #r @"..\..\bin\Microsoft.Data.OData.dll"
@@ -31,7 +29,7 @@ This example illustrates some of the features available from the type provider.
 open FSharp.Azure.StorageTypeProvider
 
 // Get a handle to my local storage emulator
-type Azure = AzureTypeProvider<"DevStoreAccount=true", "">
+type Azure = AzureTypeProvider<"UseDevelopmentStorage=true">
 
 // Navigate through the containers to a specific file and read the contents.
 let blobContents =
@@ -44,10 +42,10 @@ let results =
          .Execute()
          |> Array.map(fun row -> row.Name, row.Dob)
 
-//printfn "hello = %i" <| Library.hello 0
-//
+// Navigate through storage queues and get messages
+let queueMessage = Azure.Queues.tptest.Dequeue()
+
 (**
-Some more info
 
 Samples & documentation
 -----------------------
@@ -57,6 +55,9 @@ It can include tutorials automatically generated from `*.fsx` files in [the cont
 The API reference is automatically generated from Markdown comments in the library implementation.
 
  * [Tutorial](tutorial.html) contains a further explanation of this sample library.
+
+ * There are detailed tutorials for the [Blob](blobs.html), [Table](tables.html) and [Queue](queues.html)
+   APIs.
 
  * [API Reference](reference/index.html) contains automatically generated documentation for all types, modules
    and functions in the library. This includes additional brief samples on using most of the

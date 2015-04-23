@@ -134,7 +134,8 @@ let buildDocumentation () =
       layoutRoots = layoutRootsAll.["en"],
       ?assemblyReferences = references,
       generateAnchors = true,
-      processRecursive = false)
+      processRecursive = false,
+      fsiEvaluator = new FsiEvaluator())
 
   // And then process files which are placed in the sub directories
   // (some sub directories might be for specific language).
