@@ -22,9 +22,9 @@ Working with Blobs
 ==================
 
 For more information on Blobs in general, please see some of the many articles on
-MSDN or the Azure documentation. The core features of the Blob type provider are as follows.
+[MSDN](https://msdn.microsoft.com/en-us/library/microsoft.windowsazure.storage.blob.aspx) or the [Azure](http://azure.microsoft.com/en-us/documentation/services/storage/) [documentation](http://azure.microsoft.com/en-us/documentation/articles/storage-dotnet-how-to-use-blobs/). Some of the core features of the Blob provider are: -
 
-## Rapid navigation.
+## Rapid navigation
 
 You can easily move between containers, folders and blobs. Simply dotting into a container
 or folder will automatically request the children of that node from Azure. This allows
@@ -54,7 +54,7 @@ printfn "These files take up %d bytes." totalSize
 (*** include-output: sumOfSizes ***)
 
 (**
-## Flexible API for read operations.
+## Flexible API for read operations
 You can quickly read the contents of a blob synchronously or asynchronously.
 *)
 
@@ -101,19 +101,19 @@ Again, since files share a common type, you can easily merge multiple sequential
 *)
 
 (*** define-output: streaming-fancy ***)
-let readToEnd (file:BlobFile) =
-    printfn "Reading file '%s'" file.Name
-    let sr = file.OpenStreamAsText()
-    seq { while (not sr.EndOfStream) do yield sr.ReadLine() }
 let filesToSplice =
     [ container.``file1.txt``
       container.``file2.txt``
       container.``file3.txt``
       container.``sample.txt`` ]
+
 let lines =
-    filesToSplice
-    |> Seq.collect(readToEnd >> Seq.mapi(sprintf "LINE %d: '%s'"))
-        
+    seq { for file in filesToSplice do
+            printfn "Reading file '%s'" file.Name
+            let sr = file.OpenStreamAsText()
+            while (not sr.EndOfStream) do
+                yield sr.ReadLine() }
+      
 printfn "starting to read all lines"
 for line in lines do
     printfn "%s" line
@@ -130,7 +130,7 @@ You can quickly and easily download files, folders or entire containers to local
 let asyncFileDownload = container.``file1.txt``.Download(@"C:\temp\files\")
 
 (**
-##Shared Access Signature generation.
+##Shared Access Signature generation
 
 The type provider exposes a simple method for generating time-dependant SAS codes for
 single files.

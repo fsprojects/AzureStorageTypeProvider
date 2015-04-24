@@ -1,6 +1,7 @@
 NUGET
   remote: https://www.nuget.org/api/v2
   specs:
+    Deedle (1.0.7)
     FAKE (3.28.5)
     FSharp.Compiler.Service (0.0.89)
     FSharp.Formatting (2.9.1)

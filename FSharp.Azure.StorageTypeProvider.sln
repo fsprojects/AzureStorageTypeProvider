@@ -20,6 +20,7 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Azure.StorageTypePro
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{7CAF8D38-6250-41CB-A65B-ABD760B09281}"
 	ProjectSection(SolutionItems) = preProject
+		docs\tools\references.fsx = docs\tools\references.fsx
 		docs\tools\templates\template.cshtml = docs\tools\templates\template.cshtml
 	EndProjectSection
 EndProject
@@ -28,8 +29,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "content", "content", "{1535
 		docs\content\blobs.fsx = docs\content\blobs.fsx
 		docs\content\index.fsx = docs\content\index.fsx
 		docs\content\queues.fsx = docs\content\queues.fsx
+		docs\content\quickstart.fsx = docs\content\quickstart.fsx
 		docs\content\tables.fsx = docs\content\tables.fsx
-		docs\content\tutorial.fsx = docs\content\tutorial.fsx
 	EndProjectSection
 EndProject
 Global

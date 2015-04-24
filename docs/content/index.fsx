@@ -1,14 +1,5 @@
 (*** hide ***)
-
-#r @"..\..\bin\FSharp.Azure.StorageTypeProvider.dll"
-#r @"..\..\bin\Microsoft.Data.OData.dll"
-#r @"..\..\bin\Microsoft.Data.Services.Client.dll"
-#r @"..\..\bin\Microsoft.Data.Edm.dll"
-#r @"..\..\bin\Microsoft.WindowsAzure.Configuration.dll"
-#r @"..\..\bin\Microsoft.WindowsAzure.Storage.dll"
-#r @"..\..\bin\Newtonsoft.Json.dll"
-#r @"..\..\bin\System.Spatial.dll"
-#r @"System.Xml.Linq.dll"
+#load @"..\tools\references.fsx"
 
 (**
 About the Azure Storage Type Provider
@@ -52,7 +43,7 @@ Samples & documentation
 
 The library comes with comprehensible documentation.
 
- * The [tutorial](tutorial.html) contains further examples of how to get up and running as well the guiding principles for the library.
+ * The [quickstart](quickstart.html) contains further examples of how to get up and running as well the guiding principles for the library.
 
  * There are detailed tutorials for the [Blob](blobs.html), [Table](tables.html) and [Queue](queues.html)
    APIs.
