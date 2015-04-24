@@ -25,9 +25,6 @@ several benefits over using the standard .NET SDK, such as removing the need for
 magic strings when access tables / queues / blobs, as well as strengthening the
 typing of queries over tables.
 
-*)
-
-(** 
 Connecting to Azure
 ===================
 
@@ -41,10 +38,11 @@ Then, you can generate a type for a storage account.
 open FSharp.Azure.StorageTypeProvider
 
 // Connect to a live account using a standard Azure Storage connection string
-type Live = AzureTypeProvider<"DefaultEndpointsProtocol=https;AccountName=myAccount;AccountKey=myKey;">
+type Live =
+    AzureTypeProvider<"DefaultEndpointsProtocol=https;AccountName=name;AccountKey=key;">
 
-// Connect to a live account using a two part connection string
-type LiveTwoPart = AzureTypeProvider<"myAccount", "myKey">
+// Connect to a live account using a two-part name and key.
+type LiveTwoPart = AzureTypeProvider<"name", "key">
 
 // Connect to local storage emulator
 type Local = AzureTypeProvider<"UseDevelopmentStorage=true">
@@ -56,7 +54,7 @@ Common Themes
 
 The API is split into three areas: **Tables**, **Queues** and **Containers**.
 
-All three share common themes: -
+All three share some common themes: -
 
 - Where possible, entities such as queues, tables, containers, folders or blobs are typed based on
 live queries to the appropriate underlying storage SDK. Thus there's no requirement to enter magic

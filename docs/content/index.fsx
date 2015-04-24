@@ -52,7 +52,7 @@ Samples & documentation
 
 The library comes with comprehensible documentation.
 
- * [Tutorial](tutorial.html) contains further examples of how to get up and running as well the guiding principles for the library.
+ * The [tutorial](tutorial.html) contains further examples of how to get up and running as well the guiding principles for the library.
 
  * There are detailed tutorials for the [Blob](blobs.html), [Table](tables.html) and [Queue](queues.html)
    APIs.
