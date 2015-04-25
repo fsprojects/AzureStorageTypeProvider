@@ -9,12 +9,12 @@ The goal is to create a provider which allows lightweight access to your Azure s
 
 Use the Nuget Package Manager to install the Type Provider (https://www.nuget.org/packages/FSharp.Azure.StorageTypeProvider) or through the console
 
-``` 
+```
 PM> Install-Package FSharp.Azure.StorageTypeProvider
 ```
 # Blob Storage
 The blob storage provider is geared for ad-hoc querying of your data, rather than programmatic access.
-
+```fsharp
 	// Automatically reference all required assemblies.
 	
 	#load "../packages/FSharp.Azure.StorageTypeProvider/StorageTypeProvider.fsx"
@@ -64,10 +64,10 @@ The blob storage provider is geared for ad-hoc querying of your data, rather tha
 	
 	// Downloads an entire container locally
 	account.Containers.container1.Download(@"D:\MyContainer")
-	
+```
 #Table Storage
 The Table Storage API works equally when on ad-hoc queries as well as programmatic access.
-
+```fsharp
 	open FSharp.Azure.StorageTypeProvider.Table
 	// Get a list of tables
 	account.Tables. // list of tables are presented
@@ -87,10 +87,10 @@ The Table Storage API works equally when on ad-hoc queries as well as programmat
 	
 	// Insert entity
 	account.Tables.Customers.Insert(new Customer("fred.smith@live.co.uk", "UK", "London"))
-
+```
 #Azure Queues
 The Storage Queue API simplifies access to Azure Queues.
-
+```fsharp
 	open FSharp.Azure.StorageTypeProvider.Queue
 	
 	// Access a queue (list of all queues are presented after Queues.)
@@ -111,3 +111,4 @@ The Storage Queue API simplifies access to Azure Queues.
 	// Update a message which will become available in ten seconds
 	let testMessage = myQueue.Dequeue() |> Async.RunSynchronously
 	myQueue.UpdateMessage(testMessage.Value.Id, "Bar", TimeSpan.FromSeconds(10.))
+```
