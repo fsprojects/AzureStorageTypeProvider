@@ -3,6 +3,7 @@ NUGET
   specs:
     Deedle (1.0.7)
     FAKE (3.28.5)
+    FSharp.Charting (0.90.10)
     FSharp.Compiler.Service (0.0.89)
     FSharp.Formatting (2.9.1)
       FSharp.Compiler.Service (>= 0.0.87)

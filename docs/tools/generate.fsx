@@ -3,6 +3,8 @@
 // (the generated documentation is stored in the 'docs/output' directory)
 // --------------------------------------------------------------------------------------
 
+#load "Formatters.fsx"
+
 // Binaries that have XML documentation (in a corresponding generated XML file)
 // Any binary output / copied to bin/projectName/projectName.dll will
 // automatically be added as a binary to generate API docs for.
@@ -109,14 +111,14 @@ let buildReference () =
 let buildDocumentation () =
 
   // First, process files which are placed in the content root directory.
-
+  let fsiEvaluator = Formatters.createFsiEvaluator root output
   Literate.ProcessDirectory
     ( content, docTemplate, output, replacements = ("root", root)::info,
       layoutRoots = layoutRootsAll.["en"],
       ?assemblyReferences = references,
       generateAnchors = true,
       processRecursive = false,
-      fsiEvaluator = new FsiEvaluator())
+      fsiEvaluator = fsiEvaluator)
 
   // And then process files which are placed in the sub directories
   // (some sub directories might be for specific language).
@@ -133,7 +135,7 @@ let buildDocumentation () =
         | None -> layoutRootsAll.["en"] // "en" is the default language
 
     Literate.ProcessDirectory
-      ( dir, docTemplate, output @@ dirname, replacements = ("root", root)::info,
+      ( dir, docTemplate, output @@ dirname, replacements = ("root", root) :: info,
         layoutRoots = layoutRoots,
         ?assemblyReferences = references,
         generateAnchors = true )
