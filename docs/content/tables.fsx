@@ -23,7 +23,7 @@ easy exploration of your table assets, directly from within the REPL.
 *)
 
 (*** define-output: tableStats ***)
-let table = Azure.Tables.tptest
+let table = Azure.Tables.employee
 printfn "The table is called '%s'." table.Name
 (*** include-output: tableStats ***)
 
@@ -40,9 +40,9 @@ as well as help query data. Let's look at the schema of the row ``fred.10`` in t
 let theData =
     let keys = [ "Column Name"; "EDM Data Type"; "Value" ]
     let series = 
-        [ [ "Partition Key"; "Row Key"; "Count"; "Dob"; "Name"; "Score" ]
-          [ "string"; "string"; "int"; "datetime"; "string"; "double"; ]
-          [ "fred"; "10"; "10"; "01/05/1990"; "fred"; "0"] ]
+        [ [ "Partition Key"; "Row Key"; "Years Worked"; "Dob"; "Name"; "Salary"; "Is Manager" ]
+          [ "string"; "string"; "int"; "datetime"; "string"; "double"; "bool" ]
+          [ "fred"; "10"; "10"; "01/05/1990"; "fred"; "0"; "true"] ]
         |> List.map Series.ofValues
         |> List.map (fun s -> s :> ISeries<_>)
     Frame(keys, series) |> Frame.indexRowsString "Column Name"
@@ -55,13 +55,13 @@ Based on this EDM metadata, an appropriate .NET type can be generated and used w
 
 (*** hide ***)
 
-let fred10 = table.Get(Row "10", Partition "fred").Value
+let fred = table.Get(Row "1", Partition "men").Value
 
 (** *)
 
 (*** define-output: fred ***)
-printfn "Fred has Partition Key of %s and Row Key of %s" fred10.PartitionKey fred10.RowKey
-printfn "Fred has Name '%s', Count '%d', Dob '%O' and Score '%f'" fred10.Name fred10.Count fred10.Dob fred10.Score
+printfn "Fred has Partition Key of %s and Row Key of %s" fred.PartitionKey fred.RowKey
+printfn "Fred has Name '%s', Years Working '%d', Dob '%O', Salary '%f' and Is Manager '%b'." fred.Name fred.YearsWorking fred.Dob fred.Salary fred.IsManager
 (*** include-output: fred ***)
 
 (** 
@@ -70,7 +70,8 @@ key/value collection - this is useful for binding scenarios or e.g. mapping in D
 *)
 
 let frame =
-    [ fred10 ]
+    "women"
+    |> table.GetPartition
     |> Frame.ofRecords
     |> Frame.expandCols [ "Values" ] // expand the "Values" nested column
     |> Frame.indexRowsUsing(fun c -> sprintf "%O.%O" c.["PartitionKey"] c.["RowKey"]) // Generate a useful row index
@@ -89,8 +90,8 @@ inferred schema to generate the appropriate query functionality. Data can be que
 These are the simplest (and best performing) queries, based on a partition / row key combination,
 returning an optional result. You can also retrieve an entire partition.
 *)
-let tim = table.Get(Row "99", Partition "tim") // try to get a single row
-let allFredRows = table.GetPartition("fred") // get all rows in the fred partition
+let sara = table.Get(Row "1", Partition "women") // try to get a single row
+let allWomen = table.GetPartition("women") // get all rows in the "women" partition
 
 (**
 ###Plain Text Queries
@@ -100,11 +101,11 @@ the Azure SDK query builder.
 *)
 (*** define-output: query2 ***)
 // create the query string by hand
-let someData = table.Query("Count eq 35")
+let someData = table.Query("YearsWorking eq 35")
 printfn "The query returned %d rows." someData.Length
 
 // generate a query string programmatically.
-let filterQuery = TableQuery.GenerateFilterConditionForInt("Count", QueryComparisons.Equal, 35)
+let filterQuery = TableQuery.GenerateFilterConditionForInt("YearsWorking", QueryComparisons.Equal, 35)
 printfn "Generated query is '%s'" filterQuery
 (*** include-output: query2 ***)
 
@@ -120,21 +121,22 @@ limitations: -
     alternative that has the same sort of composability of IQueryable, yet is strong typed at compile- and
     runtime, whilst being extremely easy to use. *)
 
-let tpQuery = table.Query().``Where Count Is``.``Equal To``(35)
+let tpQuery = table.Query().``Where Years Working Is``.``Equal To``(35)
 
 (*** include-value: tpQuery ***)
 
 (** These can be composed and chained. When you have completed building, simply call ``Execute()``. *)
 
 let longerQuery = table.Query()
-                       .``Where Count Is``.``Greater Than``(14)
+                       .``Where Years Working Is``.``Greater Than``(14)
                        .``Where Name Is``.``Equal To``("Fred")
+                       .``Where Is Manager Is``.True()
 
 (*** include-value: longerQuery ***)
 
 (**
-Query operators are strongly typed, so ``Equal To`` on ``Count`` takes in an int, whereas on ``Name``
-it takes in a string. For boolean properties, you simple have ``IsTrue`` and ``IsFalse`` as query operators.
+Query operators are strongly typed, so ``Equal To`` on ``Years Working`` takes in an int, whereas on ``Name``
+it takes in a string, whilst for booleans there is no such provided method.
 
 ##Inserting data
 

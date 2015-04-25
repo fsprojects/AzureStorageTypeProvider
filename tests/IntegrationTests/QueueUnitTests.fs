@@ -18,11 +18,11 @@ type ResetQueueDataAttribute() =
 [<Fact>]
 let ``Correctly identifies queues``() =
     // compiles!
-    Local.Queues.tptest |> ignore
-    Local.Queues.second |> ignore
-    Local.Queues.third
+    Local.Queues.``sample-queue`` |> ignore
+    Local.Queues.``second-sample`` |> ignore
+    Local.Queues.``third-sample``
 
-let queue = Local.Queues.tptest
+let queue = Local.Queues.``sample-queue``
 
 [<Fact>]
 [<ResetQueueData>]
@@ -110,7 +110,11 @@ let ``Clear correctly empties the queue``() =
 let ``Cloud Queue Client gives same results as the Type Provider``() =
     let queues = Local.Queues
     let queueNames = queues.CloudQueueClient.ListQueues() |> Seq.map(fun q -> q.Name) |> Set.ofSeq
-    queueNames =? ([ queues.second.Name; queues.third.Name; queues.tptest.Name ] |> Set.ofList)
+    queueNames
+    |> Set.isSubset (Set [ queues.``sample-queue``.Name
+                           queues.``second-sample``.Name
+                           queues.``third-sample``.Name ])
+    =? true
 
 [<Fact>]
 [<ResetQueueData>]

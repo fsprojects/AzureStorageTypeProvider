@@ -12,6 +12,6 @@ let private resetQueue name =
     queue.Create()
 
 let resetData() = 
-    [ "tptest"; "second"; "third" ]
+    [ "sample-queue"; "second-sample"; "third-sample" ]
     |> List.map resetQueue
     |> ignore

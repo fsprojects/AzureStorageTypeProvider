@@ -8,12 +8,12 @@ open Xunit
 
 type Local = AzureTypeProvider<"DevStorageAccount", "">
 
-let container = Local.Containers.``tp-test``
+let container = Local.Containers.samples
 
 [<Fact>]
 let ``Correctly identifies blob containers``() =
     // compiles!
-    Local.Containers.``tp-test``
+    Local.Containers.samples
 
 [<Fact>]
 let ``Correctly identifies blobs in a container``() =
@@ -29,12 +29,12 @@ let ``Correctly identifies blobs in a subfolder``() =
 
 [<Fact>]
 let ``Correctly gets size of a blob``() =
-    container .``sample.txt``.Size =? 52L
+    container .``sample.txt``.Size =? 190L
 
 [<Fact>]
 let ``Reads a text file as text``() =
     let text = container .``sample.txt``.Read()
-    text =? "the quick brown fox jumped over the lazy dog\nbananas"
+    text =? "the quick brown fox jumps over the lazy dog\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Cras malesuada.\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla porttitor."
 
 [<Fact>]
 let ``Streams a text file line-by-line``() =
@@ -42,9 +42,11 @@ let ``Streams a text file line-by-line``() =
     let text = seq { while not textStream.EndOfStream do
                         yield textStream.ReadLine() }
                |> Seq.toArray
-    text.[0] =? "the quick brown fox jumped over the lazy dog"
-    text.[1] =? "bananas"
-    text.Length =? 2
+
+    text.[0] =? "the quick brown fox jumps over the lazy dog"
+    text.[1] =? "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras malesuada."
+    text.[2] =? "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla porttitor."
+    text.Length =? 3
 
 [<Fact>]
 let ``Opens a file with xml extension as an XML document``() =
@@ -59,7 +61,7 @@ let ``Cloud Blob Client relates to the same data as the type provider``() =
     (Local.Containers.CloudBlobClient.ListContainers()
      |> Seq.map(fun c -> c.Name)
      |> Set.ofSeq
-     |> Set.contains "tp-test") =? true
+     |> Set.contains "samples") =? true
 
 [<Fact>]
 let ``Cloud Blob Container relates to the same data as the type provider``() =

@@ -32,7 +32,7 @@ easy exploration of your blob assets, directly from within the REPL.
 *)
 
 (*** define-output: blobStats ***)
-let container = Azure.Containers.``tp-test``
+let container = Azure.Containers.samples
 let theBlob = container.``folder/``.``childFile.txt``
 printfn "Blob '%s' is %d bytes big." theBlob.Name theBlob.Size
 (*** include-output: blobStats ***)

@@ -39,8 +39,8 @@ let private buildPropertyOperatorsType tableName propertyName propertyType paren
         | EdmType.String -> buildGenericProp<string> propertyOperatorsType parentQueryType propertyName
         | EdmType.Boolean -> 
             let buildDescription = sprintf "Tests whether %s is %s." propertyName
-            [ buildCustomProp propertyOperatorsType parentQueryType propertyName "Is True" (buildDescription "true") true
-              buildCustomProp propertyOperatorsType parentQueryType propertyName "Is False" (buildDescription "false") false ]
+            [ buildCustomProp propertyOperatorsType parentQueryType propertyName "True" (buildDescription "true") true
+              buildCustomProp propertyOperatorsType parentQueryType propertyName "False" (buildDescription "false") false ]
         | EdmType.DateTime -> buildGenericProp<DateTime> propertyOperatorsType parentQueryType propertyName
         | EdmType.Double -> buildGenericProp<float> propertyOperatorsType parentQueryType propertyName
         | EdmType.Int32 -> buildGenericProp<int> propertyOperatorsType parentQueryType propertyName

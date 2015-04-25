@@ -10,7 +10,7 @@ open Xunit
 
 type Local = AzureTypeProvider<"DevStorageAccount", "">
 
-let table = Local.Tables.tptest
+let table = Local.Tables.employee
 
 type ResetTableDataAttribute() =
     inherit BeforeAfterTestAttribute()
@@ -20,18 +20,19 @@ type ResetTableDataAttribute() =
 [<Fact>]
 let ``Correctly identifies tables``() =
     // compiles!
-    Local.Tables.tptest
+    Local.Tables.employee
 
 [<Fact>]
 let ``Table name is correctly identified``() =
-    table.Name =? "tptest"
+    table.Name =? "employee"
 
 [<Fact>]
 let ``Matching row and partition key returns Some row``() =
-    match table.Get(Row "35", Partition "fred") with
-    | Some row -> row.Name =? "fred"
-                  row.Count =? 35
-                  row.Dob =? DateTime(1980, 4, 4)
+    match table.Get(Row "2", Partition "men") with
+    | Some row ->
+        row.Name =? "fred"
+        row.YearsWorking =? 35
+        row.Dob =? DateTime(1980, 4, 4)
     | None -> failwith "could not locate row"
 
 [<Fact>]
@@ -52,17 +53,17 @@ let ``Gets all rows in a table``() =
 
 [<Fact>]
 let ``Gets all rows in a partition``() =
-    table.GetPartition("fred").Length =? 2
+    table.GetPartition("men").Length =? 3
 
 type MatchingTableRow =
     { Name : string
-      Count : int 
+      YearsWorking : int 
       Dob : DateTime }
 
 [<Fact>]
 [<ResetTableData>]
 let ``Inserts and deletes a row using lightweight syntax correctly``() =
-    let result = table.Insert(Partition "isaac", Row "500", { Name = "isaac"; Count = 500; Dob = DateTime.Now })
+    let result = table.Insert(Partition "isaac", Row "500", { Name = "isaac"; YearsWorking = 500; Dob = DateTime.Now })
     match result with
     | SuccessfulResponse ((Partition "isaac", Row "500"), 204) ->
         let deleteResponse = table.Delete([ Partition "isaac", Row "500"] )
@@ -74,48 +75,49 @@ let ``Inserts and deletes a row using lightweight syntax correctly``() =
 [<Fact>]
 [<ResetTableData>]
 let ``Inserts and deletes a batch on same partition using lightweight syntax correctly``() =
-    let result = table.Insert( [ Partition "isaac", Row "500", { Name = "isaac"; Count = 500; Dob = DateTime.Now }
-                                 Partition "isaac", Row "250", { Name = "isaac"; Count = 250; Dob = DateTime.Now }
+    let result = table.Insert( [ Partition "men", Row "5", { Name = "isaac"; YearsWorking = 500; Dob = DateTime.Now }
+                                 Partition "men", Row "6", { Name = "isaac"; YearsWorking = 250; Dob = DateTime.Now }
                                ])
     match result with
-    | [| "isaac", [| SuccessfulResponse _; SuccessfulResponse _ |] |] ->
-        let deleteResponse = table.Delete([ Partition "isaac", Row "500"; Partition "isaac", Row "250" ] )
+    | [| "men", [| SuccessfulResponse _; SuccessfulResponse _ |] |] ->
+        let deleteResponse = table.Delete([ Partition "men", Row "5"; Partition "men", Row "6" ] )
         match deleteResponse with
-        | [| "isaac", [| SuccessfulResponse _; SuccessfulResponse _ |] |] -> ()
-        | _ -> failwith "error deleting"
-    | _ -> failwith "error inserting"
+        | [| "men", [| SuccessfulResponse _; SuccessfulResponse _ |] |] -> ()
+        | res -> failwith <| sprintf "error deleting %A" res
+    | res -> failwith <| sprintf "error inserting: %A" res
 
 [<Fact>]
 [<ResetTableData>]
 let ``Updates an existing row``() =
-    table.Insert(Partition "fred", Row "35", { Name = "fred"; Count = 35; Dob = DateTime.MaxValue }, TableInsertMode.Upsert) |> ignore
-    table.Get(Row "35", Partition "fred").Value.Dob =? DateTime.MaxValue
+    table.Insert(Partition "men", Row "1", { Name = "fred"; YearsWorking = 35; Dob = DateTime.MaxValue }, TableInsertMode.Upsert) |> ignore
+    table.Get(Row "1", Partition "men").Value.Dob =? DateTime.MaxValue
 
 [<Fact>]
 [<ResetTableData>]
 let ``Inserting an existing row returns an error``() =
-    let result = table.Insert(Partition "fred", Row "35", { Name = "fred"; Count = 35; Dob = DateTime.MaxValue })
+    let result = table.Insert(Partition "men", Row "1", { Name = "fred"; YearsWorking = 35; Dob = DateTime.MaxValue })
     match result with
-    | EntityError((Partition "fred", Row "35"), 409, "EntityAlreadyExists") -> ()
+    | EntityError((Partition "men", Row "1"), 409, "EntityAlreadyExists") -> ()
     | _ -> failwith "Should have failed to insert"
 
 [<Fact>]
 [<ResetTableData>]
 let ``Inserts a row using provided types correctly``() =
-    table.Insert(Local.Domain.tptestEntity(Partition "sample", Row "x", 1, DateTime.MaxValue, "Hello", 6.1)) |> ignore
+    table.Insert(Local.Domain.employeeEntity(Partition "sample", Row "x", DateTime.MaxValue, true, "Hello", 6.1, 1)) |> ignore
     let result = table.Get(Row "x", Partition "sample").Value
     result.PartitionKey =? "sample"
     result.RowKey =? "x"
-    result.Count =? 1
+    result.YearsWorking =? 1
     result.Dob =? DateTime.MaxValue
     result.Name =? "Hello"
-    result.Score =? 6.1
+    result.Salary =? 6.1
+    result.IsManager =? true
 
 [<Fact>]
 [<ResetTableData>]
 let ``Inserts many rows using provided types correctly``() =
-    table.Insert [| Local.Domain.tptestEntity(Partition "sample", Row "x", 1, DateTime.MaxValue, "Hello", 5.2)
-                    Local.Domain.tptestEntity(Partition "sample", Row "y", 1, DateTime.MaxValue, "Hello", 1.8) |] |> ignore
+    table.Insert [| Local.Domain.employeeEntity(Partition "sample", Row "x", DateTime.MaxValue, true, "Hello", 5.2, 2)
+                    Local.Domain.employeeEntity(Partition "sample", Row "y", DateTime.MaxValue, true, "Hello", 1.8, 2) |] |> ignore
     table.GetPartition("sample").Length =? 2
 
 [<Fact>]
@@ -129,13 +131,13 @@ let ``Query with single query part brings back correct rows``() =
 [<Fact>]
 let ``Query with many query parts brings back correct rows``() =
      table.Query().``Where Name Is``.``Equal To``("fred")
-                  .``Where Count Is``.``Equal To``(35)
+                  .``Where Years Working Is``.``Equal To``(35)
                   .Execute().Length =? 1
 
-//[<Fact>]
-//let ``Query conditions on floats are correctly generated``() =
-//     table.Query().``Where Score Is``.``Greater Than``(1.0)
-//                  .Execute().Length =? 5
+[<Fact(Skip = "true")>]
+let ``Query conditions on floats are correctly generated``() =
+    table.Query().``Where Salary Is``.``Greater Than``(1.0)
+                 .Execute().Length =? 5
 
 [<Fact>]
 let ``Query conditions are correctly mapped``() =
@@ -157,4 +159,4 @@ let ``Cloud Table Client relates to the same data as the type provider``() =
     (Local.Tables.CloudTableClient.ListTables()
      |> Seq.map(fun c -> c.Name)
      |> Set.ofSeq
-     |> Set.contains "tptest") =? true
+     |> Set.contains "employee") =? true
