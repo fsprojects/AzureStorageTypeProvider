@@ -36,7 +36,7 @@ let solutionFile = "UnitTests"
 let testAssemblies = "tests/**/bin/Release/*Tests*.dll"
 // Git configuration (used for publishing documentation in gh-pages branch)
 // The profile where the project is posted 
-let gitHome = "https://github.com/isaacabraham/AzureStorageTypeProvider"
+let gitHome = "https://github.com/fsprojects/AzureStorageTypeProvider"
 // The name of the project on GitHub
 let gitName = "AzureStorageTypeProvider"
 
@@ -59,10 +59,14 @@ Target "AssemblyInfo" (fun _ ->
 // --------------------------------------------------------------------------------------
 // Clean build results & restore NuGet packages
 Target "Clean" (fun _ -> CleanDirs [ "bin"; "temp"; "tests/integrationtests/bin" ])
-Target "CleanDocs" (fun _ -> CleanDirs [ "docs/output" ])
-// --------------------------------------------------------------------------------------
-// Reset test data in local azure storage
 
+// Build library & test project
+Target "Build" (fun _ -> 
+    !!("*.sln")
+    |> MSBuildRelease "" "Rebuild"
+    |> ignore)
+// --------------------------------------------------------------------------------------
+// Testing
 Target "ResetTestData" (fun _ ->
     { defaultParams with
         CommandLine = "start"
@@ -71,16 +75,24 @@ Target "ResetTestData" (fun _ ->
     |> snd
     |> Seq.iter(fun x -> printfn "%s" x.Message)
 )
-// --------------------------------------------------------------------------------------
-// Build library & test project
-Target "Build" (fun _ -> 
-    !!("*.sln")
-    |> MSBuildRelease "" "Rebuild"
-    |> ignore)
 // Run integration tests
-Target "Integration Tests" (fun _ ->
+Target "IntegrationTests" (fun _ ->
     !!(testAssemblies)
     |> xUnit (fun p -> { p with Verbose = true }))
+// --------------------------------------------------------------------------------------
+// Generate the documentation
+Target "CleanDocs" (fun _ -> CleanDirs [ "docs/output" ])
+Target "GenerateReferenceDocs" (fun _ ->
+    if not <| executeFSIWithArgs "docs/tools" "generate.fsx" ["--define:REFERENCE"] [] then
+      failwith "generating reference documentation failed"
+)
+
+Target "GenerateHelp" (fun _ ->
+    if not <| executeFSIWithArgs "docs/tools" "generate.fsx" ["--define:HELP"] [] then
+      failwith "generating help documentation failed"
+)
+
+Target "GenerateDocs" DoNothing
 // --------------------------------------------------------------------------------------
 // Build a NuGet package
 Target "Package" 
@@ -108,11 +120,22 @@ Target "Package"
 // --------------------------------------------------------------------------------------
 // Run all targets by default. Invoke 'build <Target>' to override
 Target "All" DoNothing
-"Clean" ==>
-    "AssemblyInfo" ==>
-    "ResetTestData" ==>
-    "Build" ==>
-    "Integration Tests" ==>
-    "Package" ==>
-    "All"
+
+"IntegrationTests"
+  ==> "GenerateDocs"
+
+"CleanDocs"
+  ==> "GenerateHelp"
+  ==> "GenerateReferenceDocs"
+  ==> "GenerateDocs"
+
+"Clean"
+    ==> "AssemblyInfo"
+    ==> "ResetTestData"
+    ==> "Build"
+    ==> "IntegrationTests"
+    ==> "GenerateDocs"
+    ==> "Package"
+    ==> "All"
+
 RunTargetOrDefault "All"

@@ -1,15 +1,5 @@
 (*** hide ***)
-// This block of code is omitted in the generated HTML documentation. Use 
-// it to define helpers that you do not want to show in the documentation.
-#r @"..\..\bin\FSharp.Azure.StorageTypeProvider.dll"
-#r @"..\..\bin\Microsoft.Data.OData.dll"
-#r @"..\..\bin\Microsoft.Data.Services.Client.dll"
-#r @"..\..\bin\Microsoft.Data.Edm.dll"
-#r @"..\..\bin\Microsoft.WindowsAzure.Configuration.dll"
-#r @"..\..\bin\Microsoft.WindowsAzure.Storage.dll"
-#r @"..\..\bin\Newtonsoft.Json.dll"
-#r @"..\..\bin\System.Spatial.dll"
-#r @"System.Xml.Linq.dll"
+#load @"..\tools\references.fsx"
 open FSharp.Azure.StorageTypeProvider.Table
 
 (**
@@ -30,8 +20,9 @@ Connecting to Azure
 
 Connecting to your storage account is simple.
 
-From within a script, first #load the "AzureStorageProvider.fsx" to reference all dependencies.
-Then, you can generate a type for a storage account.
+From within a script, first ``#load "AzureStorageProvider.fsx"`` to reference all dependencies.
+Then, you can generate a type for a storage account simply by providing your Azure
+account credentials.
 
 *)
 
@@ -62,14 +53,14 @@ strings for blobs, tables or queues.
 
 *)
 
-// Reference the "tptest" table. No magic strings needed.
-let tableRef = Local.Tables.tptest
+// Reference the "employee" table. No magic strings needed.
+let employee = Local.Tables.employee.Get(Row "1", Partition "somepartition")
 
-// Navigation through the "tp-test" container to the "folder/childFile.txt" blob.
-let blobRef = Local.Containers.``tp-test``.``folder/``.``childFile.txt``
+// Navigation through the "samples" container to the "folder/childFile.txt" blob.
+let blobContents = Local.Containers.samples.``folder/``.``childFile.txt``.Read()
 
-// Reference the tp-test queue.
-let queueRef = Local.Queues.tptest
+// Reference the "sample-queue" queue.
+let queueMessage = Local.Queues.``sample-queue``.Dequeue()
 
 (**
 
@@ -79,14 +70,14 @@ there's always access to the raw Azure SDK if you need it to do anything more.
 *)
 
 // Get the raw Azure Cloud Blob Client and use it to get a ref to the same blob.
-let rawBlobRef = Local.Containers.CloudBlobClient.GetContainerReference("tp-test")
+let rawBlobRef = Local.Containers.CloudBlobClient.GetContainerReference("samples")
                                                  .GetBlockBlobReference("folder/childFile.txt")
 
 // Or for the Cloud Table Client
-let rawTableRef = Local.Tables.CloudTableClient.GetTableReference("tptest")
+let rawTableRef = Local.Tables.CloudTableClient.GetTableReference("employee")
 
 // Or use a hybrid approach - use the TP to find the asset you want and then switch.
-let rawBlobRefHybrid = Local.Containers.``tp-test``.``folder/``.``childFile.txt``.AsCloudBlockBlob()
+let rawBlobRefHybrid = Local.Containers.samples.``folder/``.``childFile.txt``.AsCloudBlockBlob()
 
 (**
  
@@ -97,7 +88,7 @@ or moving to production etc.
 *)
 
 // Redirect to a blob using a different connection string.
-let liveBlob = Local.Containers.``tp-test``.``file1.txt``.AsCloudBlockBlob("myOtherConnectionString")
+let liveBlob = Local.Containers.samples.``file1.txt``.AsCloudBlockBlob("myOtherConnectionString")
 
-// Get row 1A from the "tptest" table using a different connection string.
-let row1A = Local.Tables.tptest.Get(Row "1", Partition "A", "myOtherConnectionString")
+// Get row 1A from the "employee" table using a different connection string.
+let row1A = Local.Tables.employee.Get(Row "1", Partition "A", "myOtherConnectionString")

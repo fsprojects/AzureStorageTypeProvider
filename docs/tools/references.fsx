@@ -9,3 +9,4 @@
 #r @"System.Xml.Linq.dll"
 #r @"..\..\packages\Deedle\lib\net40\Deedle.dll"
 do fsi.AddPrinter(fun (printer:Deedle.Internal.IFsiFormattable) -> "\n" + (printer.Format()))
+#load @"..\..\tests\integrationtests\ResetTestData.fsx"

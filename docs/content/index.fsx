@@ -24,17 +24,17 @@ type Azure = AzureTypeProvider<"UseDevelopmentStorage=true">
 
 // Navigate through the containers to a specific file and read the contents.
 let blobContents =
-    Azure.Containers.``tp-test``.``folder/``.``childFile.txt``.Read()
+    Azure.Containers.samples.``folder/``.``childFile.txt``.Read()
 
 // Perform a strongly-typed query against a table with automatic schema generation.
 let results =
-    Azure.Tables.tptest.Query()
+    Azure.Tables.employee.Query()
          .``Where Name Is``.``Equal To``("fred")
          .Execute()
          |> Array.map(fun row -> row.Name, row.Dob)
 
 // Navigate through storage queues and get messages
-let queueMessage = Azure.Queues.tptest.Dequeue()
+let queueMessage = Azure.Queues.``sample-queue``.Dequeue()
 
 (**
 
