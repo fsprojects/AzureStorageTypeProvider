@@ -30,3 +30,9 @@ NUGET
       Newtonsoft.Json (>= 5.0.8) - framework: wpv8.0, >= net40
     xunit (1.9.2)
     xunit.runners (1.9.2)
+GITHUB
+  remote: fsprojects/FSharp.TypeProviders.StarterPack
+  specs:
+    src/DebugProvidedTypes.fs (877014bfa6244ac382642e113d7cd6c9bc27bc6d)
+    src/ProvidedTypes.fs (877014bfa6244ac382642e113d7cd6c9bc27bc6d)
+    src/ProvidedTypes.fsi (877014bfa6244ac382642e113d7cd6c9bc27bc6d)

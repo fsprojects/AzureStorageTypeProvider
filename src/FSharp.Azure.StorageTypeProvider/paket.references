@@ -1,1 +1,4 @@
 WindowsAzure.Storage
+File:ProvidedTypes.fsi
+File:ProvidedTypes.fs
+File:DebugProvidedTypes.fs

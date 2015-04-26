@@ -1,6 +1,5 @@
 ﻿module internal FSharp.Azure.StorageTypeProvider.Queue.QueueRepository
 
-open FSharp.Azure.StorageTypeProvider.Utils
 open Microsoft.WindowsAzure.Storage
 open Microsoft.WindowsAzure.Storage.Queue
 open Microsoft.WindowsAzure.Storage.Queue.Protocol
@@ -22,6 +21,6 @@ let generateSas start duration (queue:CloudQueue) =
                                                         SharedAccessQueuePermissions.ProcessMessages |||
                                                         SharedAccessQueuePermissions.Read |||
                                                         SharedAccessQueuePermissions.Update),
-                                         SharedAccessStartTime = (start |> Option.map(fun start -> DateTimeOffset start) |> toNullable),
+                                         SharedAccessStartTime = (start |> Option.map(fun start -> DateTimeOffset start) |> Option.toNullable),
                                          SharedAccessExpiryTime = Nullable(DateTimeOffset.UtcNow.Add duration))
     queue.GetSharedAccessSignature(policy, null)

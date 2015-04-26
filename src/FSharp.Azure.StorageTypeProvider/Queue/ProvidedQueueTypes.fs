@@ -31,8 +31,6 @@ type ProvidedQueueMessage =
       AsString : string }
 
 module internal Factory = 
-    open FSharp.Azure.StorageTypeProvider.Utils
-    
     let unpackId messageId =
         let (ProvidedMessageId(MessageId messageId, PopReceipt popReceipt)) = messageId
         messageId, popReceipt
@@ -40,9 +38,9 @@ module internal Factory =
     let toProvidedQueueMessage (message : CloudQueueMessage) = 
         { Id = ProvidedMessageId(MessageId message.Id, PopReceipt message.PopReceipt)
           DequeueCount = message.DequeueCount
-          InsertionTime = message.InsertionTime |> toOption
-          ExpirationTime = message.ExpirationTime |> toOption
-          NextVisibleTime = message.NextVisibleTime |> toOption
+          InsertionTime = message.InsertionTime |> Option.ofNullable
+          ExpirationTime = message.ExpirationTime |> Option.ofNullable
+          NextVisibleTime = message.NextVisibleTime |> Option.ofNullable
           AsBytes = message.AsBytes
           AsString = message.AsString }
     

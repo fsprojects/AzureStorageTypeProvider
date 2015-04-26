@@ -10,3 +10,7 @@ nuget xunit.runners 1.9.2
 nuget FSharp.Formatting
 nuget Deedle
 nuget FSharp.Charting
+
+github fsprojects/FSharp.TypeProviders.StarterPack src/ProvidedTypes.fsi
+github fsprojects/FSharp.TypeProviders.StarterPack src/ProvidedTypes.fs
+github fsprojects/FSharp.TypeProviders.StarterPack src/DebugProvidedTypes.fs
