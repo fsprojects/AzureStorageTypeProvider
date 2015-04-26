@@ -1,5 +1,5 @@
-﻿///Contains helper functions for accessing tables
-/// [omit]
+﻿///[omit]
+///Contains helper functions for accessing tables
 module FSharp.Azure.StorageTypeProvider.Table.TableRepository
 
 open FSharp.Azure.StorageTypeProvider.Table

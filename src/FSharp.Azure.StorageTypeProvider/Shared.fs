@@ -1,11 +1,12 @@
-﻿module Option
+﻿///[omit]
+module Option
 
 open System
 
-let ofNullable (value : Nullable<_>) = 
+let internal ofNullable (value : Nullable<_>) = 
     if value.HasValue then Some value.Value
     else None
 
-let toNullable = function
+let internal toNullable = function
     | Some x -> Nullable x
     | None -> Nullable()

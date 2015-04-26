@@ -124,7 +124,8 @@ Target "All" DoNothing
 "IntegrationTests"
   ==> "GenerateDocs"
 
-"CleanDocs"
+"Build"
+  ==> "CleanDocs"
   ==> "GenerateHelp"
   ==> "GenerateReferenceDocs"
   ==> "GenerateDocs"
@@ -138,4 +139,4 @@ Target "All" DoNothing
     ==> "Package"
     ==> "All"
 
-RunTargetOrDefault "All"
+RunTargetOrDefault "GenerateReferenceDocs"
