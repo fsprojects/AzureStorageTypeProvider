@@ -34,7 +34,11 @@ type LightweightTableEntity
     let (Partition pkey) = partitionKey
     let (Row rkey) = rowKey
 
+    /// The Partition Key of the entity.
     member __.PartitionKey with get () = pkey
+    /// The Row Key of the entity.
     member __.RowKey with get () = rkey
+    /// The timestamp of the entity.
     member __.Timestamp with get () = timestamp
+    /// A collection of key/value pairs of all other properties on this entity.
     member __.Values with get () = values

@@ -17,11 +17,17 @@ type ProvidedMessageId = | ProvidedMessageId of MessageId : MessageId * PopRecei
 type ProvidedQueueMessage = 
     { /// The composite key of this message, containing both the message id and the pop receipt.
       Id : ProvidedMessageId
+      /// The number of times this message has been dequeued.
       DequeueCount : int
+      /// The time that this message was inserted.
       InsertionTime : DateTimeOffset option
+      /// The time that this message will expire.
       ExpirationTime : DateTimeOffset option
+      /// The time that this message will next become visible.
       NextVisibleTime : DateTimeOffset option
+      /// Gets the contents of the message as a byte array.
       AsBytes : byte array
+      /// Gets the contest of the message as a string.
       AsString : string }
 
 module internal Factory = 
@@ -47,6 +53,7 @@ module internal Factory =
 module internal Async = 
     let AwaitTaskUnit = Async.AwaitIAsyncResult >> Async.Ignore
 
+/// Represents an Azure Storage Queue.
 type ProvidedQueue(defaultConnectionString, name) = 
     let getConnectionString connection = defaultArg connection defaultConnectionString
     let getQueue = getConnectionString >> getQueueRef name
@@ -120,5 +127,8 @@ type ProvidedQueue(defaultConnectionString, name) =
     /// Gets the name of the queue.
     member __.Name = (None |> getQueue).Name
 
+/// [omit]
+/// Allows creation of queue entities.
 module QueueBuilder =
+    /// Gets a queue client.
     let getQueueClient connectionString = QueueRepository.getQueueClient connectionString

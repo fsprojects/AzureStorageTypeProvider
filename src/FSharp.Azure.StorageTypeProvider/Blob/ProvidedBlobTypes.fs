@@ -94,6 +94,7 @@ module internal ProvidedTypeGenerator =
           ProvidedTypeDefinition("XmlFile", Some typeof<XmlFile>, HideObjectMethods = true) ]
 
 /// Builder methods to construct blobs etc..
+/// [omit]
 module ContainerBuilder = 
     let internal (|Text|Binary|XML|) (name : string) = 
         let endsWith extension = name.EndsWith(extension, StringComparison.InvariantCultureIgnoreCase)
@@ -115,4 +116,5 @@ module ContainerBuilder =
     /// Creates a blob folder object.
     let createBlobFolder connectionString containerName path = BlobFolder(connectionString, containerName, path)
 
+    /// Creates a blob client.
     let createBlobClient connectionString = BlobRepository.getBlobClient connectionString

@@ -9,7 +9,7 @@ open System
 open System.Reflection
 
 [<TypeProvider>]
-/// The type provider for connecting to Azure Storage.
+/// [omit]
 type public AzureTypeProvider() as this = 
     inherit TypeProviderForNamespaces()
 
@@ -54,8 +54,10 @@ type public AzureTypeProvider() as this =
         [ ProvidedStaticParameter("accountName", typeof<string>, String.Empty)
           ProvidedStaticParameter("accountKey", typeof<string>, String.Empty) ]
     
-    do azureAccountType.DefineStaticParameters(parameters, buildTypes)
-    do this.AddNamespace(namespaceName, [ azureAccountType ])
+    do
+        azureAccountType.DefineStaticParameters(parameters, buildTypes)
+        this.AddNamespace(namespaceName, [ azureAccountType ])
+        azureAccountType.AddXmlDoc("The entry type to connect to Azure Storage assets.")
 
 [<TypeProviderAssembly>]
 do ()

@@ -54,6 +54,7 @@ type AzureTable internal (defaultConnection, tableName) =
     /// Gets the name of the table.
     member __.Name = tableName
 
+/// [omit]
 module TableBuilder = 
     /// Creates an Azure Table object.
     let createAzureTable connectionString tableName = AzureTable(connectionString, tableName)
