@@ -1,20 +1,9 @@
 ﻿(*** hide ***)
-
-#r @"..\..\bin\FSharp.Azure.StorageTypeProvider.dll"
-#r @"..\..\bin\Microsoft.Data.OData.dll"
-#r @"..\..\bin\Microsoft.Data.Services.Client.dll"
-#r @"..\..\bin\Microsoft.Data.Edm.dll"
-#r @"..\..\bin\Microsoft.WindowsAzure.Configuration.dll"
-#r @"..\..\bin\Microsoft.WindowsAzure.Storage.dll"
-#r @"..\..\bin\Newtonsoft.Json.dll"
-#r @"..\..\bin\System.Spatial.dll"
-#r @"System.Xml.Linq.dll"
-
+#load @"..\tools\references.fsx"
 open FSharp.Azure.StorageTypeProvider
 open FSharp.Azure.StorageTypeProvider.Blob
 open System.Xml.Linq
 open System
-
 type Azure = AzureTypeProvider<"UseDevelopmentStorage=true">
 
 (**

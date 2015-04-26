@@ -11,7 +11,18 @@ let private resetQueue name =
     queue.DeleteIfExists() |> ignore
     queue.Create()
 
+let private addMessage (queue:CloudQueue) (text:string) = queue.AddMessage(CloudQueueMessage text)
+
 let resetData() = 
     [ "sample-queue"; "second-sample"; "third-sample" ]
     |> List.map resetQueue
     |> ignore
+
+    let secondQueue = queueClient.GetQueueReference "second-sample"
+    
+    [ "Hello from Azure Type Provider"
+      "F# is cool"
+      "Azure is also pretty great" ]
+    |> List.iter (addMessage secondQueue)
+    
+

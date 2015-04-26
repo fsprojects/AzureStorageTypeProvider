@@ -5,7 +5,6 @@ open FSharp.Azure.StorageTypeProvider
 open FSharp.Azure.StorageTypeProvider.Table
 open Microsoft.WindowsAzure.Storage.Table
 open System
-
 type Azure = AzureTypeProvider<"UseDevelopmentStorage=true">
 
 (**

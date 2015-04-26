@@ -55,7 +55,7 @@ module internal Async =
 type ProvidedQueue(defaultConnectionString, name) = 
     let getConnectionString connection = defaultArg connection defaultConnectionString
     let getQueue = getConnectionString >> getQueueRef name
-    let enqueue message = getQueue >> (fun q -> q.AddMessageAsync(message) |> Async.AwaitTaskUnit)
+    let enqueue message = getQueue >> (fun q -> q.AddMessageAsync message |> Async.AwaitTaskUnit)
     let updateMessage fields connectionString newTimeout message =
         let newTimeout = defaultArg newTimeout TimeSpan.Zero
         connectionString
@@ -76,9 +76,10 @@ type ProvidedQueue(defaultConnectionString, name) =
     member __.Dequeue(?connectionString) = 
         async { 
             let! message = (getQueue connectionString).GetMessageAsync() |> Async.AwaitTask
-            return match message with
-                   | null -> None
-                   | _ -> Some(message |> Factory.toProvidedQueueMessage)
+            return
+                match message with
+                | null -> None
+                | _ -> Some(message |> Factory.toProvidedQueueMessage)
         }
     
     /// Generates a full-access shared access signature, defaulting to start from now.

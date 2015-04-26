@@ -121,9 +121,6 @@ Target "Package"
 // Run all targets by default. Invoke 'build <Target>' to override
 Target "All" DoNothing
 
-"IntegrationTests"
-  ==> "GenerateDocs"
-
 "Build"
   ==> "CleanDocs"
   ==> "GenerateHelp"
@@ -131,12 +128,14 @@ Target "All" DoNothing
   ==> "GenerateDocs"
 
 "Clean"
-    ==> "AssemblyInfo"
-    ==> "ResetTestData"
-    ==> "Build"
-    ==> "IntegrationTests"
-    ==> "GenerateDocs"
-    ==> "Package"
-    ==> "All"
+  ==> "AssemblyInfo"
+  ==> "ResetTestData"
+  ==> "Build"
+  ==> "IntegrationTests"
+  ==> "GenerateDocs"
+  ==> "Package"
+  ==> "All"
 
-RunTargetOrDefault "GenerateReferenceDocs"
+RunTargetOrDefault "GenerateDocs"
+
+
