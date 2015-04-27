@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Working with Queues
+</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Stuff" />
+    <meta name="author" content="Isaac Abraham" />
+
+    <script src="https://code.jquery.com/jquery-1.8.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.8.23/jquery-ui.js"></script>
+    <script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
+    <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet" />
+
+    <link type="text/css" rel="stylesheet" href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/content/style.css" />
+    <link type="text/css" rel="stylesheet" href="deedle.css" />
+    <script type="text/javascript" src="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/content/tips.js"></script>
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+    <div class="container">
+        <div class="masthead">
+            <ul class="nav nav-pills pull-right">
+                <li><a href="http://fsharp.org">fsharp.org</a></li>
+                <li><a href="http://github.com/fsprojects/AzureStorageTypeProvider">github page</a></li>
+            </ul>
+            <h3 class="muted"><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/index.html">Azure Storage Type Provider</a></h3>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="span9" id="main">
+                
+<h1><a name="Working-with-Queues" class="anchor" href="#Working-with-Queues">Working with Queues</a></h1>
+
+<p>For more information on Queues in general, please see some of the many articles on
+<a href="https://msdn.microsoft.com/en-us/library/microsoft.windowsazure.storage.queue.aspx">MSDN</a> or the <a href="http://azure.microsoft.com/en-us/documentation/services/storage/">Azure</a> <a href="http://azure.microsoft.com/en-us/documentation/articles/storage-dotnet-how-to-use-queues/">documentation</a>. Some of the core features of the Queue provider are: -</p>
+
+<h2><a name="Rapid-navigation" class="anchor" href="#Rapid-navigation">Rapid navigation</a></h2>
+
+<p>You can easily move between queues and view key information on that queue. Simply dotting into
+a queue will automatically request the latest details on the queue. This allows easy exploration
+of your queue assets, directly from within the REPL.</p>
+
+<table class="pre"><tr><td class="lines"><pre class="fssnip">
+<span class="l">1: </span>
+<span class="l">2: </span>
+</pre>
+</td>
+<td class="snippet"><pre class="fssnip">
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs17', 24)" onmouseover="showTip(event, 'fs17', 24)" class="i">queue</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 25)" onmouseover="showTip(event, 'fs8', 25)" class="t">Azure</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs18', 26)" onmouseover="showTip(event, 'fs18', 26)" class="i">Queues</span><span class="o">.</span><span class="i">``sample-queue``</span>
+<span onmouseout="hideTip(event, 'fs13', 27)" onmouseover="showTip(event, 'fs13', 27)" class="f">printfn</span> <span class="s">&quot;Queue &#39;</span><span class="pf">%s</span><span class="s">&#39; has </span><span class="pf">%d</span><span class="s"> items on it.&quot;</span> <span onmouseout="hideTip(event, 'fs17', 28)" onmouseover="showTip(event, 'fs17', 28)" class="i">queue</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs19', 29)" onmouseover="showTip(event, 'fs19', 29)" class="i">Name</span> (<span onmouseout="hideTip(event, 'fs17', 30)" onmouseover="showTip(event, 'fs17', 30)" class="i">queue</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 31)" onmouseover="showTip(event, 'fs20', 31)" class="f">GetCurrentLength</span>())
+</pre>
+</td>
+</tr>
+</table>
+
+<table class="pre"><tr><td><pre><code>Queue 'sample-queue' has 0 items on it.</code></pre></td></tr></table>
+
+<h2><a name="Processing-messages" class="anchor" href="#Processing-messages">Processing messages</a></h2>
+
+<p>It is easy to push and pop messages onto / off a queue - simply call the Enqueue() and Dequeue()
+methods on the appropriate queue. Enqueue will return an option message, in case there is nothing
+on the queue. Once you have finished processing the message, simply call Delete().</p>
+
+<table class="pre"><tr><td class="lines"><pre class="fssnip">
+<span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+<span class="l">17: </span>
+</pre>
+</td>
+<td class="snippet"><pre class="fssnip">
+<span onmouseout="hideTip(event, 'fs21', 32)" onmouseover="showTip(event, 'fs21', 32)" class="i">async</span> {
+    <span onmouseout="hideTip(event, 'fs13', 33)" onmouseover="showTip(event, 'fs13', 33)" class="f">printfn</span> <span class="s">&quot;Queue length is </span><span class="pf">%d</span><span class="s">.&quot;</span> (<span onmouseout="hideTip(event, 'fs17', 34)" onmouseover="showTip(event, 'fs17', 34)" class="i">queue</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 35)" onmouseover="showTip(event, 'fs20', 35)" class="f">GetCurrentLength</span>())
+
+    <span class="c">// Put a message on the queue</span>
+    <span onmouseout="hideTip(event, 'fs13', 36)" onmouseover="showTip(event, 'fs13', 36)" class="f">printfn</span> <span class="s">&quot;Enqueuing a message!&quot;</span>
+    <span class="k">do!</span> <span onmouseout="hideTip(event, 'fs17', 37)" onmouseover="showTip(event, 'fs17', 37)" class="i">queue</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs22', 38)" onmouseover="showTip(event, 'fs22', 38)" class="f">Enqueue</span>(<span class="s">&quot;Hello from Azure Type Provider&quot;</span>)
+    <span onmouseout="hideTip(event, 'fs13', 39)" onmouseover="showTip(event, 'fs13', 39)" class="f">printfn</span> <span class="s">&quot;Queue length is </span><span class="pf">%d</span><span class="s">.&quot;</span> (<span onmouseout="hideTip(event, 'fs17', 40)" onmouseover="showTip(event, 'fs17', 40)" class="i">queue</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 41)" onmouseover="showTip(event, 'fs20', 41)" class="f">GetCurrentLength</span>())
+
+    <span class="c">// Get the message back off the queue</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs23', 42)" onmouseover="showTip(event, 'fs23', 42)" class="i">dequeuedMessage</span> <span class="o">=</span> (<span onmouseout="hideTip(event, 'fs17', 43)" onmouseover="showTip(event, 'fs17', 43)" class="i">queue</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs24', 44)" onmouseover="showTip(event, 'fs24', 44)" class="f">Dequeue</span>() <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs25', 45)" onmouseover="showTip(event, 'fs25', 45)" class="t">Async</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs26', 46)" onmouseover="showTip(event, 'fs26', 46)" class="f">RunSynchronously</span>)<span class="o">.</span><span class="i">Value</span> <span class="c">// don&#39;t try this at home :)</span>
+    <span onmouseout="hideTip(event, 'fs13', 47)" onmouseover="showTip(event, 'fs13', 47)" class="f">printfn</span> <span class="s">&quot;</span><span class="pf">%A</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs23', 48)" onmouseover="showTip(event, 'fs23', 48)" class="i">dequeuedMessage</span>
+    
+    <span class="c">// Delete it off the queue to tell Azure we&#39;re done with it.</span>
+    <span onmouseout="hideTip(event, 'fs13', 49)" onmouseover="showTip(event, 'fs13', 49)" class="f">printfn</span> <span class="s">&quot;Deleting the message.&quot;</span>
+    <span class="k">do!</span> <span onmouseout="hideTip(event, 'fs17', 50)" onmouseover="showTip(event, 'fs17', 50)" class="i">queue</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs27', 51)" onmouseover="showTip(event, 'fs27', 51)" class="f">DeleteMessage</span> <span onmouseout="hideTip(event, 'fs23', 52)" onmouseover="showTip(event, 'fs23', 52)" class="i">dequeuedMessage</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs14', 53)" onmouseover="showTip(event, 'fs14', 53)" class="i">Id</span>
+    <span onmouseout="hideTip(event, 'fs13', 54)" onmouseover="showTip(event, 'fs13', 54)" class="f">printfn</span> <span class="s">&quot;Queue length is </span><span class="pf">%d</span><span class="s">.&quot;</span> (<span onmouseout="hideTip(event, 'fs17', 55)" onmouseover="showTip(event, 'fs17', 55)" class="i">queue</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 56)" onmouseover="showTip(event, 'fs20', 56)" class="f">GetCurrentLength</span>())
+} <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs25', 57)" onmouseover="showTip(event, 'fs25', 57)" class="t">Async</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs26', 58)" onmouseover="showTip(event, 'fs26', 58)" class="f">RunSynchronously</span>
+</pre>
+</td>
+</tr>
+</table>
+
+<table class="pre"><tr><td><pre><code>Queue length is 0.
+Enqueuing a message!
+Queue length is 1.
+{Id =
+  ProvidedMessageId
+    (MessageId "4fa9c85f-5705-4b9b-b355-82e394718cf0",
+     PopReceipt "8C03+xtP0ggBAAAA");
+ DequeueCount = 1;
+ InsertionTime = Some 27/04/2015 16:11:10 +00:00;
+ ExpirationTime = Some 04/05/2015 16:11:10 +00:00;
+ NextVisibleTime = Some 27/04/2015 16:11:41 +00:00;
+ AsBytes =
+  [|72uy; 101uy; 108uy; 108uy; 111uy; 32uy; 102uy; 114uy; 111uy; 109uy; 32uy;
+    65uy; 122uy; 117uy; 114uy; 101uy; 32uy; 84uy; 121uy; 112uy; 101uy; 32uy;
+    80uy; 114uy; 111uy; 118uy; 105uy; 100uy; 101uy; 114uy|];
+ AsString = "Hello from Azure Type Provider";}
+Deleting the message.
+Queue length is 0.</code></pre></td></tr></table>
+
+<h2><a name="Modifying-Queues" class="anchor" href="#Modifying-Queues">Modifying Queues</a></h2>
+
+<p>You can easily modify the contents of an existing message and push it back onto the queue, or clear
+the queue entirely.</p>
+
+<table class="pre"><tr><td class="lines"><pre class="fssnip">
+<span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+<span class="l">17: </span>
+<span class="l">18: </span>
+<span class="l">19: </span>
+<span class="l">20: </span>
+<span class="l">21: </span>
+<span class="l">22: </span>
+</pre>
+</td>
+<td class="snippet"><pre class="fssnip">
+<span onmouseout="hideTip(event, 'fs21', 59)" onmouseover="showTip(event, 'fs21', 59)" class="i">async</span> {
+    <span onmouseout="hideTip(event, 'fs13', 60)" onmouseover="showTip(event, 'fs13', 60)" class="f">printfn</span> <span class="s">&quot;Enqueuing a message!&quot;</span>
+    <span class="k">do!</span> <span onmouseout="hideTip(event, 'fs17', 61)" onmouseover="showTip(event, 'fs17', 61)" class="i">queue</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs22', 62)" onmouseover="showTip(event, 'fs22', 62)" class="f">Enqueue</span>(<span class="s">&quot;Hello from Azure Type Provider&quot;</span>)
+    
+    <span class="c">// Get the message, then put it back on the queue with a new payload immediately.</span>
+    <span onmouseout="hideTip(event, 'fs13', 63)" onmouseover="showTip(event, 'fs13', 63)" class="f">printfn</span> <span class="s">&quot;Dequeuing it.&quot;</span>
+    <span class="k">let!</span> <span onmouseout="hideTip(event, 'fs28', 64)" onmouseover="showTip(event, 'fs28', 64)" class="i">message</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs17', 65)" onmouseover="showTip(event, 'fs17', 65)" class="i">queue</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs24', 66)" onmouseover="showTip(event, 'fs24', 66)" class="f">Dequeue</span>()
+    <span class="k">match</span> <span onmouseout="hideTip(event, 'fs28', 67)" onmouseover="showTip(event, 'fs28', 67)" class="i">message</span> <span class="k">with</span>
+    | <span onmouseout="hideTip(event, 'fs29', 68)" onmouseover="showTip(event, 'fs29', 68)" class="p">Some</span> <span onmouseout="hideTip(event, 'fs30', 69)" onmouseover="showTip(event, 'fs30', 69)" class="i">message</span> <span class="k">-&gt;</span>
+        <span onmouseout="hideTip(event, 'fs10', 70)" onmouseover="showTip(event, 'fs10', 70)" class="f">printMessage</span> <span onmouseout="hideTip(event, 'fs30', 71)" onmouseover="showTip(event, 'fs30', 71)" class="i">message</span>
+        <span onmouseout="hideTip(event, 'fs13', 72)" onmouseover="showTip(event, 'fs13', 72)" class="f">printfn</span> <span class="s">&quot;Updating it and dequeuing it again.&quot;</span>
+        <span class="k">do!</span> <span onmouseout="hideTip(event, 'fs17', 73)" onmouseover="showTip(event, 'fs17', 73)" class="i">queue</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs31', 74)" onmouseover="showTip(event, 'fs31', 74)" class="f">UpdateMessage</span>(<span onmouseout="hideTip(event, 'fs30', 75)" onmouseover="showTip(event, 'fs30', 75)" class="i">message</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs14', 76)" onmouseover="showTip(event, 'fs14', 76)" class="i">Id</span>, <span class="s">&quot;Goodbye from Azure Type Provider&quot;</span>)
+        
+        <span class="c">// Now dequeue the message again and interrogate it</span>
+        <span class="k">let!</span> <span onmouseout="hideTip(event, 'fs28', 77)" onmouseover="showTip(event, 'fs28', 77)" class="i">message</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs17', 78)" onmouseover="showTip(event, 'fs17', 78)" class="i">queue</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs24', 79)" onmouseover="showTip(event, 'fs24', 79)" class="f">Dequeue</span>()
+        <span class="k">match</span> <span onmouseout="hideTip(event, 'fs28', 80)" onmouseover="showTip(event, 'fs28', 80)" class="i">message</span> <span class="k">with</span>
+        | <span onmouseout="hideTip(event, 'fs29', 81)" onmouseover="showTip(event, 'fs29', 81)" class="p">Some</span> <span onmouseout="hideTip(event, 'fs30', 82)" onmouseover="showTip(event, 'fs30', 82)" class="i">message</span> <span class="k">-&gt;</span>
+            <span onmouseout="hideTip(event, 'fs10', 83)" onmouseover="showTip(event, 'fs10', 83)" class="f">printMessage</span> <span onmouseout="hideTip(event, 'fs30', 84)" onmouseover="showTip(event, 'fs30', 84)" class="i">message</span>
+            <span class="k">do!</span> <span onmouseout="hideTip(event, 'fs17', 85)" onmouseover="showTip(event, 'fs17', 85)" class="i">queue</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs27', 86)" onmouseover="showTip(event, 'fs27', 86)" class="f">DeleteMessage</span> <span onmouseout="hideTip(event, 'fs30', 87)" onmouseover="showTip(event, 'fs30', 87)" class="i">message</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs14', 88)" onmouseover="showTip(event, 'fs14', 88)" class="i">Id</span>
+        | <span onmouseout="hideTip(event, 'fs32', 89)" onmouseover="showTip(event, 'fs32', 89)" class="p">None</span> <span class="k">-&gt;</span> ()
+    | <span onmouseout="hideTip(event, 'fs32', 90)" onmouseover="showTip(event, 'fs32', 90)" class="p">None</span> <span class="k">-&gt;</span> ()
+} <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs25', 91)" onmouseover="showTip(event, 'fs25', 91)" class="t">Async</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs26', 92)" onmouseover="showTip(event, 'fs26', 92)" class="f">RunSynchronously</span>
+</pre>
+</td>
+</tr>
+</table>
+
+<table class="pre"><tr><td><pre><code>Enqueuing a message!
+Dequeuing it.
+Message ProvidedMessageId
+  (MessageId "265c7dcc-4592-4b6b-87ac-fa65f73c30d4",
+   PopReceipt "sIpM+xtP0ggBAAAA") with body 'Hello from Azure Type Provider' has been dequeued 1 times.
+Updating it and dequeuing it again.
+Message ProvidedMessageId
+  (MessageId "265c7dcc-4592-4b6b-87ac-fa65f73c30d4",
+   PopReceipt "kI9T+xtP0ggCAAAA") with body 'Goodbye from Azure Type Provider' has been dequeued 2 times.</code></pre></td></tr></table>
+
+<h2><a name="Peeking-the-queue" class="anchor" href="#Peeking-the-queue">Peeking the queue</a></h2>
+
+<p>The Queue Provider allows you to preview messages on the queue directly in intellisense. Simply
+dot into the "Peek" property on the queue, and the first 32 messages on the queue will appear.
+Properties on them can be bound with their values.</p>
+
+<div class="tip" id="fs1">namespace FSharp</div>
+<div class="tip" id="fs2">namespace FSharp.Azure</div>
+<div class="tip" id="fs3">namespace FSharp.Azure.StorageTypeProvider</div>
+<div class="tip" id="fs4">namespace FSharp.Azure.StorageTypeProvider.Queue</div>
+<div class="tip" id="fs5">namespace System</div>
+<div class="tip" id="fs6">namespace System.Xml</div>
+<div class="tip" id="fs7">namespace System.Xml.Linq</div>
+<div class="tip" id="fs8">type Azure = AzureTypeProvider&lt;...&gt;<br /><br />Full name: Queues.Azure</div>
+<div class="tip" id="fs9">type AzureTypeProvider<br /><br />Full name: FSharp.Azure.StorageTypeProvider.AzureTypeProvider<br /><em><br /><br />The entry type to connect to Azure Storage assets.</em></div>
+<div class="tip" id="fs10">val printMessage : msg:ProvidedQueueMessage -&gt; unit<br /><br />Full name: Queues.printMessage</div>
+<div class="tip" id="fs11">val msg : ProvidedQueueMessage</div>
+<div class="tip" id="fs12">type ProvidedQueueMessage =<br />&#160;&#160;{Id: ProvidedMessageId;<br />&#160;&#160;&#160;DequeueCount: int;<br />&#160;&#160;&#160;InsertionTime: DateTimeOffset option;<br />&#160;&#160;&#160;ExpirationTime: DateTimeOffset option;<br />&#160;&#160;&#160;NextVisibleTime: DateTimeOffset option;<br />&#160;&#160;&#160;AsBytes: byte array;<br />&#160;&#160;&#160;AsString: string;}<br /><br />Full name: FSharp.Azure.StorageTypeProvider.Queue.ProvidedQueueMessage</div>
+<div class="tip" id="fs13">val printfn : format:Printf.TextWriterFormat&lt;&#39;T&gt; -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Core.ExtraTopLevelOperators.printfn</div>
+<div class="tip" id="fs14">ProvidedQueueMessage.Id: ProvidedMessageId</div>
+<div class="tip" id="fs15">ProvidedQueueMessage.AsString: string</div>
+<div class="tip" id="fs16">ProvidedQueueMessage.DequeueCount: int</div>
+<div class="tip" id="fs17">val queue : AzureTypeProvider&lt;...&gt;.Domain.UseDevelopmentStorage=true.queue.sample-queue<br /><br />Full name: Queues.queue</div>
+<div class="tip" id="fs18">property AzureTypeProvider&lt;...&gt;.Queues: AzureTypeProvider&lt;...&gt;.Domain.Queues<br /><em><br /><br />Gets the list of all queues in this storage account.</em></div>
+<div class="tip" id="fs19">property ProvidedQueue.Name: string</div>
+<div class="tip" id="fs20">member ProvidedQueue.GetCurrentLength : ?connectionString:string -&gt; int</div>
+<div class="tip" id="fs21">val async : AsyncBuilder<br /><br />Full name: Microsoft.FSharp.Core.ExtraTopLevelOperators.async</div>
+<div class="tip" id="fs22">member ProvidedQueue.Enqueue : content:byte array * ?connectionString:string -&gt; Async&lt;unit&gt;<br />member ProvidedQueue.Enqueue : content:string * ?connectionString:string -&gt; Async&lt;unit&gt;</div>
+<div class="tip" id="fs23">val dequeuedMessage : ProvidedQueueMessage</div>
+<div class="tip" id="fs24">member ProvidedQueue.Dequeue : ?connectionString:string -&gt; Async&lt;ProvidedQueueMessage option&gt;</div>
+<div class="tip" id="fs25">Multiple items<br />type Async<br />static member AsBeginEnd : computation:(&#39;Arg -&gt; Async&lt;&#39;T&gt;) -&gt; (&#39;Arg * AsyncCallback * obj -&gt; IAsyncResult) * (IAsyncResult -&gt; &#39;T) * (IAsyncResult -&gt; unit)<br />static member AwaitEvent : event:IEvent&lt;&#39;Del,&#39;T&gt; * ?cancelAction:(unit -&gt; unit) -&gt; Async&lt;&#39;T&gt; (requires delegate and &#39;Del :&gt; Delegate)<br />static member AwaitIAsyncResult : iar:IAsyncResult * ?millisecondsTimeout:int -&gt; Async&lt;bool&gt;<br />static member AwaitTask : task:Task&lt;&#39;T&gt; -&gt; Async&lt;&#39;T&gt;<br />static member AwaitWaitHandle : waitHandle:WaitHandle * ?millisecondsTimeout:int -&gt; Async&lt;bool&gt;<br />static member CancelDefaultToken : unit -&gt; unit<br />static member Catch : computation:Async&lt;&#39;T&gt; -&gt; Async&lt;Choice&lt;&#39;T,exn&gt;&gt;<br />static member FromBeginEnd : beginAction:(AsyncCallback * obj -&gt; IAsyncResult) * endAction:(IAsyncResult -&gt; &#39;T) * ?cancelAction:(unit -&gt; unit) -&gt; Async&lt;&#39;T&gt;<br />static member FromBeginEnd : arg:&#39;Arg1 * beginAction:(&#39;Arg1 * AsyncCallback * obj -&gt; IAsyncResult) * endAction:(IAsyncResult -&gt; &#39;T) * ?cancelAction:(unit -&gt; unit) -&gt; Async&lt;&#39;T&gt;<br />static member FromBeginEnd : arg1:&#39;Arg1 * arg2:&#39;Arg2 * beginAction:(&#39;Arg1 * &#39;Arg2 * AsyncCallback * obj -&gt; IAsyncResult) * endAction:(IAsyncResult -&gt; &#39;T) * ?cancelAction:(unit -&gt; unit) -&gt; Async&lt;&#39;T&gt;<br />static member FromBeginEnd : arg1:&#39;Arg1 * arg2:&#39;Arg2 * arg3:&#39;Arg3 * beginAction:(&#39;Arg1 * &#39;Arg2 * &#39;Arg3 * AsyncCallback * obj -&gt; IAsyncResult) * endAction:(IAsyncResult -&gt; &#39;T) * ?cancelAction:(unit -&gt; unit) -&gt; Async&lt;&#39;T&gt;<br />static member FromContinuations : callback:((&#39;T -&gt; unit) * (exn -&gt; unit) * (OperationCanceledException -&gt; unit) -&gt; unit) -&gt; Async&lt;&#39;T&gt;<br />static member Ignore : computation:Async&lt;&#39;T&gt; -&gt; Async&lt;unit&gt;<br />static member OnCancel : interruption:(unit -&gt; unit) -&gt; Async&lt;IDisposable&gt;<br />static member Parallel : computations:seq&lt;Async&lt;&#39;T&gt;&gt; -&gt; Async&lt;&#39;T []&gt;<br />static member RunSynchronously : computation:Async&lt;&#39;T&gt; * ?timeout:int * ?cancellationToken:CancellationToken -&gt; &#39;T<br />static member Sleep : millisecondsDueTime:int -&gt; Async&lt;unit&gt;<br />static member Start : computation:Async&lt;unit&gt; * ?cancellationToken:CancellationToken -&gt; unit<br />static member StartAsTask : computation:Async&lt;&#39;T&gt; * ?taskCreationOptions:TaskCreationOptions * ?cancellationToken:CancellationToken -&gt; Task&lt;&#39;T&gt;<br />static member StartChild : computation:Async&lt;&#39;T&gt; * ?millisecondsTimeout:int -&gt; Async&lt;Async&lt;&#39;T&gt;&gt;<br />static member StartChildAsTask : computation:Async&lt;&#39;T&gt; * ?taskCreationOptions:TaskCreationOptions -&gt; Async&lt;Task&lt;&#39;T&gt;&gt;<br />static member StartImmediate : computation:Async&lt;unit&gt; * ?cancellationToken:CancellationToken -&gt; unit<br />static member StartWithContinuations : computation:Async&lt;&#39;T&gt; * continuation:(&#39;T -&gt; unit) * exceptionContinuation:(exn -&gt; unit) * cancellationContinuation:(OperationCanceledException -&gt; unit) * ?cancellationToken:CancellationToken -&gt; unit<br />static member SwitchToContext : syncContext:SynchronizationContext -&gt; Async&lt;unit&gt;<br />static member SwitchToNewThread : unit -&gt; Async&lt;unit&gt;<br />static member SwitchToThreadPool : unit -&gt; Async&lt;unit&gt;<br />static member TryCancelled : computation:Async&lt;&#39;T&gt; * compensation:(OperationCanceledException -&gt; unit) -&gt; Async&lt;&#39;T&gt;<br />static member CancellationToken : Async&lt;CancellationToken&gt;<br />static member DefaultCancellationToken : CancellationToken<br /><br />Full name: Microsoft.FSharp.Control.Async<br /><br />--------------------<br />type Async&lt;&#39;T&gt;<br /><br />Full name: Microsoft.FSharp.Control.Async&lt;_&gt;</div>
+<div class="tip" id="fs26">static member Async.RunSynchronously : computation:Async&lt;&#39;T&gt; * ?timeout:int * ?cancellationToken:Threading.CancellationToken -&gt; &#39;T</div>
+<div class="tip" id="fs27">member ProvidedQueue.DeleteMessage : providedMessageId:ProvidedMessageId * ?connectionString:string -&gt; Async&lt;unit&gt;</div>
+<div class="tip" id="fs28">val message : ProvidedQueueMessage option</div>
+<div class="tip" id="fs29">union case Option.Some: Value: &#39;T -&gt; Option&lt;&#39;T&gt;</div>
+<div class="tip" id="fs30">val message : ProvidedQueueMessage</div>
+<div class="tip" id="fs31">member ProvidedQueue.UpdateMessage : messageId:ProvidedMessageId * newTimeout:TimeSpan * ?connectionString:string -&gt; Async&lt;unit&gt;<br />member ProvidedQueue.UpdateMessage : messageId:ProvidedMessageId * contents:byte array * ?newTimeout:TimeSpan * ?connectionString:string -&gt; Async&lt;unit&gt;<br />member ProvidedQueue.UpdateMessage : messageId:ProvidedMessageId * contents:string * ?newTimeout:TimeSpan * ?connectionString:string -&gt; Async&lt;unit&gt;</div>
+<div class="tip" id="fs32">union case Option.None: Option&lt;&#39;T&gt;</div>
+
+            </div>
+            <div class="span3">
+                <img src="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/img/logo.png" alt="F# Project" style="width:150px;margin:10px" />
+                <ul class="nav nav-list" id="menu" style="margin-top: 20px;">
+                    <li class="nav-header">Azure Storage Type Provider</li>
+                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/index.html">Home page</a></li>
+                    <li class="divider"></li>
+                    <li><a href="http://www.nuget.org/packages/FSharp.Azure.StorageTypeProvider">Get Library via NuGet</a></li>
+                    <li><a href="http://github.com/fsprojects/AzureStorageTypeProvider">Source Code on GitHub</a></li>
+                    <li><a href="http://github.com/fsprojects/AzureStorageTypeProvider/blob/master/LICENSE.txt">License</a></li>
+                    <li><a href="http://github.com/fsprojects/AzureStorageTypeProvider/blob/master/RELEASE_NOTES.md">Release Notes</a></li>
+
+                    <li class="nav-header">Getting started</li>
+                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/quickstart.html">Quick start</a></li>
+                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/blobs.html">Using Azure Blobs</a></li>
+                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/tables.html">Using Azure Tables</a></li>
+                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/queues.html">Using Azure Storage Queues</a></li>
+
+                    <li class="nav-header">Documentation</li>
+                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/reference/index.html">API Reference</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <a href="http://github.com/fsprojects/AzureStorageTypeProvider"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub" /></a>
+</body>
+</html>

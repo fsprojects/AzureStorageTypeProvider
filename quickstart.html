@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Introducing the Azure Storage Type Provider
+</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Stuff" />
+    <meta name="author" content="Isaac Abraham" />
+
+    <script src="https://code.jquery.com/jquery-1.8.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.8.23/jquery-ui.js"></script>
+    <script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
+    <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet" />
+
+    <link type="text/css" rel="stylesheet" href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/content/style.css" />
+    <link type="text/css" rel="stylesheet" href="deedle.css" />
+    <script type="text/javascript" src="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/content/tips.js"></script>
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+    <div class="container">
+        <div class="masthead">
+            <ul class="nav nav-pills pull-right">
+                <li><a href="http://fsharp.org">fsharp.org</a></li>
+                <li><a href="http://github.com/fsprojects/AzureStorageTypeProvider">github page</a></li>
+            </ul>
+            <h3 class="muted"><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/index.html">Azure Storage Type Provider</a></h3>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="span9" id="main">
+                
+<h1><a name="Introducing-the-Azure-Storage-Type-Provider" class="anchor" href="#Introducing-the-Azure-Storage-Type-Provider">Introducing the Azure Storage Type Provider</a></h1>
+
+<p>The Azure Storage Type Provider is designed to let you rapidly access your
+storage assets in Azure from F# without the need to resort to third party tools
+or the server explorer in Visual Studio.</p>
+
+<p>The provider is designed to be as easy as possible to consume, whilst allowing
+several benefits over using the standard .NET SDK, such as removing the need for
+magic strings when access tables / queues / blobs, as well as strengthening the
+typing of queries over tables.</p>
+
+<h1><a name="Connecting-to-Azure" class="anchor" href="#Connecting-to-Azure">Connecting to Azure</a></h1>
+
+<p>Connecting to your storage account is simple.</p>
+
+<p>From within a script, first <code>#load "AzureStorageProvider.fsx"</code> to reference all dependencies.
+Then, you can generate a type for a storage account simply by providing your Azure
+account credentials.</p>
+
+<table class="pre"><tr><td class="lines"><pre class="fssnip">
+<span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+</pre>
+</td>
+<td class="snippet"><pre class="fssnip">
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 5)" onmouseover="showTip(event, 'fs1', 5)" class="i">FSharp</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs2', 6)" onmouseover="showTip(event, 'fs2', 6)" class="i">Azure</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs3', 7)" onmouseover="showTip(event, 'fs3', 7)" class="i">StorageTypeProvider</span>
+
+<span class="c">// Connect to a live account using a standard Azure Storage connection string</span>
+<span class="k">type</span> <span onmouseout="hideTip(event, 'fs5', 8)" onmouseover="showTip(event, 'fs5', 8)" class="t">Live</span> <span class="o">=</span>
+    <span onmouseout="hideTip(event, 'fs6', 9)" onmouseover="showTip(event, 'fs6', 9)" class="t">AzureTypeProvider</span><span class="o">&lt;</span><span class="s">&quot;DefaultEndpointsProtocol=https;AccountName=name;AccountKey=key;&quot;</span><span class="o">&gt;</span>
+
+<span class="c">// Connect to a live account using a two-part name and key.</span>
+<span class="k">type</span> <span onmouseout="hideTip(event, 'fs7', 10)" onmouseover="showTip(event, 'fs7', 10)" class="t">LiveTwoPart</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs6', 11)" onmouseover="showTip(event, 'fs6', 11)" class="t">AzureTypeProvider</span><span class="o">&lt;</span><span class="s">&quot;name&quot;</span>, <span class="s">&quot;key&quot;</span><span class="o">&gt;</span>
+
+<span class="c">// Connect to local storage emulator</span>
+<span class="k">type</span> <span onmouseout="hideTip(event, 'fs8', 12)" onmouseover="showTip(event, 'fs8', 12)" class="t">Local</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs6', 13)" onmouseover="showTip(event, 'fs6', 13)" class="t">AzureTypeProvider</span><span class="o">&lt;</span><span class="s">&quot;UseDevelopmentStorage=true&quot;</span><span class="o">&gt;</span>
+</pre>
+</td>
+</tr>
+</table>
+
+<h1><a name="Common-Themes" class="anchor" href="#Common-Themes">Common Themes</a></h1>
+
+<p>The API is split into three areas: <strong>Tables</strong>, <strong>Queues</strong> and <strong>Containers</strong>.</p>
+
+<p>All three share some common themes: -</p>
+
+<ul>
+<li>Where possible, entities such as queues, tables, containers, folders or blobs are typed based on
+live queries to the appropriate underlying storage SDK. Thus there's no requirement to enter magic
+strings for blobs, tables or queues.</li>
+</ul>
+
+<table class="pre"><tr><td class="lines"><pre class="fssnip">
+<span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+<span class="l">8: </span>
+</pre>
+</td>
+<td class="snippet"><pre class="fssnip">
+<span class="c">// Reference the &quot;employee&quot; table. No magic strings needed.</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs9', 14)" onmouseover="showTip(event, 'fs9', 14)" class="i">employee</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 15)" onmouseover="showTip(event, 'fs8', 15)" class="t">Local</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs10', 16)" onmouseover="showTip(event, 'fs10', 16)" class="i">Tables</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs11', 17)" onmouseover="showTip(event, 'fs11', 17)" class="i">employee</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 18)" onmouseover="showTip(event, 'fs12', 18)" class="f">Get</span>(<span onmouseout="hideTip(event, 'fs13', 19)" onmouseover="showTip(event, 'fs13', 19)" class="p">Row</span> <span class="s">&quot;1&quot;</span>, <span onmouseout="hideTip(event, 'fs14', 20)" onmouseover="showTip(event, 'fs14', 20)" class="p">Partition</span> <span class="s">&quot;somepartition&quot;</span>)
+
+<span class="c">// Navigation through the &quot;samples&quot; container to the &quot;folder/childFile.txt&quot; blob.</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs15', 21)" onmouseover="showTip(event, 'fs15', 21)" class="i">blobContents</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 22)" onmouseover="showTip(event, 'fs8', 22)" class="t">Local</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs16', 23)" onmouseover="showTip(event, 'fs16', 23)" class="i">Containers</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 24)" onmouseover="showTip(event, 'fs17', 24)" class="i">samples</span><span class="o">.</span><span class="i">``folder/``</span><span class="o">.</span><span class="i">``childFile.txt``</span><span class="o">.</span><span class="f">Read</span>()
+
+<span class="c">// Reference the &quot;sample-queue&quot; queue.</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs18', 25)" onmouseover="showTip(event, 'fs18', 25)" class="i">queueMessage</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 26)" onmouseover="showTip(event, 'fs8', 26)" class="t">Local</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs19', 27)" onmouseover="showTip(event, 'fs19', 27)" class="i">Queues</span><span class="o">.</span><span class="i">``sample-queue``</span><span class="o">.</span><span class="f">Dequeue</span>()
+</pre>
+</td>
+</tr>
+</table>
+
+<ul>
+<li>Common methods and functionality are made available directly on the appropriate assets, but
+there's always access to the raw Azure SDK if you need it to do anything more.</li>
+</ul>
+
+<table class="pre"><tr><td class="lines"><pre class="fssnip">
+<span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+<span class="l">8: </span>
+<span class="l">9: </span>
+</pre>
+</td>
+<td class="snippet"><pre class="fssnip">
+<span class="c">// Get the raw Azure Cloud Blob Client and use it to get a ref to the same blob.</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs20', 28)" onmouseover="showTip(event, 'fs20', 28)" class="i">rawBlobRef</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 29)" onmouseover="showTip(event, 'fs8', 29)" class="t">Local</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs16', 30)" onmouseover="showTip(event, 'fs16', 30)" class="i">Containers</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs21', 31)" onmouseover="showTip(event, 'fs21', 31)" class="i">CloudBlobClient</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs22', 32)" onmouseover="showTip(event, 'fs22', 32)" class="f">GetContainerReference</span>(<span class="s">&quot;samples&quot;</span>)
+                                                 <span class="o">.</span><span class="f">GetBlockBlobReference</span>(<span class="s">&quot;folder/childFile.txt&quot;</span>)
+
+<span class="c">// Or for the Cloud Table Client</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs23', 33)" onmouseover="showTip(event, 'fs23', 33)" class="i">rawTableRef</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 34)" onmouseover="showTip(event, 'fs8', 34)" class="t">Local</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs10', 35)" onmouseover="showTip(event, 'fs10', 35)" class="i">Tables</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs24', 36)" onmouseover="showTip(event, 'fs24', 36)" class="i">CloudTableClient</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs25', 37)" onmouseover="showTip(event, 'fs25', 37)" class="f">GetTableReference</span>(<span class="s">&quot;employee&quot;</span>)
+
+<span class="c">// Or use a hybrid approach - use the TP to find the asset you want and then switch.</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs26', 38)" onmouseover="showTip(event, 'fs26', 38)" class="i">rawBlobRefHybrid</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 39)" onmouseover="showTip(event, 'fs8', 39)" class="t">Local</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs16', 40)" onmouseover="showTip(event, 'fs16', 40)" class="i">Containers</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 41)" onmouseover="showTip(event, 'fs17', 41)" class="i">samples</span><span class="o">.</span><span class="i">``folder/``</span><span class="o">.</span><span class="i">``childFile.txt``</span><span class="o">.</span><span class="f">AsCloudBlockBlob</span>()
+</pre>
+</td>
+</tr>
+</table>
+
+<ul>
+<li>You can override the connection to the destination asset at runtime. This is useful so that you can
+use your local (free) storage emulator for development, and then move to a live account when testing
+or moving to production etc.</li>
+</ul>
+
+<table class="pre"><tr><td class="lines"><pre class="fssnip">
+<span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+</pre>
+</td>
+<td class="snippet"><pre class="fssnip">
+<span class="c">// Redirect to a blob using a different connection string.</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs27', 42)" onmouseover="showTip(event, 'fs27', 42)" class="i">liveBlob</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 43)" onmouseover="showTip(event, 'fs8', 43)" class="t">Local</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs16', 44)" onmouseover="showTip(event, 'fs16', 44)" class="i">Containers</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 45)" onmouseover="showTip(event, 'fs17', 45)" class="i">samples</span><span class="o">.</span><span class="i">``file1.txt``</span><span class="o">.</span><span class="f">AsCloudBlockBlob</span>(<span class="s">&quot;myOtherConnectionString&quot;</span>)
+
+<span class="c">// Get row 1A from the &quot;employee&quot; table using a different connection string.</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs28', 46)" onmouseover="showTip(event, 'fs28', 46)" class="i">row1A</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 47)" onmouseover="showTip(event, 'fs8', 47)" class="t">Local</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs10', 48)" onmouseover="showTip(event, 'fs10', 48)" class="i">Tables</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs11', 49)" onmouseover="showTip(event, 'fs11', 49)" class="i">employee</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 50)" onmouseover="showTip(event, 'fs12', 50)" class="f">Get</span>(<span onmouseout="hideTip(event, 'fs13', 51)" onmouseover="showTip(event, 'fs13', 51)" class="p">Row</span> <span class="s">&quot;1&quot;</span>, <span onmouseout="hideTip(event, 'fs14', 52)" onmouseover="showTip(event, 'fs14', 52)" class="p">Partition</span> <span class="s">&quot;A&quot;</span>, <span class="s">&quot;myOtherConnectionString&quot;</span>)
+</pre>
+</td>
+</tr>
+</table>
+
+<div class="tip" id="fs1">namespace FSharp</div>
+<div class="tip" id="fs2">namespace FSharp.Azure</div>
+<div class="tip" id="fs3">namespace FSharp.Azure.StorageTypeProvider</div>
+<div class="tip" id="fs4">namespace FSharp.Azure.StorageTypeProvider.Table</div>
+<div class="tip" id="fs5">type Live = AzureTypeProvider&lt;...&gt;<br /><br />Full name: Quickstart.Live</div>
+<div class="tip" id="fs6">type AzureTypeProvider<br /><br />Full name: FSharp.Azure.StorageTypeProvider.AzureTypeProvider<br /><em><br /><br />The entry type to connect to Azure Storage assets.</em></div>
+<div class="tip" id="fs7">type LiveTwoPart = AzureTypeProvider&lt;...&gt;<br /><br />Full name: Quickstart.LiveTwoPart</div>
+<div class="tip" id="fs8">type Local = AzureTypeProvider&lt;...&gt;<br /><br />Full name: Quickstart.Local</div>
+<div class="tip" id="fs9">val employee : Option&lt;AzureTypeProvider&lt;...&gt;.Domain.employeeEntity&gt;<br /><br />Full name: Quickstart.employee</div>
+<div class="tip" id="fs10">property AzureTypeProvider&lt;...&gt;.Tables: AzureTypeProvider&lt;...&gt;.Domain.Tables<br /><em><br /><br />Gets the list of all tables in this storage account.</em></div>
+<div class="tip" id="fs11">property AzureTypeProvider&lt;...&gt;.Domain.Tables.employee: AzureTypeProvider&lt;...&gt;.Domain.employeeTable<br /><em><br /><br />Provides access to the &#39;employee&#39; table.</em></div>
+<div class="tip" id="fs12">AzureTypeProvider&lt;...&gt;.Domain.employeeTable.Get(rowKey: Row, partitionKey: Partition, ?connectionString: string) : Option&lt;AzureTypeProvider&lt;...&gt;.Domain.employeeEntity&gt;<br /><em><br /><br />Gets a single entity based on the row and partition key.</em></div>
+<div class="tip" id="fs13">Multiple items<br />union case Row.Row: string -&gt; Row<br /><br />--------------------<br />type Row = | Row of string<br /><br />Full name: FSharp.Azure.StorageTypeProvider.Table.Row</div>
+<div class="tip" id="fs14">Multiple items<br />union case Partition.Partition: string -&gt; Partition<br /><br />--------------------<br />type Partition = | Partition of string<br /><br />Full name: FSharp.Azure.StorageTypeProvider.Table.Partition</div>
+<div class="tip" id="fs15">val blobContents : string<br /><br />Full name: Quickstart.blobContents</div>
+<div class="tip" id="fs16">property AzureTypeProvider&lt;...&gt;.Containers: AzureTypeProvider&lt;...&gt;.Domain.Containers<br /><em><br /><br />Gets the list of all containers in this storage account.</em></div>
+<div class="tip" id="fs17">property AzureTypeProvider&lt;...&gt;.Domain.Containers.samples: AzureTypeProvider&lt;...&gt;.Domain.samplesContainer<br /><em><br /><br />Provides access to the &#39;samples&#39; container.</em></div>
+<div class="tip" id="fs18">val queueMessage : Async&lt;Queue.ProvidedQueueMessage option&gt;<br /><br />Full name: Quickstart.queueMessage</div>
+<div class="tip" id="fs19">property AzureTypeProvider&lt;...&gt;.Queues: AzureTypeProvider&lt;...&gt;.Domain.Queues<br /><em><br /><br />Gets the list of all queues in this storage account.</em></div>
+<div class="tip" id="fs20">val rawBlobRef : Microsoft.WindowsAzure.Storage.Blob.CloudBlockBlob<br /><br />Full name: Quickstart.rawBlobRef</div>
+<div class="tip" id="fs21">property AzureTypeProvider&lt;...&gt;.Domain.Containers.CloudBlobClient: Microsoft.WindowsAzure.Storage.Blob.CloudBlobClient<br /><em><br /><br />Gets a handle to the Blob Azure SDK client for this storage account.</em></div>
+<div class="tip" id="fs22">Microsoft.WindowsAzure.Storage.Blob.CloudBlobClient.GetContainerReference(containerName: string) : Microsoft.WindowsAzure.Storage.Blob.CloudBlobContainer</div>
+<div class="tip" id="fs23">val rawTableRef : Microsoft.WindowsAzure.Storage.Table.CloudTable<br /><br />Full name: Quickstart.rawTableRef</div>
+<div class="tip" id="fs24">property AzureTypeProvider&lt;...&gt;.Domain.Tables.CloudTableClient: Microsoft.WindowsAzure.Storage.Table.CloudTableClient<br /><em><br /><br />Gets a handle to the Table Azure SDK client for this storage account.</em></div>
+<div class="tip" id="fs25">Microsoft.WindowsAzure.Storage.Table.CloudTableClient.GetTableReference(tableName: string) : Microsoft.WindowsAzure.Storage.Table.CloudTable</div>
+<div class="tip" id="fs26">val rawBlobRefHybrid : Microsoft.WindowsAzure.Storage.Blob.CloudBlockBlob<br /><br />Full name: Quickstart.rawBlobRefHybrid</div>
+<div class="tip" id="fs27">val liveBlob : Microsoft.WindowsAzure.Storage.Blob.CloudBlockBlob<br /><br />Full name: Quickstart.liveBlob</div>
+<div class="tip" id="fs28">val row1A : Option&lt;AzureTypeProvider&lt;...&gt;.Domain.employeeEntity&gt;<br /><br />Full name: Quickstart.row1A</div>
+
+            </div>
+            <div class="span3">
+                <img src="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/img/logo.png" alt="F# Project" style="width:150px;margin:10px" />
+                <ul class="nav nav-list" id="menu" style="margin-top: 20px;">
+                    <li class="nav-header">Azure Storage Type Provider</li>
+                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/index.html">Home page</a></li>
+                    <li class="divider"></li>
+                    <li><a href="http://www.nuget.org/packages/FSharp.Azure.StorageTypeProvider">Get Library via NuGet</a></li>
+                    <li><a href="http://github.com/fsprojects/AzureStorageTypeProvider">Source Code on GitHub</a></li>
+                    <li><a href="http://github.com/fsprojects/AzureStorageTypeProvider/blob/master/LICENSE.txt">License</a></li>
+                    <li><a href="http://github.com/fsprojects/AzureStorageTypeProvider/blob/master/RELEASE_NOTES.md">Release Notes</a></li>
+
+                    <li class="nav-header">Getting started</li>
+                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/quickstart.html">Quick start</a></li>
+                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/blobs.html">Using Azure Blobs</a></li>
+                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/tables.html">Using Azure Tables</a></li>
+                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/queues.html">Using Azure Storage Queues</a></li>
+
+                    <li class="nav-header">Documentation</li>
+                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/reference/index.html">API Reference</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <a href="http://github.com/fsprojects/AzureStorageTypeProvider"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub" /></a>
+</body>
+</html>
