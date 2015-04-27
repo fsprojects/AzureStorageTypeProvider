@@ -42,7 +42,7 @@ open FSharp.MetadataFormat
 // When called from 'build.fsx', use the public project URL as <root>
 // otherwise, use the current 'output' directory.
 #if RELEASE
-let root = website
+let root = "."
 #else
 let root = "file://" + (__SOURCE_DIRECTORY__ @@ "../output")
 #endif

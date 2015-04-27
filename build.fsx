@@ -36,7 +36,7 @@ let solutionFile = "UnitTests"
 let testAssemblies = "tests/**/bin/Release/*Tests*.dll"
 // Git configuration (used for publishing documentation in gh-pages branch)
 // The profile where the project is posted 
-let gitHome = "https://github.com/fsprojects/AzureStorageTypeProvider"
+let gitHome = "https://github.com/fsprojects"
 // The name of the project on GitHub
 let gitName = "AzureStorageTypeProvider"
 
@@ -83,16 +83,27 @@ Target "IntegrationTests" (fun _ ->
 // Generate the documentation
 Target "CleanDocs" (fun _ -> CleanDirs [ "docs/output" ])
 Target "GenerateReferenceDocs" (fun _ ->
-    if not <| executeFSIWithArgs "docs/tools" "generate.fsx" ["--define:REFERENCE"] [] then
+    if not <| executeFSIWithArgs "docs/tools" "generate.fsx" ["--define:RELEASE"; "--define:REFERENCE"] [] then
       failwith "generating reference documentation failed"
 )
 
 Target "GenerateHelp" (fun _ ->
-    if not <| executeFSIWithArgs "docs/tools" "generate.fsx" ["--define:HELP"] [] then
+    if not <| executeFSIWithArgs "docs/tools" "generate.fsx" ["--define:RELEASE"; "--define:HELP"] [] then
       failwith "generating help documentation failed"
 )
 
 Target "GenerateDocs" DoNothing
+
+Target "ReleaseDocs" (fun _ ->
+    let tempDocsDir = "temp/gh-pages"
+    CleanDir tempDocsDir
+    Repository.cloneSingleBranch "" (gitHome + "/" + gitName + ".git") "gh-pages" tempDocsDir
+
+    CopyRecursive "docs/output" tempDocsDir true |> tracefn "%A"
+    StageAll tempDocsDir
+    Commit tempDocsDir (sprintf "Update generated documentation for version %s" release.NugetVersion)
+    Branches.push tempDocsDir
+)
 // --------------------------------------------------------------------------------------
 // Build a NuGet package
 Target "Package" 
@@ -120,12 +131,15 @@ Target "Package"
 // --------------------------------------------------------------------------------------
 // Run all targets by default. Invoke 'build <Target>' to override
 Target "All" DoNothing
+Target "Release" DoNothing
 
-"Build"
+"IntegrationTests"
   ==> "CleanDocs"
   ==> "GenerateHelp"
   ==> "GenerateReferenceDocs"
   ==> "GenerateDocs"
+  ==> "ReleaseDocs"
+  ==> "Release"
 
 "Clean"
   ==> "AssemblyInfo"
@@ -137,5 +151,4 @@ Target "All" DoNothing
   ==> "All"
 
 RunTargetOrDefault "GenerateDocs"
-
 

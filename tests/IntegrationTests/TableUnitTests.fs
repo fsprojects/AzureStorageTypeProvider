@@ -48,10 +48,12 @@ let ``Non matching row key returns None``() =
     | None -> ()
 
 [<Fact>]
+[<ResetTableData>]
 let ``Gets all rows in a table``() =
     table.Query().Execute().Length =? 5
 
 [<Fact>]
+[<ResetTableData>]
 let ``Gets all rows in a partition``() =
     table.GetPartition("men").Length =? 3
 
@@ -121,20 +123,24 @@ let ``Inserts many rows using provided types correctly``() =
     table.GetPartition("sample").Length =? 2
 
 [<Fact>]
+[<ResetTableData>]
 let ``Query without arguments brings back all rows``() =
     table.Query().Execute().Length =? 5
 
 [<Fact>]
+[<ResetTableData>]
 let ``Query with single query part brings back correct rows``() =
     table.Query().``Where Name Is``.``Equal To``("fred").Execute().Length =? 2
 
 [<Fact>]
+[<ResetTableData>]
 let ``Query with many query parts brings back correct rows``() =
      table.Query().``Where Name Is``.``Equal To``("fred")
                   .``Where Years Working Is``.``Equal To``(35)
                   .Execute().Length =? 1
 
 [<Fact(Skip = "true")>]
+[<ResetTableData>]
 let ``Query conditions on floats are correctly generated``() =
     table.Query().``Where Salary Is``.``Greater Than``(1.0)
                  .Execute().Length =? 5
