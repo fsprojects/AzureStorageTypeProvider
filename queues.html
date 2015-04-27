@@ -13,9 +13,9 @@
     <script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
     <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet" />
 
-    <link type="text/css" rel="stylesheet" href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/content/style.css" />
+    <link type="text/css" rel="stylesheet" href="FSharp.Azure.StorageTypeProvider/content/style.css" />
     <link type="text/css" rel="stylesheet" href="deedle.css" />
-    <script type="text/javascript" src="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/content/tips.js"></script>
+    <script type="text/javascript" src="FSharp.Azure.StorageTypeProvider/content/tips.js"></script>
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -28,7 +28,7 @@
                 <li><a href="http://fsharp.org">fsharp.org</a></li>
                 <li><a href="http://github.com/fsprojects/AzureStorageTypeProvider">github page</a></li>
             </ul>
-            <h3 class="muted"><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/index.html">Azure Storage Type Provider</a></h3>
+            <h3 class="muted"><a href="FSharp.Azure.StorageTypeProvider/index.html">Azure Storage Type Provider</a></h3>
         </div>
         <hr />
         <div class="row">
@@ -114,12 +114,12 @@ Enqueuing a message!
 Queue length is 1.
 {Id =
   ProvidedMessageId
-    (MessageId "4fa9c85f-5705-4b9b-b355-82e394718cf0",
-     PopReceipt "8C03+xtP0ggBAAAA");
+    (MessageId "b9d44cf0-c197-4b1e-99b1-2dd9e42ea31e",
+     PopReceipt "UPgU2RxP0ggBAAAA");
  DequeueCount = 1;
- InsertionTime = Some 27/04/2015 16:11:10 +00:00;
- ExpirationTime = Some 04/05/2015 16:11:10 +00:00;
- NextVisibleTime = Some 27/04/2015 16:11:41 +00:00;
+ InsertionTime = Some 27/04/2015 16:17:23 +00:00;
+ ExpirationTime = Some 04/05/2015 16:17:23 +00:00;
+ NextVisibleTime = Some 27/04/2015 16:17:53 +00:00;
  AsBytes =
   [|72uy; 101uy; 108uy; 108uy; 111uy; 32uy; 102uy; 114uy; 111uy; 109uy; 32uy;
     65uy; 122uy; 117uy; 114uy; 101uy; 32uy; 84uy; 121uy; 112uy; 101uy; 32uy;
@@ -189,12 +189,12 @@ the queue entirely.</p>
 <table class="pre"><tr><td><pre><code>Enqueuing a message!
 Dequeuing it.
 Message ProvidedMessageId
-  (MessageId "265c7dcc-4592-4b6b-87ac-fa65f73c30d4",
-   PopReceipt "sIpM+xtP0ggBAAAA") with body 'Hello from Azure Type Provider' has been dequeued 1 times.
+  (MessageId "c532b493-2e7e-49d7-9cbc-e54936fbdde1",
+   PopReceipt "EFUq2RxP0ggBAAAA") with body 'Hello from Azure Type Provider' has been dequeued 1 times.
 Updating it and dequeuing it again.
 Message ProvidedMessageId
-  (MessageId "265c7dcc-4592-4b6b-87ac-fa65f73c30d4",
-   PopReceipt "kI9T+xtP0ggCAAAA") with body 'Goodbye from Azure Type Provider' has been dequeued 2 times.</code></pre></td></tr></table>
+  (MessageId "c532b493-2e7e-49d7-9cbc-e54936fbdde1",
+   PopReceipt "wOQw2RxP0ggCAAAA") with body 'Goodbye from Azure Type Provider' has been dequeued 2 times.</code></pre></td></tr></table>
 
 <h2><a name="Peeking-the-queue" class="anchor" href="#Peeking-the-queue">Peeking the queue</a></h2>
 
@@ -237,10 +237,10 @@ Properties on them can be bound with their values.</p>
 
             </div>
             <div class="span3">
-                <img src="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/img/logo.png" alt="F# Project" style="width:150px;margin:10px" />
+                <img src="FSharp.Azure.StorageTypeProvider/img/logo.png" alt="F# Project" style="width:150px;margin:10px" />
                 <ul class="nav nav-list" id="menu" style="margin-top: 20px;">
                     <li class="nav-header">Azure Storage Type Provider</li>
-                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/index.html">Home page</a></li>
+                    <li><a href="FSharp.Azure.StorageTypeProvider/index.html">Home page</a></li>
                     <li class="divider"></li>
                     <li><a href="http://www.nuget.org/packages/FSharp.Azure.StorageTypeProvider">Get Library via NuGet</a></li>
                     <li><a href="http://github.com/fsprojects/AzureStorageTypeProvider">Source Code on GitHub</a></li>
@@ -248,13 +248,13 @@ Properties on them can be bound with their values.</p>
                     <li><a href="http://github.com/fsprojects/AzureStorageTypeProvider/blob/master/RELEASE_NOTES.md">Release Notes</a></li>
 
                     <li class="nav-header">Getting started</li>
-                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/quickstart.html">Quick start</a></li>
-                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/blobs.html">Using Azure Blobs</a></li>
-                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/tables.html">Using Azure Tables</a></li>
-                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/queues.html">Using Azure Storage Queues</a></li>
+                    <li><a href="FSharp.Azure.StorageTypeProvider/quickstart.html">Quick start</a></li>
+                    <li><a href="FSharp.Azure.StorageTypeProvider/blobs.html">Using Azure Blobs</a></li>
+                    <li><a href="FSharp.Azure.StorageTypeProvider/tables.html">Using Azure Tables</a></li>
+                    <li><a href="FSharp.Azure.StorageTypeProvider/queues.html">Using Azure Storage Queues</a></li>
 
                     <li class="nav-header">Documentation</li>
-                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/reference/index.html">API Reference</a></li>
+                    <li><a href="FSharp.Azure.StorageTypeProvider/reference/index.html">API Reference</a></li>
                 </ul>
             </div>
         </div>
