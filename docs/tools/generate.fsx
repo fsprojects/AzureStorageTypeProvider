@@ -12,8 +12,6 @@
 // referenceBinaries list below in order to generate documentation for the binaries.
 // (This is the original behaviour of ProjectScaffold prior to multi project support)
 let referenceBinaries = [ @"..\..\bin\FSharp.Azure.StorageTypeProvider.dll" ]
-// Web site location for the generated documentation
-let website = "FSharp.Azure.StorageTypeProvider"
 
 let githubLink = "http://github.com/fsprojects/AzureStorageTypeProvider"
 

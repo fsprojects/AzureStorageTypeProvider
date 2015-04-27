@@ -133,7 +133,7 @@ Target "Package"
 Target "All" DoNothing
 Target "Release" DoNothing
 
-"IntegrationTests"
+"Build"
   ==> "CleanDocs"
   ==> "GenerateHelp"
   ==> "GenerateReferenceDocs"
