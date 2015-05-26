@@ -150,5 +150,5 @@ Target "Release" DoNothing
   ==> "Package"
   ==> "All"
 
-RunTargetOrDefault "GenerateDocs"
+RunTargetOrDefault "ReleaseDocs"
 

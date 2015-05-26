@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Elastacloud.AzureTypeProvider</RootNamespace>
     <AssemblyName>FSharp.Azure.StorageTypeProvider</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <Name>FSharp.Azure.StorageTypeProvider</Name>
     <TargetFSharpCoreVersion>4.3.1.0</TargetFSharpCoreVersion>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>

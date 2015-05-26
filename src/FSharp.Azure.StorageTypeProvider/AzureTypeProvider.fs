@@ -1,8 +1,8 @@
 ﻿namespace ProviderImplementation
 
 open FSharp.Azure.StorageTypeProvider.Blob
-open FSharp.Azure.StorageTypeProvider.Table
 open FSharp.Azure.StorageTypeProvider.Queue
+open FSharp.Azure.StorageTypeProvider.Table
 open Microsoft.FSharp.Core.CompilerServices
 open ProviderImplementation.ProvidedTypes
 open System
