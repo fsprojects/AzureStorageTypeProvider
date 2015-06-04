@@ -127,6 +127,7 @@ Target "Package"
                         "Microsoft.WindowsAzure.Configuration.dll"; "Microsoft.WindowsAzure.Storage.dll"; 
                         "Newtonsoft.Json.dll"; "System.Spatial.dll" ] 
                      |> List.map (fun file -> @"..\bin\" + file, Some "lib/net40", None))
+                    @ [ "StorageTypeProvider.fsx", None, None ]
                      }) 
         ("nuget/" + project + ".nuspec"))
 // --------------------------------------------------------------------------------------
