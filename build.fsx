@@ -120,7 +120,7 @@ Target "Package"
                  Tags = tags
                  OutputPath = "bin"
                  Dependencies = ["WindowsAzure.Storage","4.3.0"]
-                 References = ["FSharp.Azure.StorageTypeProvider.xml"; "FSharp.Azure.StorageTypeProvider.dll"] 
+                 References = ["FSharp.Azure.StorageTypeProvider.dll"] 
                  Files = 
                      ([ "FSharp.Azure.StorageTypeProvider.xml"; "FSharp.Azure.StorageTypeProvider.dll"; "Microsoft.Data.Edm.dll"; 
                         "Microsoft.Data.OData.dll"; "Microsoft.Data.Services.Client.dll"; 
