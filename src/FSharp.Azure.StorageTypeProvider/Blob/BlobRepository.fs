@@ -6,17 +6,18 @@ open Microsoft.WindowsAzure.Storage.Blob
 open System
 open System.IO
 
-type containerItem = 
-    | Folder of path : string * name : string * contents : (unit -> array<containerItem>)
+type ContainerItem = 
+    | Folder of path : string * name : string * contents : (unit -> array<ContainerItem>)
     | Blob of path : string * name : string * properties : BlobProperties
 
 type LightweightContainer = 
     { Name : string
-      GetFiles : unit -> seq<containerItem> }
+      GetFiles : unit -> seq<ContainerItem> }
 
 let getBlobClient connection = CloudStorageAccount.Parse(connection).CreateCloudBlobClient()
 let getContainerRef(connection, container) = (getBlobClient connection).GetContainerReference(container)
-let getBlobRef (connection, container, file) = getContainerRef(connection, container).GetBlockBlobReference(file)
+let getBlockBlobRef (connection, container, file) = getContainerRef(connection, container).GetBlockBlobReference(file)
+let getPageBlobRef (connection, container, file) = getContainerRef(connection, container).GetPageBlobReference(file)
 
 let private getItemName (item : string) (parent : CloudBlobDirectory) = 
     item, 
@@ -24,16 +25,16 @@ let private getItemName (item : string) (parent : CloudBlobDirectory) =
     else item.Substring(parent.Prefix.Length)
 
 let rec private getContainerStructure wildcard (container : CloudBlobContainer) = 
-    container.ListBlobs(prefix = wildcard)
+    container.ListBlobs(prefix = wildcard, blobListingDetails = BlobListingDetails.Metadata)
     |> Seq.distinctBy (fun b -> b.Uri.AbsoluteUri)
     |> Seq.choose (function
        | :? CloudBlobDirectory as directory -> 
            let path, name = getItemName directory.Prefix directory.Parent
            Some(Folder(path, name, (fun () -> container |> getContainerStructure directory.Prefix)))
-       | :? CloudBlockBlob as blob -> 
+       | :? ICloudBlob as blob ->
            let path, name = getItemName blob.Name blob.Parent
            Some(Blob(path, name, blob.Properties))
-       | _ -> None) //todo: Handle CloudPageBlobs!
+       | _ -> None)
     |> Seq.toArray
 
 let getBlobStorageAccountManifest connection = 
@@ -48,25 +49,24 @@ let getBlobStorageAccountManifest connection =
 let awaitUnit = Async.AwaitIAsyncResult >> Async.Ignore
 
 let downloadFolder (connectionDetails, path) =
-    let downloadFile(connectionDetails, destination) =
-        let blobRef = getBlobRef (connectionDetails)
+    let downloadFile (blobRef:ICloudBlob) destination =
         let targetDirectory = Path.GetDirectoryName(destination)
         if not (Directory.Exists targetDirectory) then Directory.CreateDirectory targetDirectory |> ignore
         blobRef.DownloadToFileAsync(destination, FileMode.Create) |> awaitUnit
 
     let connection, container, folderPath = connectionDetails
     let containerRef = (getBlobClient connection).GetContainerReference(container)
-    containerRef.ListBlobs(prefix = folderPath, useFlatBlobListing = true)
+    containerRef.ListBlobs(prefix = folderPath, useFlatBlobListing = true, blobListingDetails = BlobListingDetails.Metadata)
     |> Seq.choose (fun b -> 
            match b with
-           | :? CloudBlockBlob as b -> Some b
+           | :? ICloudBlob as b -> Some b
            | _ -> None)
     |> Seq.map (fun blob -> 
            let targetName = 
                match folderPath with
                | folderPath when String.IsNullOrEmpty folderPath -> blob.Name
                | _ -> blob.Name.Replace(folderPath, String.Empty)
-           downloadFile((connection,container,blob.Name),(Path.Combine(path, targetName))))
+           downloadFile blob (Path.Combine(path, targetName)))
     |> Async.Parallel
     |> Async.Ignore
     |> Async.Start

@@ -16,16 +16,16 @@ let rec private createBlobItem (domainType : ProvidedTypeDefinition) connectionS
              |> Array.choose (createBlobItem domainType connectionString containerName)
              |> Array.toList))
         Some <| ProvidedProperty(name, folderProp, GetterCode = fun _ -> <@@ ContainerBuilder.createBlobFolder connectionString containerName path @@>)
-    | Blob(path, name, _) -> 
+    | Blob(path, name, properties) -> 
         let fileType = 
             match path with
-            | ContainerBuilder.XML -> "XmlFile"
-            | ContainerBuilder.Binary | ContainerBuilder.Text -> "BlobFile"
+            | ContainerBuilder.XML -> "XmlBlob"
+            | ContainerBuilder.Binary | ContainerBuilder.Text -> "BlockBlob"
         
         let fileTypeDefinition = domainType.GetMember(fileType).[0] :?> ProvidedTypeDefinition
-        match BlobFile(connectionString, containerName, path).Size with
+        match properties.Length with
         | 0L -> None
-        | _ -> Some <| ProvidedProperty(name, fileTypeDefinition, GetterCode = fun _ -> <@@ ContainerBuilder.createBlobFile connectionString containerName path @@>)
+        | _ -> Some <| ProvidedProperty(name, fileTypeDefinition, GetterCode = fun _ -> <@@ ContainerBuilder.createBlockBlobFile connectionString containerName path @@>)
 
 let private createContainerType (domainType : ProvidedTypeDefinition) connectionString (container : LightweightContainer) = 
     let individualContainerType = ProvidedTypeDefinition(container.Name + "Container", Some typeof<BlobContainer>, HideObjectMethods = true)
