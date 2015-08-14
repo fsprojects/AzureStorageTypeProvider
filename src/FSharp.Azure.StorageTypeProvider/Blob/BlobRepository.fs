@@ -25,7 +25,7 @@ let private getItemName (item : string) (parent : CloudBlobDirectory) =
     else item.Substring(parent.Prefix.Length)
 
 let rec private getContainerStructure wildcard (container : CloudBlobContainer) = 
-    container.ListBlobs(prefix = wildcard, blobListingDetails = BlobListingDetails.Metadata)
+    container.ListBlobs(prefix = wildcard)
     |> Seq.distinctBy (fun b -> b.Uri.AbsoluteUri)
     |> Seq.choose (function
        | :? CloudBlobDirectory as directory -> 
@@ -56,7 +56,7 @@ let downloadFolder (connectionDetails, path) =
 
     let connection, container, folderPath = connectionDetails
     let containerRef = (getBlobClient connection).GetContainerReference(container)
-    containerRef.ListBlobs(prefix = folderPath, useFlatBlobListing = true, blobListingDetails = BlobListingDetails.Metadata)
+    containerRef.ListBlobs(prefix = folderPath, useFlatBlobListing = true)
     |> Seq.choose (fun b -> 
            match b with
            | :? ICloudBlob as b -> Some b

@@ -21,7 +21,7 @@ type BlobFile internal (defaultConnectionString, container, file, getBlobRef : _
     member private __.BlobRef connectionString = getBlobRef connectionString
     
     /// Gets a handle to the Azure SDK client for this blob.
-    member this.AsCloudBlob(?connectionString) = this.BlobRef(connectionString)
+    member this.AsICloudBlob(?connectionString) = this.BlobRef(connectionString)
 
     /// Generates a full-access shared-access signature for the supplied duration.
     member this.GenerateSharedAccessSignature(duration, ?connectionString) = 
@@ -66,6 +66,11 @@ type BlockBlobFile internal (defaultConnectionString, container, file) =
     /// Reads this file as a string asynchronously.
     member __.ReadAsync(?connectionString) = getBlobRef(connectionString).DownloadTextAsync() |> Async.AwaitTask
 
+type PageBlobFile internal (defaultConnectionString, container, file) =
+    inherit BlobFile(defaultConnectionString, container, file, (getPageBlobRef >> fun x -> x :> ICloudBlob))
+
+    /// Gets a handle to the Azure SDK client for this blob.
+    member __.AsPageBlockBlob(?connectionString) = getPageBlobRef(defaultArg connectionString defaultConnectionString, container, file)
 
 /// Represents an XML file stored in blob storage.
 type XmlFile internal (defaultConnectionString, container, file) = 
@@ -107,6 +112,7 @@ type BlobContainer internal (defaultConnectionString, container) =
 module internal ProvidedTypeGenerator = 
     let generateTypes() = 
         [ ProvidedTypeDefinition("BlockBlob", Some typeof<BlockBlobFile>, HideObjectMethods = true)
+          ProvidedTypeDefinition("PageBlob", Some typeof<PageBlobFile>, HideObjectMethods = true)
           ProvidedTypeDefinition("XmlBlob", Some typeof<XmlFile>, HideObjectMethods = true) ]
 
 /// Builder methods to construct blobs etc..
@@ -119,12 +125,16 @@ module ContainerBuilder =
         | _ when endsWith ".xml" -> XML
         | _ -> Binary
     
-    /// Creates a blob file object.
+    /// Creates a block blob file object.
     let createBlockBlobFile connectionString containerName path = 
         let details = connectionString, containerName, path
         match path with
-        | XML -> new XmlFile(details) :> BlockBlobFile
-        | Text | Binary -> new BlockBlobFile(details)
+        | XML -> XmlFile(details) :> BlockBlobFile
+        | Text | Binary -> BlockBlobFile(details)
+
+    /// Creates a page blob file object.
+    let createPageBlobFile connectionString containerName path = 
+        PageBlobFile(connectionString, containerName, path)
     
     /// Creates a blob container object.
     let createContainer connectionString containerName = BlobContainer(connectionString, containerName)
