@@ -119,9 +119,11 @@ Target "Package"
                  ReleaseNotes = release.Notes |> String.concat Environment.NewLine
                  Tags = tags
                  OutputPath = "bin"
+                 Dependencies = ["WindowsAzure.Storage","4.3.0"]
+                 References = ["FSharp.Azure.StorageTypeProvider.dll"] 
                  Files = 
-                     ([ "FSharp.Azure.StorageTypeProvider.xml"; "FSharp.Azure.StorageTypeProvider.dll"; 
-                        "Microsoft.Data.Edm.dll"; "Microsoft.Data.OData.dll"; "Microsoft.Data.Services.Client.dll"; 
+                     ([ "FSharp.Azure.StorageTypeProvider.xml"; "FSharp.Azure.StorageTypeProvider.dll"; "Microsoft.Data.Edm.dll"; 
+                        "Microsoft.Data.OData.dll"; "Microsoft.Data.Services.Client.dll"; 
                         "Microsoft.WindowsAzure.Configuration.dll"; "Microsoft.WindowsAzure.Storage.dll"; 
                         "Newtonsoft.Json.dll"; "System.Spatial.dll" ] 
                      |> List.map (fun file -> @"..\bin\" + file, Some "lib/net40", None))
