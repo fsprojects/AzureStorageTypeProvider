@@ -25,9 +25,7 @@ let rec private createBlobItem (domainType : ProvidedTypeDefinition) connectionS
         let fileTypeDefinition = domainType.GetMember(fileType).[0] :?> ProvidedTypeDefinition
         match BlobFile(connectionString, containerName, path).Size with
         | 0L -> None
-        | _ -> 
-            Some 
-            <| ProvidedProperty(name, fileTypeDefinition, GetterCode = fun _ -> <@@ ContainerBuilder.createBlobFile connectionString containerName path @@>)
+        | _ -> Some <| ProvidedProperty(name, fileTypeDefinition, GetterCode = fun _ -> <@@ ContainerBuilder.createBlobFile connectionString containerName path @@>)
 
 let private createContainerType (domainType : ProvidedTypeDefinition) connectionString (container : LightweightContainer) = 
     let individualContainerType = ProvidedTypeDefinition(container.Name + "Container", Some typeof<BlobContainer>, HideObjectMethods = true)

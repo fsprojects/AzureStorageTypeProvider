@@ -26,16 +26,14 @@ let private getItemName (item : string) (parent : CloudBlobDirectory) =
 let rec private getContainerStructure wildcard (container : CloudBlobContainer) = 
     container.ListBlobs(prefix = wildcard)
     |> Seq.distinctBy (fun b -> b.Uri.AbsoluteUri)
-    |> Seq.choose (fun item -> 
-           match item with
-           | :? CloudBlobDirectory as directory -> 
-               let path, name = getItemName directory.Prefix directory.Parent
-               Some(Folder(path, name, (fun () -> container |> getContainerStructure directory.Prefix)))
-           | :? CloudBlockBlob as blob -> 
-               let path, name = getItemName blob.Name blob.Parent
-               Some(Blob(path, name, blob.Properties))
-           | :? CloudPageBlob -> None //todo: Handle page blobs!
-           | _ -> failwith "unknown type")
+    |> Seq.choose (function
+       | :? CloudBlobDirectory as directory -> 
+           let path, name = getItemName directory.Prefix directory.Parent
+           Some(Folder(path, name, (fun () -> container |> getContainerStructure directory.Prefix)))
+       | :? CloudBlockBlob as blob -> 
+           let path, name = getItemName blob.Name blob.Parent
+           Some(Blob(path, name, blob.Properties))
+       | _ -> None) //todo: Handle CloudPageBlobs!
     |> Seq.toArray
 
 let getBlobStorageAccountManifest connection = 
