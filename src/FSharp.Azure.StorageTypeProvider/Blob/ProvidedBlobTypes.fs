@@ -44,6 +44,14 @@ type BlobFile internal (defaultConnectionString, container, file) =
     /// Opens this file as a text stream for reading.
     member this.OpenStreamAsText() = new StreamReader(this.OpenStream())
 
+    /// Lazily read the contents of this blob a line at a time.
+    member this.ReadLines() =
+        seq {
+            use stream = this.OpenStreamAsText()
+            while not stream.EndOfStream do
+                yield stream.ReadLine()
+        }
+
     /// Reads this file as a string.
     member __.Read(?connectionString) = getBlobRef(connectionString).DownloadText()
     
