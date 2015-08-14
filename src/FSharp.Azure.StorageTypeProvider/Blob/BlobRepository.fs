@@ -71,4 +71,3 @@ let downloadFolder (connectionDetails, path) =
            downloadFile((connection,container,blob.Name),(Path.Combine(path, targetName))))
     |> Async.Parallel
     |> Async.Ignore
-    |> Async.Start
