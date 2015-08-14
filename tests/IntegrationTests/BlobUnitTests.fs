@@ -84,7 +84,7 @@ let ``Page Blobs support streams``() =
 
 [<Fact>]
 let ``CloudPageBlob relates to the same data as the type provider``() =
-    let blob = container.``pageData.bin``.AsPageBlockBlob()
+    let blob = container.``pageData.bin``.AsCloudPageBlob()
     blob.Name =? "pageData.bin"
 
 [<Fact>]

@@ -70,7 +70,7 @@ type PageBlobFile internal (defaultConnectionString, container, file) =
     inherit BlobFile(defaultConnectionString, container, file, (getPageBlobRef >> fun x -> x :> ICloudBlob))
 
     /// Gets a handle to the Azure SDK client for this blob.
-    member __.AsPageBlockBlob(?connectionString) = getPageBlobRef(defaultArg connectionString defaultConnectionString, container, file)
+    member __.AsCloudPageBlob(?connectionString) = getPageBlobRef(defaultArg connectionString defaultConnectionString, container, file)
 
 /// Represents an XML file stored in blob storage.
 type XmlFile internal (defaultConnectionString, container, file) = 
