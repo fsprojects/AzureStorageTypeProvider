@@ -6,13 +6,14 @@
         <title>@title@</title>
         <authors>@authors@</authors>
         <owners>@authors@</owners>
-        <projectUrl>https://github.com/isaacabraham/AzureStorageTypeProvider</projectUrl>
+        <projectUrl>https://github.com/fsprojects/AzureStorageTypeProvider</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>@description@</description>
         <tags>@tags@</tags>
         <summary>@summary@</summary>
         <releaseNotes>@releaseNotes@</releaseNotes>
         @dependencies@
+        @references@
     </metadata>
     @files@
 </package>

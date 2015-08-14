@@ -27,3 +27,6 @@
 * Simplified some naming of methods on blobs.
 
 ### 1.3.0 - ???
+* Lots of work on documentation.
+* Go back to .NET 4.0 dependency - no need to push up to 4.5.1.
+* Blobs now support connection string overrides.

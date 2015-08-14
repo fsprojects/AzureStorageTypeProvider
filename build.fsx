@@ -68,9 +68,17 @@ Target "Build" (fun _ ->
 // --------------------------------------------------------------------------------------
 // Testing
 Target "ResetTestData" (fun _ ->
+    let emulatorPath =
+        [ "AzureStorageEmulator"; "WAStorageEmulator" ]
+        |> List.map (combinePaths ProgramFilesX86 << sprintf @"Microsoft SDKs\Azure\Storage Emulator\%s.exe")
+        |> List.tryFind fileExists
+        |> function
+        | None -> failwith "Unable to locate Azure Storage Emulator!"
+        | Some file -> file
+
     { defaultParams with
         CommandLine = "start"
-        Program = combinePaths ProgramFilesX86 @"Microsoft SDKs\Azure\Storage Emulator\WAStorageEmulator.exe" } |> shellExec |> ignore
+        Program = combinePaths ProgramFilesX86 emulatorPath } |> shellExec |> ignore
     FSIHelper.executeFSI (Path.Combine(__SOURCE_DIRECTORY__, @"tests\IntegrationTests")) "ResetTestData.fsx" []
     |> snd
     |> Seq.iter(fun x -> printfn "%s" x.Message)
@@ -108,28 +116,26 @@ Target "ReleaseDocs" (fun _ ->
 // Build a NuGet package
 Target "Package" 
     (fun _ -> 
-    NuGet 
-        (fun p -> 
-        { p with Authors = authors
-                 Project = project                 
-                 Title = "F# Azure Storage Type Provider"
-                 Summary = summary
-                 Description = description
-                 Version = release.NugetVersion
-                 ReleaseNotes = release.Notes |> String.concat Environment.NewLine
-                 Tags = tags
-                 OutputPath = "bin"
-                 Dependencies = ["WindowsAzure.Storage","4.3.0"]
-                 References = ["FSharp.Azure.StorageTypeProvider.dll"] 
-                 Files = 
-                     ([ "FSharp.Azure.StorageTypeProvider.xml"; "FSharp.Azure.StorageTypeProvider.dll"; "Microsoft.Data.Edm.dll"; 
-                        "Microsoft.Data.OData.dll"; "Microsoft.Data.Services.Client.dll"; 
-                        "Microsoft.WindowsAzure.Configuration.dll"; "Microsoft.WindowsAzure.Storage.dll"; 
-                        "Newtonsoft.Json.dll"; "System.Spatial.dll" ] 
-                     |> List.map (fun file -> @"..\bin\" + file, Some "lib/net40", None))
-                     @ [ "StorageTypeProvider.fsx", None, None ]
-                     }) 
-        ("nuget/" + project + ".nuspec"))
+        NuGet (fun p ->
+            { p with Authors = authors
+                     Project = project
+                     Title = "F# Azure Storage Type Provider"
+                     Summary = summary
+                     Description = description
+                     Version = release.NugetVersion
+                     ReleaseNotes = release.Notes |> String.concat Environment.NewLine
+                     Tags = tags
+                     OutputPath = "bin"
+                     Dependencies = [ "WindowsAzure.Storage", "4.3.0" ]
+                     References = [ "FSharp.Azure.StorageTypeProvider.dll" ]
+                     Files = 
+                         ([ "FSharp.Azure.StorageTypeProvider.xml"; "FSharp.Azure.StorageTypeProvider.dll"; "Microsoft.Data.Edm.dll"; 
+                            "Microsoft.Data.OData.dll"; "Microsoft.Data.Services.Client.dll"; 
+                            "Microsoft.WindowsAzure.Configuration.dll"; "Microsoft.WindowsAzure.Storage.dll"; 
+                            "Newtonsoft.Json.dll"; "System.Spatial.dll" ] 
+                          |> List.map (fun file -> @"..\bin\" + file, Some "lib/net40", None))
+                          @ [ "StorageTypeProvider.fsx", None, None ] }) 
+              ("nuget/" + project + ".nuspec"))
 // --------------------------------------------------------------------------------------
 // Run all targets by default. Invoke 'build <Target>' to override
 Target "All" DoNothing
