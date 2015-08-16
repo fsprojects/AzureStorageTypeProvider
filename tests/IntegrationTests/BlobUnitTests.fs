@@ -70,6 +70,23 @@ let ``Cloud Blob Container relates to the same data as the type provider``() =
     blobs =? [ "data.xml"; "file1.txt"; "file2.txt"; "file3.txt"; "sample.txt" ]
 
 [<Fact>]
-let ``Cloud Block Blob relates to the same data as the type provider``() =
+let ``CloudBlockBlob relates to the same data as the type provider``() =
     let blob = container.``data.xml``.AsCloudBlockBlob()
     blob.Name =? "data.xml"
+
+[<Fact>]
+let ``Page Blobs are listed``() =
+    container.``pageData.bin`` // compiles!
+
+[<Fact>]
+let ``Page Blobs support streams``() =
+    container.``pageData.bin``.OpenStreamAsText().ReadToEnd().StartsWith "hello from page blob" =? true
+
+[<Fact>]
+let ``CloudPageBlob relates to the same data as the type provider``() =
+    let blob = container.``pageData.bin``.AsCloudPageBlob()
+    blob.Name =? "pageData.bin"
+
+[<Fact>]
+let ``Page Blobs calculate size correctly``() =
+    container.``pageData.bin``.Size =? 512L

@@ -2,30 +2,44 @@
 #r @"..\..\packages\WindowsAzure.Storage\lib\net40\Microsoft.WindowsAzure.Storage.dll"
 
 open Microsoft.WindowsAzure.Storage
+open System.Text
 
 let logWith entity func =
     printfn "Resetting %s data..." entity
     func()
     printfn "Done!"
 
-fun () ->
+let createData _ =
     let blobClient = CloudStorageAccount.DevelopmentStorageAccount.CreateCloudBlobClient()
-    let container = blobClient.GetContainerReference("samples")
+    let container = blobClient.GetContainerReference "samples"
 
     if container.Exists() then container.Delete()
     container.Create()
 
-    let createBlob fileName contents =
-        let blob = container.GetBlockBlobReference(fileName)
-        blob.UploadText(contents)
+    let createBlockBlob fileName contents =
+        let blob = container.GetBlockBlobReference fileName
+        blob.UploadText contents
 
-    createBlob "file1.txt" "stuff"
-    createBlob "file2.txt" "more stuff"
-    createBlob "file3.txt" "even more stuff"
-    createBlob "folder/childFile.txt" "child file stuff"
-    createBlob "sample.txt" "the quick brown fox jumps over the lazy dog\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Cras malesuada.\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla porttitor."
-    createBlob "data.xml" "<data><items><item>thing</item></items></data>"
-|> logWith "blob"
+    let createPageBlob fileName (contents:string) =
+        let blob = container.GetPageBlobReference fileName
+
+        let bytes =
+            let data = contents |> Encoding.UTF8.GetBytes |> ResizeArray
+            let output = Array.init (data.Count - (data.Count % 512) + 512) (fun _ -> 0uy)
+            data.CopyTo output
+            output
+        blob.UploadFromByteArray(bytes, 0, bytes.Length)
+
+    createBlockBlob "file1.txt" "stuff"
+    createBlockBlob "file2.txt" "more stuff"
+    createBlockBlob "file3.txt" "even more stuff"
+    createBlockBlob "folder/childFile.txt" "child file stuff"
+    createBlockBlob "sample.txt" "the quick brown fox jumps over the lazy dog\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Cras malesuada.\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla porttitor."
+    createBlockBlob "data.xml" "<data><items><item>thing</item></items></data>"
+    createPageBlob "pageData.bin" "hello from page blob"
+    createPageBlob "folder/pageDataChild.txt" "hello from child page blob"
+
+createData |> logWith "blob"
 
 #load "TableHelpers.fs"
 #load "QueueHelpers.fs"

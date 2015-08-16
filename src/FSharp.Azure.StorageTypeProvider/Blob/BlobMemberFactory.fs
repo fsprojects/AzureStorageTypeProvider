@@ -16,16 +16,19 @@ let rec private createBlobItem (domainType : ProvidedTypeDefinition) connectionS
              |> Array.choose (createBlobItem domainType connectionString containerName)
              |> Array.toList))
         Some <| ProvidedProperty(name, folderProp, GetterCode = fun _ -> <@@ ContainerBuilder.createBlobFolder connectionString containerName path @@>)
-    | Blob(path, name, _) -> 
-        let fileType = 
-            match path with
-            | ContainerBuilder.XML -> "XmlFile"
-            | ContainerBuilder.Binary | ContainerBuilder.Text -> "BlobFile"
-        
-        let fileTypeDefinition = domainType.GetMember(fileType).[0] :?> ProvidedTypeDefinition
-        match BlobFile(connectionString, containerName, path).Size with
-        | 0L -> None
-        | _ -> Some <| ProvidedProperty(name, fileTypeDefinition, GetterCode = fun _ -> <@@ ContainerBuilder.createBlobFile connectionString containerName path @@>)
+    | Blob(path, name, properties) -> 
+        let fileTypeDefinition = 
+            match properties.BlobType, path with
+            | BlobType.PageBlob, _ -> "PageBlob"
+            | _, ContainerBuilder.XML -> "XmlBlob"
+            | _, ContainerBuilder.Binary | _, ContainerBuilder.Text -> "BlockBlob"
+            |> fun typeName -> domainType.GetMember(typeName).[0] :?> ProvidedTypeDefinition
+
+        match properties.BlobType, properties.Length with
+        | _, 0L -> None
+        | BlobType.PageBlob, _ -> Some <| ProvidedProperty(name, fileTypeDefinition, GetterCode = fun _ -> <@@ ContainerBuilder.createPageBlobFile connectionString containerName path @@>)
+        | BlobType.BlockBlob, _ -> Some <| ProvidedProperty(name, fileTypeDefinition, GetterCode = fun _ -> <@@ ContainerBuilder.createBlockBlobFile connectionString containerName path @@>)
+        | _ -> None
 
 let private createContainerType (domainType : ProvidedTypeDefinition) connectionString (container : LightweightContainer) = 
     let individualContainerType = ProvidedTypeDefinition(container.Name + "Container", Some typeof<BlobContainer>, HideObjectMethods = true)
