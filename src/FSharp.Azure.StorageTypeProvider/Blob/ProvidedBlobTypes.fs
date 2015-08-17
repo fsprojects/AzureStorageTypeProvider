@@ -119,7 +119,8 @@ type BlobContainer internal (defaultConnectionString, container) =
 
 module internal ProvidedTypeGenerator = 
     let generateTypes() = 
-        [ ProvidedTypeDefinition("BlockBlob", Some typeof<BlockBlobFile>, HideObjectMethods = true)
+        [ ProvidedTypeDefinition("BlobFile", Some typeof<BlobFile>, HideObjectMethods = true)
+          ProvidedTypeDefinition("BlockBlob", Some typeof<BlockBlobFile>, HideObjectMethods = true)
           ProvidedTypeDefinition("PageBlob", Some typeof<PageBlobFile>, HideObjectMethods = true)
           ProvidedTypeDefinition("XmlBlob", Some typeof<XmlFile>, HideObjectMethods = true) ]
 

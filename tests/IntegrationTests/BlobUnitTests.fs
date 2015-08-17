@@ -5,6 +5,8 @@ open Microsoft.WindowsAzure.Storage.Blob
 open Swensen.Unquote
 open System.Linq
 open Xunit
+open System.IO
+open FSharp.Azure.StorageTypeProvider.Blob
 
 type Local = AzureTypeProvider<"DevStorageAccount", "">
 
@@ -38,10 +40,7 @@ let ``Reads a text file as text``() =
 
 [<Fact>]
 let ``Streams a text file line-by-line``() =
-    let textStream = container .``sample.txt``.OpenStreamAsText()
-    let text = seq { while not textStream.EndOfStream do
-                        yield textStream.ReadLine() }
-               |> Seq.toArray
+    let text = container .``sample.txt``.ReadLines() |> Seq.toArray
 
     text.[0] =? "the quick brown fox jumps over the lazy dog"
     text.[1] =? "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras malesuada."
@@ -90,3 +89,36 @@ let ``CloudPageBlob relates to the same data as the type provider``() =
 [<Fact>]
 let ``Page Blobs calculate size correctly``() =
     container.``pageData.bin``.Size =? 512L
+
+let testFileDownload (blobFile:BlobFile) =
+    let filename = Path.GetTempFileName()
+    File.Delete filename
+    blobFile.Download filename |> Async.RunSynchronously
+    let predicates = 
+        [ File.Exists
+          FileInfo >> fun fi -> fi.Length = blobFile.Size ]
+        |> List.map(fun p -> p filename)
+    File.Delete filename
+    predicates |> List.iter((=?) true)
+
+[<Fact>]
+let ``Can correctly download a block blob``() = testFileDownload container.``file1.txt``
+
+[<Fact>]
+let ``Can correctly download a page blob``() = testFileDownload container.``pageData.bin``
+
+let testFolderDownload download expectedFiles expectedFolders =
+    let tempFolder = Path.Combine(Path.GetTempPath(), "tpTestFolder")
+    if Directory.Exists tempFolder then Directory.Delete(tempFolder, true)
+    download tempFolder |> Async.RunSynchronously
+    let files = Directory.GetFiles(tempFolder, "*", SearchOption.AllDirectories) |> Seq.length
+    let folders = Directory.GetDirectories(tempFolder, "*", SearchOption.AllDirectories) |> Seq.length
+    Directory.Delete(tempFolder, true)
+    files =? expectedFiles
+    folders =? expectedFolders
+
+[<Fact>]
+let ``Can correctly download a folder``() = testFolderDownload container.``folder/``.Download 2 0
+
+[<Fact>]
+let ``Can correctly download a container``() = testFolderDownload container.Download 8 1
