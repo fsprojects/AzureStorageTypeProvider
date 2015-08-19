@@ -96,26 +96,35 @@ type XmlFile internal (defaultConnectionString, container, file) =
 
 /// Represents a pseudo-folder in blob storage.
 type BlobFolder internal (defaultConnectionString, container, file) = 
+    let getConnectionDetails connectionString = defaultArg connectionString defaultConnectionString, container, file
+
     /// Downloads the entire folder contents to the local file system asynchronously.
     member __.Download(path, ?connectionString) =
-        let connectionDetails = defaultArg connectionString defaultConnectionString, container, file
-        downloadFolder (connectionDetails, path)
+        downloadFolder (getConnectionDetails connectionString, path)
+
+    // returns a list of all the blobs in thisfolder.
+    member __.ListBlobs(?connectionString) =
+        listBlobs (getConnectionDetails connectionString)
 
 /// Represents a container in blob storage.
 type BlobContainer internal (defaultConnectionString, container) =
+    let getConnectionDetails connectionString = (defaultArg connectionString defaultConnectionString), container, String.Empty
     /// Gets a handle to the Azure SDK client for this container.
     member __.AsCloudBlobContainer(?connectionString) = getContainerRef(defaultArg connectionString defaultConnectionString, container)
 
     /// Downloads the entire container contents to the local file system asynchronously.
     member __.Download(path, ?connectionString) = 
-        let connectionDetails = (defaultArg connectionString defaultConnectionString), container, String.Empty
-        downloadFolder (connectionDetails, path)
+        downloadFolder (getConnectionDetails connectionString, path)
     
     /// Uploads a file to this container.
     member __.Upload(path, ?connectionString) = 
         let fileName = path |> Path.GetFileName
         let blobRef = getBlockBlobRef ((defaultArg connectionString defaultConnectionString), container, fileName)
         awaitUnit (blobRef.UploadFromFileAsync(path, FileMode.Open))
+
+    /// returns a list of all the blobs in this container.
+    member __.ListBlobs(?connectionString) =
+        listBlobs (getConnectionDetails connectionString)
 
 module internal ProvidedTypeGenerator = 
     let generateTypes() = 
