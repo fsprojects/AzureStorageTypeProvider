@@ -6,6 +6,7 @@ NUGET
     FAKE (3.28.5)
     FSharp.Charting (0.90.10)
     FSharp.Compiler.Service (0.0.89)
+    FSharp.Core (3.1.2.5)
     FSharp.Formatting (2.9.1)
       FSharp.Compiler.Service (>= 0.0.87)
       FSharpVSPowerTools.Core (1.8.0)
@@ -25,7 +26,7 @@ NUGET
     System.Spatial (5.6.2)
     Unquote (2.2.2)
     WindowsAzure.Storage (4.3.0)
-      Microsoft.Data.OData (>= 5.6.2)
+      Microsoft.Data.OData (>= 5.6.2) - framework: winv4.5, wpv8.1, wpv8.0, >= net40
       Microsoft.Data.Services.Client (>= 5.6.2) - framework: >= net40
       Microsoft.WindowsAzure.ConfigurationManager (>= 1.8.0.0) - framework: >= net40
       Newtonsoft.Json (>= 5.0.8) - framework: wpv8.0, >= net40
@@ -34,6 +35,6 @@ NUGET
 GITHUB
   remote: fsprojects/FSharp.TypeProviders.StarterPack
   specs:
-    src/DebugProvidedTypes.fs (877014bfa6244ac382642e113d7cd6c9bc27bc6d)
-    src/ProvidedTypes.fs (877014bfa6244ac382642e113d7cd6c9bc27bc6d)
-    src/ProvidedTypes.fsi (877014bfa6244ac382642e113d7cd6c9bc27bc6d)
+    src/DebugProvidedTypes.fs (7b14087a976df7477ef06c496933b8f8369ad5f5)
+    src/ProvidedTypes.fs (7b14087a976df7477ef06c496933b8f8369ad5f5)
+    src/ProvidedTypes.fsi (7b14087a976df7477ef06c496933b8f8369ad5f5)
