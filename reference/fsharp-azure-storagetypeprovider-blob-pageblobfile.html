@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>Partition - Azure Storage Type Provider</title>
+    <title>PageBlobFile - Azure Storage Type Provider</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="" />
     <meta name="author" content="Isaac Abraham" />
@@ -36,32 +36,32 @@
 
 
 
-<h1>Partition</h1>
+<h1>PageBlobFile</h1>
 <div class="xmldoc">
-<p>The name of the partition.</p>
 </div>
-  <h3>Union Cases</h3>
+  <h3>Instance members</h3>
   <table class="table table-bordered member-list">
     <thead>
-      <tr><td>Union Case</td><td>Description</td></tr>
+      <tr><td>Instance member</td><td>Description</td></tr>
     </thead>
     <tbody>
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '55', 55)" onmouseover="showTip(event, '55', 55)">
-            Partition(string)
+          <code onmouseout="hideTip(event, '20', 20)" onmouseover="showTip(event, '20', 20)">
+            AsCloudPageBlob(connectionString)
           </code>
-          <div class="tip" id="55">
-            <strong>Signature:</strong> string<br />
+          <div class="tip" id="20">
+            <strong>Signature:</strong> (connectionString:string option) -&gt; CloudPageBlob<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Table/SharedTableTypes.fs#L13-13" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L81-81" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
-          
+          <p>Gets a handle to the Azure SDK client for this blob.</p>
+
         </td>
       </tr>
     </tbody>

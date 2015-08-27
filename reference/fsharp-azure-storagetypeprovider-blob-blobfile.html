@@ -50,14 +50,14 @@
         <td class="member-name">
 
           <code onmouseout="hideTip(event, '8', 8)" onmouseover="showTip(event, '8', 8)">
-            AsCloudBlockBlob(connectionString)
+            AsICloudBlob(connectionString)
           </code>
           <div class="tip" id="8">
-            <strong>Signature:</strong> (connectionString:string option) -&gt; CloudBlockBlob<br />
+            <strong>Signature:</strong> (connectionString:string option) -&gt; ICloudBlob<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L21-21" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L24-24" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
@@ -69,14 +69,14 @@
         <td class="member-name">
 
           <code onmouseout="hideTip(event, '9', 9)" onmouseover="showTip(event, '9', 9)">
-            Download(path)
+            Download(path, connectionString)
           </code>
           <div class="tip" id="9">
-            <strong>Signature:</strong> path:string -&gt; Async&lt;unit&gt;<br />
+            <strong>Signature:</strong> (path:string * connectionString:string option) -&gt; Async&lt;unit&gt;<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L35-35" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L39-39" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
@@ -88,14 +88,14 @@
         <td class="member-name">
 
           <code onmouseout="hideTip(event, '10', 10)" onmouseover="showTip(event, '10', 10)">
-            GenerateSharedAccessSignature(duration)
+            GenerateSharedAccessSignature(...)
           </code>
           <div class="tip" id="10">
-            <strong>Signature:</strong> duration:TimeSpan -&gt; Uri<br />
+            <strong>Signature:</strong> (duration:TimeSpan * connectionString:string option) -&gt; Uri<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L24-24" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L27-27" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
@@ -114,7 +114,7 @@
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L56-56" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L62-62" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
@@ -126,14 +126,14 @@
         <td class="member-name">
 
           <code onmouseout="hideTip(event, '12', 12)" onmouseover="showTip(event, '12', 12)">
-            OpenStream()
+            OpenStream(connectionString)
           </code>
           <div class="tip" id="12">
-            <strong>Signature:</strong> unit -&gt; Stream<br />
+            <strong>Signature:</strong> (connectionString:string option) -&gt; Stream<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L41-41" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L45-45" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
@@ -152,7 +152,7 @@
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L44-44" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L48-48" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
@@ -164,18 +164,18 @@
         <td class="member-name">
 
           <code onmouseout="hideTip(event, '14', 14)" onmouseover="showTip(event, '14', 14)">
-            Read()
+            ReadLines()
           </code>
           <div class="tip" id="14">
-            <strong>Signature:</strong> unit -&gt; string<br />
+            <strong>Signature:</strong> unit -&gt; seq&lt;string&gt;<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L47-47" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L51-51" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
-          <p>Reads this file as a string.</p>
+          <p>Lazily read the contents of this blob a line at a time.</p>
 
         </td>
       </tr>
@@ -183,33 +183,14 @@
         <td class="member-name">
 
           <code onmouseout="hideTip(event, '15', 15)" onmouseover="showTip(event, '15', 15)">
-            ReadAsync()
-          </code>
-          <div class="tip" id="15">
-            <strong>Signature:</strong> unit -&gt; Async&lt;string&gt;<br />
-                      </div>
-        </td>
-        <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L50-50" class="github-link">
-              <img src="../content/img/github.png" class="normal" />
-              <img src="../content/img/github-blue.png" class="hover" />
-            </a>
-          <p>Reads this file as a string asynchronously.</p>
-
-        </td>
-      </tr>
-      <tr>
-        <td class="member-name">
-
-          <code onmouseout="hideTip(event, '16', 16)" onmouseover="showTip(event, '16', 16)">
             Size
           </code>
-          <div class="tip" id="16">
+          <div class="tip" id="15">
             <strong>Signature:</strong> int64<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L53-53" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L59-59" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
