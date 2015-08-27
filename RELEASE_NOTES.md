@@ -26,8 +26,10 @@
 * Added hooks into native Azure Storage SDK directly in the type provider.
 * Simplified some naming of methods on blobs.
 
-### 1.3.0 - ???
+### 1.3.0 - 27th August 2015
 * Lots of work on documentation.
 * Blobs now support connection string overrides.
 * Support for Page Blobs.
 * Go back to .NET 4.0 dependency - no need to push up to 4.5.1.
+* No longer add Azure SDK references to client projects.
+* Breaking change: downloadFolder() now requires the caller to explicitly start the Async workflow to being downloading.
