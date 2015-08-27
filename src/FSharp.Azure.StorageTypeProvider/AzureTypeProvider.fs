@@ -3,14 +3,16 @@
 open FSharp.Azure.StorageTypeProvider.Blob
 open FSharp.Azure.StorageTypeProvider.Queue
 open FSharp.Azure.StorageTypeProvider.Table
+open FSharp.Azure.StorageTypeProvider.Configuration
 open Microsoft.FSharp.Core.CompilerServices
 open ProviderImplementation.ProvidedTypes
 open System
 open System.Reflection
 
+
 [<TypeProvider>]
 /// [omit]
-type public AzureTypeProvider() as this = 
+type public AzureTypeProvider(config : TypeProviderConfig) as this = 
     inherit TypeProviderForNamespaces()
 
     let namespaceName = "FSharp.Azure.StorageTypeProvider"
@@ -21,8 +23,12 @@ type public AzureTypeProvider() as this =
         let (|ConnectionString|TwoPart|DevelopmentStorage|) (args:obj []) =
             let firstArg = args.[0] :?> string
             let secondArg = args.[1] :?> string
+            let thirdArg = args.[2] :?> string
+            let fourthArg = args.[3] :?> string
 
-            match firstArg, secondArg with
+            match firstArg, secondArg, thirdArg with
+            | _ when String.IsNullOrWhiteSpace thirdArg |> not -> 
+                ConnectionString(Configuration.ReadConnectionStringFromConfigFileByName(thirdArg, config.ResolutionFolder, fourthArg))
             | _ when firstArg.StartsWith "DefaultEndpointsProtocol" -> ConnectionString firstArg
             | _ when [ firstArg; secondArg ] |> List.exists String.IsNullOrWhiteSpace -> DevelopmentStorage
             | _ -> TwoPart (firstArg, secondArg)
@@ -52,7 +58,9 @@ type public AzureTypeProvider() as this =
     // Parameterising the provider
     let parameters = 
         [ ProvidedStaticParameter("accountName", typeof<string>, String.Empty)
-          ProvidedStaticParameter("accountKey", typeof<string>, String.Empty) ]
+          ProvidedStaticParameter("accountKey", typeof<string>, String.Empty)
+          ProvidedStaticParameter("connectionStringName", typeof<string>, String.Empty)
+          ProvidedStaticParameter("configFileName", typeof<string>, "app.config") ]
     
     do
         azureAccountType.DefineStaticParameters(parameters, buildTypes)
