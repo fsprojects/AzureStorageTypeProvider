@@ -17,7 +17,8 @@ For more information on Blobs in general, please see some of the many articles o
 
 You can easily move between containers, folders and blobs. Simply dotting into a container
 or folder will automatically request the children of that node from Azure. This allows
-easy exploration of your blob assets, directly from within the REPL.
+easy exploration of your blob assets, directly from within the REPL. Support exists for both
+page and block blobs.
 *)
 
 (*** define-output: blobStats ***)
@@ -90,18 +91,12 @@ Again, since files share a common type, you can easily merge multiple sequential
 *)
 
 (*** define-output: streaming-fancy ***)
-let filesToSplice =
+let lines =
     [ container.``file1.txt``
       container.``file2.txt``
       container.``file3.txt``
       container.``sample.txt`` ]
-
-let lines =
-    seq { for file in filesToSplice do
-            printfn "Reading file '%s'" file.Name
-            let sr = file.OpenStreamAsText()
-            while (not sr.EndOfStream) do
-                yield sr.ReadLine() }
+    |> Seq.collect(fun file -> file.ReadLines()) // could also use yield! syntax within a seq { }
       
 printfn "starting to read all lines"
 for line in lines do
