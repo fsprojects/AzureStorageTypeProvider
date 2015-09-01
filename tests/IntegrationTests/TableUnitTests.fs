@@ -91,8 +91,8 @@ let ``Inserts and deletes a batch on same partition using lightweight syntax cor
 [<Fact>]
 [<ResetTableData>]
 let ``Updates an existing row``() =
-    table.Insert(Partition "men", Row "1", { Name = "fred"; YearsWorking = 35; Dob = DateTime(1, 1, 2000, 0, 0, 0, DateTimeKind.Utc) }, TableInsertMode.Upsert) |> ignore
-    table.Get(Row "1", Partition "men").Value.Dob =? DateTime(1, 1, 2000, 0, 0, 0, DateTimeKind.Utc)
+    table.Insert(Partition "men", Row "1", { Name = "fred"; YearsWorking = 35; Dob = DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc) }, TableInsertMode.Upsert) |> ignore
+    table.Get(Row "1", Partition "men").Value.Dob =? DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc)
 
 [<Fact>]
 [<ResetTableData>]
@@ -105,12 +105,12 @@ let ``Inserting an existing row returns an error``() =
 [<Fact>]
 [<ResetTableData>]
 let ``Inserts a row using provided types correctly``() =
-    table.Insert(Local.Domain.employeeEntity(Partition "sample", Row "x", DateTime(1, 1, 2000, 0, 0, 0, DateTimeKind.Utc), true, "Hello", 6.1, 1)) |> ignore
+    table.Insert(Local.Domain.employeeEntity(Partition "sample", Row "x", DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc), true, "Hello", 6.1, 1)) |> ignore
     let result = table.Get(Row "x", Partition "sample").Value
     result.PartitionKey =? "sample"
     result.RowKey =? "x"
     result.YearsWorking =? 1
-    result.Dob =? DateTime(1, 1, 2000, 0, 0, 0, DateTimeKind.Utc)
+    result.Dob =? DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc)
     result.Name =? "Hello"
     result.Salary =? 6.1
     result.IsManager =? true
