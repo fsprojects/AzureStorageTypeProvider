@@ -21,17 +21,17 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
 
     let buildConnectionString (args : obj []) =
         let (|ConnectionString|TwoPart|DevelopmentStorage|) (args:obj []) =
-            let firstArg = args.[0] :?> string
-            let secondArg = args.[1] :?> string
-            let thirdArg = args.[2] :?> string
-            let fourthArg = args.[3] :?> string
+            let getArg i = args.[i] :?> string
+            let accountNameOrConnectionString, accountKey = getArg 0, getArg 1
+            let configFileKey, configFileName = getArg 2, getArg 3
 
-            match firstArg, secondArg, thirdArg with
-            | _ when String.IsNullOrWhiteSpace thirdArg |> not -> 
-                ConnectionString(Configuration.ReadConnectionStringFromConfigFileByName(thirdArg, config.ResolutionFolder, fourthArg))
-            | _ when firstArg.StartsWith "DefaultEndpointsProtocol" -> ConnectionString firstArg
-            | _ when [ firstArg; secondArg ] |> List.exists String.IsNullOrWhiteSpace -> DevelopmentStorage
-            | _ -> TwoPart (firstArg, secondArg)
+            match accountNameOrConnectionString, accountKey, configFileKey with
+            | _ when (not << String.IsNullOrWhiteSpace) configFileKey -> 
+                let connectionFromConfig = getConnectionString(configFileKey, config.ResolutionFolder, configFileName)
+                ConnectionString connectionFromConfig
+            | _ when accountNameOrConnectionString.StartsWith "DefaultEndpointsProtocol" -> ConnectionString accountNameOrConnectionString
+            | _ when [ accountNameOrConnectionString; accountKey ] |> List.exists String.IsNullOrWhiteSpace -> DevelopmentStorage
+            | _ -> TwoPart (accountNameOrConnectionString, accountKey)
 
         match args with
         | DevelopmentStorage -> "UseDevelopmentStorage=true"
