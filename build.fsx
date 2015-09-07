@@ -136,10 +136,18 @@ Target "Package"
                           |> List.map (fun file -> @"..\bin\" + file, Some "lib/net40", None))
                           @ [ "StorageTypeProvider.fsx", None, None ] }) 
               ("nuget/" + project + ".nuspec"))
+Target "LocalDeploy" (fun _ ->
+    directoryInfo @"bin"
+    |> filesInDirMatching "*.nupkg"
+    |> Seq.map(fun x -> x.FullName)
+    |> CopyFiles "..\..\LocalPackages")
+
 // --------------------------------------------------------------------------------------
 // Run all targets by default. Invoke 'build <Target>' to override
 Target "All" DoNothing
 Target "Release" DoNothing
+Target "TestBuild" DoNothing
+Target "PackageForRelease" DoNothing
 
 "Build"
   ==> "CleanDocs"
@@ -155,8 +163,12 @@ Target "Release" DoNothing
   ==> "Build"
   ==> "IntegrationTests"
   ==> "GenerateDocs"
-  ==> "Package"
+  ==> "PackageForRelease"
   ==> "All"
 
-RunTargetOrDefault "All"
+"Build"
+  ==> "Package"
+  ==> "LocalDeploy"
+  ==> "PackageForRelease"
 
+RunTargetOrDefault "LocalDeploy"

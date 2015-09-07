@@ -3,14 +3,16 @@
 open FSharp.Azure.StorageTypeProvider.Blob
 open FSharp.Azure.StorageTypeProvider.Queue
 open FSharp.Azure.StorageTypeProvider.Table
+open FSharp.Azure.StorageTypeProvider.Configuration
 open Microsoft.FSharp.Core.CompilerServices
 open ProviderImplementation.ProvidedTypes
 open System
 open System.Reflection
 
+
 [<TypeProvider>]
 /// [omit]
-type public AzureTypeProvider() as this = 
+type public AzureTypeProvider(config : TypeProviderConfig) as this = 
     inherit TypeProviderForNamespaces()
 
     let namespaceName = "FSharp.Azure.StorageTypeProvider"
@@ -19,13 +21,17 @@ type public AzureTypeProvider() as this =
 
     let buildConnectionString (args : obj []) =
         let (|ConnectionString|TwoPart|DevelopmentStorage|) (args:obj []) =
-            let firstArg = args.[0] :?> string
-            let secondArg = args.[1] :?> string
+            let getArg i = args.[i] :?> string
+            let accountNameOrConnectionString, accountKey = getArg 0, getArg 1
+            let configFileKey, configFileName = getArg 2, getArg 3
 
-            match firstArg, secondArg with
-            | _ when firstArg.StartsWith "DefaultEndpointsProtocol" -> ConnectionString firstArg
-            | _ when [ firstArg; secondArg ] |> List.exists String.IsNullOrWhiteSpace -> DevelopmentStorage
-            | _ -> TwoPart (firstArg, secondArg)
+            match accountNameOrConnectionString, accountKey, configFileKey with
+            | _ when (not << String.IsNullOrWhiteSpace) configFileKey -> 
+                let connectionFromConfig = getConnectionString(configFileKey, config.ResolutionFolder, configFileName)
+                ConnectionString connectionFromConfig
+            | _ when accountNameOrConnectionString.StartsWith "DefaultEndpointsProtocol" -> ConnectionString accountNameOrConnectionString
+            | _ when [ accountNameOrConnectionString; accountKey ] |> List.exists String.IsNullOrWhiteSpace -> DevelopmentStorage
+            | _ -> TwoPart (accountNameOrConnectionString, accountKey)
 
         match args with
         | DevelopmentStorage -> "UseDevelopmentStorage=true"
@@ -52,7 +58,9 @@ type public AzureTypeProvider() as this =
     // Parameterising the provider
     let parameters = 
         [ ProvidedStaticParameter("accountName", typeof<string>, String.Empty)
-          ProvidedStaticParameter("accountKey", typeof<string>, String.Empty) ]
+          ProvidedStaticParameter("accountKey", typeof<string>, String.Empty)
+          ProvidedStaticParameter("connectionStringName", typeof<string>, String.Empty)
+          ProvidedStaticParameter("configFileName", typeof<string>, "app.config") ]
     
     do
         azureAccountType.DefineStaticParameters(parameters, buildTypes)

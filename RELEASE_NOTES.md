@@ -33,3 +33,6 @@
 * Go back to .NET 4.0 dependency - no need to push up to 4.5.1.
 * No longer add Azure SDK references to client projects.
 * Breaking change: downloadFolder() now requires the caller to explicitly start the Async workflow to being downloading.
+
+### 1.4.0 - ???
+* Configuration file support.

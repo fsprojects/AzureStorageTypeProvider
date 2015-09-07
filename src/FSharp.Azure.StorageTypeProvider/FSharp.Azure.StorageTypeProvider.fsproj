@@ -64,6 +64,7 @@
       <Link>paket-files/DebugProvidedTypes.fs</Link>
     </Compile>
     <Compile Include="Shared.fs" />
+    <Compile Include="Configuration.fs" />
     <Compile Include="Table\SharedTableTypes.fs" />
     <Compile Include="Table\TableRepository.fs" />
     <Compile Include="Table\ProvidedTableTypes.fs" />
@@ -83,6 +84,7 @@
   <ItemGroup>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Services.Client" />

@@ -32,8 +32,8 @@ let resetData() =
     let employeeTable = getTable "employee" |> recreateTable
     getTable "emptytable" |> recreateTable |> ignore
 
-    employeeTable |> insertRow("men", 1, "fred", 10, DateTime(1990, 5, 1), 0., true) |> ignore
-    employeeTable |> insertRow("men", 2, "fred", 35, DateTime(1980, 4, 4), 1.5, false) |> ignore
-    employeeTable |> insertRow("men", 3, "tim", 99, DateTime(2001, 10, 5), 10., false) |> ignore
-    employeeTable |> insertRow("women", 1, "sara", 35, DateTime(2005, 4, 30), 3.5, true) |> ignore
-    employeeTable |> insertRow("women", 2, "rachel", 20, DateTime(1965, 8, 20), 5.5, false) |> ignore
+    employeeTable |> insertRow("men", 1, "fred", 10, DateTime(1990, 5, 1, 0, 0, 0, DateTimeKind.Utc), 0., true) |> ignore
+    employeeTable |> insertRow("men", 2, "fred", 35, DateTime(1980, 4, 4, 0, 0, 0, DateTimeKind.Utc), 1.5, false) |> ignore
+    employeeTable |> insertRow("men", 3, "tim", 99, DateTime(2001, 10, 5, 0, 0, 0, DateTimeKind.Utc), 10., false) |> ignore
+    employeeTable |> insertRow("women", 1, "sara", 35, DateTime(2005, 4, 30, 0, 0, 0, DateTimeKind.Utc), 3.5, true) |> ignore
+    employeeTable |> insertRow("women", 2, "rachel", 20, DateTime(1965, 8, 20, 0, 0, 0, DateTimeKind.Utc), 5.5, false) |> ignore

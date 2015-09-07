@@ -32,7 +32,7 @@ let ``Matching row and partition key returns Some row``() =
     | Some row ->
         row.Name =? "fred"
         row.YearsWorking =? 35
-        row.Dob =? DateTime(1980, 4, 4)
+        row.Dob =? DateTime(1980, 4, 4, 0, 0, 0, DateTimeKind.Utc)
     | None -> failwith "could not locate row"
 
 [<Fact>]
@@ -65,7 +65,7 @@ type MatchingTableRow =
 [<Fact>]
 [<ResetTableData>]
 let ``Inserts and deletes a row using lightweight syntax correctly``() =
-    let result = table.Insert(Partition "isaac", Row "500", { Name = "isaac"; YearsWorking = 500; Dob = DateTime.Now })
+    let result = table.Insert(Partition "isaac", Row "500", { Name = "isaac"; YearsWorking = 500; Dob = DateTime.UtcNow })
     match result with
     | SuccessfulResponse ((Partition "isaac", Row "500"), 204) ->
         let deleteResponse = table.Delete([ Partition "isaac", Row "500"] )
@@ -77,8 +77,8 @@ let ``Inserts and deletes a row using lightweight syntax correctly``() =
 [<Fact>]
 [<ResetTableData>]
 let ``Inserts and deletes a batch on same partition using lightweight syntax correctly``() =
-    let result = table.Insert( [ Partition "men", Row "5", { Name = "isaac"; YearsWorking = 500; Dob = DateTime.Now }
-                                 Partition "men", Row "6", { Name = "isaac"; YearsWorking = 250; Dob = DateTime.Now }
+    let result = table.Insert( [ Partition "men", Row "5", { Name = "isaac"; YearsWorking = 500; Dob = DateTime.UtcNow }
+                                 Partition "men", Row "6", { Name = "isaac"; YearsWorking = 250; Dob = DateTime.UtcNow }
                                ])
     match result with
     | [| "men", [| SuccessfulResponse _; SuccessfulResponse _ |] |] ->
@@ -91,8 +91,8 @@ let ``Inserts and deletes a batch on same partition using lightweight syntax cor
 [<Fact>]
 [<ResetTableData>]
 let ``Updates an existing row``() =
-    table.Insert(Partition "men", Row "1", { Name = "fred"; YearsWorking = 35; Dob = DateTime.MaxValue }, TableInsertMode.Upsert) |> ignore
-    table.Get(Row "1", Partition "men").Value.Dob =? DateTime.MaxValue
+    table.Insert(Partition "men", Row "1", { Name = "fred"; YearsWorking = 35; Dob = DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc) }, TableInsertMode.Upsert) |> ignore
+    table.Get(Row "1", Partition "men").Value.Dob =? DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc)
 
 [<Fact>]
 [<ResetTableData>]
@@ -105,12 +105,12 @@ let ``Inserting an existing row returns an error``() =
 [<Fact>]
 [<ResetTableData>]
 let ``Inserts a row using provided types correctly``() =
-    table.Insert(Local.Domain.employeeEntity(Partition "sample", Row "x", DateTime.MaxValue, true, "Hello", 6.1, 1)) |> ignore
+    table.Insert(Local.Domain.employeeEntity(Partition "sample", Row "x", DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc), true, "Hello", 6.1, 1)) |> ignore
     let result = table.Get(Row "x", Partition "sample").Value
     result.PartitionKey =? "sample"
     result.RowKey =? "x"
     result.YearsWorking =? 1
-    result.Dob =? DateTime.MaxValue
+    result.Dob =? DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc)
     result.Name =? "Hello"
     result.Salary =? 6.1
     result.IsManager =? true
