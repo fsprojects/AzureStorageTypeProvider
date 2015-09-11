@@ -122,3 +122,12 @@ let ``Can correctly download a folder``() = testFolderDownload container.``folde
 
 [<Fact>]
 let ``Can correctly download a container``() = testFolderDownload container.Download 8 1
+
+let testFolderListBlobs listBlobs expectedBlobs =
+    listBlobs |> Seq.length =? expectedBlobs
+
+[<Fact>]
+let ``Can corretly list blobs in a folder``() = testFolderListBlobs container.``folder/``.ListBlobs 2
+
+[<Fact>]
+let ``Can corretly list blobs in a container``() = testFolderListBlobs container.ListBlobs 8

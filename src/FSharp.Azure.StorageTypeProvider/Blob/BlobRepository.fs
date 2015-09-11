@@ -48,19 +48,24 @@ let getBlobStorageAccountManifest connection =
 
 let awaitUnit = Async.AwaitIAsyncResult >> Async.Ignore
 
+let getBlobs (connection, container, folderPath) =
+    let containerRef = (getBlobClient connection).GetContainerReference(container)
+    containerRef.ListBlobs(prefix = folderPath, useFlatBlobListing = true)
+
+let filterICloudBlobs (l: IListBlobItem seq) =
+    l |> Seq.choose (function
+        | :? ICloudBlob as b -> Some b
+        | _ -> None)
+
 let downloadFolder (connectionDetails, path) =
     let downloadFile (blobRef:ICloudBlob) destination =
         let targetDirectory = Path.GetDirectoryName(destination)
         if not (Directory.Exists targetDirectory) then Directory.CreateDirectory targetDirectory |> ignore
         blobRef.DownloadToFileAsync(destination, FileMode.Create) |> awaitUnit
 
-    let connection, container, folderPath = connectionDetails
-    let containerRef = (getBlobClient connection).GetContainerReference(container)
-    containerRef.ListBlobs(prefix = folderPath, useFlatBlobListing = true)
-    |> Seq.choose (fun b -> 
-           match b with
-           | :? ICloudBlob as b -> Some b
-           | _ -> None)
+    let _, _, folderPath = connectionDetails
+    getBlobs connectionDetails
+    |> filterICloudBlobs
     |> Seq.map (fun blob -> 
            let targetName = 
                match folderPath with
@@ -69,3 +74,7 @@ let downloadFolder (connectionDetails, path) =
            downloadFile blob (Path.Combine(path, targetName)))
     |> Async.Parallel
     |> Async.Ignore
+
+let listBlobs connectionDetails =
+    getBlobs connectionDetails
+    |> filterICloudBlobs
