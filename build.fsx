@@ -12,10 +12,6 @@ open Fake.UserInputHelper
 open System
 open System.IO
 
-// --------------------------------------------------------------------------------------
-// START TODO: Provide project-specific details below
-// --------------------------------------------------------------------------------------
-
 // Information about the project are used
 //  - for version and project name in generated AssemblyInfo file
 //  - by the generated NuGet package
@@ -226,9 +222,6 @@ Target "ReleaseDocs" (fun _ ->
     Branches.push tempDocsDir
 )
 
-#load "paket-files/fsharp/FAKE/modules/Octokit/Octokit.fsx"
-open Octokit
-
 Target "Release" (fun _ ->
     let user =
         match getBuildParam "github-user" with
@@ -249,14 +242,7 @@ Target "Release" (fun _ ->
     Branches.pushBranch "" remote (Information.getBranchName "")
 
     Branches.tag "" release.NugetVersion
-    Branches.pushTag "" remote release.NugetVersion
-    
-    // release on github
-    createClient user pw
-    |> createDraft gitOwner gitName release.NugetVersion (release.SemVer.PreRelease <> None) release.Notes
-    |> releaseDraft
-    |> Async.RunSynchronously
-)
+    Branches.pushTag "" remote release.NugetVersion)
 
 
 Target "LocalDeploy" (fun _ ->
