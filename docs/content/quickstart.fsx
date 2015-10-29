@@ -22,7 +22,7 @@ Connecting to your storage account is simple.
 
 From within a script, first ``#load "AzureStorageProvider.fsx"`` to reference all dependencies.
 Then, you can generate a type for a storage account simply by providing your Azure
-account credentials.
+account credentials via a number of ways.
 
 *)
 
@@ -37,6 +37,9 @@ type LiveTwoPart = AzureTypeProvider<"name", "key">
 
 // Connect to local storage emulator
 type Local = AzureTypeProvider<"UseDevelopmentStorage=true">
+
+// Connect via configuration file with named connection string.
+type FromConfig = AzureTypeProvider<connectionStringName = "myConnection", configFileName="sample.config">
 
 (**
 

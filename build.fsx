@@ -177,7 +177,7 @@ Target "GenerateHelp" (fun _ ->
     CopyFile buildDir "packages/FSharp.Core/lib/net40/FSharp.Core.sigdata"
     CopyFile buildDir "packages/FSharp.Core/lib/net40/FSharp.Core.optdata"
 
-    generateHelp true true
+    generateHelp false false
 )
 
 Target "GenerateHelpDebug" (fun _ ->
@@ -215,7 +215,7 @@ Target "ReleaseDocs" (fun _ ->
     Repository.cloneSingleBranch "" (gitHome + "/" + gitName + ".git") "gh-pages" tempDocsDir
 
     Git.CommandHelper.runSimpleGitCommand tempDocsDir "rm . -f -r" |> ignore
-    CopyRecursive "docs/output" tempDocsDir true |> tracefn "%A"    
+    CopyRecursive "docs/output" tempDocsDir true |> tracefn "%A"
     
     StageAll tempDocsDir
     Git.Commit.Commit tempDocsDir (sprintf "Update generated documentation for version %s" release.NugetVersion)
@@ -290,4 +290,4 @@ Target "All" DoNothing
 "BuildPackage"
   ==> "Release"
 
-RunTargetOrDefault "Release"
+RunTargetOrDefault "ReleaseDocs"

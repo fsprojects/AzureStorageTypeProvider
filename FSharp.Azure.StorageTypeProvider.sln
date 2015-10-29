@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{94066CAA-4417-4C43-A286-40182E920E43}"
 	ProjectSection(SolutionItems) = preProject
@@ -30,6 +30,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "content", "content", "{1535
 		docs\content\index.fsx = docs\content\index.fsx
 		docs\content\queues.fsx = docs\content\queues.fsx
 		docs\content\quickstart.fsx = docs\content\quickstart.fsx
+		docs\content\sample.config = docs\content\sample.config
 		docs\content\tables.fsx = docs\content\tables.fsx
 	EndProjectSection
 EndProject
