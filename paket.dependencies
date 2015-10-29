@@ -5,13 +5,14 @@ nuget FAKE
 nuget Nuget.CommandLine
 nuget FsUnit.xUnit
 nuget Unquote
-nuget WindowsAzure.Storage 4.3.0
+nuget WindowsAzure.Storage 6.0.0
 nuget xunit 1.9.2
 nuget xunit.runners 1.9.2
 nuget FSharp.Formatting
 nuget Deedle
 nuget FSharp.Charting
 nuget FSharp.Core ~> 3
+nuget Newtonsoft.Json 6.0.8
 
 github fsprojects/FSharp.TypeProviders.StarterPack src/ProvidedTypes.fsi
 github fsprojects/FSharp.TypeProviders.StarterPack src/ProvidedTypes.fs

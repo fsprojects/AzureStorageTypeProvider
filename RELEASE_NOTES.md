@@ -34,5 +34,5 @@
 * No longer add Azure SDK references to client projects.
 * Breaking change: downloadFolder() now requires the caller to explicitly start the Async workflow to being downloading.
 
-### 1.4.0 - ???
+### 1.4.0 - 28th October 2015
 * Configuration file support.

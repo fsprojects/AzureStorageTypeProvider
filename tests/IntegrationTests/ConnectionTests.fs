@@ -11,17 +11,17 @@ type FirstBlank = AzureTypeProvider<"", "Foo">
 
 [<Fact>]
 let ``SecondBlank connection string works``() =
-    SecondBlank.Containers.CloudBlobClient.GetContainerReference("samples").Exists() =? true
+    SecondBlank.Containers.CloudBlobClient.GetContainerReference("samples").Exists() =! true
 
 [<Fact>]
 let ``FirstBlank connection string works``() =
-    FirstBlank.Containers.CloudBlobClient.GetContainerReference("samples").Exists() =? true
+    FirstBlank.Containers.CloudBlobClient.GetContainerReference("samples").Exists() =! true
 
 //[<Fact>]
 //let ``TwoPart connection string works``() =
-//    TwoPart.Containers.CloudBlobClient.GetContainerReference("samples").Exists() =? true
+//    TwoPart.Containers.CloudBlobClient.GetContainerReference("samples").Exists() =! true
 //
 //[<Fact>]
 //let ``FullPath connection string works``() =
-//    FullPath.Containers.CloudBlobClient.GetContainerReference("samples").Exists() =? true
+//    FullPath.Containers.CloudBlobClient.GetContainerReference("samples").Exists() =! true
 //

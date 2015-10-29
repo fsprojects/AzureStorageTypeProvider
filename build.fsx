@@ -9,6 +9,7 @@ open Fake.Git
 open Fake.AssemblyInfoFile
 open Fake.ReleaseNotesHelper
 open Fake.UserInputHelper
+open Fake.Testing
 open System
 open System.IO
 
@@ -114,7 +115,7 @@ Target "ResetTestData" (fun _ ->
 // Run integration tests
 Target "RunTests" (fun _ ->
     !!(testAssemblies)
-    |> xUnit (fun p -> { p with Verbose = true })
+    |> xUnit id
 )
 
 // --------------------------------------------------------------------------------------
@@ -131,13 +132,12 @@ Target "NuGet"
                      ReleaseNotes = release.Notes |> String.concat Environment.NewLine
                      Tags = tags
                      OutputPath = "bin"
-                     Dependencies = [ "WindowsAzure.Storage", "4.3.0" ]
+                     Dependencies = [ "WindowsAzure.Storage", "6.0.0" ]
                      References = [ "FSharp.Azure.StorageTypeProvider.dll" ]
                      Files = 
-                         ([ "FSharp.Azure.StorageTypeProvider.xml"; "FSharp.Azure.StorageTypeProvider.dll"; "Microsoft.Data.Edm.dll"; 
-                            "Microsoft.Data.OData.dll"; "Microsoft.Data.Services.Client.dll"; 
-                            "Microsoft.WindowsAzure.Configuration.dll"; "Microsoft.WindowsAzure.Storage.dll"; 
-                            "Newtonsoft.Json.dll"; "System.Spatial.dll" ] 
+                         ([ "FSharp.Azure.StorageTypeProvider.xml"; "FSharp.Azure.StorageTypeProvider.dll"; "Microsoft.Azure.KeyVault.Core.dll"
+                            "Microsoft.Data.Edm.dll"; "Microsoft.Data.OData.dll"; "Microsoft.Data.Services.Client.dll";
+                            "Microsoft.WindowsAzure.Storage.dll"; "Newtonsoft.Json.dll"; "System.Spatial.dll" ] 
                           |> List.map (fun file -> @"..\bin\" + file, Some "lib/net40", None))
                           @ [ "StorageTypeProvider.fsx", None, None ] }) 
               ("nuget/" + project + ".nuspec")
@@ -290,4 +290,4 @@ Target "All" DoNothing
 "BuildPackage"
   ==> "Release"
 
-RunTargetOrDefault "All"
+RunTargetOrDefault "Release"
