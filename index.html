@@ -13,9 +13,9 @@
     <script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
     <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet" />
 
-    <link type="text/css" rel="stylesheet" href="./content/style.css" />
+    <link type="text/css" rel="stylesheet" href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/content/style.css" />
     <link type="text/css" rel="stylesheet" href="deedle.css" />
-    <script type="text/javascript" src="./content/tips.js"></script>
+    <script type="text/javascript" src="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/content/tips.js"></script>
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -28,7 +28,7 @@
                 <li><a href="http://fsharp.org">fsharp.org</a></li>
                 <li><a href="http://github.com/fsprojects/AzureStorageTypeProvider">github page</a></li>
             </ul>
-            <h3 class="muted"><a href="./index.html">Azure Storage Type Provider</a></h3>
+            <h3 class="muted"><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/index.html">Azure Storage Type Provider</a></h3>
         </div>
         <hr />
         <div class="row">
@@ -46,8 +46,7 @@ provided.</p>
 
 <p>This example illustrates some of the features available from the type provider.</p>
 
-<table class="pre"><tr><td class="lines"><pre class="fssnip">
-<span class="l"> 1: </span>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
 <span class="l"> 2: </span>
 <span class="l"> 3: </span>
 <span class="l"> 4: </span>
@@ -65,10 +64,8 @@ provided.</p>
 <span class="l">16: </span>
 <span class="l">17: </span>
 <span class="l">18: </span>
-</pre>
-</td>
-<td class="snippet"><pre class="fssnip">
-<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 1)" onmouseover="showTip(event, 'fs1', 1)" class="i">FSharp</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs2', 2)" onmouseover="showTip(event, 'fs2', 2)" class="i">Azure</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs3', 3)" onmouseover="showTip(event, 'fs3', 3)" class="i">StorageTypeProvider</span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 1)" onmouseover="showTip(event, 'fs1', 1)" class="i">FSharp</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs2', 2)" onmouseover="showTip(event, 'fs2', 2)" class="i">Azure</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs3', 3)" onmouseover="showTip(event, 'fs3', 3)" class="i">StorageTypeProvider</span>
 
 <span class="c">// Get a handle to my local storage emulator</span>
 <span class="k">type</span> <span onmouseout="hideTip(event, 'fs4', 4)" onmouseover="showTip(event, 'fs4', 4)" class="t">Azure</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs5', 5)" onmouseover="showTip(event, 'fs5', 5)" class="t">AzureTypeProvider</span><span class="o">&lt;</span><span class="s">&quot;UseDevelopmentStorage=true&quot;</span><span class="o">&gt;</span>
@@ -86,8 +83,7 @@ provided.</p>
 
 <span class="c">// Navigate through storage queues and get messages</span>
 <span class="k">let</span> <span onmouseout="hideTip(event, 'fs18', 22)" onmouseover="showTip(event, 'fs18', 22)" class="i">queueMessage</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs4', 23)" onmouseover="showTip(event, 'fs4', 23)" class="t">Azure</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs19', 24)" onmouseover="showTip(event, 'fs19', 24)" class="i">Queues</span><span class="o">.</span><span class="i">``sample-queue``</span><span class="o">.</span><span class="f">Dequeue</span>()
-</pre>
-</td>
+</code></pre></td>
 </tr>
 </table>
 
@@ -115,7 +111,7 @@ also want to read the <a href="https://github.com/fsprojects/FSharp.ProjectScaff
 redistribution for both commercial and non-commercial purposes. For more information see the 
 <a href="https://github.com/fsprojects/FSharp.ProjectScaffold/blob/master/LICENSE.txt">License file</a> in the GitHub repository.</p>
 
-<div class="tip" id="fs1">namespace FSharp</div>
+<div class="tip" id="fs1">Multiple items<br />namespace FSharp<br /><br />--------------------<br />namespace Microsoft.FSharp</div>
 <div class="tip" id="fs2">namespace FSharp.Azure</div>
 <div class="tip" id="fs3">namespace FSharp.Azure.StorageTypeProvider</div>
 <div class="tip" id="fs4">type Azure = AzureTypeProvider&lt;...&gt;<br /><br />Full name: Index.Azure</div>
@@ -137,10 +133,10 @@ redistribution for both commercial and non-commercial purposes. For more informa
 
             </div>
             <div class="span3">
-                <img src="./img/logo.png" alt="F# Project" style="width:150px;margin:10px" />
+                <img src="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/img/logo.png" alt="F# Project" style="width:150px;margin:10px" />
                 <ul class="nav nav-list" id="menu" style="margin-top: 20px;">
                     <li class="nav-header">Azure Storage Type Provider</li>
-                    <li><a href="./index.html">Home page</a></li>
+                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/index.html">Home page</a></li>
                     <li class="divider"></li>
                     <li><a href="http://www.nuget.org/packages/FSharp.Azure.StorageTypeProvider">Get Library via NuGet</a></li>
                     <li><a href="http://github.com/fsprojects/AzureStorageTypeProvider">Source Code on GitHub</a></li>
@@ -148,13 +144,13 @@ redistribution for both commercial and non-commercial purposes. For more informa
                     <li><a href="http://github.com/fsprojects/AzureStorageTypeProvider/blob/master/RELEASE_NOTES.md">Release Notes</a></li>
 
                     <li class="nav-header">Getting started</li>
-                    <li><a href="./quickstart.html">Quick start</a></li>
-                    <li><a href="./blobs.html">Using Azure Blobs</a></li>
-                    <li><a href="./tables.html">Using Azure Tables</a></li>
-                    <li><a href="./queues.html">Using Azure Storage Queues</a></li>
+                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/quickstart.html">Quick start</a></li>
+                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/blobs.html">Using Azure Blobs</a></li>
+                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/tables.html">Using Azure Tables</a></li>
+                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/queues.html">Using Azure Storage Queues</a></li>
 
                     <li class="nav-header">Documentation</li>
-                    <li><a href="./reference/index.html">API Reference</a></li>
+                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/reference/index.html">API Reference</a></li>
                 </ul>
             </div>
         </div>

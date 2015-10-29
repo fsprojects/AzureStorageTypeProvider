@@ -13,9 +13,9 @@
     <script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
     <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet" />
 
-    <link type="text/css" rel="stylesheet" href="./content/style.css" />
+    <link type="text/css" rel="stylesheet" href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/content/style.css" />
     <link type="text/css" rel="stylesheet" href="deedle.css" />
-    <script type="text/javascript" src="./content/tips.js"></script>
+    <script type="text/javascript" src="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/content/tips.js"></script>
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -28,7 +28,7 @@
                 <li><a href="http://fsharp.org">fsharp.org</a></li>
                 <li><a href="http://github.com/fsprojects/AzureStorageTypeProvider">github page</a></li>
             </ul>
-            <h3 class="muted"><a href="./index.html">Azure Storage Type Provider</a></h3>
+            <h3 class="muted"><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/index.html">Azure Storage Type Provider</a></h3>
         </div>
         <hr />
         <div class="row">
@@ -45,16 +45,12 @@
 will automatically retrieve the list of tables in the storage account. This allows
 easy exploration of your table assets, directly from within the REPL.</p>
 
-<table class="pre"><tr><td class="lines"><pre class="fssnip">
-<span class="l">1: </span>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
-</pre>
-</td>
-<td class="snippet"><pre class="fssnip">
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs13', 16)" onmouseover="showTip(event, 'fs13', 16)" class="i">employeeTable</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs11', 17)" onmouseover="showTip(event, 'fs11', 17)" class="t">Azure</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs14', 18)" onmouseover="showTip(event, 'fs14', 18)" class="i">Tables</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs15', 19)" onmouseover="showTip(event, 'fs15', 19)" class="i">employee</span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs13', 16)" onmouseover="showTip(event, 'fs13', 16)" class="i">employeeTable</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs11', 17)" onmouseover="showTip(event, 'fs11', 17)" class="t">Azure</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs14', 18)" onmouseover="showTip(event, 'fs14', 18)" class="i">Tables</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs15', 19)" onmouseover="showTip(event, 'fs15', 19)" class="i">employee</span>
 <span onmouseout="hideTip(event, 'fs16', 20)" onmouseover="showTip(event, 'fs16', 20)" class="f">printfn</span> <span class="s">&quot;The table is called &#39;</span><span class="pf">%s</span><span class="s">&#39;.&quot;</span> <span onmouseout="hideTip(event, 'fs13', 21)" onmouseover="showTip(event, 'fs13', 21)" class="i">employeeTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 22)" onmouseover="showTip(event, 'fs17', 22)" class="i">Name</span>
-</pre>
-</td>
+</code></pre></td>
 </tr>
 </table>
 
@@ -71,18 +67,14 @@ table.</p>
 
 <p>Based on this EDM metadata, an appropriate .NET type can be generated and used within the provider.</p>
 
-<table class="pre"><tr><td class="lines"><pre class="fssnip">
-<span class="l">1: </span>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
-</pre>
-</td>
-<td class="snippet"><pre class="fssnip">
-<span onmouseout="hideTip(event, 'fs16', 45)" onmouseover="showTip(event, 'fs16', 45)" class="f">printfn</span> <span class="s">&quot;Fred has Partition Key of </span><span class="pf">%s</span><span class="s"> and Row Key of </span><span class="pf">%s</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs29', 46)" onmouseover="showTip(event, 'fs29', 46)" class="i">fred</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs33', 47)" onmouseover="showTip(event, 'fs33', 47)" class="i">PartitionKey</span> <span onmouseout="hideTip(event, 'fs29', 48)" onmouseover="showTip(event, 'fs29', 48)" class="i">fred</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs34', 49)" onmouseover="showTip(event, 'fs34', 49)" class="i">RowKey</span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs16', 45)" onmouseover="showTip(event, 'fs16', 45)" class="f">printfn</span> <span class="s">&quot;Fred has Partition Key of </span><span class="pf">%s</span><span class="s"> and Row Key of </span><span class="pf">%s</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs29', 46)" onmouseover="showTip(event, 'fs29', 46)" class="i">fred</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs33', 47)" onmouseover="showTip(event, 'fs33', 47)" class="i">PartitionKey</span> <span onmouseout="hideTip(event, 'fs29', 48)" onmouseover="showTip(event, 'fs29', 48)" class="i">fred</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs34', 49)" onmouseover="showTip(event, 'fs34', 49)" class="i">RowKey</span>
 <span onmouseout="hideTip(event, 'fs16', 50)" onmouseover="showTip(event, 'fs16', 50)" class="f">printfn</span> <span class="s">&quot;Fred has Name &#39;</span><span class="pf">%s</span><span class="s">&#39;, Years Working &#39;</span><span class="pf">%d</span><span class="s">&#39;, Dob &#39;</span><span class="pf">%O</span><span class="s">&#39;, Salary &#39;</span><span class="pf">%f</span><span class="s">&#39; and Is Manager &#39;</span><span class="pf">%b</span><span class="s">&#39;.&quot;</span>
     <span onmouseout="hideTip(event, 'fs29', 51)" onmouseover="showTip(event, 'fs29', 51)" class="i">fred</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs35', 52)" onmouseover="showTip(event, 'fs35', 52)" class="i">Name</span> <span onmouseout="hideTip(event, 'fs29', 53)" onmouseover="showTip(event, 'fs29', 53)" class="i">fred</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs36', 54)" onmouseover="showTip(event, 'fs36', 54)" class="i">YearsWorking</span> <span onmouseout="hideTip(event, 'fs29', 55)" onmouseover="showTip(event, 'fs29', 55)" class="i">fred</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs37', 56)" onmouseover="showTip(event, 'fs37', 56)" class="i">Dob</span> <span onmouseout="hideTip(event, 'fs29', 57)" onmouseover="showTip(event, 'fs29', 57)" class="i">fred</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs38', 58)" onmouseover="showTip(event, 'fs38', 58)" class="i">Salary</span> <span onmouseout="hideTip(event, 'fs29', 59)" onmouseover="showTip(event, 'fs29', 59)" class="i">fred</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs39', 60)" onmouseover="showTip(event, 'fs39', 60)" class="i">IsManager</span>
-</pre>
-</td>
+</code></pre></td>
 </tr>
 </table>
 
@@ -91,8 +83,7 @@ table.</p>
 <p>In addition, an extra "Values" property is available which exposes all properties on the entity
 in a key/value collection - this is useful for binding scenarios or e.g. mapping in Deedle frames.</p>
 
-<table class="pre"><tr><td class="lines"><pre class="fssnip">
-<span class="l">1: </span>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
 <span class="l">4: </span>
@@ -101,10 +92,8 @@ in a key/value collection - this is useful for binding scenarios or e.g. mapping
 <span class="l">7: </span>
 <span class="l">8: </span>
 <span class="l">9: </span>
-</pre>
-</td>
-<td class="snippet"><pre class="fssnip">
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs40', 61)" onmouseover="showTip(event, 'fs40', 61)" class="i">frame</span> <span class="o">=</span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs40', 61)" onmouseover="showTip(event, 'fs40', 61)" class="i">frame</span> <span class="o">=</span>
     <span class="s">&quot;women&quot;</span>
     <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs13', 62)" onmouseover="showTip(event, 'fs13', 62)" class="i">employeeTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs41', 63)" onmouseover="showTip(event, 'fs41', 63)" class="f">GetPartition</span>
     <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs27', 64)" onmouseover="showTip(event, 'fs27', 64)" class="t">Frame</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs42', 65)" onmouseover="showTip(event, 'fs42', 65)" class="f">ofRecords</span>
@@ -113,8 +102,7 @@ in a key/value collection - this is useful for binding scenarios or e.g. mapping
     <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs27', 74)" onmouseover="showTip(event, 'fs27', 74)" class="t">Frame</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs47', 75)" onmouseover="showTip(event, 'fs47', 75)" class="f">dropCol</span> <span class="s">&quot;PartitionKey&quot;</span>
     <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs27', 76)" onmouseover="showTip(event, 'fs27', 76)" class="t">Frame</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs47', 77)" onmouseover="showTip(event, 'fs47', 77)" class="f">dropCol</span> <span class="s">&quot;RowKey&quot;</span>
     <span class="o">|&gt;</span> <span class="k">fun</span> <span onmouseout="hideTip(event, 'fs48', 78)" onmouseover="showTip(event, 'fs48', 78)" class="i">f</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs48', 79)" onmouseover="showTip(event, 'fs48', 79)" class="i">f</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs27', 80)" onmouseover="showTip(event, 'fs27', 80)" class="t">Frame</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs49', 81)" onmouseover="showTip(event, 'fs49', 81)" class="f">indexColsWith</span> (<span onmouseout="hideTip(event, 'fs48', 82)" onmouseover="showTip(event, 'fs48', 82)" class="i">f</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs50', 83)" onmouseover="showTip(event, 'fs50', 83)" class="i">ColumnKeys</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs51', 84)" onmouseover="showTip(event, 'fs51', 84)" class="t">Seq</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs52', 85)" onmouseover="showTip(event, 'fs52', 85)" class="f">map</span>(<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs53', 86)" onmouseover="showTip(event, 'fs53', 86)" class="i">c</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs53', 87)" onmouseover="showTip(event, 'fs53', 87)" class="i">c</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs54', 88)" onmouseover="showTip(event, 'fs54', 88)" class="f">Replace</span>(<span class="s">&quot;Values.&quot;</span>, <span class="s">&quot;&quot;</span>))) <span class="c">// rename columns to omit &quot;Values.&quot;</span>
-</pre>
-</td>
+</code></pre></td>
 </tr>
 </table>
 
@@ -131,16 +119,12 @@ ways: -</p>
 <p>These are the simplest (and best performing) queries, based on a partition / row key combination,
 returning an optional result. You can also retrieve an entire partition.</p>
 
-<table class="pre"><tr><td class="lines"><pre class="fssnip">
-<span class="l">1: </span>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
-</pre>
-</td>
-<td class="snippet"><pre class="fssnip">
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs55', 89)" onmouseover="showTip(event, 'fs55', 89)" class="i">sara</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs13', 90)" onmouseover="showTip(event, 'fs13', 90)" class="i">employeeTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs30', 91)" onmouseover="showTip(event, 'fs30', 91)" class="f">Get</span>(<span onmouseout="hideTip(event, 'fs31', 92)" onmouseover="showTip(event, 'fs31', 92)" class="p">Row</span> <span class="s">&quot;1&quot;</span>, <span onmouseout="hideTip(event, 'fs32', 93)" onmouseover="showTip(event, 'fs32', 93)" class="p">Partition</span> <span class="s">&quot;women&quot;</span>) <span class="c">// try to get a single row</span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs55', 89)" onmouseover="showTip(event, 'fs55', 89)" class="i">sara</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs13', 90)" onmouseover="showTip(event, 'fs13', 90)" class="i">employeeTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs30', 91)" onmouseover="showTip(event, 'fs30', 91)" class="f">Get</span>(<span onmouseout="hideTip(event, 'fs31', 92)" onmouseover="showTip(event, 'fs31', 92)" class="p">Row</span> <span class="s">&quot;1&quot;</span>, <span onmouseout="hideTip(event, 'fs32', 93)" onmouseover="showTip(event, 'fs32', 93)" class="p">Partition</span> <span class="s">&quot;women&quot;</span>) <span class="c">// try to get a single row</span>
 <span class="k">let</span> <span onmouseout="hideTip(event, 'fs56', 94)" onmouseover="showTip(event, 'fs56', 94)" class="i">allWomen</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs13', 95)" onmouseover="showTip(event, 'fs13', 95)" class="i">employeeTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs41', 96)" onmouseover="showTip(event, 'fs41', 96)" class="f">GetPartition</span>(<span class="s">&quot;women&quot;</span>) <span class="c">// get all rows in the &quot;women&quot; partition</span>
-</pre>
-</td>
+</code></pre></td>
 </tr>
 </table>
 
@@ -149,8 +133,7 @@ returning an optional result. You can also retrieve an entire partition.</p>
 <p>If you need to search for a set of entities, you can enter a plain text search, either manually or
 using the Azure SDK query builder.</p>
 
-<table class="pre"><tr><td class="lines"><pre class="fssnip">
-<span class="l">1: </span>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
 <span class="l">4: </span>
@@ -158,10 +141,8 @@ using the Azure SDK query builder.</p>
 <span class="l">6: </span>
 <span class="l">7: </span>
 <span class="l">8: </span>
-</pre>
-</td>
-<td class="snippet"><pre class="fssnip">
-<span class="c">// create the query string by hand</span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// create the query string by hand</span>
 <span class="k">let</span> <span onmouseout="hideTip(event, 'fs57', 97)" onmouseover="showTip(event, 'fs57', 97)" class="i">someData</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs13', 98)" onmouseover="showTip(event, 'fs13', 98)" class="i">employeeTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs58', 99)" onmouseover="showTip(event, 'fs58', 99)" class="f">Query</span>(<span class="s">&quot;YearsWorking eq 35&quot;</span>)
 <span onmouseout="hideTip(event, 'fs16', 100)" onmouseover="showTip(event, 'fs16', 100)" class="f">printfn</span> <span class="s">&quot;The query returned </span><span class="pf">%d</span><span class="s"> rows.&quot;</span> <span onmouseout="hideTip(event, 'fs57', 101)" onmouseover="showTip(event, 'fs57', 101)" class="i">someData</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs59', 102)" onmouseover="showTip(event, 'fs59', 102)" class="i">Length</span>
 
@@ -169,8 +150,7 @@ using the Azure SDK query builder.</p>
 <span class="k">let</span> <span onmouseout="hideTip(event, 'fs60', 103)" onmouseover="showTip(event, 'fs60', 103)" class="i">filterQuery</span> <span class="o">=</span>
     <span onmouseout="hideTip(event, 'fs61', 104)" onmouseover="showTip(event, 'fs61', 104)" class="t">TableQuery</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs62', 105)" onmouseover="showTip(event, 'fs62', 105)" class="f">GenerateFilterConditionForInt</span>(<span class="s">&quot;YearsWorking&quot;</span>, <span onmouseout="hideTip(event, 'fs63', 106)" onmouseover="showTip(event, 'fs63', 106)" class="t">QueryComparisons</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs64', 107)" onmouseover="showTip(event, 'fs64', 107)" class="i">Equal</span>, <span class="n">35</span>)
 <span onmouseout="hideTip(event, 'fs16', 108)" onmouseover="showTip(event, 'fs16', 108)" class="f">printfn</span> <span class="s">&quot;Generated query is &#39;</span><span class="pf">%s</span><span class="s">&#39;&quot;</span> <span onmouseout="hideTip(event, 'fs60', 109)" onmouseover="showTip(event, 'fs60', 109)" class="i">filterQuery</span>
-</pre>
-</td>
+</code></pre></td>
 </tr>
 </table>
 
@@ -190,14 +170,10 @@ is strongly typed at compile- and runtime, whilst being extremely easy to use. I
 methods appropriate for each property on the entity, including appropriate clauses e.g. Greater
 Than, Less Than etc. as supported by the Azure Storage Table service</p>
 
-<table class="pre"><tr><td class="lines"><pre class="fssnip">
-<span class="l">1: </span>
-</pre>
-</td>
-<td class="snippet"><pre class="fssnip">
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs65', 110)" onmouseover="showTip(event, 'fs65', 110)" class="i">tpQuery</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs13', 111)" onmouseover="showTip(event, 'fs13', 111)" class="i">employeeTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs58', 112)" onmouseover="showTip(event, 'fs58', 112)" class="f">Query</span>()<span class="o">.</span><span class="i">``Where Years Working Is``</span><span class="o">.</span><span class="f">``Equal To``</span>(<span class="n">35</span>)
-</pre>
-</td>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs65', 110)" onmouseover="showTip(event, 'fs65', 110)" class="i">tpQuery</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs13', 111)" onmouseover="showTip(event, 'fs13', 111)" class="i">employeeTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs58', 112)" onmouseover="showTip(event, 'fs58', 112)" class="f">Query</span>()<span class="o">.</span><span class="i">``Where Years Working Is``</span><span class="o">.</span><span class="f">``Equal To``</span>(<span class="n">35</span>)
+</code></pre></td>
 </tr>
 </table>
 
@@ -205,20 +181,16 @@ Than, Less Than etc. as supported by the Azure Storage Table service</p>
 
 <p>These can be composed and chained. When you have completed building, simply call <code>Execute()</code>.</p>
 
-<table class="pre"><tr><td class="lines"><pre class="fssnip">
-<span class="l">1: </span>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
 <span class="l">4: </span>
-</pre>
-</td>
-<td class="snippet"><pre class="fssnip">
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs66', 113)" onmouseover="showTip(event, 'fs66', 113)" class="i">longerQuery</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs13', 114)" onmouseover="showTip(event, 'fs13', 114)" class="i">employeeTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs58', 115)" onmouseover="showTip(event, 'fs58', 115)" class="f">Query</span>()
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs66', 113)" onmouseover="showTip(event, 'fs66', 113)" class="i">longerQuery</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs13', 114)" onmouseover="showTip(event, 'fs13', 114)" class="i">employeeTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs58', 115)" onmouseover="showTip(event, 'fs58', 115)" class="f">Query</span>()
                        <span class="o">.</span><span class="i">``Where Years Working Is``</span><span class="o">.</span><span class="f">``Greater Than``</span>(<span class="n">14</span>)
                        <span class="o">.</span><span class="i">``Where Name Is``</span><span class="o">.</span><span class="f">``Equal To``</span>(<span class="s">&quot;Fred&quot;</span>)
                        <span class="o">.</span><span class="i">``Where Is Manager Is``</span><span class="o">.</span><span class="f">True</span>()
-</pre>
-</td>
+</code></pre></td>
 </tr>
 </table>
 
@@ -244,27 +216,22 @@ it, you can use a strongly-typed Insert method. You can also choose whether to i
 
 <p>Both mechanisms will also return a TableResponse discriminated union on the outcome of the operation.</p>
 
-<table class="pre"><tr><td class="lines"><pre class="fssnip">
-<span class="l">1: </span>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
 <span class="l">4: </span>
-</pre>
-</td>
-<td class="snippet"><pre class="fssnip">
-<span class="k">type</span> <span onmouseout="hideTip(event, 'fs67', 116)" onmouseover="showTip(event, 'fs67', 116)" class="t">Person</span> <span class="o">=</span> { <span onmouseout="hideTip(event, 'fs68', 117)" onmouseover="showTip(event, 'fs68', 117)" class="i">Name</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs69', 118)" onmouseover="showTip(event, 'fs69', 118)" class="t">string</span>; <span onmouseout="hideTip(event, 'fs70', 119)" onmouseover="showTip(event, 'fs70', 119)" class="i">City</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs69', 120)" onmouseover="showTip(event, 'fs69', 120)" class="t">string</span> }
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">type</span> <span onmouseout="hideTip(event, 'fs67', 116)" onmouseover="showTip(event, 'fs67', 116)" class="t">Person</span> <span class="o">=</span> { <span onmouseout="hideTip(event, 'fs68', 117)" onmouseover="showTip(event, 'fs68', 117)" class="i">Name</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs69', 118)" onmouseover="showTip(event, 'fs69', 118)" class="t">string</span>; <span onmouseout="hideTip(event, 'fs70', 119)" onmouseover="showTip(event, 'fs70', 119)" class="i">City</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs69', 120)" onmouseover="showTip(event, 'fs69', 120)" class="t">string</span> }
 <span class="k">let</span> <span onmouseout="hideTip(event, 'fs71', 121)" onmouseover="showTip(event, 'fs71', 121)" class="i">emptyTable</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs11', 122)" onmouseover="showTip(event, 'fs11', 122)" class="t">Azure</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs14', 123)" onmouseover="showTip(event, 'fs14', 123)" class="i">Tables</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs72', 124)" onmouseover="showTip(event, 'fs72', 124)" class="i">emptytable</span>
 <span class="c">// insert a single row into an empty table</span>
 <span class="k">let</span> <span onmouseout="hideTip(event, 'fs73', 125)" onmouseover="showTip(event, 'fs73', 125)" class="i">response</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs71', 126)" onmouseover="showTip(event, 'fs71', 126)" class="i">emptyTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs74', 127)" onmouseover="showTip(event, 'fs74', 127)" class="f">Insert</span>(<span onmouseout="hideTip(event, 'fs32', 128)" onmouseover="showTip(event, 'fs32', 128)" class="p">Partition</span> <span class="s">&quot;Europe&quot;</span>, <span onmouseout="hideTip(event, 'fs31', 129)" onmouseover="showTip(event, 'fs31', 129)" class="p">Row</span> <span class="s">&quot;1&quot;</span>, { <span class="i">Name</span> <span class="o">=</span> <span class="s">&quot;Isaac&quot;</span>; <span class="i">City</span> <span class="o">=</span> <span class="s">&quot;London&quot;</span> })
-</pre>
-</td>
+</code></pre></td>
 </tr>
 </table>
 
 <table class="pre"><tr><td><pre><code>No value has been returned</code></pre></td></tr></table>
 
-<table class="pre"><tr><td class="lines"><pre class="fssnip">
-<span class="l">1: </span>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
 <span class="l">4: </span>
@@ -273,10 +240,8 @@ it, you can use a strongly-typed Insert method. You can also choose whether to i
 <span class="l">7: </span>
 <span class="l">8: </span>
 <span class="l">9: </span>
-</pre>
-</td>
-<td class="snippet"><pre class="fssnip">
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs75', 130)" onmouseover="showTip(event, 'fs75', 130)" class="i">newEmployee</span> <span class="o">=</span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs75', 130)" onmouseover="showTip(event, 'fs75', 130)" class="i">newEmployee</span> <span class="o">=</span>
     <span class="k">new</span> <span onmouseout="hideTip(event, 'fs11', 131)" onmouseover="showTip(event, 'fs11', 131)" class="i">Azure</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs76', 132)" onmouseover="showTip(event, 'fs76', 132)" class="i">Domain</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs77', 133)" onmouseover="showTip(event, 'fs77', 133)" class="t">employeeEntity</span>(
         <span onmouseout="hideTip(event, 'fs32', 134)" onmouseover="showTip(event, 'fs32', 134)" class="p">Partition</span> <span class="s">&quot;women&quot;</span>, <span onmouseout="hideTip(event, 'fs31', 135)" onmouseover="showTip(event, 'fs31', 135)" class="p">Row</span> <span class="s">&quot;3&quot;</span>,
         <span class="i">Dob</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs78', 136)" onmouseover="showTip(event, 'fs78', 136)" class="t">DateTime</span>(<span class="n">1979</span>, <span class="n">2</span>, <span class="n">12</span>),
@@ -285,21 +250,16 @@ it, you can use a strongly-typed Insert method. You can also choose whether to i
         <span class="i">Salary</span> <span class="o">=</span> <span class="n">123.</span>,
         <span class="i">YearsWorking</span> <span class="o">=</span> <span class="n">17</span>)
 <span class="k">let</span> <span onmouseout="hideTip(event, 'fs79', 137)" onmouseover="showTip(event, 'fs79', 137)" class="i">newEmployeeResponse</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs13', 138)" onmouseover="showTip(event, 'fs13', 138)" class="i">employeeTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs80', 139)" onmouseover="showTip(event, 'fs80', 139)" class="f">Insert</span>(<span onmouseout="hideTip(event, 'fs75', 140)" onmouseover="showTip(event, 'fs75', 140)" class="i">newEmployee</span>)
-</pre>
-</td>
+</code></pre></td>
 </tr>
 </table>
 
 <table class="pre"><tr><td><pre><code>No value has been returned</code></pre></td></tr></table>
 
-<table class="pre"><tr><td class="lines"><pre class="fssnip">
-<span class="l">1: </span>
-</pre>
-</td>
-<td class="snippet"><pre class="fssnip">
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs81', 141)" onmouseover="showTip(event, 'fs81', 141)" class="i">upsertResponse</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs13', 142)" onmouseover="showTip(event, 'fs13', 142)" class="i">employeeTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs80', 143)" onmouseover="showTip(event, 'fs80', 143)" class="f">Insert</span>(<span onmouseout="hideTip(event, 'fs75', 144)" onmouseover="showTip(event, 'fs75', 144)" class="i">newEmployee</span>, <span onmouseout="hideTip(event, 'fs82', 145)" onmouseover="showTip(event, 'fs82', 145)" class="t">TableInsertMode</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs83', 146)" onmouseover="showTip(event, 'fs83', 146)" class="i">Upsert</span>)
-</pre>
-</td>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs81', 141)" onmouseover="showTip(event, 'fs81', 141)" class="i">upsertResponse</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs13', 142)" onmouseover="showTip(event, 'fs13', 142)" class="i">employeeTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs80', 143)" onmouseover="showTip(event, 'fs80', 143)" class="f">Insert</span>(<span onmouseout="hideTip(event, 'fs75', 144)" onmouseover="showTip(event, 'fs75', 144)" class="i">newEmployee</span>, <span onmouseout="hideTip(event, 'fs82', 145)" onmouseover="showTip(event, 'fs82', 145)" class="t">TableInsertMode</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs83', 146)" onmouseover="showTip(event, 'fs83', 146)" class="i">Upsert</span>)
+</code></pre></td>
 </tr>
 </table>
 
@@ -312,24 +272,20 @@ large datasets into the appropriate batches, which for Azure Tables have to be a
 partition and in sizes of up to 100 entities. You can insert batches for tables that either
 already have schema or do not.</p>
 
-<table class="pre"><tr><td class="lines"><pre class="fssnip">
-<span class="l">1: </span>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
 <span class="l">4: </span>
 <span class="l">5: </span>
 <span class="l">6: </span>
-</pre>
-</td>
-<td class="snippet"><pre class="fssnip">
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs84', 147)" onmouseover="showTip(event, 'fs84', 147)" class="i">people</span> <span class="o">=</span> [ <span onmouseout="hideTip(event, 'fs32', 148)" onmouseover="showTip(event, 'fs32', 148)" class="p">Partition</span> <span class="s">&quot;Europe&quot;</span>, <span onmouseout="hideTip(event, 'fs31', 149)" onmouseover="showTip(event, 'fs31', 149)" class="p">Row</span> <span class="s">&quot;2&quot;</span>, { <span class="i">Name</span> <span class="o">=</span> <span class="s">&quot;Tony&quot;</span>; <span class="i">City</span> <span class="o">=</span> <span class="s">&quot;Milan&quot;</span>}
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs84', 147)" onmouseover="showTip(event, 'fs84', 147)" class="i">people</span> <span class="o">=</span> [ <span onmouseout="hideTip(event, 'fs32', 148)" onmouseover="showTip(event, 'fs32', 148)" class="p">Partition</span> <span class="s">&quot;Europe&quot;</span>, <span onmouseout="hideTip(event, 'fs31', 149)" onmouseover="showTip(event, 'fs31', 149)" class="p">Row</span> <span class="s">&quot;2&quot;</span>, { <span class="i">Name</span> <span class="o">=</span> <span class="s">&quot;Tony&quot;</span>; <span class="i">City</span> <span class="o">=</span> <span class="s">&quot;Milan&quot;</span>}
                <span onmouseout="hideTip(event, 'fs32', 150)" onmouseover="showTip(event, 'fs32', 150)" class="p">Partition</span> <span class="s">&quot;North America&quot;</span>, <span onmouseout="hideTip(event, 'fs31', 151)" onmouseover="showTip(event, 'fs31', 151)" class="p">Row</span> <span class="s">&quot;1&quot;</span>, { <span class="i">Name</span> <span class="o">=</span> <span class="s">&quot;Sally&quot;</span>; <span class="i">City</span> <span class="o">=</span> <span class="s">&quot;New York&quot;</span>}
                <span onmouseout="hideTip(event, 'fs32', 152)" onmouseover="showTip(event, 'fs32', 152)" class="p">Partition</span> <span class="s">&quot;Europe&quot;</span>, <span onmouseout="hideTip(event, 'fs31', 153)" onmouseover="showTip(event, 'fs31', 153)" class="p">Row</span> <span class="s">&quot;3&quot;</span>, { <span class="i">Name</span> <span class="o">=</span> <span class="s">&quot;Dirk&quot;</span>; <span class="i">City</span> <span class="o">=</span> <span class="s">&quot;Frankfurt&quot;</span>} ]
 
 <span class="c">// results are grouped by the batch that they were inserted in.</span>
 <span class="k">let</span> <span onmouseout="hideTip(event, 'fs85', 154)" onmouseover="showTip(event, 'fs85', 154)" class="i">batchResults</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs71', 155)" onmouseover="showTip(event, 'fs71', 155)" class="i">emptyTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs74', 156)" onmouseover="showTip(event, 'fs74', 156)" class="f">Insert</span>(<span onmouseout="hideTip(event, 'fs84', 157)" onmouseover="showTip(event, 'fs84', 157)" class="i">people</span>)
-</pre>
-</td>
+</code></pre></td>
 </tr>
 </table>
 
@@ -341,14 +297,10 @@ already have schema or do not.</p>
 you wish to delete. Unfortunately there is no way to delete an entire partition - this is a limitation
 of the Table Storage service</p>
 
-<table class="pre"><tr><td class="lines"><pre class="fssnip">
-<span class="l">1: </span>
-</pre>
-</td>
-<td class="snippet"><pre class="fssnip">
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs86', 158)" onmouseover="showTip(event, 'fs86', 158)" class="i">deleteResult</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs71', 159)" onmouseover="showTip(event, 'fs71', 159)" class="i">emptyTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs87', 160)" onmouseover="showTip(event, 'fs87', 160)" class="f">Delete</span> [ <span class="k">for</span> <span onmouseout="hideTip(event, 'fs88', 161)" onmouseover="showTip(event, 'fs88', 161)" class="i">row</span> <span class="k">in</span> <span class="n">1</span> <span class="o">..</span> <span class="n">3</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs32', 162)" onmouseover="showTip(event, 'fs32', 162)" class="p">Partition</span> <span class="s">&quot;Europe&quot;</span>, <span onmouseout="hideTip(event, 'fs31', 163)" onmouseover="showTip(event, 'fs31', 163)" class="p">Row</span> (<span onmouseout="hideTip(event, 'fs88', 164)" onmouseover="showTip(event, 'fs88', 164)" class="i">row</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs89', 165)" onmouseover="showTip(event, 'fs89', 165)" class="f">ToString</span>()) ]
-</pre>
-</td>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs86', 158)" onmouseover="showTip(event, 'fs86', 158)" class="i">deleteResult</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs71', 159)" onmouseover="showTip(event, 'fs71', 159)" class="i">emptyTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs87', 160)" onmouseover="showTip(event, 'fs87', 160)" class="f">Delete</span> [ <span class="k">for</span> <span onmouseout="hideTip(event, 'fs88', 161)" onmouseover="showTip(event, 'fs88', 161)" class="i">row</span> <span class="k">in</span> <span class="n">1</span> <span class="o">..</span> <span class="n">3</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs32', 162)" onmouseover="showTip(event, 'fs32', 162)" class="p">Partition</span> <span class="s">&quot;Europe&quot;</span>, <span onmouseout="hideTip(event, 'fs31', 163)" onmouseover="showTip(event, 'fs31', 163)" class="p">Row</span> (<span onmouseout="hideTip(event, 'fs88', 164)" onmouseover="showTip(event, 'fs88', 164)" class="i">row</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs89', 165)" onmouseover="showTip(event, 'fs89', 165)" class="f">ToString</span>()) ]
+</code></pre></td>
 </tr>
 </table>
 
@@ -360,76 +312,60 @@ of the Table Storage service</p>
 TableResponse. This contains the Partition and Row Keys of the affected row as well as the
 associated TableResult, wrapped in a discriminated union to allow easy matching.</p>
 
-<table class="pre"><tr><td class="lines"><pre class="fssnip">
-<span class="l">1: </span>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
 <span class="l">4: </span>
 <span class="l">5: </span>
 <span class="l">6: </span>
-</pre>
-</td>
-<td class="snippet"><pre class="fssnip">
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs90', 166)" onmouseover="showTip(event, 'fs90', 166)" class="f">handleResponse</span> <span class="o">=</span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs90', 166)" onmouseover="showTip(event, 'fs90', 166)" class="f">handleResponse</span> <span class="o">=</span>
     <span class="k">function</span>
     | <span onmouseout="hideTip(event, 'fs91', 167)" onmouseover="showTip(event, 'fs91', 167)" class="p">SuccessfulResponse</span>(<span onmouseout="hideTip(event, 'fs92', 168)" onmouseover="showTip(event, 'fs92', 168)" class="i">entityId</span>, <span onmouseout="hideTip(event, 'fs93', 169)" onmouseover="showTip(event, 'fs93', 169)" class="i">errorCode</span>) <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs16', 170)" onmouseover="showTip(event, 'fs16', 170)" class="f">printfn</span> <span class="s">&quot;Entity </span><span class="pf">%A</span><span class="s"> succeeded: </span><span class="pf">%d</span><span class="s">.&quot;</span> <span onmouseout="hideTip(event, 'fs92', 171)" onmouseover="showTip(event, 'fs92', 171)" class="i">entityId</span> <span onmouseout="hideTip(event, 'fs93', 172)" onmouseover="showTip(event, 'fs93', 172)" class="i">errorCode</span>
     | <span onmouseout="hideTip(event, 'fs94', 173)" onmouseover="showTip(event, 'fs94', 173)" class="p">EntityError</span>(<span onmouseout="hideTip(event, 'fs92', 174)" onmouseover="showTip(event, 'fs92', 174)" class="i">entityId</span>, <span onmouseout="hideTip(event, 'fs95', 175)" onmouseover="showTip(event, 'fs95', 175)" class="i">httpCode</span>, <span onmouseout="hideTip(event, 'fs96', 176)" onmouseover="showTip(event, 'fs96', 176)" class="i">errorCode</span>) <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs16', 177)" onmouseover="showTip(event, 'fs16', 177)" class="f">printfn</span> <span class="s">&quot;Entity </span><span class="pf">%A</span><span class="s"> failed: </span><span class="pf">%d</span><span class="s"> - </span><span class="pf">%s</span><span class="s">.&quot;</span> <span onmouseout="hideTip(event, 'fs92', 178)" onmouseover="showTip(event, 'fs92', 178)" class="i">entityId</span> <span onmouseout="hideTip(event, 'fs95', 179)" onmouseover="showTip(event, 'fs95', 179)" class="i">httpCode</span> <span onmouseout="hideTip(event, 'fs96', 180)" onmouseover="showTip(event, 'fs96', 180)" class="i">errorCode</span>
     | <span onmouseout="hideTip(event, 'fs97', 181)" onmouseover="showTip(event, 'fs97', 181)" class="p">BatchOperationFailedError</span>(<span onmouseout="hideTip(event, 'fs92', 182)" onmouseover="showTip(event, 'fs92', 182)" class="i">entityId</span>) <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs16', 183)" onmouseover="showTip(event, 'fs16', 183)" class="f">printfn</span> <span class="s">&quot;Entity </span><span class="pf">%A</span><span class="s"> was ignored as part of a failed batch operation.&quot;</span> <span onmouseout="hideTip(event, 'fs92', 184)" onmouseover="showTip(event, 'fs92', 184)" class="i">entityId</span>
     | <span onmouseout="hideTip(event, 'fs98', 185)" onmouseover="showTip(event, 'fs98', 185)" class="p">BatchError</span>(<span onmouseout="hideTip(event, 'fs92', 186)" onmouseover="showTip(event, 'fs92', 186)" class="i">entityId</span>, <span onmouseout="hideTip(event, 'fs95', 187)" onmouseover="showTip(event, 'fs95', 187)" class="i">httpCode</span>, <span onmouseout="hideTip(event, 'fs96', 188)" onmouseover="showTip(event, 'fs96', 188)" class="i">errorCode</span>) <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs16', 189)" onmouseover="showTip(event, 'fs16', 189)" class="f">printfn</span> <span class="s">&quot;Entity </span><span class="pf">%A</span><span class="s"> failed with an unknown batch error: </span><span class="pf">%d</span><span class="s"> - </span><span class="pf">%s</span><span class="s">.&quot;</span> <span onmouseout="hideTip(event, 'fs92', 190)" onmouseover="showTip(event, 'fs92', 190)" class="i">entityId</span> <span onmouseout="hideTip(event, 'fs95', 191)" onmouseover="showTip(event, 'fs95', 191)" class="i">httpCode</span> <span onmouseout="hideTip(event, 'fs96', 192)" onmouseover="showTip(event, 'fs96', 192)" class="i">errorCode</span>
-</pre>
-</td>
+</code></pre></td>
 </tr>
 </table>
 
-<table class="pre"><tr><td class="lines"><pre class="fssnip">
-<span class="l">1: </span>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
-</pre>
-</td>
-<td class="snippet"><pre class="fssnip">
-<span class="c">// Insert an existing entity</span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// Insert an existing entity</span>
 <span onmouseout="hideTip(event, 'fs13', 193)" onmouseover="showTip(event, 'fs13', 193)" class="i">employeeTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs80', 194)" onmouseover="showTip(event, 'fs80', 194)" class="f">Insert</span>(<span onmouseout="hideTip(event, 'fs75', 195)" onmouseover="showTip(event, 'fs75', 195)" class="i">newEmployee</span>) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs90', 196)" onmouseover="showTip(event, 'fs90', 196)" class="f">handleResponse</span>
-</pre>
-</td>
+</code></pre></td>
 </tr>
 </table>
 
 <table class="pre"><tr><td><pre><code>No output has been produced.</code></pre></td></tr></table>
 
-<table class="pre"><tr><td class="lines"><pre class="fssnip">
-<span class="l">1: </span>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
-</pre>
-</td>
-<td class="snippet"><pre class="fssnip">
-<span class="c">// Insert the same batch twice</span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// Insert the same batch twice</span>
 <span onmouseout="hideTip(event, 'fs71', 197)" onmouseover="showTip(event, 'fs71', 197)" class="i">emptyTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs74', 198)" onmouseover="showTip(event, 'fs74', 198)" class="f">Insert</span>(<span onmouseout="hideTip(event, 'fs84', 199)" onmouseover="showTip(event, 'fs84', 199)" class="i">people</span>)
 <span onmouseout="hideTip(event, 'fs71', 200)" onmouseover="showTip(event, 'fs71', 200)" class="i">emptyTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs74', 201)" onmouseover="showTip(event, 'fs74', 201)" class="f">Insert</span>(<span onmouseout="hideTip(event, 'fs84', 202)" onmouseover="showTip(event, 'fs84', 202)" class="i">people</span>) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs51', 203)" onmouseover="showTip(event, 'fs51', 203)" class="t">Seq</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs99', 204)" onmouseover="showTip(event, 'fs99', 204)" class="f">collect</span> <span onmouseout="hideTip(event, 'fs100', 205)" onmouseover="showTip(event, 'fs100', 205)" class="f">snd</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs51', 206)" onmouseover="showTip(event, 'fs51', 206)" class="t">Seq</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs101', 207)" onmouseover="showTip(event, 'fs101', 207)" class="f">iter</span> <span onmouseout="hideTip(event, 'fs90', 208)" onmouseover="showTip(event, 'fs90', 208)" class="f">handleResponse</span>
-</pre>
-</td>
+</code></pre></td>
 </tr>
 </table>
 
 <table class="pre"><tr><td><pre><code>No output has been produced.</code></pre></td></tr></table>
 
-<table class="pre"><tr><td class="lines"><pre class="fssnip">
-<span class="l">1: </span>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
-</pre>
-</td>
-<td class="snippet"><pre class="fssnip">
-<span class="c">// Delete a non-existant entity</span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// Delete a non-existant entity</span>
 <span onmouseout="hideTip(event, 'fs71', 209)" onmouseover="showTip(event, 'fs71', 209)" class="i">emptyTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs87', 210)" onmouseover="showTip(event, 'fs87', 210)" class="f">Delete</span>([ <span onmouseout="hideTip(event, 'fs32', 211)" onmouseover="showTip(event, 'fs32', 211)" class="p">Partition</span> <span class="s">&quot;Foo&quot;</span>, <span onmouseout="hideTip(event, 'fs31', 212)" onmouseover="showTip(event, 'fs31', 212)" class="p">Row</span> <span class="s">&quot;Bar&quot;</span> ]) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs51', 213)" onmouseover="showTip(event, 'fs51', 213)" class="t">Seq</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs99', 214)" onmouseover="showTip(event, 'fs99', 214)" class="f">collect</span> <span onmouseout="hideTip(event, 'fs100', 215)" onmouseover="showTip(event, 'fs100', 215)" class="f">snd</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs51', 216)" onmouseover="showTip(event, 'fs51', 216)" class="t">Seq</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs101', 217)" onmouseover="showTip(event, 'fs101', 217)" class="f">iter</span> <span onmouseout="hideTip(event, 'fs90', 218)" onmouseover="showTip(event, 'fs90', 218)" class="f">handleResponse</span>
-</pre>
-</td>
+</code></pre></td>
 </tr>
 </table>
 
 <table class="pre"><tr><td><pre><code>No output has been produced.</code></pre></td></tr></table>
 
 <div class="tip" id="fs1">namespace Deedle</div>
-<div class="tip" id="fs2">namespace FSharp</div>
+<div class="tip" id="fs2">Multiple items<br />namespace FSharp<br /><br />--------------------<br />namespace Microsoft.FSharp</div>
 <div class="tip" id="fs3">namespace FSharp.Azure</div>
 <div class="tip" id="fs4">namespace FSharp.Azure.StorageTypeProvider</div>
 <div class="tip" id="fs5">namespace FSharp.Azure.StorageTypeProvider.Table</div>
@@ -448,13 +384,13 @@ associated TableResult, wrapped in a discriminated union to allow easy matching.
 <div class="tip" id="fs18">val theData : Frame&lt;string,string&gt;<br /><br />Full name: Tables.theData</div>
 <div class="tip" id="fs19">val keys : string list</div>
 <div class="tip" id="fs20">val series : ISeries&lt;int&gt; list</div>
-<div class="tip" id="fs21">Multiple items<br />module List<br /><br />from Microsoft.FSharp.Collections<br /><br />--------------------<br />type List&lt;&#39;T&gt; =<br />&#160;&#160;| ( [] )<br />&#160;&#160;| ( :: ) of Head: &#39;T * Tail: &#39;T list<br />&#160;&#160;interface IEnumerable<br />&#160;&#160;interface IEnumerable&lt;&#39;T&gt;<br />&#160;&#160;member Head : &#39;T<br />&#160;&#160;member IsEmpty : bool<br />&#160;&#160;member Item : index:int -&gt; &#39;T with get<br />&#160;&#160;member Length : int<br />&#160;&#160;member Tail : &#39;T list<br />&#160;&#160;static member Cons : head:&#39;T * tail:&#39;T list -&gt; &#39;T list<br />&#160;&#160;static member Empty : &#39;T list<br /><br />Full name: Microsoft.FSharp.Collections.List&lt;_&gt;</div>
+<div class="tip" id="fs21">Multiple items<br />module List<br /><br />from Microsoft.FSharp.Collections<br /><br />--------------------<br />type List&lt;&#39;T&gt; =<br />&#160;&#160;| ( [] )<br />&#160;&#160;| ( :: ) of Head: &#39;T * Tail: &#39;T list<br />&#160;&#160;interface IEnumerable<br />&#160;&#160;interface IEnumerable&lt;&#39;T&gt;<br />&#160;&#160;member GetSlice : startIndex:int option * endIndex:int option -&gt; &#39;T list<br />&#160;&#160;member Head : &#39;T<br />&#160;&#160;member IsEmpty : bool<br />&#160;&#160;member Item : index:int -&gt; &#39;T with get<br />&#160;&#160;member Length : int<br />&#160;&#160;member Tail : &#39;T list<br />&#160;&#160;static member Cons : head:&#39;T * tail:&#39;T list -&gt; &#39;T list<br />&#160;&#160;static member Empty : &#39;T list<br /><br />Full name: Microsoft.FSharp.Collections.List&lt;_&gt;</div>
 <div class="tip" id="fs22">val map : mapping:(&#39;T -&gt; &#39;U) -&gt; list:&#39;T list -&gt; &#39;U list<br /><br />Full name: Microsoft.FSharp.Collections.List.map</div>
-<div class="tip" id="fs23">Multiple items<br />module Series<br /><br />from Deedle<br /><br />--------------------<br />type Series =<br />&#160;&#160;static member ofNullables : values:seq&lt;Nullable&lt;&#39;a0&gt;&gt; -&gt; Series&lt;int,&#39;a0&gt; (requires default constructor and value type and &#39;a0 :&gt; ValueType)<br />&#160;&#160;static member ofObservations : observations:seq&lt;&#39;a0 * &#39;a1&gt; -&gt; Series&lt;&#39;a0,&#39;a1&gt; (requires equality)<br />&#160;&#160;static member ofOptionalObservations : observations:seq&lt;&#39;K * &#39;a1 option&gt; -&gt; Series&lt;&#39;K,&#39;a1&gt; (requires equality)<br />&#160;&#160;static member ofValues : values:seq&lt;&#39;a0&gt; -&gt; Series&lt;int,&#39;a0&gt;<br /><br />Full name: Deedle.FSharpSeriesExtensions.Series<br /><br />--------------------<br />type Series&lt;&#39;K,&#39;V (requires equality)&gt; =<br />&#160;&#160;interface IFsiFormattable<br />&#160;&#160;interface ISeries&lt;&#39;K&gt;<br />&#160;&#160;new : pairs:seq&lt;KeyValuePair&lt;&#39;K,&#39;V&gt;&gt; -&gt; Series&lt;&#39;K,&#39;V&gt;<br />&#160;&#160;new : keys:&#39;K [] * values:&#39;V [] -&gt; Series&lt;&#39;K,&#39;V&gt;<br />&#160;&#160;new : keys:seq&lt;&#39;K&gt; * values:seq&lt;&#39;V&gt; -&gt; Series&lt;&#39;K,&#39;V&gt;<br />&#160;&#160;new : index:IIndex&lt;&#39;K&gt; * vector:IVector&lt;&#39;V&gt; * vectorBuilder:IVectorBuilder * indexBuilder:IIndexBuilder -&gt; Series&lt;&#39;K,&#39;V&gt;<br />&#160;&#160;member After : lowerExclusive:&#39;K -&gt; Series&lt;&#39;K,&#39;V&gt;<br />&#160;&#160;member Aggregate : aggregation:Aggregation&lt;&#39;K&gt; * observationSelector:Func&lt;DataSegment&lt;Series&lt;&#39;K,&#39;V&gt;&gt;,KeyValuePair&lt;&#39;TNewKey,OptionalValue&lt;&#39;R&gt;&gt;&gt; -&gt; Series&lt;&#39;TNewKey,&#39;R&gt; (requires equality)<br />&#160;&#160;member Aggregate : aggregation:Aggregation&lt;&#39;K&gt; * keySelector:Func&lt;DataSegment&lt;Series&lt;&#39;K,&#39;V&gt;&gt;,&#39;TNewKey&gt; * valueSelector:Func&lt;DataSegment&lt;Series&lt;&#39;K,&#39;V&gt;&gt;,OptionalValue&lt;&#39;R&gt;&gt; -&gt; Series&lt;&#39;TNewKey,&#39;R&gt; (requires equality)<br />&#160;&#160;member AsyncMaterialize : unit -&gt; Async&lt;Series&lt;&#39;K,&#39;V&gt;&gt;<br />&#160;&#160;...<br /><br />Full name: Deedle.Series&lt;_,_&gt;<br /><br />--------------------<br />new : pairs:seq&lt;Collections.Generic.KeyValuePair&lt;&#39;K,&#39;V&gt;&gt; -&gt; Series&lt;&#39;K,&#39;V&gt;<br />new : keys:seq&lt;&#39;K&gt; * values:seq&lt;&#39;V&gt; -&gt; Series&lt;&#39;K,&#39;V&gt;<br />new : keys:&#39;K [] * values:&#39;V [] -&gt; Series&lt;&#39;K,&#39;V&gt;<br />new : index:Indices.IIndex&lt;&#39;K&gt; * vector:IVector&lt;&#39;V&gt; * vectorBuilder:Vectors.IVectorBuilder * indexBuilder:Indices.IIndexBuilder -&gt; Series&lt;&#39;K,&#39;V&gt;</div>
+<div class="tip" id="fs23">Multiple items<br />module Series<br /><br />from Deedle<br /><br />--------------------<br />type Series =<br />&#160;&#160;static member ofNullables : values:seq&lt;Nullable&lt;&#39;a0&gt;&gt; -&gt; Series&lt;int,&#39;a0&gt; (requires default constructor and value type and &#39;a0 :&gt; ValueType)<br />&#160;&#160;static member ofObservations : observations:seq&lt;&#39;a0 * &#39;a1&gt; -&gt; Series&lt;&#39;a0,&#39;a1&gt; (requires equality)<br />&#160;&#160;static member ofOptionalObservations : observations:seq&lt;&#39;K * &#39;a1 option&gt; -&gt; Series&lt;&#39;K,&#39;a1&gt; (requires equality)<br />&#160;&#160;static member ofValues : values:seq&lt;&#39;a0&gt; -&gt; Series&lt;int,&#39;a0&gt;<br /><br />Full name: Deedle.F# Series extensions.Series<br /><br />--------------------<br />type Series&lt;&#39;K,&#39;V (requires equality)&gt; =<br />&#160;&#160;interface IFsiFormattable<br />&#160;&#160;interface ISeries&lt;&#39;K&gt;<br />&#160;&#160;new : pairs:seq&lt;KeyValuePair&lt;&#39;K,&#39;V&gt;&gt; -&gt; Series&lt;&#39;K,&#39;V&gt;<br />&#160;&#160;new : keys:&#39;K [] * values:&#39;V [] -&gt; Series&lt;&#39;K,&#39;V&gt;<br />&#160;&#160;new : keys:seq&lt;&#39;K&gt; * values:seq&lt;&#39;V&gt; -&gt; Series&lt;&#39;K,&#39;V&gt;<br />&#160;&#160;new : index:IIndex&lt;&#39;K&gt; * vector:IVector&lt;&#39;V&gt; * vectorBuilder:IVectorBuilder * indexBuilder:IIndexBuilder -&gt; Series&lt;&#39;K,&#39;V&gt;<br />&#160;&#160;member After : lowerExclusive:&#39;K -&gt; Series&lt;&#39;K,&#39;V&gt;<br />&#160;&#160;member Aggregate : aggregation:Aggregation&lt;&#39;K&gt; * observationSelector:Func&lt;DataSegment&lt;Series&lt;&#39;K,&#39;V&gt;&gt;,KeyValuePair&lt;&#39;TNewKey,OptionalValue&lt;&#39;R&gt;&gt;&gt; -&gt; Series&lt;&#39;TNewKey,&#39;R&gt; (requires equality)<br />&#160;&#160;member Aggregate : aggregation:Aggregation&lt;&#39;K&gt; * keySelector:Func&lt;DataSegment&lt;Series&lt;&#39;K,&#39;V&gt;&gt;,&#39;TNewKey&gt; * valueSelector:Func&lt;DataSegment&lt;Series&lt;&#39;K,&#39;V&gt;&gt;,OptionalValue&lt;&#39;R&gt;&gt; -&gt; Series&lt;&#39;TNewKey,&#39;R&gt; (requires equality)<br />&#160;&#160;member AsyncMaterialize : unit -&gt; Async&lt;Series&lt;&#39;K,&#39;V&gt;&gt;<br />&#160;&#160;...<br /><br />Full name: Deedle.Series&lt;_,_&gt;<br /><br />--------------------<br />new : pairs:seq&lt;Collections.Generic.KeyValuePair&lt;&#39;K,&#39;V&gt;&gt; -&gt; Series&lt;&#39;K,&#39;V&gt;<br />new : keys:seq&lt;&#39;K&gt; * values:seq&lt;&#39;V&gt; -&gt; Series&lt;&#39;K,&#39;V&gt;<br />new : keys:&#39;K [] * values:&#39;V [] -&gt; Series&lt;&#39;K,&#39;V&gt;<br />new : index:Indices.IIndex&lt;&#39;K&gt; * vector:IVector&lt;&#39;V&gt; * vectorBuilder:Vectors.IVectorBuilder * indexBuilder:Indices.IIndexBuilder -&gt; Series&lt;&#39;K,&#39;V&gt;</div>
 <div class="tip" id="fs24">static member Series.ofValues : values:seq&lt;&#39;a0&gt; -&gt; Series&lt;int,&#39;a0&gt;</div>
 <div class="tip" id="fs25">val s : Series&lt;int,string&gt;</div>
-<div class="tip" id="fs26">type ISeries&lt;&#39;K (requires equality)&gt; =<br />&#160;&#160;interface<br />&#160;&#160;&#160;&#160;abstract member TryGetObject : &#39;K -&gt; OptionalValue&lt;obj&gt;<br />&#160;&#160;&#160;&#160;abstract member Index : IIndex&lt;&#39;K&gt;<br />&#160;&#160;&#160;&#160;abstract member Vector : IVector<br />&#160;&#160;end<br /><br />Full name: Deedle.ISeries&lt;_&gt;</div>
-<div class="tip" id="fs27">Multiple items<br />module Frame<br /><br />from Deedle<br /><br />--------------------<br />type Frame =<br />&#160;&#160;static member CreateEmpty : unit -&gt; Frame&lt;&#39;R,&#39;C&gt; (requires equality and equality)<br />&#160;&#160;static member FromArray2D : array:&#39;T [,] -&gt; Frame&lt;int,int&gt;<br />&#160;&#160;static member FromColumns : cols:Series&lt;&#39;TColKey,Series&lt;&#39;TRowKey,&#39;V&gt;&gt; -&gt; Frame&lt;&#39;TRowKey,&#39;TColKey&gt; (requires equality and equality)<br />&#160;&#160;static member FromColumns : cols:Series&lt;&#39;TColKey,ObjectSeries&lt;&#39;TRowKey&gt;&gt; -&gt; Frame&lt;&#39;TRowKey,&#39;TColKey&gt; (requires equality and equality)<br />&#160;&#160;static member FromColumns : columns:seq&lt;KeyValuePair&lt;&#39;ColKey,ObjectSeries&lt;&#39;RowKey&gt;&gt;&gt; -&gt; Frame&lt;&#39;RowKey,&#39;ColKey&gt; (requires equality and equality)<br />&#160;&#160;static member FromColumns : columns:seq&lt;KeyValuePair&lt;&#39;ColKey,Series&lt;&#39;RowKey,&#39;V&gt;&gt;&gt; -&gt; Frame&lt;&#39;RowKey,&#39;ColKey&gt; (requires equality and equality)<br />&#160;&#160;static member FromColumns : cols:seq&lt;Series&lt;&#39;ColKey,&#39;V&gt;&gt; -&gt; Frame&lt;&#39;ColKey,int&gt; (requires equality)<br />&#160;&#160;static member FromRecords : values:seq&lt;&#39;T&gt; -&gt; Frame&lt;int,string&gt;<br />&#160;&#160;static member FromRecords : series:Series&lt;&#39;K,&#39;R&gt; -&gt; Frame&lt;&#39;K,string&gt; (requires equality)<br />&#160;&#160;static member FromRowKeys : keys:seq&lt;&#39;K&gt; -&gt; Frame&lt;&#39;K,string&gt; (requires equality)<br />&#160;&#160;...<br /><br />Full name: Deedle.Frame<br /><br />--------------------<br />type Frame&lt;&#39;TRowKey,&#39;TColumnKey (requires equality and equality)&gt; =<br />&#160;&#160;interface IDynamicMetaObjectProvider<br />&#160;&#160;interface INotifyCollectionChanged<br />&#160;&#160;interface IFsiFormattable<br />&#160;&#160;interface IFrame<br />&#160;&#160;new : names:seq&lt;&#39;TColumnKey&gt; * columns:seq&lt;ISeries&lt;&#39;TRowKey&gt;&gt; -&gt; Frame&lt;&#39;TRowKey,&#39;TColumnKey&gt;<br />&#160;&#160;new : rowIndex:IIndex&lt;&#39;TRowKey&gt; * columnIndex:IIndex&lt;&#39;TColumnKey&gt; * data:IVector&lt;IVector&gt; * indexBuilder:IIndexBuilder * vectorBuilder:IVectorBuilder -&gt; Frame&lt;&#39;TRowKey,&#39;TColumnKey&gt;<br />&#160;&#160;member AddColumn : column:&#39;TColumnKey * series:ISeries&lt;&#39;TRowKey&gt; -&gt; unit<br />&#160;&#160;member AddColumn : column:&#39;TColumnKey * series:seq&lt;&#39;V&gt; -&gt; unit<br />&#160;&#160;member AddColumn : column:&#39;TColumnKey * series:ISeries&lt;&#39;TRowKey&gt; * lookup:Lookup -&gt; unit<br />&#160;&#160;member AddColumn : column:&#39;TColumnKey * series:seq&lt;&#39;V&gt; * lookup:Lookup -&gt; unit<br />&#160;&#160;...<br /><br />Full name: Deedle.Frame&lt;_,_&gt;<br /><br />--------------------<br />new : names:seq&lt;&#39;TColumnKey&gt; * columns:seq&lt;ISeries&lt;&#39;TRowKey&gt;&gt; -&gt; Frame&lt;&#39;TRowKey,&#39;TColumnKey&gt;<br />new : rowIndex:Indices.IIndex&lt;&#39;TRowKey&gt; * columnIndex:Indices.IIndex&lt;&#39;TColumnKey&gt; * data:IVector&lt;IVector&gt; * indexBuilder:Indices.IIndexBuilder * vectorBuilder:Vectors.IVectorBuilder -&gt; Frame&lt;&#39;TRowKey,&#39;TColumnKey&gt;</div>
+<div class="tip" id="fs26">type ISeries&lt;&#39;K (requires equality)&gt; =<br />&#160;&#160;interface<br />&#160;&#160;&#160;&#160;abstract member TryGetObject : &#39;K -&gt; OptionalValue&lt;obj&gt;<br />&#160;&#160;&#160;&#160;abstract member Index : IIndex&lt;&#39;K&gt;<br />&#160;&#160;&#160;&#160;abstract member Vector : IVector<br />&#160;&#160;&#160;&#160;abstract member VectorBuilder : IVectorBuilder<br />&#160;&#160;end<br /><br />Full name: Deedle.ISeries&lt;_&gt;</div>
+<div class="tip" id="fs27">Multiple items<br />module Frame<br /><br />from Deedle<br /><br />--------------------<br />type Frame =<br />&#160;&#160;static member ReadReader : reader:IDataReader -&gt; Frame&lt;int,string&gt;<br />&#160;&#160;static member CustomExpanders : Dictionary&lt;Type,Func&lt;obj,seq&lt;string * Type * obj&gt;&gt;&gt;<br />&#160;&#160;static member NonExpandableInterfaces : List&lt;Type&gt;<br />&#160;&#160;static member NonExpandableTypes : HashSet&lt;Type&gt;<br /><br />Full name: Deedle.Frame<br /><br />--------------------<br />type Frame&lt;&#39;TRowKey,&#39;TColumnKey (requires equality and equality)&gt; =<br />&#160;&#160;interface IDynamicMetaObjectProvider<br />&#160;&#160;interface INotifyCollectionChanged<br />&#160;&#160;interface IFsiFormattable<br />&#160;&#160;interface IFrame<br />&#160;&#160;new : names:seq&lt;&#39;TColumnKey&gt; * columns:seq&lt;ISeries&lt;&#39;TRowKey&gt;&gt; -&gt; Frame&lt;&#39;TRowKey,&#39;TColumnKey&gt;<br />&#160;&#160;new : rowIndex:IIndex&lt;&#39;TRowKey&gt; * columnIndex:IIndex&lt;&#39;TColumnKey&gt; * data:IVector&lt;IVector&gt; * indexBuilder:IIndexBuilder * vectorBuilder:IVectorBuilder -&gt; Frame&lt;&#39;TRowKey,&#39;TColumnKey&gt;<br />&#160;&#160;member AddColumn : column:&#39;TColumnKey * series:ISeries&lt;&#39;TRowKey&gt; -&gt; unit<br />&#160;&#160;member AddColumn : column:&#39;TColumnKey * series:seq&lt;&#39;V&gt; -&gt; unit<br />&#160;&#160;member AddColumn : column:&#39;TColumnKey * series:ISeries&lt;&#39;TRowKey&gt; * lookup:Lookup -&gt; unit<br />&#160;&#160;member AddColumn : column:&#39;TColumnKey * series:seq&lt;&#39;V&gt; * lookup:Lookup -&gt; unit<br />&#160;&#160;...<br /><br />Full name: Deedle.Frame&lt;_,_&gt;<br /><br />--------------------<br />new : names:seq&lt;&#39;TColumnKey&gt; * columns:seq&lt;ISeries&lt;&#39;TRowKey&gt;&gt; -&gt; Frame&lt;&#39;TRowKey,&#39;TColumnKey&gt;<br />new : rowIndex:Indices.IIndex&lt;&#39;TRowKey&gt; * columnIndex:Indices.IIndex&lt;&#39;TColumnKey&gt; * data:IVector&lt;IVector&gt; * indexBuilder:Indices.IIndexBuilder * vectorBuilder:Vectors.IVectorBuilder -&gt; Frame&lt;&#39;TRowKey,&#39;TColumnKey&gt;</div>
 <div class="tip" id="fs28">val indexRowsString : column:&#39;C -&gt; frame:Frame&lt;&#39;R1,&#39;C&gt; -&gt; Frame&lt;string,&#39;C&gt; (requires equality and equality)<br /><br />Full name: Deedle.Frame.indexRowsString</div>
 <div class="tip" id="fs29">val fred : AzureTypeProvider&lt;...&gt;.Domain.employeeEntity<br /><br />Full name: Tables.fred</div>
 <div class="tip" id="fs30">AzureTypeProvider&lt;...&gt;.Domain.employeeTable.Get(rowKey: Row, partitionKey: Partition, ?connectionString: string) : Option&lt;AzureTypeProvider&lt;...&gt;.Domain.employeeEntity&gt;<br /><em><br /><br />Gets a single entity based on the row and partition key.</em></div>
@@ -532,10 +468,10 @@ associated TableResult, wrapped in a discriminated union to allow easy matching.
 
             </div>
             <div class="span3">
-                <img src="./img/logo.png" alt="F# Project" style="width:150px;margin:10px" />
+                <img src="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/img/logo.png" alt="F# Project" style="width:150px;margin:10px" />
                 <ul class="nav nav-list" id="menu" style="margin-top: 20px;">
                     <li class="nav-header">Azure Storage Type Provider</li>
-                    <li><a href="./index.html">Home page</a></li>
+                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/index.html">Home page</a></li>
                     <li class="divider"></li>
                     <li><a href="http://www.nuget.org/packages/FSharp.Azure.StorageTypeProvider">Get Library via NuGet</a></li>
                     <li><a href="http://github.com/fsprojects/AzureStorageTypeProvider">Source Code on GitHub</a></li>
@@ -543,13 +479,13 @@ associated TableResult, wrapped in a discriminated union to allow easy matching.
                     <li><a href="http://github.com/fsprojects/AzureStorageTypeProvider/blob/master/RELEASE_NOTES.md">Release Notes</a></li>
 
                     <li class="nav-header">Getting started</li>
-                    <li><a href="./quickstart.html">Quick start</a></li>
-                    <li><a href="./blobs.html">Using Azure Blobs</a></li>
-                    <li><a href="./tables.html">Using Azure Tables</a></li>
-                    <li><a href="./queues.html">Using Azure Storage Queues</a></li>
+                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/quickstart.html">Quick start</a></li>
+                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/blobs.html">Using Azure Blobs</a></li>
+                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/tables.html">Using Azure Tables</a></li>
+                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/queues.html">Using Azure Storage Queues</a></li>
 
                     <li class="nav-header">Documentation</li>
-                    <li><a href="./reference/index.html">API Reference</a></li>
+                    <li><a href="file://C:\Users\Isaac\Source\Repos\AzureStorageTypeProvider\docs\tools\../output/reference/index.html">API Reference</a></li>
                 </ul>
             </div>
         </div>
