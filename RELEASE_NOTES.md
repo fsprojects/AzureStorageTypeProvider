@@ -37,4 +37,5 @@
 ### 1.4.0 - 28th October 2015
 * Configuration file support.
 
-### 1.4.1 - Remove obsolete reference from StorageTypeProvider.fsx
+### 1.4.1 - 8th January 2016
+* Remove obsolete reference from StorageTypeProvider.fsx
