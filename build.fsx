@@ -290,4 +290,4 @@ Target "All" DoNothing
 "BuildPackage"
   ==> "Release"
 
-RunTargetOrDefault "ReleaseDocs"
+RunTargetOrDefault "Release"
