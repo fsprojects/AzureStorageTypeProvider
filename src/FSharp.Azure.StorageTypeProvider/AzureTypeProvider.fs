@@ -56,7 +56,7 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
                    QueueMemberFactory.getQueueStorageMembers ]
                 |> List.map (fun builder -> builder(connectionString, domainTypes)))
             typeProviderForAccount
-        | Failure(ex) -> failwith (sprintf "Unable to validate connection string (%s)" ex.Message)
+        | Failure ex -> failwith (sprintf "Unable to validate connection string (%s)" ex.Message)
     
     // Parameterising the provider
     let parameters = 

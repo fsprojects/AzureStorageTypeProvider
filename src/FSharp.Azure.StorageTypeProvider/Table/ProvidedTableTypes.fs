@@ -50,6 +50,17 @@ type AzureTable internal (defaultConnection, tableName) =
                let Partition(partitionKey), Row(rowKey) = entityId
                DynamicTableEntity(partitionKey, rowKey, ETag = "*"))
         |> executeBatchOperation TableOperation.Delete table
+
+    /// Deletes an entire partition from the table
+    member __.DeletePartition(partitionKey, ?connectionString) = 
+        let table = getTableForConnection (defaultArg connectionString defaultConnection)
+        let filter = Table.TableQuery.GenerateFilterCondition ("PartitionKey", Table.QueryComparisons.Equal, partitionKey)
+        let projection = [|"RowKey"|]
+        (new Table.TableQuery<Table.DynamicTableEntity>()).Where(filter).Select(projection)
+        |> table.ExecuteQuery
+        |> Seq.map(fun e -> (Partition(e.PartitionKey), Row(e.RowKey)))
+        |> __.Delete
+        |> ignore
     
     /// Gets the name of the table.
     member __.Name = tableName
