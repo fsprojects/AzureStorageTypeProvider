@@ -43,17 +43,20 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
         let typeProviderForAccount = ProvidedTypeDefinition(thisAssembly, namespaceName, typeName, baseType = Some typeof<obj>)
         typeProviderForAccount.AddMember(ProvidedConstructor(parameters = [], InvokeCode = (fun args -> <@@ null @@>)))
         let connectionString = buildConnectionString args
-        let domainTypes = ProvidedTypeDefinition("Domain", Some typeof<obj>)
-        domainTypes.AddMembers <| ProvidedTypeGenerator.generateTypes()
-        typeProviderForAccount.AddMember(domainTypes)
+        match validateConnectionString connectionString with
+        | Success ->
+            let domainTypes = ProvidedTypeDefinition("Domain", Some typeof<obj>)
+            domainTypes.AddMembers <| ProvidedTypeGenerator.generateTypes()
+            typeProviderForAccount.AddMember(domainTypes)
 
-        // Now create child members e.g. containers, tables etc.
-        typeProviderForAccount.AddMembers
-            ([ BlobMemberFactory.getBlobStorageMembers 
-               TableMemberFactory.getTableStorageMembers
-               QueueMemberFactory.getQueueStorageMembers ]
-            |> List.map (fun builder -> builder(connectionString, domainTypes)))
-        typeProviderForAccount
+            // Now create child members e.g. containers, tables etc.
+            typeProviderForAccount.AddMembers
+                ([ BlobMemberFactory.getBlobStorageMembers 
+                   TableMemberFactory.getTableStorageMembers
+                   QueueMemberFactory.getQueueStorageMembers ]
+                |> List.map (fun builder -> builder(connectionString, domainTypes)))
+            typeProviderForAccount
+        | Failure(ex) -> failwith (sprintf "Unable to validate connection string (%s)" ex.Message)
     
     // Parameterising the provider
     let parameters = 

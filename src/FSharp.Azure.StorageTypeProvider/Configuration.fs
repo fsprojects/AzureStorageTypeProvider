@@ -3,6 +3,9 @@
 open System.Collections.Generic
 open System.Configuration
 open System.IO
+open Microsoft.WindowsAzure.Storage
+open Microsoft.Azure
+open Microsoft.WindowsAzure.Storage.Table
 
 let private doesFileExist folder file =
     let fullPath = Path.Combine(folder, file) 
@@ -37,3 +40,27 @@ let getConnectionString(connectionName: string, resolutionFolder, requestedConfi
     | null, _ -> raise <| KeyNotFoundException(sprintf "Cannot find the <connectionStrings> section of %s file." configPath)
     | _, Lazy null -> raise <| KeyNotFoundException(sprintf "Cannot find name %s in <connectionStrings> section of %s file." connectionName configPath)
     | _, Lazy x -> x.ConnectionString
+
+type ConnectionStringValidationResult =
+| Success
+| Failure of System.Exception
+
+let cachedValidationResults = new Dictionary<string,ConnectionStringValidationResult>()
+
+let checkConnectionString connectionString = 
+    try
+        connectionString
+        |> CloudStorageAccount.Parse
+        |> fun c -> c.CreateCloudTableClient()
+        |> fun t -> t.GetTableReference("a")
+        |> fun t -> t.Exists()                  //throws an exception if attempted with an invalid connection string
+        |> ignore
+        Success
+    with
+    | _ as ex ->
+        Failure(ex)
+
+let validateConnectionString connectionString = 
+    if not(cachedValidationResults.ContainsKey connectionString)
+    then cachedValidationResults.[connectionString] <- checkConnectionString connectionString
+    cachedValidationResults.[connectionString]
