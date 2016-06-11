@@ -41,26 +41,24 @@ let getConnectionString(connectionName: string, resolutionFolder, requestedConfi
     | _, Lazy null -> raise <| KeyNotFoundException(sprintf "Cannot find name %s in <connectionStrings> section of %s file." connectionName configPath)
     | _, Lazy x -> x.ConnectionString
 
-type ConnectionStringValidationResult =
-| Success
-| Failure of System.Exception
 
-let cachedValidationResults = new Dictionary<string,ConnectionStringValidationResult>()
-
-let checkConnectionString connectionString = 
-    try
-        connectionString
-        |> CloudStorageAccount.Parse
-        |> fun c -> c.CreateCloudTableClient()
-        |> fun t -> t.GetTableReference("a")
-        |> fun t -> t.Exists()                  //throws an exception if attempted with an invalid connection string
-        |> ignore
-        Success
-    with
-    | _ as ex ->
-        Failure(ex)
-
-let validateConnectionString connectionString = 
-    if not(cachedValidationResults.ContainsKey connectionString)
-    then cachedValidationResults.[connectionString] <- checkConnectionString connectionString
-    cachedValidationResults.[connectionString]
+[<AutoOpen>]
+module ConnectionValidation =
+    type ConnectionStringValidationResult = | Success | Failure of exn
+    let private memoize code =
+        let cache = Dictionary()
+        fun arg ->
+            if not(cache.ContainsKey arg)
+            then cache.[arg] <- code arg
+            cache.[arg]
+    let private checkConnectionString connectionString =
+        try
+            CloudStorageAccount
+                .Parse(connectionString)
+                .CreateCloudTableClient()
+                .GetTableReference("a")
+                .Exists()                  //throws an exception if attempted with an invalid connection string
+                |> ignore
+            Success
+        with | ex -> Failure ex
+    let validateConnectionString = memoize checkConnectionString
