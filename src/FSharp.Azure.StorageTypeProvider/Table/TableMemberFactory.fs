@@ -18,12 +18,10 @@ let getTableStorageMembers (connectionString, domainType : ProvidedTypeDefinitio
         tableProp
 
     let tableListingType = ProvidedTypeDefinition("Tables", Some typeof<obj>, HideObjectMethods = true)
-    async {
-        getTables connectionString
-        |> Seq.map (createTableType connectionString)
-        |> Seq.toList
-        |> tableListingType.AddMembers }
-    |> Async.Start
+    getTables connectionString
+    |> Seq.map (createTableType connectionString)
+    |> Seq.toList
+    |> tableListingType.AddMembers
     
     let ctcProp = ProvidedProperty("CloudTableClient", typeof<CloudTableClient>, GetterCode = (fun _ -> <@@ TableBuilder.createAzureTableRoot connectionString @@>))
     ctcProp.AddXmlDoc "Gets a handle to the Table Azure SDK client for this storage account."
