@@ -166,3 +166,9 @@ let ``Cloud Table Client relates to the same data as the type provider``() =
      |> Seq.map(fun c -> c.Name)
      |> Set.ofSeq
      |> Set.contains "employee") =! true
+
+[<Fact>]
+[<ResetTableData>]
+let ``DeletePartition deletes entries with given partition key``() =
+    table.DeletePartition "men"
+    Assert.Equal (0,table.Query().``Where Partition Key Is``.``Equal To``("men").Execute().Length)
