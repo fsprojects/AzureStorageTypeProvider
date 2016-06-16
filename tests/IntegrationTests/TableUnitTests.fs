@@ -11,6 +11,7 @@ open Xunit
 type Local = AzureTypeProvider<"DevStorageAccount", "">
 
 let table = Local.Tables.employee
+let lgeTable = Local.Tables.large
 
 type ResetTableDataAttribute() =
     inherit BeforeAfterTestAttribute()
@@ -20,6 +21,7 @@ type ResetTableDataAttribute() =
 [<Fact>]
 let ``Correctly identifies tables``() =
     // compiles!
+    Local.Tables.large |> ignore
     Local.Tables.employee
 
 [<Fact>]
@@ -172,3 +174,29 @@ let ``Cloud Table Client relates to the same data as the type provider``() =
 let ``DeletePartition deletes entries with given partition key``() =
     table.DeletePartition "men"
     Assert.Equal (0,table.Query().``Where Partition Key Is``.``Equal To``("men").Execute().Length)
+
+
+    
+[<Fact>]
+[<ResetTableData>]
+let ``Insert suceeds for entries over 4Mb``() =
+    let generateLargeEntity partitionKey rowKey =
+        let byteArr20kb = [| for i in 1 .. 20000 do yield i |> byte |]
+        Local.Domain.largeEntity(partitionKey,rowKey,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb)
+    let generateBatchOfLargeEntities partitionKey size = 
+        [| for i in 1 .. size do yield generateLargeEntity partitionKey (Row(Guid.NewGuid().ToString())) |]
+
+    let resultsOfInsert = 
+        generateBatchOfLargeEntities (Partition("1")) 10 
+        |> lgeTable.Insert
+
+    let failureCount = 
+        resultsOfInsert        
+        |> Array.map snd
+        |> Array.concat
+        |> Array.filter (fun r -> 
+            match r with
+            | SuccessfulResponse(e,i) -> false
+            | _ -> true)
+        |> Array.length
+    Assert.Equal(0, failureCount)

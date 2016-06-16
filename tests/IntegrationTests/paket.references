@@ -2,4 +2,5 @@ FsUnit.xUnit
 Unquote
 WindowsAzure.Storage
 xunit
+xunit.runners
 FSharp.Core

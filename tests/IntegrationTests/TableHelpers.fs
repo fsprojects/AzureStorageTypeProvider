@@ -10,6 +10,31 @@ let private getTable =
         .CreateCloudTableClient()
         .GetTableReference
 
+let bArr = [| for i in 1 .. 255 do yield i |> byte |]
+
+type LargeEntity() = 
+//20 byte array properties with a max size of 64kb each give this entity type a maz size of c. 1.3Mb
+    inherit TableEntity()
+    member val ByteArr1 = bArr with get, set
+    member val ByteArr2 = bArr with get, set
+    member val ByteArr3 = bArr with get, set
+    member val ByteArr4 = bArr with get, set
+    member val ByteArr5 = bArr with get, set
+    member val ByteArr6 = bArr with get, set
+    member val ByteArr7 = bArr with get, set
+    member val ByteArr9 = bArr with get, set
+    member val ByteArr10 = bArr with get, set
+    member val ByteArr11= bArr with get, set
+    member val ByteArr12 = bArr with get, set
+    member val ByteArr13 = bArr with get, set
+    member val ByteArr14 = bArr with get, set
+    member val ByteArr15 = bArr with get, set
+    member val ByteArr16 = bArr with get, set
+    member val ByteArr17 = bArr with get, set
+    member val ByteArr18 = bArr with get, set
+    member val ByteArr19 = bArr with get, set
+    member val ByteArr20 = bArr with get, set
+
 type RandomEntity() = 
     inherit TableEntity()
     member val Name = String.Empty with get, set
@@ -23,11 +48,21 @@ let insertRow (pk, rk, name, yearsWorking, dob, salary, isManager) (table:CloudT
     |> TableOperation.Insert
     |> table.Execute
 
+let insertLargeRow (pk, rk)(table:CloudTable) =
+    LargeEntity(PartitionKey = pk, RowKey = rk)
+    |> TableOperation.Insert
+    |> table.Execute
+
 let resetData() =
     let recreateTable (table:CloudTable) =
         if table.Exists() then table.Delete()
         table.Create()
         table
+
+    let lgeTable = getTable "large" |> recreateTable
+    lgeTable |> insertLargeRow("1","1") |> ignore
+    lgeTable |> insertLargeRow("1","2") |> ignore
+    lgeTable |> insertLargeRow("2","1") |> ignore
 
     let employeeTable = getTable "employee" |> recreateTable
     getTable "emptytable" |> recreateTable |> ignore
