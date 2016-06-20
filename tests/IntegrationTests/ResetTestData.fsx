@@ -36,8 +36,13 @@ let createData _ =
     createBlockBlob "folder/childFile.txt" "child file stuff"
     createBlockBlob "sample.txt" "the quick brown fox jumps over the lazy dog\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Cras malesuada.\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla porttitor."
     createBlockBlob "data.xml" "<data><items><item>thing</item></items></data>"
+    createBlockBlob "folder2/child/grandchild1/descedant1.txt" "not important"
+    createBlockBlob "folder2/child/grandchild1/descedant2.txt" "not important"
+    createBlockBlob "folder2/child/grandchild2/descedant3.txt" "not important"
+    createBlockBlob "folder2/child/descedant4.txt" "not important"
+    createBlockBlob "folder/pageDataChild.txt" "hello from child page blob"
     createPageBlob "pageData.bin" "hello from page blob"
-    createPageBlob "folder/pageDataChild.txt" "hello from child page blob"
+    
 
 createData |> logWith "blob"
 

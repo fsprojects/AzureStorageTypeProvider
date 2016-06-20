@@ -20,14 +20,14 @@ let rec private createBlobItem (domainType : ProvidedTypeDefinition) connectionS
         let fileTypeDefinition = 
             match properties.BlobType, path with
             | BlobType.PageBlob, _ -> "PageBlob"
-            | _, ContainerBuilder.XML -> "XmlBlob"
-            | _, ContainerBuilder.Binary | _, ContainerBuilder.Text -> "BlockBlob"
+            | _, BlobBuilder.XML -> "XmlBlob"
+            | _, BlobBuilder.Binary | _, BlobBuilder.Text -> "BlockBlob"
             |> fun typeName -> domainType.GetMember(typeName).[0] :?> ProvidedTypeDefinition
 
         match properties.BlobType, properties.Length with
         | _, 0L -> None
-        | BlobType.PageBlob, _ -> Some <| ProvidedProperty(name, fileTypeDefinition, GetterCode = fun _ -> <@@ ContainerBuilder.createPageBlobFile connectionString containerName path @@>)
-        | BlobType.BlockBlob, _ -> Some <| ProvidedProperty(name, fileTypeDefinition, GetterCode = fun _ -> <@@ ContainerBuilder.createBlockBlobFile connectionString containerName path @@>)
+        | BlobType.PageBlob, _ -> Some <| ProvidedProperty(name, fileTypeDefinition, GetterCode = fun _ -> <@@ BlobBuilder.createPageBlobFile connectionString containerName path @@>)
+        | BlobType.BlockBlob, _ -> Some <| ProvidedProperty(name, fileTypeDefinition, GetterCode = fun _ -> <@@ BlobBuilder.createBlockBlobFile connectionString containerName path @@>)
         | _ -> None
 
 let private createContainerType (domainType : ProvidedTypeDefinition) connectionString (container : LightweightContainer) = 
