@@ -8,6 +8,21 @@ open Microsoft.WindowsAzure.Storage.Table
 open Microsoft.WindowsAzure.Storage.Table.Queryable
 open System
 
+///series of constant values describing size limits for azure storage tables in kb (source: https://msdn.microsoft.com/en-us/library/dd179338.aspx)
+module SizeLimits =
+    let batch = 4000 
+    let partitionKey = 1
+    let rowKey = 1
+    let timestamp = 2
+    let dateTime = 2
+    let byteArr = 64
+    let bool = 1
+    let double = 2
+    let guid = 4
+    let int32 = 1
+    let int64 = 1
+    let string = 64
+
 let internal getTableClient connection = CloudStorageAccount.Parse(connection).CreateCloudTableClient()
 
 let buildTableEntity partitionKey rowKey names (values: obj []) = 
@@ -75,12 +90,34 @@ let private batch size source =
         | head::tail -> doBatch output (head::currentBatch) (counter + 1) tail
     doBatch [] [] 0 (source |> Seq.toList)
 
+let private calcMaxSize (entity:DynamicTableEntity) = 
+    let basicSize = SizeLimits.rowKey + SizeLimits.partitionKey + SizeLimits.timestamp
+    let propsSize = 
+        entity.Properties.Values
+        |> Seq.sumBy(fun p -> 
+            match p.PropertyType with 
+            | Table.EdmType.DateTime -> SizeLimits.dateTime
+            | Table.EdmType.Binary -> SizeLimits.byteArr
+            | Table.EdmType.Boolean -> SizeLimits.bool
+            | Table.EdmType.Double -> SizeLimits.double
+            | Table.EdmType.Guid -> SizeLimits.guid
+            | Table.EdmType.Int32 -> SizeLimits.int32
+            | Table.EdmType.Int64 -> SizeLimits.int64
+            | Table.EdmType.String -> SizeLimits.string
+            | _ -> failwith("Unknown EdmType"))
+    (basicSize + propsSize)
+    
+let private calcBatchSize entity = 
+    let entityMaxSize = calcMaxSize entity
+    SizeLimits.batch / entityMaxSize
+
 let internal executeBatchOperation createTableOp (table:CloudTable) entities =
+    let batchSize = entities |> Seq.head |> calcBatchSize
     entities
     |> Seq.groupBy(fun (entity:DynamicTableEntity) -> entity.PartitionKey)
     |> Seq.collect(fun (partitionKey, entities) -> 
            entities
-           |> batch 100
+           |> batch batchSize
            |> Seq.map(fun entityBatch ->
                 let batchForPartition = TableBatchOperation()
                 entityBatch |> Seq.iter (createTableOp >> batchForPartition.Add)
