@@ -28,7 +28,7 @@ let queue = Local.Queues.``sample-queue``
 [<ResetQueueData>]
 let ``Enqueues a message``() =
     queue.Enqueue("Foo") |> Async.RunSynchronously
-    queue.GetCurrentLength() =! 1
+    test <@ queue.GetCurrentLength() = 1 @>
 
 [<Fact>]
 [<ResetQueueData>]
@@ -36,7 +36,7 @@ let ``Dequeues a message``() =
     let message = async { do! queue.Enqueue "Foo"
                           return! queue.Dequeue() }
                   |> Async.RunSynchronously
-    message.Value.AsString =! "Foo"
+    test <@ message.Value.AsString = "Foo" @>
 
 [<Fact>]
 [<ResetQueueData>]
@@ -44,7 +44,7 @@ let ``Dequeues a message of bytes``() =
     let message = async { do! queue.Enqueue [| 0uy; 1uy; 2uy; |]
                           return! queue.Dequeue() }
                   |> Async.RunSynchronously
-    message.Value.AsBytes =! [| 0uy; 1uy; 2uy; |]
+    test <@ message.Value.AsBytes = [| 0uy; 1uy; 2uy; |] @>
 
 [<Fact>]
 [<ResetQueueData>]
@@ -53,13 +53,12 @@ let ``Deletes a message``() =
             let! message = queue.Dequeue()
             do! queue.DeleteMessage(message.Value.Id) }
     |> Async.RunSynchronously
-    queue.GetCurrentLength() =! 0
+    test <@ queue.GetCurrentLength() = 0 @>
 
 [<Fact>]
 [<ResetQueueData>]
 let ``Dequeue with nothing on the queue returns None``() =
-    let message = queue.Dequeue() |> Async.RunSynchronously
-    message.IsNone =! true
+    test <@ queue.Dequeue() |> Async.RunSynchronously = None @>
 
 [<Fact>]
 [<ResetQueueData>]
@@ -70,7 +69,7 @@ let ``Update Message affects the text message body``() =
                           return! queue.Dequeue() }
                   |> Async.RunSynchronously
 
-    message.Value.AsString =! "Bar"
+    test <@ message.Value.AsString = "Bar" @>
 
 [<Fact>]
 [<ResetQueueData>]
@@ -81,7 +80,7 @@ let ``Update Message affects the bytes message body``() =
                           return! queue.Dequeue() }
                   |> Async.RunSynchronously
 
-    message.Value.AsBytes =! [| 2uy; 1uy; 0uy |]
+    test <@ message.Value.AsBytes = [| 2uy; 1uy; 0uy |] @>
 
 [<Fact>]
 [<ResetQueueData>]
@@ -93,7 +92,7 @@ let ``Dequeue Count is correctly emitted``() =
             let! message = queue.Dequeue()
             do! queue.UpdateMessage(message.Value.Id, TimeSpan.FromSeconds(0.))
             return! queue.Dequeue() } |> Async.RunSynchronously
-    message.Value.DequeueCount =! 3
+    test <@ message.Value.DequeueCount = 3 @>
 
 [<Fact>]
 [<ResetQueueData>]
@@ -103,20 +102,19 @@ let ``Clear correctly empties the queue``() =
         do! queue.Enqueue "Bar"
         do! queue.Enqueue "Test"
         do! queue.Clear() } |> Async.Ignore |> Async.RunSynchronously
-    queue.GetCurrentLength() =! 0
+    test <@ queue.GetCurrentLength() = 0 @>
 
 [<Fact>]
 [<ResetQueueData>]
 let ``Cloud Queue Client gives same results as the Type Provider``() =
     let queues = Local.Queues
     let queueNames = queues.CloudQueueClient.ListQueues() |> Seq.map(fun q -> q.Name) |> Set.ofSeq
-    queueNames
-    |> Set.isSubset (Set [ queues.``sample-queue``.Name
-                           queues.``second-sample``.Name
-                           queues.``third-sample``.Name ])
-    =! true
+    test <@ queueNames
+            |> Set.isSubset (Set [ queues.``sample-queue``.Name
+                                   queues.``second-sample``.Name
+                                   queues.``third-sample``.Name ]) @>
 
 [<Fact>]
 [<ResetQueueData>]
 let ``Cloud Queue is the same queue as the Type Provider``() =
-    queue.AsCloudQueue().Name =! queue.Name
+    test <@ queue.AsCloudQueue().Name = queue.Name @>
