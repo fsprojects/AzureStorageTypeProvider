@@ -94,12 +94,54 @@ type XmlFile internal (defaultConnectionString, container, file) =
             return XDocument.Parse text
         }
 
+module BlobBuilder = 
+    let internal (|Text|Binary|XML|) (name : string) = 
+        let endsWith extension = name.EndsWith(extension, StringComparison.InvariantCultureIgnoreCase)
+        match name with
+        | _ when [ ".txt"; ".csv" ] |> Seq.exists endsWith -> Text
+        | _ when endsWith ".xml" -> XML
+        | _ -> Binary
+
+    /// Creates a block blob file object.
+    let createBlockBlobFile connectionString containerName path = 
+        let details = connectionString, containerName, path
+        match path with
+        | XML -> XmlFile(details) :> BlockBlobFile
+        | Text | Binary -> BlockBlobFile(details)
+
+    /// Creates a page blob file object.
+    let createPageBlobFile connectionString containerName path = 
+        PageBlobFile(connectionString, containerName, path)
+
 /// Represents a pseudo-folder in blob storage.
 type BlobFolder internal (defaultConnectionString, container, file) = 
     /// Downloads the entire folder contents to the local file system asynchronously.
     member __.Download(path, ?connectionString) =
         let connectionDetails = defaultArg connectionString defaultConnectionString, container, file
         downloadFolder (connectionDetails, path)
+
+    /// The Path of the current folder
+    member __.Path = 
+        file
+
+    /// Lists all blobs contained in this folder
+    member __.ListBlobs(?includeBlobsInSubFolders) = 
+        let incSubFolders = defaultArg includeBlobsInSubFolders false
+        let container = getContainerRef (defaultConnectionString,container)
+        listBlobs incSubFolders container file
+        |> Seq.map (fun b ->
+            match b with
+            | Blob(path, name, properties) -> 
+                match properties.BlobType with
+                | BlobType.PageBlob -> 
+                    (BlobBuilder.createPageBlobFile defaultConnectionString container.Name path) :> BlobFile 
+                | _ -> 
+                    (BlobBuilder.createBlockBlobFile defaultConnectionString container.Name path) :> BlobFile 
+                |> Some
+            | _ -> None)
+        |> Seq.filter(fun x -> x.IsSome)
+        |> Seq.map(fun x -> x.Value)
+
 
 /// Represents a container in blob storage.
 type BlobContainer internal (defaultConnectionString, container) =
@@ -127,23 +169,7 @@ module internal ProvidedTypeGenerator =
 /// Builder methods to construct blobs etc..
 /// [omit]
 module ContainerBuilder = 
-    let internal (|Text|Binary|XML|) (name : string) = 
-        let endsWith extension = name.EndsWith(extension, StringComparison.InvariantCultureIgnoreCase)
-        match name with
-        | _ when [ ".txt"; ".csv" ] |> Seq.exists endsWith -> Text
-        | _ when endsWith ".xml" -> XML
-        | _ -> Binary
-    
-    /// Creates a block blob file object.
-    let createBlockBlobFile connectionString containerName path = 
-        let details = connectionString, containerName, path
-        match path with
-        | XML -> XmlFile(details) :> BlockBlobFile
-        | Text | Binary -> BlockBlobFile(details)
 
-    /// Creates a page blob file object.
-    let createPageBlobFile connectionString containerName path = 
-        PageBlobFile(connectionString, containerName, path)
     
     /// Creates a blob container object.
     let createContainer connectionString containerName = BlobContainer(connectionString, containerName)

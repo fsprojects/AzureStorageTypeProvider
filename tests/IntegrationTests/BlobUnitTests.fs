@@ -121,4 +121,23 @@ let testFolderDownload download expectedFiles expectedFolders =
 let ``Can correctly download a folder``() = testFolderDownload container.``folder/``.Download 2 0
 
 [<Fact>]
-let ``Can correctly download a container``() = testFolderDownload container.Download 8 1
+let ``Can correctly download a container``() = testFolderDownload container.Download 12 5
+
+[<Fact>]
+let ``Can access Path property on a folder`` = 
+    let childFolder = Local.Containers.samples.``folder2/``.``child/``
+    Assert.Equal<string>("folder2/child/", childFolder.Path)
+
+[<Fact>]
+let ``ListBlobs method returns correct number of blobs`` = 
+    let childFolder = Local.Containers.samples.``folder2/``.``child/``
+    let allBlobs = childFolder.ListBlobs()
+    let count = allBlobs |> Seq.length
+    Assert.Equal(1,count)
+
+[<Fact>]
+let ``Can access List blobs method on a folder`` = 
+    let childFolder = Local.Containers.samples.``folder2/``.``child/``
+    let allBlobs = childFolder.ListBlobs(true)
+    let count = allBlobs |> Seq.length
+    Assert.Equal(4,count)

@@ -37,6 +37,17 @@ let rec private getContainerStructure wildcard (container : CloudBlobContainer) 
        | _ -> None)
     |> Seq.toArray
 
+let listBlobs incSubDirs (container:CloudBlobContainer) prefix = 
+    container.ListBlobs(prefix, incSubDirs)
+    |> Seq.map(fun b -> 
+        match b with
+        | :? ICloudBlob as blob -> 
+            let path, name = getItemName blob.Name blob.Parent
+            Some(Blob(path, name, blob.Properties))
+        | _ -> None)    //can safely ignore folder types as we have a flat structure if & only if we want to include items from sub directories
+    |> Seq.filter(fun b -> b.IsSome)
+    |> Seq.map(fun b -> b.Value)
+
 let getBlobStorageAccountManifest connection = 
     (getBlobClient connection).ListContainers()
     |> Seq.toList
