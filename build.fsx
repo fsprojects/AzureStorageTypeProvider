@@ -78,10 +78,7 @@ Target "AssemblyInfo" (fun _ ->
 // --------------------------------------------------------------------------------------
 // Clean build results
 Target "Clean" (fun _ -> CleanDirs [ "bin"; "temp"; "tests/integrationtests/bin" ])
-
-Target "CleanDocs" (fun _ ->
-    CleanDirs ["docs/output"]
-)
+Target "CleanDocs" (fun _ -> CleanDirs ["docs/output"])
 
 // --------------------------------------------------------------------------------------
 // Build library & test project
@@ -89,8 +86,7 @@ Target "CleanDocs" (fun _ ->
 Target "Build" (fun _ ->
     !!("*.sln")
     |> MSBuildRelease "" "Rebuild"
-    |> ignore
-)
+    |> ignore)
 
 // --------------------------------------------------------------------------------------
 // Run the unit tests using test runner
@@ -113,10 +109,7 @@ Target "ResetTestData" (fun _ ->
 )
 
 // Run integration tests
-Target "RunTests" (fun _ ->
-    !!(testAssemblies)
-    |> xUnit id
-)
+Target "RunTests" (fun _ -> !!(testAssemblies) |> xUnit id)
 
 // --------------------------------------------------------------------------------------
 // Build a NuGet package
@@ -149,8 +142,7 @@ Target "NuGet"
 
 Target "GenerateReferenceDocs" (fun _ ->
     if not <| executeFSIWithArgs "docs/tools" "generate.fsx" ["--define:RELEASE"; "--define:REFERENCE"] [] then
-      failwith "generating reference documentation failed"
-)
+      failwith "generating reference documentation failed")
 
 let generateHelp fail debug =
     let args =
@@ -160,10 +152,8 @@ let generateHelp fail debug =
     if executeFSIWithArgs "docs/tools" "generate.fsx" args [] then
         traceImportant "Help generated"
     else
-        if fail then
-            failwith "generating help documentation failed"
-        else
-            traceImportant "generating help documentation failed"
+        if fail then failwith "generating help documentation failed"
+        else traceImportant "generating help documentation failed"
 
 Target "GenerateHelp" (fun _ ->
     DeleteFile "docs/content/release-notes.md"
@@ -194,15 +184,11 @@ Target "GenerateHelpDebug" (fun _ ->
 
 Target "KeepRunning" (fun _ ->    
     use watcher = !! "docs/content/**/*.*" |> WatchChanges (fun changes ->
-         generateHelp false false
-    )
+         generateHelp false false)
 
     traceImportant "Waiting for help edits. Press any key to stop."
-
     System.Console.ReadKey() |> ignore
-
-    watcher.Dispose()
-)
+    watcher.Dispose())
 
 Target "GenerateDocs" DoNothing
 
