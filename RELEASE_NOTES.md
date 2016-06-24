@@ -40,7 +40,7 @@
 ### 1.4.1 - 8th January 2016
 * Remove obsolete reference from StorageTypeProvider.fsx
 
-### 1.5.0
+### 1.5.0 - 24th June 2016
 * Better connection string management
 * Eager table type loading
 * Delete entire partitions
