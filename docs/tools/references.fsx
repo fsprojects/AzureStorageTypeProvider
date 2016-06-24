@@ -2,7 +2,6 @@
 #r @"..\..\bin\Microsoft.Data.OData.dll"
 #r @"..\..\bin\Microsoft.Data.Services.Client.dll"
 #r @"..\..\bin\Microsoft.Data.Edm.dll"
-#r @"..\..\bin\Microsoft.WindowsAzure.Configuration.dll"
 #r @"..\..\bin\Microsoft.WindowsAzure.Storage.dll"
 #r @"..\..\bin\Newtonsoft.Json.dll"
 #r @"..\..\bin\System.Spatial.dll"
