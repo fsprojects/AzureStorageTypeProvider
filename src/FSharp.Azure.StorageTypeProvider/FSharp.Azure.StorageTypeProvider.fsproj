@@ -1,42 +1,85 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
+    <Name>FSharp.Azure.StorageTypeProvider</Name>
+    <AssemblyName>FSharp.Azure.StorageTypeProvider</AssemblyName>
+    <RootNamespace>Elastacloud.AzureTypeProvider</RootNamespace>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>fb7ca8f3-c158-49e9-b816-501741e2921f</ProjectGuid>
+    <ProjectType />
     <OutputType>Library</OutputType>
-    <RootNamespace>Elastacloud.AzureTypeProvider</RootNamespace>
-    <AssemblyName>FSharp.Azure.StorageTypeProvider</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <Name>FSharp.Azure.StorageTypeProvider</Name>
-    <TargetFSharpCoreVersion>4.3.1.0</TargetFSharpCoreVersion>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <TargetFrameworkProfile />
+    <AutoGenerateBindingRedirects />
+    <TargetFSharpCoreVersion>4.3.1.0</TargetFSharpCoreVersion>
+    <DocumentationFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
+    <DebugType>Full</DebugType>
     <Optimize>false</Optimize>
     <Tailcalls>false</Tailcalls>
     <OutputPath>..\..\bin\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <CompilationConstants />
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>..\..\bin\FSharp.Azure.StorageTypeProvider.XML</DocumentationFile>
+    <PlatformTarget />
+    <Prefer32Bit />
+    <OtherFlags />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugSymbols />
+    <DebugType>PdbOnly</DebugType>
     <Optimize>true</Optimize>
     <Tailcalls>true</Tailcalls>
     <OutputPath>..\..\bin</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <CompilationConstants />
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>..\..\bin\FSharp.Azure.StorageTypeProvider.XML</DocumentationFile>
+    <PlatformTarget />
+    <Prefer32Bit />
+    <OtherFlags />
   </PropertyGroup>
-  <PropertyGroup>
-    <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
-  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.Services.Client" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="../../paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fsi">
+      <Link>paket-files/ProvidedTypes.fsi</Link>
+    </Content>
+    <Compile Include="../../paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs">
+      <Link>paket-files/ProvidedTypes.fs</Link>
+    </Compile>
+    <Compile Include="../../paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/DebugProvidedTypes.fs">
+      <Link>paket-files/DebugProvidedTypes.fs</Link>
+    </Compile>
+    <Compile Include="Shared.fs" />
+    <Compile Include="Configuration.fs" />
+    <Compile Include="Table/SharedTableTypes.fs" />
+    <Compile Include="Table/TableRepository.fs" />
+    <Compile Include="Table/ProvidedTableTypes.fs" />
+    <Compile Include="Table/TableQueryBuilder.fs" />
+    <Compile Include="Table/TableEntityMemberFactory.fs" />
+    <Compile Include="Table/TableMemberFactory.fs" />
+    <Compile Include="Blob/BlobRepository.fs" />
+    <Compile Include="Blob/ProvidedBlobTypes.fs" />
+    <Compile Include="Blob/BlobMemberFactory.fs" />
+    <Compile Include="Queue/QueueRepository.fs" />
+    <Compile Include="Queue/ProvidedQueueTypes.fs" />
+    <Compile Include="Queue/QueueMemberFactory.fs" />
+    <Compile Include="AzureTypeProvider.fs" />
+    <None Include="App.config" />
+    <Content Include="paket.references" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '11.0'">
       <PropertyGroup>
@@ -50,55 +93,6 @@
     </Otherwise>
   </Choose>
   <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
-  <ItemGroup>
-    <Content Include="..\..\paket-files\fsprojects\FSharp.TypeProviders.StarterPack\src\ProvidedTypes.fsi">
-      <Paket>True</Paket>
-      <Link>paket-files/ProvidedTypes.fsi</Link>
-    </Content>
-    <Compile Include="..\..\paket-files\fsprojects\FSharp.TypeProviders.StarterPack\src\ProvidedTypes.fs">
-      <Paket>True</Paket>
-      <Link>paket-files/ProvidedTypes.fs</Link>
-    </Compile>
-    <Compile Include="..\..\paket-files\fsprojects\FSharp.TypeProviders.StarterPack\src\DebugProvidedTypes.fs">
-      <Paket>True</Paket>
-      <Link>paket-files/DebugProvidedTypes.fs</Link>
-    </Compile>
-    <Compile Include="Shared.fs" />
-    <Compile Include="Configuration.fs" />
-    <Compile Include="Table\SharedTableTypes.fs" />
-    <Compile Include="Table\TableRepository.fs" />
-    <Compile Include="Table\ProvidedTableTypes.fs" />
-    <Compile Include="Table\TableQueryBuilder.fs" />
-    <Compile Include="Table\TableEntityMemberFactory.fs" />
-    <Compile Include="Table\TableMemberFactory.fs" />
-    <Compile Include="Blob\BlobRepository.fs" />
-    <Compile Include="Blob\ProvidedBlobTypes.fs" />
-    <Compile Include="Blob\BlobMemberFactory.fs" />
-    <Compile Include="Queue\QueueRepository.fs" />
-    <Compile Include="Queue\ProvidedQueueTypes.fs" />
-    <Compile Include="Queue\QueueMemberFactory.fs" />
-    <Compile Include="AzureTypeProvider.fs" />
-    <None Include="App.config" />
-    <Content Include="paket.references" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="mscorlib" />
-    <Reference Include="System" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Data.Services.Client" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq" />
-  </ItemGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
   <Import Project="..\..\.paket\paket.targets" />
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v2.0' Or $(TargetFrameworkVersion) == 'v3.0' Or $(TargetFrameworkVersion) == 'v3.5')">

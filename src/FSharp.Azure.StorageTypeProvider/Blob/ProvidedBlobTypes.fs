@@ -60,7 +60,9 @@ type BlobFile internal (defaultConnectionString, container, file, getBlobRef : _
 
     /// Gets the name of the blob
     member __.Name with get() = (getBlobRef None).Name
-   
+
+    override this.ToString() = this.Name
+
 type BlockBlobFile internal (defaultConnectionString, container, file) =
     inherit BlobFile(defaultConnectionString, container, file, (getBlockBlobRef >> fun x -> x :> ICloudBlob))
     let getBlobRef connectionString = getBlockBlobRef(defaultArg connectionString defaultConnectionString, container, file)
@@ -121,27 +123,21 @@ type BlobFolder internal (defaultConnectionString, container, file) =
         downloadFolder (connectionDetails, path)
 
     /// The Path of the current folder
-    member __.Path = 
-        file
+    member __.Path = file
 
     /// Lists all blobs contained in this folder
-    member __.ListBlobs(?includeBlobsInSubFolders) = 
-        let incSubFolders = defaultArg includeBlobsInSubFolders false
-        let container = getContainerRef (defaultConnectionString,container)
-        listBlobs incSubFolders container file
-        |> Seq.map (fun b ->
-            match b with
-            | Blob(path, name, properties) -> 
+    member __.ListBlobs(?includeSubfolders) = 
+        let includeSubfolders = defaultArg includeSubfolders false
+        let container = getContainerRef (defaultConnectionString, container)
+        
+        listBlobs includeSubfolders container file
+        |> Seq.choose (function
+            | Blob(path, _, properties) -> 
                 match properties.BlobType with
-                | BlobType.PageBlob -> 
-                    (BlobBuilder.createPageBlobFile defaultConnectionString container.Name path) :> BlobFile 
-                | _ -> 
-                    (BlobBuilder.createBlockBlobFile defaultConnectionString container.Name path) :> BlobFile 
+                | BlobType.PageBlob -> (BlobBuilder.createPageBlobFile defaultConnectionString container.Name path) :> BlobFile 
+                | _ -> (BlobBuilder.createBlockBlobFile defaultConnectionString container.Name path) :> BlobFile 
                 |> Some
             | _ -> None)
-        |> Seq.filter(fun x -> x.IsSome)
-        |> Seq.map(fun x -> x.Value)
-
 
 /// Represents a container in blob storage.
 type BlobContainer internal (defaultConnectionString, container) =
@@ -169,8 +165,6 @@ module internal ProvidedTypeGenerator =
 /// Builder methods to construct blobs etc..
 /// [omit]
 module ContainerBuilder = 
-
-    
     /// Creates a blob container object.
     let createContainer connectionString containerName = BlobContainer(connectionString, containerName)
     

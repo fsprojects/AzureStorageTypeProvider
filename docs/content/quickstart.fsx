@@ -84,9 +84,10 @@ let rawBlobRefHybrid = Local.Containers.samples.``folder/``.``childFile.txt``.As
 
 (**
  
-- You can override the connection to the destination asset at runtime. This is useful so that you can
-use your local (free) storage emulator for development, and then move to a live account when testing
-or moving to production etc.
+- You can override the connection to the destination asset at runtime. This is useful if not using
+configuration files so that you can use your local (free) storage emulator for development, and then
+move to a live account when testing or moving to production etc.. In addition it's also useful for
+data migration scenarios.
 
 *)
 

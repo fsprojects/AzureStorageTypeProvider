@@ -27,6 +27,16 @@ let theBlob = container.``folder/``.``childFile.txt``
 printfn "Blob '%s' is %d bytes big." theBlob.Name theBlob.Size
 (*** include-output: blobStats ***)
 
+(** 
+You can also perform useful helper actions on folders, such as pulling back all blobs in a folder.
+*)
+
+(*** define-output: folders ***)
+let folder = container.``folder2/``
+let blobs = folder.ListBlobs(true)
+printfn "Folder '%s' has the following blobs: %A" folder.Path blobs
+(*** include-output: folders ***)
+
 (**
 ## Shared types
 Individual files, folders and containers share a common base type so list operations are possible e.g.   

@@ -8,20 +8,37 @@ open Microsoft.WindowsAzure.Storage.Table
 open Microsoft.WindowsAzure.Storage.Table.Queryable
 open System
 
-///series of constant values describing size limits for azure storage tables in kb (source: https://msdn.microsoft.com/en-us/library/dd179338.aspx)
-module SizeLimits =
-    let batch = 4000 
-    let partitionKey = 1
-    let rowKey = 1
-    let timestamp = 2
-    let dateTime = 2
-    let byteArr = 64
-    let bool = 1
-    let double = 2
-    let guid = 4
-    let int32 = 1
-    let int64 = 1
-    let string = 64
+/// Suggests batch sizes based on a given entity type and published EDM property type sizes (source: https://msdn.microsoft.com/en-us/library/dd179338.aspx)
+module private BatchCalculator =
+    /// The basic size of a single row with no custom properties. 
+    let private basicRowSize =
+        let partitionKey = 1
+        let rowKey = 1
+        let timestamp = 2
+        partitionKey + rowKey + timestamp
+
+    /// Gets the maximum size, in KB, of a single property.
+    let private getMaxPropertySize (property:EntityProperty) =
+        match property.PropertyType with 
+        | Table.EdmType.DateTime -> 2
+        | Table.EdmType.Binary -> 64
+        | Table.EdmType.Boolean -> 1
+        | Table.EdmType.Double -> 2
+        | Table.EdmType.Guid -> 4
+        | Table.EdmType.Int32 -> 1
+        | Table.EdmType.Int64 -> 1
+        | Table.EdmType.String -> 64
+        | unknown -> failwith (sprintf "Unknown EdmType %A" unknown)
+
+    /// Calculates the maximum size of a given entity. 
+    let private getMaxEntitySize (entity:DynamicTableEntity) =
+        let entityRowSize = entity.Properties.Values |> Seq.sumBy getMaxPropertySize
+        basicRowSize + entityRowSize
+        
+    let private maximumBatchSizeKb = 4000
+
+    /// Calculates the maximum number of entities of a given type that can be inserted in a single batch.
+    let getBatchSize entity = maximumBatchSizeKb / (getMaxEntitySize entity)
 
 let internal getTableClient connection = CloudStorageAccount.Parse(connection).CreateCloudTableClient()
 
@@ -90,29 +107,8 @@ let private batch size source =
         | head::tail -> doBatch output (head::currentBatch) (counter + 1) tail
     doBatch [] [] 0 (source |> Seq.toList)
 
-let private calcMaxSize (entity:DynamicTableEntity) = 
-    let basicSize = SizeLimits.rowKey + SizeLimits.partitionKey + SizeLimits.timestamp
-    let propsSize = 
-        entity.Properties.Values
-        |> Seq.sumBy(fun p -> 
-            match p.PropertyType with 
-            | Table.EdmType.DateTime -> SizeLimits.dateTime
-            | Table.EdmType.Binary -> SizeLimits.byteArr
-            | Table.EdmType.Boolean -> SizeLimits.bool
-            | Table.EdmType.Double -> SizeLimits.double
-            | Table.EdmType.Guid -> SizeLimits.guid
-            | Table.EdmType.Int32 -> SizeLimits.int32
-            | Table.EdmType.Int64 -> SizeLimits.int64
-            | Table.EdmType.String -> SizeLimits.string
-            | _ -> failwith("Unknown EdmType"))
-    (basicSize + propsSize)
-    
-let private calcBatchSize entity = 
-    let entityMaxSize = calcMaxSize entity
-    SizeLimits.batch / entityMaxSize
-
 let internal executeBatchOperation createTableOp (table:CloudTable) entities =
-    let batchSize = entities |> Seq.head |> calcBatchSize
+    let batchSize = entities |> Seq.head |> BatchCalculator.getBatchSize
     entities
     |> Seq.groupBy(fun (entity:DynamicTableEntity) -> entity.PartitionKey)
     |> Seq.collect(fun (partitionKey, entities) -> 
