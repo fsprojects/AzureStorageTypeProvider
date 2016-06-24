@@ -54,7 +54,7 @@ of your queue assets, directly from within the REPL.</p>
 </tr>
 </table>
 
-<table class="pre"><tr><td><pre><code>No output has been produced.</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>Queue 'sample-queue' has 0 items on it.</code></pre></td></tr></table>
 
 <h2><a name="Processing-messages" class="anchor" href="#Processing-messages">Processing messages</a></h2>
 
@@ -101,7 +101,24 @@ on the queue. Once you have finished processing the message, simply call Delete(
 </tr>
 </table>
 
-<table class="pre"><tr><td><pre><code>No output has been produced.</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>Queue length is 0.
+Enqueuing a message!
+Queue length is 1.
+{Id =
+  ProvidedMessageId
+    (MessageId "e5f94644-5505-4e3a-882b-7c2bd2b27ca3",
+     PopReceipt "MJvMB9mb0wgBAAAA");
+ DequeueCount = 1;
+ InsertionTime = Some 24/06/2016 2:40:52 +00:00;
+ ExpirationTime = Some 01/07/2016 2:40:52 +00:00;
+ NextVisibleTime = Some 24/06/2016 2:41:23 +00:00;
+ AsBytes =
+  [|72uy; 101uy; 108uy; 108uy; 111uy; 32uy; 102uy; 114uy; 111uy; 109uy; 32uy;
+    65uy; 122uy; 117uy; 114uy; 101uy; 32uy; 84uy; 121uy; 112uy; 101uy; 32uy;
+    80uy; 114uy; 111uy; 118uy; 105uy; 100uy; 101uy; 114uy|];
+ AsString = "Hello from Azure Type Provider";}
+Deleting the message.
+Queue length is 0.</code></pre></td></tr></table>
 
 <h2><a name="Modifying-Queues" class="anchor" href="#Modifying-Queues">Modifying Queues</a></h2>
 
@@ -157,7 +174,15 @@ the queue entirely.</p>
 </tr>
 </table>
 
-<table class="pre"><tr><td><pre><code>No output has been produced.</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>Enqueuing a message!
+Dequeuing it.
+Message ProvidedMessageId
+  (MessageId "ce607c64-61ea-4c98-9c59-119a1a9b214b",
+   PopReceipt "EJnpB9mb0wgBAAAA") with body 'Hello from Azure Type Provider' has been dequeued 1 times.
+Updating it and dequeuing it again.
+Message ProvidedMessageId
+  (MessageId "ce607c64-61ea-4c98-9c59-119a1a9b214b",
+   PopReceipt "MDrxB9mb0wgCAAAA") with body 'Goodbye from Azure Type Provider' has been dequeued 2 times.</code></pre></td></tr></table>
 
 <h2><a name="Peeking-the-queue" class="anchor" href="#Peeking-the-queue">Peeking the queue</a></h2>
 

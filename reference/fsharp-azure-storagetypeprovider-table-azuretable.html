@@ -54,10 +54,10 @@
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '48', 48)" onmouseover="showTip(event, '48', 48)">
+          <code onmouseout="hideTip(event, '52', 52)" onmouseover="showTip(event, '52', 52)">
             AsCloudTable(connectionString)
           </code>
-          <div class="tip" id="48">
+          <div class="tip" id="52">
             <strong>Signature:</strong> (connectionString:string option) -&gt; CloudTable<br />
                       </div>
         </td>
@@ -75,10 +75,10 @@
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '49', 49)" onmouseover="showTip(event, '49', 49)">
+          <code onmouseout="hideTip(event, '53', 53)" onmouseover="showTip(event, '53', 53)">
             Delete(entities, connectionString)
           </code>
-          <div class="tip" id="49">
+          <div class="tip" id="53">
             <strong>Signature:</strong> (entities:seq&lt;Partition * Row&gt; * connectionString:string option) -&gt; (string * TableResponse []) []<br />
                       </div>
         </td>
@@ -96,10 +96,31 @@
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '50', 50)" onmouseover="showTip(event, '50', 50)">
+          <code onmouseout="hideTip(event, '54', 54)" onmouseover="showTip(event, '54', 54)">
+            DeletePartition(...)
+          </code>
+          <div class="tip" id="54">
+            <strong>Signature:</strong> (partitionKey:string * connectionString:string option) -&gt; unit<br />
+                      </div>
+        </td>
+        <td class="xmldoc">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Table/ProvidedTableTypes.fs#L55-55" class="github-link">
+              <img src="../content/img/github.png" class="normal" />
+              <img src="../content/img/github-blue.png" class="hover" />
+            </a>
+          <p>Deletes an entire partition from the table</p>
+
+
+
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '55', 55)" onmouseover="showTip(event, '55', 55)">
             Insert(...)
           </code>
-          <div class="tip" id="50">
+          <div class="tip" id="55">
             <strong>Signature:</strong> (partitionKey:Partition * rowKey:Row * entity:&#39;?7234 * insertMode:TableInsertMode option * connectionString:string option) -&gt; TableResponse<br />
                           <strong>Type parameters:</strong> '?7234          </div>
         </td>
@@ -117,10 +138,10 @@
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '51', 51)" onmouseover="showTip(event, '51', 51)">
+          <code onmouseout="hideTip(event, '56', 56)" onmouseover="showTip(event, '56', 56)">
             Insert(...)
           </code>
-          <div class="tip" id="51">
+          <div class="tip" id="56">
             <strong>Signature:</strong> (entities:seq&lt;Partition * Row * &#39;b&gt; * insertMode:TableInsertMode option * connectionString:string option) -&gt; (string * TableResponse []) []<br />
                           <strong>Type parameters:</strong> 'b          </div>
         </td>
@@ -138,15 +159,15 @@
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '52', 52)" onmouseover="showTip(event, '52', 52)">
+          <code onmouseout="hideTip(event, '57', 57)" onmouseover="showTip(event, '57', 57)">
             Name
           </code>
-          <div class="tip" id="52">
+          <div class="tip" id="57">
             <strong>Signature:</strong> string<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Table/ProvidedTableTypes.fs#L55-55" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Table/ProvidedTableTypes.fs#L66-66" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>

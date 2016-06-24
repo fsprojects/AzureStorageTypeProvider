@@ -57,7 +57,7 @@ page and block blobs.</p>
 </tr>
 </table>
 
-<table class="pre"><tr><td><pre><code>No output has been produced.</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>Blob 'folder/childFile.txt' is 16 bytes big.</code></pre></td></tr></table>
 
 <h2><a name="Shared-types" class="anchor" href="#Shared-types">Shared types</a></h2>
 
@@ -84,7 +84,7 @@ page and block blobs.</p>
 </tr>
 </table>
 
-<table class="pre"><tr><td><pre><code>No output has been produced.</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>These files take up 220 bytes.</code></pre></td></tr></table>
 
 <h2><a name="Flexible-API-for-read-operations" class="anchor" href="#Flexible-API-for-read-operations">Flexible API for read operations</a></h2>
 
@@ -113,7 +113,8 @@ page and block blobs.</p>
 </tr>
 </table>
 
-<table class="pre"><tr><td><pre><code>No output has been produced.</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>sync contents = 'child file stuff'
+async contents = 'child file stuff'</code></pre></td></tr></table>
 
 <p>In addition, the provider has support for custom methods for different document types e.g. XML.</p>
 
@@ -134,7 +135,12 @@ page and block blobs.</p>
 </tr>
 </table>
 
-<table class="pre"><tr><td><pre><code>No output has been produced.</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>text output = '&lt;data&gt;&lt;items&gt;&lt;item&gt;thing&lt;/item&gt;&lt;/items&gt;&lt;/data&gt;'
+xml output = '&lt;data&gt;
+  &lt;items&gt;
+    &lt;item&gt;thing&lt;/item&gt;
+  &lt;/items&gt;
+&lt;/data&gt;'</code></pre></td></tr></table>
 
 <h2><a name="Streaming-support" class="anchor" href="#Streaming-support">Streaming support</a></h2>
 
@@ -152,7 +158,9 @@ This is extremely useful for previewing large files etc.</p>
 </tr>
 </table>
 
-<table class="pre"><tr><td><pre><code>No output has been produced.</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>LINE: 'the quick brown fox jumps over the lazy dog'
+LINE: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras malesuada.'
+LINE: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla porttitor.'</code></pre></td></tr></table>
 
 <p>Again, since files share a common type, you can easily merge multiple sequential streams into one: -</p>
 
@@ -183,7 +191,14 @@ This is extremely useful for previewing large files etc.</p>
 </tr>
 </table>
 
-<table class="pre"><tr><td><pre><code>No output has been produced.</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>starting to read all lines
+stuff
+more stuff
+even more stuff
+the quick brown fox jumps over the lazy dog
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras malesuada.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla porttitor.
+finished reading all lines</code></pre></td></tr></table>
 
 <h2><a name="Download-assets" class="anchor" href="#Download-assets">Download assets</a></h2>
 
@@ -218,7 +233,9 @@ single files.</p>
 </tr>
 </table>
 
-<table class="pre"><tr><td><pre><code>No output has been produced.</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>Current time: 24/06/2016 2:40:47
+SAS expiry: 24/06/2016 3:17:47
+SAS URI: http://127.0.0.1:10000/devstoreaccount1/samples/file1.txt?sv=2015-04-05&amp;sr=b&amp;sig=M10z+A0dk1p7hEAmfscsxH6xB0pk2nyVVXj0YqzNVgM=&amp;se=2016-06-24T03:17:47Z&amp;sp=rwdl</code></pre></td></tr></table>
 
 <div class="tip" id="fs1">Multiple items<br />namespace FSharp<br /><br />--------------------<br />namespace Microsoft.FSharp</div>
 <div class="tip" id="fs2">namespace FSharp.Azure</div>

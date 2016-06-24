@@ -54,7 +54,7 @@ easy exploration of your table assets, directly from within the REPL.</p>
 </tr>
 </table>
 
-<table class="pre"><tr><td><pre><code>No output has been produced.</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>The table is called 'employee'.</code></pre></td></tr></table>
 
 <h2><a name="Automatic-schema-inference" class="anchor" href="#Automatic-schema-inference">Automatic schema inference</a></h2>
 
@@ -63,7 +63,57 @@ row level in the form of EDM metadata. This can be interrogated in order to infe
 as well as help query data. Let's look at the schema of the row <code>fred.1</code> in the <code>employee</code>
 table.</p>
 
-<table class="pre"><tr><td><pre><code>No value has been returned</code></pre></td></tr></table>
+<div class="deedleframe">
+
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th><p>EDM Data Type</p></th>
+<th><p>Value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>Partition Key</p></td>
+<td><p>string</p></td>
+<td><p>fred</p></td>
+</tr>
+<tr class="even">
+<td><p>Row Key</p></td>
+<td><p>string</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="odd">
+<td><p>Years Worked</p></td>
+<td><p>int</p></td>
+<td><p>10</p></td>
+</tr>
+<tr class="even">
+<td><p>Dob</p></td>
+<td><p>datetime</p></td>
+<td><p>01/05/1990</p></td>
+</tr>
+<tr class="odd">
+<td><p>Name</p></td>
+<td><p>string</p></td>
+<td><p>fred</p></td>
+</tr>
+<tr class="even">
+<td><p>Salary</p></td>
+<td><p>double</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="odd">
+<td><p>Is Manager</p></td>
+<td><p>bool</p></td>
+<td><p>true</p></td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
 
 <p>Based on this EDM metadata, an appropriate .NET type can be generated and used within the provider.</p>
 
@@ -78,7 +128,8 @@ table.</p>
 </tr>
 </table>
 
-<table class="pre"><tr><td><pre><code>No output has been produced.</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>Fred has Partition Key of men and Row Key of 1
+Fred has Name 'fred', Years Working '10', Dob '01/05/1990 0:00:00', Salary '0.000000' and Is Manager 'true'.</code></pre></td></tr></table>
 
 <p>In addition, an extra "Values" property is available which exposes all properties on the entity
 in a key/value collection - this is useful for binding scenarios or e.g. mapping in Deedle frames.</p>
@@ -106,7 +157,44 @@ in a key/value collection - this is useful for binding scenarios or e.g. mapping
 </tr>
 </table>
 
-<table class="pre"><tr><td><pre><code>No value has been returned</code></pre></td></tr></table>
+<div class="deedleframe">
+
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th><p>Timestamp</p></th>
+<th><p>Dob</p></th>
+<th><p>IsManager</p></th>
+<th><p>Name</p></th>
+<th><p>Salary</p></th>
+<th><p>YearsWorking</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>women.1</p></td>
+<td><p>24/06/2016 2:40:59 +00:00</p></td>
+<td><p>30/04/2005 0:00:00</p></td>
+<td><p>True</p></td>
+<td><p>sara</p></td>
+<td><p>3.5</p></td>
+<td><p>35</p></td>
+</tr>
+<tr class="even">
+<td><p>women.2</p></td>
+<td><p>24/06/2016 2:40:59 +00:00</p></td>
+<td><p>20/08/1965 0:00:00</p></td>
+<td><p>False</p></td>
+<td><p>rachel</p></td>
+<td><p>5.5</p></td>
+<td><p>20</p></td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
 
 <h2><a name="Querying-data" class="anchor" href="#Querying-data">Querying data</a></h2>
 
@@ -154,7 +242,8 @@ using the Azure SDK query builder.</p>
 </tr>
 </table>
 
-<table class="pre"><tr><td><pre><code>No output has been produced.</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>The query returned 2 rows.
+Generated query is 'YearsWorking eq 35'</code></pre></td></tr></table>
 
 <h3><a name="Query-DSL" class="anchor" href="#Query-DSL">Query DSL</a></h3>
 
@@ -177,7 +266,7 @@ Than, Less Than etc. as supported by the Azure Storage Table service</p>
 </tr>
 </table>
 
-<table class="pre"><tr><td><pre><code>No value has been returned</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>["YearsWorking eq 35"]</code></pre></td></tr></table>
 
 <p>These can be composed and chained. When you have completed building, simply call <code>Execute()</code>.</p>
 
@@ -194,7 +283,7 @@ Than, Less Than etc. as supported by the Azure Storage Table service</p>
 </tr>
 </table>
 
-<table class="pre"><tr><td><pre><code>No value has been returned</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>["IsManager eq true"; "Name eq 'Fred'"; "YearsWorking gt 14"]</code></pre></td></tr></table>
 
 <p>Query operators are strongly typed, so <code>Equal To</code> on <code>Years Working</code> takes in an int, whereas
 on <code>Name</code> it takes in a string, whilst for booleans there is no such provided method.</p>
@@ -229,7 +318,7 @@ it, you can use a strongly-typed Insert method. You can also choose whether to i
 </tr>
 </table>
 
-<table class="pre"><tr><td><pre><code>No value has been returned</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>SuccessfulResponse ((Partition "Europe", Row "1"),204)</code></pre></td></tr></table>
 
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
@@ -254,7 +343,7 @@ it, you can use a strongly-typed Insert method. You can also choose whether to i
 </tr>
 </table>
 
-<table class="pre"><tr><td><pre><code>No value has been returned</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>SuccessfulResponse ((Partition "women", Row "3"),204)</code></pre></td></tr></table>
 
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
@@ -263,7 +352,7 @@ it, you can use a strongly-typed Insert method. You can also choose whether to i
 </tr>
 </table>
 
-<table class="pre"><tr><td><pre><code>No value has been returned</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>SuccessfulResponse ((Partition "women", Row "3"),204)</code></pre></td></tr></table>
 
 <h3><a name="Inserting-batches" class="anchor" href="#Inserting-batches">Inserting batches</a></h3>
 
@@ -289,7 +378,11 @@ already have schema or do not.</p>
 </tr>
 </table>
 
-<table class="pre"><tr><td><pre><code>No value has been returned</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>[|("Europe",
+   [|SuccessfulResponse ((Partition "Europe", Row "3"),204);
+     SuccessfulResponse ((Partition "Europe", Row "2"),204)|]);
+  ("North America",
+   [|SuccessfulResponse ((Partition "North America", Row "1"),204)|])|]</code></pre></td></tr></table>
 
 <h2><a name="Deleting-data" class="anchor" href="#Deleting-data">Deleting data</a></h2>
 
@@ -304,7 +397,10 @@ of the Table Storage service</p>
 </tr>
 </table>
 
-<table class="pre"><tr><td><pre><code>No value has been returned</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>[|("Europe",
+   [|SuccessfulResponse ((Partition "Europe", Row "3"),204);
+     SuccessfulResponse ((Partition "Europe", Row "2"),204);
+     SuccessfulResponse ((Partition "Europe", Row "1"),204)|])|]</code></pre></td></tr></table>
 
 <h2><a name="Error-handling" class="anchor" href="#Error-handling">Error handling</a></h2>
 
@@ -338,7 +434,7 @@ associated TableResult, wrapped in a discriminated union to allow easy matching.
 </tr>
 </table>
 
-<table class="pre"><tr><td><pre><code>No output has been produced.</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>Entity (Partition "women", Row "3") failed: 409 - EntityAlreadyExists.</code></pre></td></tr></table>
 
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
@@ -351,7 +447,9 @@ associated TableResult, wrapped in a discriminated union to allow easy matching.
 </tr>
 </table>
 
-<table class="pre"><tr><td><pre><code>No output has been produced.</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>Entity (Partition "Europe", Row "3") failed: 409 - EntityAlreadyExists.
+Entity (Partition "Europe", Row "2") was ignored as part of a failed batch operation.
+Entity (Partition "North America", Row "1") failed: 409 - EntityAlreadyExists.</code></pre></td></tr></table>
 
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
@@ -362,7 +460,7 @@ associated TableResult, wrapped in a discriminated union to allow easy matching.
 </tr>
 </table>
 
-<table class="pre"><tr><td><pre><code>No output has been produced.</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>Entity (Partition "Foo", Row "Bar") failed: 404 - ResourceNotFound.</code></pre></td></tr></table>
 
 <div class="tip" id="fs1">namespace Deedle</div>
 <div class="tip" id="fs2">Multiple items<br />namespace FSharp<br /><br />--------------------<br />namespace Microsoft.FSharp</div>
