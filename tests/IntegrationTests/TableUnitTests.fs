@@ -169,7 +169,7 @@ let ``Cloud Table Client relates to the same data as the type provider``() =
 let ``DeletePartition deletes entries with given partition key``() =
     table.DeletePartition "men"
     test <@ table.Query().``Where Partition Key Is``.``Equal To``("men").Execute().Length = 0 @>
-    
+
 [<Fact>]
 [<ResetTableData>]
 let ``Insert suceeds for entries over 4Mb``() =
@@ -190,3 +190,14 @@ let ``Insert suceeds for entries over 4Mb``() =
         |> Array.filter (function | SuccessfulResponse _ -> false | _ -> true)
         |> Array.length
     test <@ failureCount = 0 @>
+
+[<Fact>]
+[<ResetTableData>]
+let ``Async query without arguments brings back all rows``() =
+    let length = 
+        async{
+            let! results = table.Query().ExecuteAsync();
+            return results.Length
+        } 
+        |> Async.RunSynchronously
+    test <@ length = 5 @>

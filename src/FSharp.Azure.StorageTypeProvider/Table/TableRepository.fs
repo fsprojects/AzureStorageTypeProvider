@@ -62,19 +62,42 @@ let internal getRowsForSchema (rowCount: int) connection tableName =
     |> Seq.truncate rowCount
     |> Seq.toArray
 
+let toLightweightTableEntity (dte:DynamicTableEntity) = 
+    LightweightTableEntity(
+                    Partition dte.PartitionKey,
+                    Row dte.RowKey,
+                    dte.Timestamp,
+                    dte.Properties
+                    |> Seq.map(fun p -> p.Key, p.Value.PropertyAsObject)
+                    |> Map.ofSeq)
+
+let executeQueryAsync connection tableName maxResults filterString = async {
+        let query = DynamicQuery().Where(filterString)
+        let query = if maxResults > 0 then query.Take(Nullable maxResults) else query
+        
+        let resSet = ResizeArray<LightweightTableEntity>()
+        let getBatch contTkn = async {
+            let! batch = (getTable tableName connection).ExecuteQuerySegmentedAsync(query,contTkn) |> Async.AwaitTask
+            batch 
+            |> Seq.map(toLightweightTableEntity)
+            |> resSet.AddRange
+            return contTkn
+        } 
+        let! firstContTkn = getBatch null
+        let mutable contTkn = firstContTkn
+        while (contTkn <> null) do
+            let! nextTkn = getBatch contTkn
+            contTkn <- nextTkn
+
+        return resSet |> Array.ofSeq
+    }
+
 let executeQuery connection tableName maxResults filterString = 
     let query = DynamicQuery().Where(filterString)
     let query = if maxResults > 0 then query.Take(Nullable maxResults) else query
 
     (getTable tableName connection).ExecuteQuery(query)
-    |> Seq.map(fun dte ->
-        LightweightTableEntity(
-            Partition dte.PartitionKey,
-            Row dte.RowKey,
-            dte.Timestamp,
-            dte.Properties
-            |> Seq.map(fun p -> p.Key, p.Value.PropertyAsObject)
-            |> Map.ofSeq))
+    |> Seq.map(toLightweightTableEntity)
     |> Seq.toArray
 
 let internal buildDynamicTableEntity(entity:LightweightTableEntity) =
