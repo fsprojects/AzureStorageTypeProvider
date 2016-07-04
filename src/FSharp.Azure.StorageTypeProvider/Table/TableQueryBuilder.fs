@@ -57,6 +57,17 @@ let createTableQueryType (tableEntityType: ProvidedTypeDefinition) connection ta
                           "Timestamp", buildPropertyOperatorsType tableName "Timestamp" EdmType.DateTime tableQueryType ] @
                         [ for (name, value) in properties -> name, buildPropertyOperatorsType tableName name value.PropertyType tableQueryType ]
     tableQueryType.AddMembersDelayed(fun () ->
+        
+        let executeQueryMethodAsync =
+            let symbKind = (typeof<Async<_>> |> SymbolKind.Generic)
+            let retType = ProvidedSymbolType( symbKind,[tableEntityType.MakeArrayType()]) :> Type
+            ProvidedMethod
+                ("ExecuteAsync", [ ProvidedParameter("maxResults", typeof<int>, optionalValue = 0)
+                                   ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ],
+                 retType, 
+                 InvokeCode = (fun args -> <@@ executeQueryAsync (%%args.[2] : string) tableName %%args.[1] (composeAllFilters((%%args.[0]: obj) :?> string list)) @@>))
+        executeQueryMethodAsync.AddXmlDocDelayed <| fun _ -> "Executes the current query asyncronously."
+
         let executeQueryMethod =
             ProvidedMethod
                 ("Execute", [ ProvidedParameter("maxResults", typeof<int>, optionalValue = 0)
@@ -64,10 +75,14 @@ let createTableQueryType (tableEntityType: ProvidedTypeDefinition) connection ta
                  tableEntityType.MakeArrayType(), 
                  InvokeCode = (fun args -> <@@ executeQuery (%%args.[2] : string) tableName %%args.[1] (composeAllFilters((%%args.[0]: obj) :?> string list)) @@>))
         executeQueryMethod.AddXmlDocDelayed <| fun _ -> "Executes the current query."
+        
         let customQueryProperties = 
             [ for (name, operatorType) in operatorTypes -> 
                   let queryProperty = ProvidedProperty("Where" + name + "Is" |> splitOnCaps, operatorType, GetterCode = (fun args -> <@@ (%%args.[0]: obj) :?> string list @@>))
                   queryProperty.AddXmlDocDelayed <| fun _ -> sprintf "Creates a query part for the %s property." name
                   queryProperty :> MemberInfo ]
-        (executeQueryMethod :> MemberInfo) :: customQueryProperties)
+
+        [[(executeQueryMethodAsync :> MemberInfo); (executeQueryMethod :> MemberInfo)]; customQueryProperties]
+        |> List.concat)
+        
     tableQueryType, operatorTypes |> List.unzip |> snd
