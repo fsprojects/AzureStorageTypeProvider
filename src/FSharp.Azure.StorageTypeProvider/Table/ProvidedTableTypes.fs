@@ -51,6 +51,16 @@ type AzureTable internal (defaultConnection, tableName) =
                DynamicTableEntity(partitionKey, rowKey, ETag = "*"))
         |> executeBatchOperation TableOperation.Delete table
 
+    /// Asyncronously deletes a batch of entities from the table using the supplied pairs of Partition and Row keys.
+    member __.DeleteAsync(entities, ?connectionString) = async{
+        let table = getTableForConnection (defaultArg connectionString defaultConnection)
+        return! entities
+        |> Seq.map (fun entityId -> 
+               let Partition(partitionKey), Row(rowKey) = entityId
+               DynamicTableEntity(partitionKey, rowKey, ETag = "*"))
+        |> executeBatchOperationAsync TableOperation.Delete table
+    }
+        
     /// Deletes an entire partition from the table
     member __.DeletePartition(partitionKey, ?connectionString) = 
         let table = getTableForConnection (defaultArg connectionString defaultConnection)
@@ -60,7 +70,25 @@ type AzureTable internal (defaultConnection, tableName) =
         |> table.ExecuteQuery
         |> Seq.map(fun e -> (Partition(e.PartitionKey), Row(e.RowKey)))
         |> __.Delete
-        |> ignore
+        |> ignore   
+        
+    /// Asyncronously deletes an entire partition from the table
+    member __.DeletePartitionAsync(partitionKey, ?connectionString) = async{
+        let table = getTableForConnection (defaultArg connectionString defaultConnection)
+        let connStringToUse = 
+            match connectionString with
+            | Some c -> c
+            | None -> defaultConnection
+        let filter = Table.TableQuery.GenerateFilterCondition ("PartitionKey", Table.QueryComparisons.Equal, partitionKey)
+        let projection = [|"RowKey"|]
+        let! qryResp = executeGenericQueryAsync connStringToUse table.Name Int32.MaxValue filter (fun e -> (Partition(e.PartitionKey), Row(e.RowKey)))
+            
+        return!
+            qryResp
+            |> __.DeleteAsync
+            |> Async.Ignore             
+    }
+        
     
     /// Gets the name of the table.
     member __.Name = tableName

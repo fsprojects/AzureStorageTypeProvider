@@ -170,6 +170,15 @@ let ``DeletePartition deletes entries with given partition key``() =
     table.DeletePartition "men"
     test <@ table.Query().``Where Partition Key Is``.``Equal To``("men").Execute().Length = 0 @>
 
+<<<<<<< HEAD
+=======
+[<Fact>]
+[<ResetTableData>]
+let ``DeletePartitionAsync deletes entries with given partition key``() =
+    table.DeletePartitionAsync "men" |> Async.RunSynchronously
+    test <@ table.Query().``Where Partition Key Is``.``Equal To``("men").Execute().Length = 0 @>
+
+>>>>>>> async-tables-extrafuncs
 [<Fact>]
 [<ResetTableData>]
 let ``Insert suceeds for entries over 4Mb``() =
