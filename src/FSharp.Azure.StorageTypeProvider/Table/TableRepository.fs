@@ -83,17 +83,15 @@ let executeGenericQueryAsync<'a> connection tableName maxResults filterString ma
         batch 
         |> Seq.map(mapToReturnEntity)
         |> resSet.AddRange
-        return contTkn
-    } 
+        return contTkn } 
+
     let! firstContTkn = getBatch null
     let mutable contTkn = firstContTkn
     while (contTkn <> null) do
         let! nextTkn = getBatch contTkn
         contTkn <- nextTkn
 
-    return resSet |> Array.ofSeq
-}
-    
+    return resSet |> Array.ofSeq }
 
 let executeQueryAsync connection tableName maxResults filterString = 
     executeGenericQueryAsync connection tableName maxResults filterString toLightweightTableEntity
@@ -162,7 +160,7 @@ let private processErrorResp entityBatch buildEntityId (ex:StorageException) =
     | [|message|] -> entityBatch |> Seq.map(fun entity -> EntityError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
     | _ -> entityBatch |> Seq.map(fun entity -> BatchError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
 
-let internal executeBatchAsyncronously batchOp entityBatch buildEntityId (table:CloudTable) = async{
+let internal executeBatchAsynchronously batchOp entityBatch buildEntityId (table:CloudTable) = async{
     let! response =  table.ExecuteBatchAsync(batchOp) |> Async.AwaitTask |> Async.Catch
     match response with
     | Choice1Of2 successResp -> 
@@ -189,7 +187,7 @@ let internal executeBatchOperationAsync createTableOp (table:CloudTable) entitie
         splitIntoBatches createTableOp entities
         |> Seq.map(fun (partitionKey, entityBatch, batchOperation) -> async{
             let buildEntityId (entity:DynamicTableEntity) = Partition(entity.PartitionKey), Row(entity.RowKey)
-            let! responses = executeBatchAsyncronously batchOperation entityBatch buildEntityId table
+            let! responses = executeBatchAsynchronously batchOperation entityBatch buildEntityId table
             return (partitionKey, responses |> Seq.toArray)
             })
         |> Async.Parallel

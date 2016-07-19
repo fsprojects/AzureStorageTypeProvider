@@ -97,6 +97,7 @@ let buildTableEntityMembers (parentTableType:ProvidedTypeDefinition, parentTable
                        ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], parentTableEntityType.MakeArrayType(), 
                      InvokeCode = (fun args -> <@@ getPartitionRows %%args.[1] %%args.[2] tableName @@>))
             getPartition.AddXmlDocDelayed <| fun _ -> "Eagerly retrieves all entities in a table partition by its key."
+            
             let getPartitionAsync = 
                 let retType = ProvidedSymbolType( asyncSymbKind,[parentTableEntityType.MakeArrayType()]) :> Type
                 ProvidedMethod
@@ -105,7 +106,8 @@ let buildTableEntityMembers (parentTableType:ProvidedTypeDefinition, parentTable
                        ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ],
                        retType,
                        InvokeCode = (fun args -> <@@ getPartitionRowsAsync %%args.[1] %%args.[2] tableName @@>))
-            getPartitionAsync.AddXmlDocDelayed <| fun _ -> "Asyncronously retrieves all entities in a table partition by its key."
+            getPartitionAsync.AddXmlDocDelayed <| fun _ -> "Asynchronously retrieves all entities in a table partition by its key."
+            
             let queryBuilderType, childTypes = TableQueryBuilder.createTableQueryType parentTableEntityType connection tableName propertiesCreated
             let executeQuery = 
                 ProvidedMethod
@@ -134,7 +136,7 @@ let buildTableEntityMembers (parentTableType:ProvidedTypeDefinition, parentTable
                        ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], 
                      retType, 
                      InvokeCode = (fun args -> <@@ getEntityAsync (%%args.[1] : Row) (%%args.[2] : Partition) (%%args.[3] : string) tableName @@>))
-            getEntityAsync.AddXmlDocDelayed <| fun _ -> "Gets a single entity based on the row and partition key asyncronously."
+            getEntityAsync.AddXmlDocDelayed <| fun _ -> "Gets a single entity based on the row and partition key asynchronously."
             let deleteEntity = 
                 ProvidedMethod
                     ("Delete", 
@@ -148,7 +150,7 @@ let buildTableEntityMembers (parentTableType:ProvidedTypeDefinition, parentTable
                      [ ProvidedParameter("entity", parentTableEntityType)
                        ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], returnType = typeof<Async<TableResponse>>, 
                      InvokeCode = (fun args -> <@@ deleteEntityAsync %%args.[2] tableName %%args.[1] @@>))
-            deleteEntityAsync.AddXmlDocDelayed <| fun _ -> "Deletes a single entity from the table asyncronously."
+            deleteEntityAsync.AddXmlDocDelayed <| fun _ -> "Deletes a single entity from the table asynchronously."
             let deleteEntities = 
                 ProvidedMethod
                     ("Delete", 
@@ -162,7 +164,7 @@ let buildTableEntityMembers (parentTableType:ProvidedTypeDefinition, parentTable
                      [ ProvidedParameter("entities", parentTableEntityType.MakeArrayType())
                        ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], returnType = typeof<Async<(string * TableResponse []) []>>, 
                      InvokeCode = (fun args -> <@@ deleteEntitiesAsync %%args.[2] tableName %%args.[1] @@>))
-            deleteEntitiesAsync.AddXmlDocDelayed <| fun _ -> "Deletes a batch of entities from the table asyncronously."
+            deleteEntitiesAsync.AddXmlDocDelayed <| fun _ -> "Deletes a batch of entities from the table asynchronously."
             let insertEntity = 
                 ProvidedMethod
                     ("Insert", 
@@ -178,7 +180,7 @@ let buildTableEntityMembers (parentTableType:ProvidedTypeDefinition, parentTable
                        ProvidedParameter("insertMode", typeof<TableInsertMode>, optionalValue = TableInsertMode.Insert)
                        ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], returnType = typeof<Async<TableResponse>>, 
                      InvokeCode = (fun args -> <@@ insertEntityAsync (%%args.[3] : string) tableName %%args.[2] (%%args.[1] : LightweightTableEntity) @@>))
-            insertEntityAsync.AddXmlDocDelayed <| fun _ -> "Asyncronously inserts a single entity with the inferred table schema into the table."
+            insertEntityAsync.AddXmlDocDelayed <| fun _ -> "Asynchronously inserts a single entity with the inferred table schema into the table."
             let insertEntities = 
                 ProvidedMethod
                     ("Insert", 
@@ -194,7 +196,15 @@ let buildTableEntityMembers (parentTableType:ProvidedTypeDefinition, parentTable
                        ProvidedParameter("insertMode", typeof<TableInsertMode>, optionalValue = TableInsertMode.Insert)
                        ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], returnType = typeof<Async<(string * TableResponse [])[]>>, 
                      InvokeCode = (fun args -> <@@ insertEntityBatchAsync (%%args.[3] : string) tableName %%args.[2] (%%args.[1] : LightweightTableEntity []) @@>))
-            insertEntitiesAsync.AddXmlDocDelayed <| fun _ -> "Asyncronously inserts a batch of entities with the inferred table schema into the table."
+            insertEntitiesAsync.AddXmlDocDelayed <| fun _ -> "Asynchronously inserts a batch of entities with the inferred table schema into the table."
+            
             domainType.AddMembers(queryBuilderType :: childTypes)
-            [ getPartition; getPartitionAsync; getEntity; getEntityAsync; buildQuery; executeQuery; deleteEntity; deleteEntityAsync; 
-              deleteEntities; deleteEntitiesAsync; insertEntity; insertEntityAsync; insertEntities; insertEntitiesAsync ])
+            
+            [ getPartition; getPartitionAsync
+              getEntity; getEntityAsync
+              buildQuery
+              executeQuery
+              deleteEntity; deleteEntityAsync
+              deleteEntities; deleteEntitiesAsync
+              insertEntity; insertEntityAsync
+              insertEntities; insertEntitiesAsync ])
