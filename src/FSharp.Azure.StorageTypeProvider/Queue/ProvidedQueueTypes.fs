@@ -14,7 +14,7 @@ type PopReceipt = | PopReceipt of string
 type ProvidedMessageId = | ProvidedMessageId of MessageId : MessageId * PopReceipt : PopReceipt
 
 /// Represents a single message that has been dequeued.
-type ProvidedQueueMessage = 
+type ProvidedQueueMessage =
     { /// The composite key of this message, containing both the message id and the pop receipt.
       Id : ProvidedMessageId
       /// The number of times this message has been dequeued.
@@ -26,9 +26,9 @@ type ProvidedQueueMessage =
       /// The time that this message will next become visible.
       NextVisibleTime : DateTimeOffset option
       /// Gets the contents of the message as a byte array.
-      AsBytes : byte array
+      AsBytes : Lazy<byte array>
       /// Gets the contest of the message as a string.
-      AsString : string }
+      AsString : Lazy<string> }
 
 module internal Factory = 
     let unpackId messageId =
@@ -41,8 +41,8 @@ module internal Factory =
           InsertionTime = message.InsertionTime |> Option.ofNullable
           ExpirationTime = message.ExpirationTime |> Option.ofNullable
           NextVisibleTime = message.NextVisibleTime |> Option.ofNullable
-          AsBytes = message.AsBytes
-          AsString = message.AsString }
+          AsBytes = Lazy.Create(fun _ -> message.AsBytes)
+          AsString = Lazy.Create(fun _ -> message.AsString) }
     
     let toAzureQueueMessage providedMessageId = 
         let messageId, popReceipt = providedMessageId |> unpackId
