@@ -81,7 +81,6 @@ let setPropertiesForEntity (entityType : ProvidedTypeDefinition) (sampleEntities
 
 /// Gets all the members for a Table Entity type
 let buildTableEntityMembers (parentTableType:ProvidedTypeDefinition, parentTableEntityType, domainType:ProvidedTypeDefinition, connection, tableName) = 
-    let asyncSymbKind = (typeof<Async<_>> |> SymbolKind.Generic)
     parentTableType.AddMembersDelayed(fun () ->
         let propertiesCreated = 
             tableName
@@ -99,12 +98,11 @@ let buildTableEntityMembers (parentTableType:ProvidedTypeDefinition, parentTable
             getPartition.AddXmlDocDelayed <| fun _ -> "Eagerly retrieves all entities in a table partition by its key."
             
             let getPartitionAsync = 
-                let retType = ProvidedSymbolType( asyncSymbKind,[parentTableEntityType.MakeArrayType()]) :> Type
                 ProvidedMethod
                     ("GetPartitionAsync", 
                      [ ProvidedParameter("key", typeof<string>)
                        ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ],
-                       retType,
+                       typeof<Async<_>>.GetGenericTypeDefinition().MakeGenericType(parentTableEntityType.MakeArrayType()),
                        InvokeCode = (fun args -> <@@ getPartitionRowsAsync %%args.[1] %%args.[2] tableName @@>))
             getPartitionAsync.AddXmlDocDelayed <| fun _ -> "Asynchronously retrieves all entities in a table partition by its key."
             
@@ -128,13 +126,15 @@ let buildTableEntityMembers (parentTableType:ProvidedTypeDefinition, parentTable
                      InvokeCode = (fun args -> <@@ getEntity (%%args.[1] : Row) (%%args.[2] : Partition) (%%args.[3] : string) tableName @@>))
             getEntity.AddXmlDocDelayed <| fun _ -> "Gets a single entity based on the row and partition key."
             let getEntityAsync = 
-                let retType = ProvidedSymbolType( asyncSymbKind,[(typeof<Option<_>>).GetGenericTypeDefinition().MakeGenericType(parentTableEntityType)]) :> Type
+                let returnType =
+                    let optionType = typeof<Option<_>>.GetGenericTypeDefinition().MakeGenericType(parentTableEntityType)
+                    typeof<Async<_>>.GetGenericTypeDefinition().MakeGenericType(optionType)
                 ProvidedMethod
                     ("GetAsync", 
                      [ ProvidedParameter("rowKey", typeof<Row>)
                        ProvidedParameter("partitionKey", typeof<Partition>)
                        ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], 
-                     retType, 
+                     returnType, 
                      InvokeCode = (fun args -> <@@ getEntityAsync (%%args.[1] : Row) (%%args.[2] : Partition) (%%args.[3] : string) tableName @@>))
             getEntityAsync.AddXmlDocDelayed <| fun _ -> "Gets a single entity based on the row and partition key asynchronously."
             let deleteEntity = 
