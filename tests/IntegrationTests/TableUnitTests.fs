@@ -185,6 +185,18 @@ let ``Inserts many rows asyncronously using provided types correctly``() =
 
 [<Fact>]
 [<ResetTableData>]
+let ``Query with multiple batches returns all results``() =
+    [|1 .. 1001|]
+    |> Array.map(fun i -> sprintf "Row %i" i)
+    |> Array.map(fun i -> Local.Domain.employeeEntity(Partition "bulk insert", Row i, DateTime.MaxValue, true, "Hello", 100.0, 10 ))
+    |> table.Insert
+    |> ignore
+
+    let retrievedEntries = table.GetPartitionAsync("bulk insert") |> Async.RunSynchronously
+    test <@ retrievedEntries.Length = 1001 @>
+
+[<Fact>]
+[<ResetTableData>]
 let ``Query without arguments brings back all rows``() =
     test <@ table.Query().Execute().Length = 5 @>
 
