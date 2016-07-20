@@ -58,12 +58,10 @@ let createTableQueryType (tableEntityType: ProvidedTypeDefinition) connection ta
                         [ for (name, value) in properties -> name, buildPropertyOperatorsType tableName name value.PropertyType tableQueryType ]
     tableQueryType.AddMembersDelayed(fun () ->        
         let executeQueryMethodAsync =
-            let symbKind = (typeof<Async<_>> |> SymbolKind.Generic)
-            let retType = ProvidedSymbolType( symbKind,[tableEntityType.MakeArrayType()]) :> Type
             ProvidedMethod
                 ("ExecuteAsync", [ ProvidedParameter("maxResults", typeof<int>, optionalValue = 0)
                                    ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ],
-                 retType, 
+                 typeof<Async<_>>.GetGenericTypeDefinition().MakeGenericType(tableEntityType.MakeArrayType()),
                  InvokeCode = (fun args -> <@@ executeQueryAsync (%%args.[2] : string) tableName %%args.[1] (composeAllFilters((%%args.[0]: obj) :?> string list)) @@>))
         executeQueryMethodAsync.AddXmlDocDelayed <| fun _ -> "Executes the current query asynchronously."
 
