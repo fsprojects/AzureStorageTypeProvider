@@ -186,7 +186,7 @@ let ``Inserts many rows asyncronously using provided types correctly``() =
 [<Fact>]
 [<ResetTableData>]
 let ``Query with multiple batches returns all results``() =
-    [|1 .. 1001|]
+    [| 1 .. 1001 |]
     |> Array.map(fun i -> sprintf "Row %i" i)
     |> Array.map(fun i -> Local.Domain.employeeEntity(Partition "bulk insert", Row i, DateTime.MaxValue, true, "Hello", 100.0, 10 ))
     |> table.Insert
@@ -194,6 +194,19 @@ let ``Query with multiple batches returns all results``() =
 
     let retrievedEntries = table.GetPartitionAsync("bulk insert") |> Async.RunSynchronously
     test <@ retrievedEntries.Length = 1001 @>
+
+[<Fact>]
+[<ResetTableData>]
+let ``Query with multiple batches returns data in the correct order``() =
+    [| 1 .. 1001 |]
+    |> Array.map(fun i -> sprintf "Row %04i" i)
+    |> Array.map(fun i -> Local.Domain.employeeEntity(Partition "bulk insert", Row i, DateTime.MaxValue, true, "Hello", 100.0, 10 ))
+    |> table.Insert
+    |> ignore
+
+    let retrievedEntries = table.GetPartitionAsync("bulk insert") |> Async.RunSynchronously
+    test <@ retrievedEntries.[0].RowKey = "Row 0001" @>
+    test <@ retrievedEntries.[1000].RowKey = "Row 1001" @>
 
 [<Fact>]
 [<ResetTableData>]
@@ -262,9 +275,7 @@ let ``Insert suceeds for entries over 4Mb``() =
     let generateBatchOfLargeEntities partitionKey size = 
         [| for i in 1 .. size do yield generateLargeEntity partitionKey (Row(Guid.NewGuid().ToString())) |]
 
-    let resultsOfInsert = 
-        generateBatchOfLargeEntities (Partition("1")) 10 
-        |> lgeTable.Insert
+    let resultsOfInsert = generateBatchOfLargeEntities (Partition "1") 10 |> lgeTable.Insert
 
     let failureCount = 
         resultsOfInsert        
@@ -276,10 +287,9 @@ let ``Insert suceeds for entries over 4Mb``() =
 [<Fact>]
 [<ResetTableData>]
 let ``Async query without arguments brings back all rows``() =
-    let length = 
-        async{
+    let length =
+        async {
             let! results = table.Query().ExecuteAsync();
-            return results.Length
-        } 
+            return results.Length } 
         |> Async.RunSynchronously
     test <@ length = 5 @>

@@ -56,7 +56,8 @@ let createTableQueryType (tableEntityType: ProvidedTypeDefinition) connection ta
                           "RowKey", buildPropertyOperatorsType tableName "RowKey" EdmType.String tableQueryType
                           "Timestamp", buildPropertyOperatorsType tableName "Timestamp" EdmType.DateTime tableQueryType ] @
                         [ for (name, value) in properties -> name, buildPropertyOperatorsType tableName name value.PropertyType tableQueryType ]
-    tableQueryType.AddMembersDelayed(fun () ->        
+    
+    tableQueryType.AddMembersDelayed(fun () ->
         let executeQueryMethodAsync =
             ProvidedMethod
                 ("ExecuteAsync", [ ProvidedParameter("maxResults", typeof<int>, optionalValue = 0)
