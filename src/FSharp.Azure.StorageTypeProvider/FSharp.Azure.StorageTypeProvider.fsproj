@@ -62,12 +62,6 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="../../paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fsi">
-      <Link>paket-files/ProvidedTypes.fsi</Link>
-    </Content>
-    <Compile Include="../../paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs">
-      <Link>paket-files/ProvidedTypes.fs</Link>
-    </Compile>
     <Compile Include="Shared.fs" />
     <Compile Include="Configuration.fs" />
     <Compile Include="Table/SharedTableTypes.fs" />
