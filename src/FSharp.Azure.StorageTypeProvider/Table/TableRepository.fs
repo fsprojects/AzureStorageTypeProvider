@@ -70,25 +70,29 @@ let toLightweightTableEntity (dte:DynamicTableEntity) =
                     |> Seq.map(fun p -> p.Key, p.Value.PropertyAsObject)
                     |> Map.ofSeq)
 
-let executeGenericQueryAsync<'a> connection tableName maxResults filterString mapToReturnEntity = async{
-    let query = DynamicQuery().Where(filterString)
-    let query = if maxResults > 0 then query.Take(Nullable maxResults) else query
-        
-    let resSet = ResizeArray<'a>()
-    let getBatch contTkn = async {
-        let! batch = (getTable tableName connection).ExecuteQuerySegmentedAsync(query,contTkn) |> Async.AwaitTask
-        batch 
-        |> Seq.map(mapToReturnEntity)
-        |> resSet.AddRange
-        return batch.ContinuationToken } 
+let executeGenericQueryAsync connection tableName maxResults filterString mapToReturnEntity = async {
+    let query =
+        let query = DynamicQuery().Where(filterString)
+        if maxResults > 0 then query.Take(Nullable maxResults) else query
+    let table = getTable tableName connection
 
-    let! firstContTkn = getBatch null
-    let mutable contTkn = firstContTkn
-    while (contTkn <> null) do
-        let! nextTkn = getBatch contTkn
-        contTkn <- nextTkn
+    let output = ResizeArray()
 
-    return resSet |> Array.ofSeq }
+    let rec controlRec token = async {
+        let! rows, token = async {
+            let! batch = table.ExecuteQuerySegmentedAsync(query, token) |> Async.AwaitTask
+            return batch |> Seq.map mapToReturnEntity, batch.ContinuationToken |> Option.ofObj }
+        output.AddRange rows
+
+        do!
+            match token with
+            | Some token -> controlRec token
+            | None -> async.Return()
+
+        return () }
+
+    do! controlRec null
+    return output |> Seq.toArray }
 
 let executeQueryAsync connection tableName maxResults filterString = 
     executeGenericQueryAsync connection tableName maxResults filterString toLightweightTableEntity
