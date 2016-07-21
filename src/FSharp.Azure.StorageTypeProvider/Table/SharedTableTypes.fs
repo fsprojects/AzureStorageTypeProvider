@@ -9,6 +9,13 @@ type TableInsertMode =
     /// Insert if the entity does not already exist; otherwise overwrite the entity.
     | Upsert = 1
 
+/// The type of property
+type internal PropertyNeed =
+    /// The property is optional.
+    | Optional
+    /// The property is mandatory.
+    | Mandatory
+
 /// The name of the partition.
 type Partition = | Partition of string
 /// The row key.
