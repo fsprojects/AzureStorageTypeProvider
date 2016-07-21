@@ -72,7 +72,7 @@ type ProvidedQueue(defaultConnectionString, name) =
         if queueRef.ApproximateMessageCount.HasValue then queueRef.ApproximateMessageCount.Value
         else 0
     
-    /// Dequeues the next message and optionally sets the visibilityTimeout (i.e. how long you can work with the message before it reappears in the queue)
+    /// Dequeues the next message and optionally sets the visibility timeout (i.e. how long you can work with the message before it reappears in the queue)
     member __.Dequeue(?connectionString, ?visibilityTimeout) = 
         async { 
             let! message = (getQueue connectionString).GetMessageAsync(visibilityTimeout |> Option.toNullable, null, null) |> Async.AwaitTask
@@ -82,15 +82,8 @@ type ProvidedQueue(defaultConnectionString, name) =
                 | _ -> Some(message |> Factory.toProvidedQueueMessage)
         }
 
-    /// Dequeues the next message using the default connection string and sets the visibilityTimeout (i.e. how long you can work with the message before it reappears in the queue)
-    member __.Dequeue(visibilityTimeout) = 
-        async { 
-            let! message = (getQueueRef name defaultConnectionString).GetMessageAsync(visibilityTimeout |> Nullable , null, null) |> Async.AwaitTask
-            return
-                match message with
-                | null -> None
-                | _ -> Some(message |> Factory.toProvidedQueueMessage)
-        }
+    /// Dequeues the next message using the default connection string and sets the visibility timeout (i.e. how long you can work with the message before it reappears in the queue)
+    member __.Dequeue(visibilityTimeout) = __.Dequeue(defaultConnectionString, visibilityTimeout)
 
     /// Generates a full-access shared access signature, defaulting to start from now.
     member __.GenerateSharedAccessSignature(duration, ?start, ?connectionString) = 

@@ -118,3 +118,22 @@ let ``Cloud Queue Client gives same results as the Type Provider``() =
 [<ResetQueueData>]
 let ``Cloud Queue is the same queue as the Type Provider``() =
     test <@ queue.AsCloudQueue().Name = queue.Name @>
+
+[<Fact>]
+[<ResetQueueData>]
+let ``Queue message with visibility timeout reappears correctly``() =
+    queue.Enqueue "test" |> Async.RunSynchronously
+    let message = queue.Dequeue(TimeSpan.FromSeconds 1.) |> Async.RunSynchronously
+    Threading.Thread.Sleep 2000
+    let message = queue.Dequeue() |> Async.RunSynchronously
+    test <@ Option.isSome message @>
+    test <@ message.Value.DequeueCount = 2 @>
+
+[<Fact>]
+[<ResetQueueData>]
+let ``Queue message with visibility timeout is correctly applied``() =
+    queue.Enqueue "test" |> Async.RunSynchronously
+    let message = queue.Dequeue(TimeSpan.FromSeconds 3.) |> Async.RunSynchronously
+    Threading.Thread.Sleep 2000
+    let message = queue.Dequeue() |> Async.RunSynchronously
+    test <@ Option.isNone message @>
