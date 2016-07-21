@@ -38,6 +38,15 @@ let ``Matching row and partition key returns Some row``() =
     | None -> failwith "could not locate row"
 
 [<Fact>]
+let ``Matching row and partition key returns Some row when using GetAsync``() =
+    match (table.GetAsync(Row "2", Partition "men") |> Async.RunSynchronously) with
+    | Some row ->
+        test <@ row.Name = "fred" @>
+        test <@ row.YearsWorking = 35 @>
+        test <@ row.Dob = DateTime(1980, 4, 4, 0, 0, 0, DateTimeKind.Utc) @>
+    | None -> failwith "could not locate row"
+
+[<Fact>]
 let ``Non matching partition key returns None``() =
     test <@ table.Get(Row "35", Partition "random") = None @>
 
@@ -55,6 +64,12 @@ let ``Gets all rows in a table``() =
 let ``Gets all rows in a partition``() =
     test <@ table.GetPartition("men").Length = 3 @>
 
+[<Fact>]
+[<ResetTableData>]
+let ``Gets all rows in a partition asyncronously``() =
+    let partition = table.GetPartitionAsync("men") |> Async.RunSynchronously
+    test <@ partition.Length = 3 @>
+
 type MatchingTableRow =
     { Name : string
       YearsWorking : int 
@@ -71,7 +86,19 @@ let ``Inserts and deletes a row using lightweight syntax correctly``() =
         | [| "isaac", [| SuccessfulResponse((Partition "isaac", Row "500"), 204) |] |] -> ()
         | _ -> failwith "error deleting"
     | _ -> failwith "error inserting"
-    
+   
+[<Fact>]
+[<ResetTableData>]
+let ``Inserts and deletes a row asyncronously using lightweight syntax correctly``() =
+    let result = table.InsertAsync(Partition "isaac", Row "500", { Name = "isaac"; YearsWorking = 500; Dob = DateTime.UtcNow }) |> Async.RunSynchronously
+    match result with
+    | SuccessfulResponse ((Partition "isaac", Row "500"), 204) ->
+        let deleteResponse = table.DeleteAsync([ Partition "isaac", Row "500"] ) |> Async.RunSynchronously
+        match deleteResponse with
+        | [| "isaac", [| SuccessfulResponse((Partition "isaac", Row "500"), 204) |] |] -> ()
+        | _ -> failwith "error deleting"
+    | _ -> failwith "error inserting"
+
 [<Fact>]
 [<ResetTableData>]
 let ``Inserts and deletes a batch on same partition using lightweight syntax correctly``() =
@@ -85,6 +112,20 @@ let ``Inserts and deletes a batch on same partition using lightweight syntax cor
         | [| "men", [| SuccessfulResponse _; SuccessfulResponse _ |] |] -> ()
         | res -> failwith <| sprintf "error deleting %A" res
     | res -> failwith <| sprintf "error inserting: %A" res
+
+[<Fact>]
+[<ResetTableData>]
+let ``Deletes row asyncronously using overload for single entity``() =
+    let entityToDelete = table.Get(Row "1", Partition "men");
+    table.DeleteAsync(entityToDelete.Value) |> Async.RunSynchronously |> ignore
+    test<@ table.Get(Row "1", Partition "men").IsNone @>
+
+[<Fact>]
+[<ResetTableData>]
+let ``Deletes rows asyncronously using overload for multiple entities``() =
+    let entitiesToDelete = table.GetPartition("men");
+    table.DeleteAsync(entitiesToDelete) |> Async.RunSynchronously |> ignore
+    test<@ table.GetPartition("men").Length = 0 @>
 
 [<Fact>]
 [<ResetTableData>]
@@ -114,10 +155,58 @@ let ``Inserts a row using provided types correctly``() =
 
 [<Fact>]
 [<ResetTableData>]
+let ``Inserts a row asyncronously using provided types correctly``() =
+    table.InsertAsync(Local.Domain.employeeEntity(Partition "sample", Row "x", DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc), true, "Hello", 6.1, 1)) |> Async.RunSynchronously |> ignore
+    let result = table.Get(Row "x", Partition "sample").Value
+    
+    test <@ result.PartitionKey = "sample" @>
+    test <@ result.RowKey = "x" @>
+    test <@ result.YearsWorking = 1 @>
+    test <@ result.Dob = DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc) @>
+    test <@ result.Name = "Hello" @>
+    test <@ result.Salary = 6.1 @>
+    test <@ result.IsManager = true @>
+
+[<Fact>]
+[<ResetTableData>]
 let ``Inserts many rows using provided types correctly``() =
     table.Insert [| Local.Domain.employeeEntity(Partition "sample", Row "x", DateTime.MaxValue, true, "Hello", 5.2, 2)
                     Local.Domain.employeeEntity(Partition "sample", Row "y", DateTime.MaxValue, true, "Hello", 1.8, 2) |] |> ignore
     test <@ table.GetPartition("sample").Length = 2 @>
+
+[<Fact>]
+[<ResetTableData>]
+let ``Inserts many rows asyncronously using provided types correctly``() =
+    table.InsertAsync [| Local.Domain.employeeEntity(Partition "sample", Row "x", DateTime.MaxValue, true, "Hello", 5.2, 2)
+                         Local.Domain.employeeEntity(Partition "sample", Row "y", DateTime.MaxValue, true, "Hello", 1.8, 2) |] 
+                         |> Async.RunSynchronously
+                         |> ignore
+    test <@ table.GetPartition("sample").Length = 2 @>
+
+[<Fact>]
+[<ResetTableData>]
+let ``Query with multiple batches returns all results``() =
+    [| 1 .. 1001 |]
+    |> Array.map(fun i -> sprintf "Row %i" i)
+    |> Array.map(fun i -> Local.Domain.employeeEntity(Partition "bulk insert", Row i, DateTime.MaxValue, true, "Hello", 100.0, 10 ))
+    |> table.Insert
+    |> ignore
+
+    let retrievedEntries = table.GetPartitionAsync("bulk insert") |> Async.RunSynchronously
+    test <@ retrievedEntries.Length = 1001 @>
+
+[<Fact>]
+[<ResetTableData>]
+let ``Query with multiple batches returns data in the correct order``() =
+    [| 1 .. 1001 |]
+    |> Array.map(fun i -> sprintf "Row %04i" i)
+    |> Array.map(fun i -> Local.Domain.employeeEntity(Partition "bulk insert", Row i, DateTime.MaxValue, true, "Hello", 100.0, 10 ))
+    |> table.Insert
+    |> ignore
+
+    let retrievedEntries = table.GetPartitionAsync("bulk insert") |> Async.RunSynchronously
+    test <@ retrievedEntries.[0].RowKey = "Row 0001" @>
+    test <@ retrievedEntries.[1000].RowKey = "Row 1001" @>
 
 [<Fact>]
 [<ResetTableData>]
@@ -169,7 +258,13 @@ let ``Cloud Table Client relates to the same data as the type provider``() =
 let ``DeletePartition deletes entries with given partition key``() =
     table.DeletePartition "men"
     test <@ table.Query().``Where Partition Key Is``.``Equal To``("men").Execute().Length = 0 @>
-    
+
+[<Fact>]
+[<ResetTableData>]
+let ``DeletePartitionAsync deletes entries with given partition key``() =
+    table.DeletePartitionAsync "men" |> Async.RunSynchronously
+    test <@ table.Query().``Where Partition Key Is``.``Equal To``("men").Execute().Length = 0 @>
+
 [<Fact>]
 [<ResetTableData>]
 let ``Insert suceeds for entries over 4Mb``() =
@@ -180,9 +275,7 @@ let ``Insert suceeds for entries over 4Mb``() =
     let generateBatchOfLargeEntities partitionKey size = 
         [| for i in 1 .. size do yield generateLargeEntity partitionKey (Row(Guid.NewGuid().ToString())) |]
 
-    let resultsOfInsert = 
-        generateBatchOfLargeEntities (Partition("1")) 10 
-        |> lgeTable.Insert
+    let resultsOfInsert = generateBatchOfLargeEntities (Partition "1") 10 |> lgeTable.Insert
 
     let failureCount = 
         resultsOfInsert        
@@ -190,3 +283,13 @@ let ``Insert suceeds for entries over 4Mb``() =
         |> Array.filter (function | SuccessfulResponse _ -> false | _ -> true)
         |> Array.length
     test <@ failureCount = 0 @>
+
+[<Fact>]
+[<ResetTableData>]
+let ``Async query without arguments brings back all rows``() =
+    let length =
+        async {
+            let! results = table.Query().ExecuteAsync();
+            return results.Length } 
+        |> Async.RunSynchronously
+    test <@ length = 5 @>

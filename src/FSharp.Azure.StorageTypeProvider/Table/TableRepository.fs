@@ -5,7 +5,6 @@ module FSharp.Azure.StorageTypeProvider.Table.TableRepository
 open FSharp.Azure.StorageTypeProvider.Table
 open Microsoft.WindowsAzure.Storage
 open Microsoft.WindowsAzure.Storage.Table
-open Microsoft.WindowsAzure.Storage.Table.Queryable
 open System
 
 /// Suggests batch sizes based on a given entity type and published EDM property type sizes (source: https://msdn.microsoft.com/en-us/library/dd179338.aspx)
@@ -62,19 +61,48 @@ let internal getRowsForSchema (rowCount: int) connection tableName =
     |> Seq.truncate rowCount
     |> Seq.toArray
 
+let toLightweightTableEntity (dte:DynamicTableEntity) = 
+    LightweightTableEntity(
+                    Partition dte.PartitionKey,
+                    Row dte.RowKey,
+                    dte.Timestamp,
+                    dte.Properties
+                    |> Seq.map(fun p -> p.Key, p.Value.PropertyAsObject)
+                    |> Map.ofSeq)
+
+let executeGenericQueryAsync connection tableName maxResults filterString mapToReturnEntity = async {
+    let query =
+        let query = DynamicQuery().Where(filterString)
+        if maxResults > 0 then query.Take(Nullable maxResults) else query
+    let table = getTable tableName connection
+
+    let output = ResizeArray()
+
+    let rec controlRec token = async {
+        let! rows, token = async {
+            let! batch = table.ExecuteQuerySegmentedAsync(query, token) |> Async.AwaitTask
+            return batch |> Seq.map mapToReturnEntity, batch.ContinuationToken |> Option.ofObj }
+        output.AddRange rows
+
+        do!
+            match token with
+            | Some token -> controlRec token
+            | None -> async.Return()
+
+        return () }
+
+    do! controlRec null
+    return output |> Seq.toArray }
+
+let executeQueryAsync connection tableName maxResults filterString = 
+    executeGenericQueryAsync connection tableName maxResults filterString toLightweightTableEntity
+
 let executeQuery connection tableName maxResults filterString = 
     let query = DynamicQuery().Where(filterString)
     let query = if maxResults > 0 then query.Take(Nullable maxResults) else query
 
     (getTable tableName connection).ExecuteQuery(query)
-    |> Seq.map(fun dte ->
-        LightweightTableEntity(
-            Partition dte.PartitionKey,
-            Row dte.RowKey,
-            dte.Timestamp,
-            dte.Properties
-            |> Seq.map(fun p -> p.Key, p.Value.PropertyAsObject)
-            |> Map.ofSeq))
+    |> Seq.map(toLightweightTableEntity)
     |> Seq.toArray
 
 let internal buildDynamicTableEntity(entity:LightweightTableEntity) =
@@ -107,7 +135,7 @@ let private batch size source =
         | head::tail -> doBatch output (head::currentBatch) (counter + 1) tail
     doBatch [] [] 0 (source |> Seq.toList)
 
-let internal executeBatchOperation createTableOp (table:CloudTable) entities =
+let private splitIntoBatches createTableOp entities = 
     let batchSize = entities |> Seq.head |> BatchCalculator.getBatchSize
     entities
     |> Seq.groupBy(fun (entity:DynamicTableEntity) -> entity.PartitionKey)
@@ -118,28 +146,58 @@ let internal executeBatchOperation createTableOp (table:CloudTable) entities =
                 let batchForPartition = TableBatchOperation()
                 entityBatch |> Seq.iter (createTableOp >> batchForPartition.Add)
                 partitionKey, entityBatch, batchForPartition))
-    |> Seq.map(fun (partitionKey, entityBatch, batchOperation) ->
-        let buildEntityId (entity:DynamicTableEntity) = Partition(entity.PartitionKey), Row(entity.RowKey)
-        let responses =
-            try
-            table.ExecuteBatch(batchOperation)
+
+let private processErrorResp entityBatch buildEntityId (ex:StorageException) =
+    let requestInformation = ex.RequestInformation
+    match requestInformation.ExtendedErrorInformation.ErrorMessage.Split('\n').[0].Split(':') with
+    | [|index; _|] ->
+        match Int32.TryParse(index) with
+        | true, index ->
+            entityBatch
+            |> Seq.mapi(fun entityIndex entity ->
+                if entityIndex = index then EntityError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode)
+                else BatchOperationFailedError(buildEntityId entity))
+        | _ -> entityBatch |> Seq.map(fun entity -> BatchError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
+    | [| _ |] -> entityBatch |> Seq.map(fun entity -> EntityError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
+    | _ -> entityBatch |> Seq.map(fun entity -> BatchError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
+
+let internal executeBatchAsynchronously batchOp entityBatch buildEntityId (table:CloudTable) = async{
+    let! response =  table.ExecuteBatchAsync(batchOp) |> Async.AwaitTask |> Async.Catch
+    match response with
+    | Choice1Of2 successResp -> 
+        return 
+            successResp
             |> Seq.zip entityBatch
             |> Seq.map(fun (entity, res) -> SuccessfulResponse(buildEntityId entity, res.HttpStatusCode))
-            with :? StorageException as ex ->
-            let requestInformation = ex.RequestInformation
-            match requestInformation.ExtendedErrorInformation.ErrorMessage.Split('\n').[0].Split(':') with
-            | [|index;message|] ->
-                match Int32.TryParse(index) with
-                | true, index ->
-                    entityBatch
-                    |> Seq.mapi(fun entityIndex entity ->
-                        if entityIndex = index then EntityError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode)
-                        else BatchOperationFailedError(buildEntityId entity))
-                | _ -> entityBatch |> Seq.map(fun entity -> BatchError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
-            | [|message|] -> entityBatch |> Seq.map(fun entity -> EntityError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
-            | _ -> entityBatch |> Seq.map(fun entity -> BatchError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
-        partitionKey, responses |> Seq.toArray)
+    | Choice2Of2 err ->
+        return
+            match err with
+            | :? StorageException as ex -> processErrorResp entityBatch buildEntityId ex
+            | _  -> raise (err) }
 
+let internal executeBatchSyncronously batchOp entityBatch buildEntityId (table:CloudTable) =
+    try 
+    table.ExecuteBatch(batchOp)
+    |> Seq.zip entityBatch
+    |> Seq.map(fun (entity, res) -> SuccessfulResponse(buildEntityId entity, res.HttpStatusCode))
+    with :? StorageException as ex -> processErrorResp entityBatch buildEntityId ex
+
+let internal executeBatchOperationAsync createTableOp (table:CloudTable) entities = async {
+    return!
+        splitIntoBatches createTableOp entities
+        |> Seq.map(fun (partitionKey, entityBatch, batchOperation) -> async{
+            let buildEntityId (entity:DynamicTableEntity) = Partition(entity.PartitionKey), Row(entity.RowKey)
+            let! responses = executeBatchAsynchronously batchOperation entityBatch buildEntityId table
+            return (partitionKey, responses |> Seq.toArray)
+            })
+        |> Async.Parallel }
+
+let internal executeBatchOperation createTableOp (table:CloudTable) entities =
+    splitIntoBatches createTableOp entities
+    |> Seq.map(fun (partitionKey, entityBatch, batchOperation) ->
+        let buildEntityId (entity:DynamicTableEntity) = Partition(entity.PartitionKey), Row(entity.RowKey)
+        let responses = executeBatchSyncronously batchOperation entityBatch buildEntityId table
+        partitionKey, responses |> Seq.toArray)
     |> Seq.toArray
 
 let deleteEntities connection tableName entities =
@@ -148,8 +206,27 @@ let deleteEntities connection tableName entities =
     |> Array.map buildDynamicTableEntity
     |> executeBatchOperation TableOperation.Delete table
 
+let deleteEntitiesAsync connection tableName entities = async {
+    let table = getTable tableName connection
+    return! 
+        entities
+        |> Array.map buildDynamicTableEntity
+        |> executeBatchOperationAsync TableOperation.Delete table }
+
 let deleteEntity connection tableName entity =
     deleteEntities connection tableName [| entity |] |> Seq.head |> snd |> Seq.head
+
+let deleteEntityAsync connection tableName entity = async {
+    let! resp = deleteEntitiesAsync connection tableName [| entity |] 
+    return resp |> Seq.head |> snd |> Seq.head }
+
+let insertEntityBatchAsync connection tableName insertMode entities = async {
+    let table = getTable tableName connection
+    let insertOp = createInsertOperation insertMode
+    return! 
+        entities
+        |> Seq.map buildDynamicTableEntity
+        |> executeBatchOperationAsync insertOp table }
     
 let insertEntityBatch connection tableName insertMode entities = 
     let table = getTable tableName connection
@@ -159,7 +236,11 @@ let insertEntityBatch connection tableName insertMode entities =
     |> executeBatchOperation insertOp table
 
 let insertEntity connection tableName insertMode entity = 
-    insertEntityBatch connection tableName insertMode [entity] |> Seq.head |> snd |> Seq.head    
+    insertEntityBatch connection tableName insertMode [entity] |> Seq.head |> snd |> Seq.head
+
+let insertEntityAsync connection tableName insertMode entity = async {
+    let! resp = insertEntityBatchAsync connection tableName insertMode [entity] 
+    return resp |> Seq.head |> snd |> Seq.head }
 
 let composeAllFilters filters = 
     match filters with
@@ -180,17 +261,33 @@ let buildFilter(propertyName, comparison, value) =
     | :? Guid as value -> TableQuery.GenerateFilterConditionForGuid(propertyName, comparison, value)
     | _ -> TableQuery.GenerateFilterCondition(propertyName, comparison, value.ToString())
 
-let getEntity rowKey partitionKey connection tableName = 
+let buildGetEntityQry rowKey partitionKey = 
     let (Row rowKey, Partition partitionKey) = rowKey, partitionKey
-    let results =
-        [ ("RowKey", rowKey)
-          ("PartitionKey", partitionKey) ]
-        |> List.map(fun (prop, value) -> buildFilter(prop, QueryComparisons.Equal, value))
-        |> composeAllFilters
-        |> executeQuery connection tableName 0
+    [ ("RowKey", rowKey); ("PartitionKey", partitionKey) ]
+    |> List.map(fun (prop, value) -> buildFilter(prop, QueryComparisons.Equal, value))
+    |> composeAllFilters
+
+let parseGetEntityResults results = 
     match results with
     | [| exactMatch |] -> Some exactMatch
     | _ -> None
 
+let getEntity rowKey partitionKey connection tableName = 
+    buildGetEntityQry rowKey partitionKey
+    |> executeQuery connection tableName 0
+    |> parseGetEntityResults
+
+let getEntityAsync rowKey partitionKey connection tableName = async {
+    let! results =
+        buildGetEntityQry rowKey partitionKey
+        |> executeQueryAsync connection tableName 0
+    return results |> parseGetEntityResults }
+
 let getPartitionRows (partitionKey:string) connection tableName = 
-    buildFilter("PartitionKey", QueryComparisons.Equal, partitionKey) |> executeQuery connection tableName 0
+    buildFilter("PartitionKey", QueryComparisons.Equal, partitionKey)
+    |> executeQuery connection tableName 0
+
+let getPartitionRowsAsync (partitionKey:string) connection tableName = async {
+    return!
+        buildFilter("PartitionKey", QueryComparisons.Equal, partitionKey)
+        |> executeQueryAsync connection tableName 0 } 
