@@ -20,7 +20,6 @@ let private getDistinctProperties tableEntities =
             if initialRun then
                 optionals, entity, false
             else
-                
                 let optionals = (mandatory - entity) + (entity - mandatory) + optionals
                 let mandatory = Set.intersect mandatory entity
                 optionals, mandatory, false)
@@ -36,13 +35,13 @@ let private buildEntityProperty<'a> key need =
         | PropertyNeed.Mandatory ->
             fun (args : Expr list) -> 
                 <@@ let entity = (%%args.[0] : LightweightTableEntity)
-                    if entity.Values.ContainsKey(key) then entity.Values.[key] :?> 'a
+                    if entity.Values.ContainsKey key then entity.Values.[key] :?> 'a
                     else Unchecked.defaultof<'a> @@>
             , typeof<'a>
         | PropertyNeed.Optional ->
             fun (args : Expr list) -> 
                 <@@ let entity = (%%args.[0] : LightweightTableEntity)
-                    if entity.Values.ContainsKey(key) then Some(entity.Values.[key] :?> 'a)
+                    if entity.Values.ContainsKey key then Some(entity.Values.[key] :?> 'a)
                     else None @@>
             , typeof<Option<'a>>
     
@@ -84,7 +83,9 @@ let setPropertiesForEntity (entityType : ProvidedTypeDefinition) (sampleEntities
     let buildParameter name need buildType =
         match need with
         | Mandatory -> ProvidedParameter(name, buildType)
-        | Optional -> ProvidedParameter(name, buildType, optionalValue = None)
+        | Optional ->
+            let optionOfBuildType = typeof<Option<_>>.GetGenericTypeDefinition().MakeGenericType(buildType)
+            ProvidedParameter(name, optionOfBuildType, optionalValue = None)
 
     // Build a constructor as well.
     entityType.AddMemberDelayed(fun () -> 
@@ -98,20 +99,18 @@ let setPropertiesForEntity (entityType : ProvidedTypeDefinition) (sampleEntities
         ProvidedConstructor(
             parameters, 
             InvokeCode = fun args ->
-                printfn "Args: %A" (args |> List.map(fun a -> a, a.Type))
                 let fieldValues = 
                     args
                     |> Seq.skip 2
                     |> Seq.map (fun arg -> Expr.Coerce(arg, typeof<obj>))
                     |> Seq.toList
 
-                printfn "Values: %A" fieldValues
                 let fieldNames =
                     (mandatoryParams @ optionalParams)
                     |> Seq.take fieldValues.Length
                     |> Seq.map(fun (name, _, _) -> name)
                     |> Seq.toList
-                printfn "Names: %A" fieldNames
+
                 <@@ buildTableEntity (%%args.[0] : Partition) (%%args.[1] : Row) fieldNames (%%(Expr.NewArray(typeof<obj>, fieldValues))) @@>))
     properties
 
