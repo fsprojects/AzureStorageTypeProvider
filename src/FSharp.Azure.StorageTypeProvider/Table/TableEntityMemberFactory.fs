@@ -84,7 +84,7 @@ let setPropertiesForEntity (entityType : ProvidedTypeDefinition) (sampleEntities
     let buildParameter name need buildType =
         match need with
         | Mandatory -> ProvidedParameter(name, buildType)
-        | Optional -> ProvidedParameter(name, buildType, optionalValue = true)
+        | Optional -> ProvidedParameter(name, buildType, optionalValue = None)
 
     // Build a constructor as well.
     entityType.AddMemberDelayed(fun () -> 
