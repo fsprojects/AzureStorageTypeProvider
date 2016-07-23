@@ -12,22 +12,22 @@ type Local = AzureTypeProvider<"DevStorageAccount", "">
 
 type ResetQueueDataAttribute() =
     inherit BeforeAfterTestAttribute()
-    override x.Before(methodUnderTest) = QueueHelpers.resetData()
-    override x.After(methodUnderTest) = QueueHelpers.resetData()
+    override __.Before _ = QueueHelpers.resetData()
+    override __.After _ = QueueHelpers.resetData()
 
 [<Fact>]
 let ``Correctly identifies queues``() =
     // compiles!
     Local.Queues.``sample-queue`` |> ignore
     Local.Queues.``second-sample`` |> ignore
-    Local.Queues.``third-sample``
+    Local.Queues.``third-sample`` |> ignore
 
 let queue = Local.Queues.``sample-queue``
 
 [<Fact>]
 [<ResetQueueData>]
 let ``Enqueues a message``() =
-    queue.Enqueue("Foo") |> Async.RunSynchronously
+    queue.Enqueue "Foo" |> Async.RunSynchronously
     test <@ queue.GetCurrentLength() = 1 @>
 
 [<Fact>]
@@ -36,7 +36,7 @@ let ``Dequeues a message``() =
     let message = async { do! queue.Enqueue "Foo"
                           return! queue.Dequeue() }
                   |> Async.RunSynchronously
-    test <@ message.Value.AsString = "Foo" @>
+    test <@ message.Value.AsString.Value = "Foo" @>
 
 [<Fact>]
 [<ResetQueueData>]
@@ -44,14 +44,22 @@ let ``Dequeues a message of bytes``() =
     let message = async { do! queue.Enqueue [| 0uy; 1uy; 2uy; |]
                           return! queue.Dequeue() }
                   |> Async.RunSynchronously
-    test <@ message.Value.AsBytes = [| 0uy; 1uy; 2uy; |] @>
+    test <@ message.Value.AsBytes.Value = [| 0uy; 1uy; 2uy; |] @>
+
+[<Fact(Skip = "Waiting for reproducable test case")>]
+[<ResetQueueData>]
+let ``Safely supports lazy evaluation of "bad data"``() =
+    let message = async { do! queue.Enqueue [| 0uy; 1uy; 2uy; |]
+                          return! queue.Dequeue() }
+                  |> Async.RunSynchronously
+    test <@ message.Value.AsString.Value <> null @>
 
 [<Fact>]
 [<ResetQueueData>]
 let ``Deletes a message``() =
     async { do! queue.Enqueue "Foo"
             let! message = queue.Dequeue()
-            do! queue.DeleteMessage(message.Value.Id) }
+            do! queue.DeleteMessage message.Value.Id }
     |> Async.RunSynchronously
     test <@ queue.GetCurrentLength() = 0 @>
 
@@ -69,7 +77,7 @@ let ``Update Message affects the text message body``() =
                           return! queue.Dequeue() }
                   |> Async.RunSynchronously
 
-    test <@ message.Value.AsString = "Bar" @>
+    test <@ message.Value.AsString.Value = "Bar" @>
 
 [<Fact>]
 [<ResetQueueData>]
@@ -80,7 +88,7 @@ let ``Update Message affects the bytes message body``() =
                           return! queue.Dequeue() }
                   |> Async.RunSynchronously
 
-    test <@ message.Value.AsBytes = [| 2uy; 1uy; 0uy |] @>
+    test <@ message.Value.AsBytes.Value = [| 2uy; 1uy; 0uy |] @>
 
 [<Fact>]
 [<ResetQueueData>]
@@ -88,9 +96,9 @@ let ``Dequeue Count is correctly emitted``() =
     let message = async {
             do! queue.Enqueue("Foo")
             let! message = queue.Dequeue()
-            do! queue.UpdateMessage(message.Value.Id, TimeSpan.FromSeconds(0.))
+            do! queue.UpdateMessage(message.Value.Id, TimeSpan.FromSeconds 0.)
             let! message = queue.Dequeue()
-            do! queue.UpdateMessage(message.Value.Id, TimeSpan.FromSeconds(0.))
+            do! queue.UpdateMessage(message.Value.Id, TimeSpan.FromSeconds 0.)
             return! queue.Dequeue() } |> Async.RunSynchronously
     test <@ message.Value.DequeueCount = 3 @>
 

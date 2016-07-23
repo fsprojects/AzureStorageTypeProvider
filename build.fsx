@@ -83,8 +83,11 @@ Target "CleanDocs" (fun _ -> CleanDirs ["docs/output"])
 // --------------------------------------------------------------------------------------
 // Build library & test project
 
+// --------------------------------------------------------------------------------------
+// Build library & test project
+
 Target "Build" (fun _ ->
-    !!("*.sln")
+    !!("FSharp.Azure.StorageTypeProvider.sln")
     |> MSBuildRelease "" "Rebuild"
     |> ignore)
 
@@ -102,14 +105,16 @@ Target "ResetTestData" (fun _ ->
 
     { defaultParams with
         CommandLine = "start"
-        Program = combinePaths ProgramFilesX86 emulatorPath } |> shellExec |> ignore
+        Program = ProgramFilesX86 </> emulatorPath } |> shellExec |> ignore
     FSIHelper.executeFSI (Path.Combine(__SOURCE_DIRECTORY__, @"tests\IntegrationTests")) "ResetTestData.fsx" []
     |> snd
     |> Seq.iter(fun x -> printfn "%s" x.Message)
 )
 
 // Run integration tests
-Target "RunTests" (fun _ -> !!(testAssemblies) |> xUnit id)
+Target "RunTests" (fun _ ->
+    !!("UnitTests.sln") |> MSBuildRelease "" "Rebuild" |> ignore
+    !!(testAssemblies) |> xUnit id)
 
 // --------------------------------------------------------------------------------------
 // Build a NuGet package
@@ -249,20 +254,17 @@ Target "All" DoNothing
   ==> "ResetTestData"
   ==> "Build"
   ==> "RunTests"
-  =?> ("GenerateReferenceDocs",isLocalBuild && not isMono)
-  =?> ("GenerateDocs",isLocalBuild && not isMono)
-  ==> "All"
-  =?> ("ReleaseDocs",isLocalBuild && not isMono)
 
-"All"
+"RunTests"
   ==> "NuGet"
   ==> "LocalDeploy"
   ==> "BuildPackage"
-
-"CleanDocs"
+"RunTests"
+  ==> "CleanDocs"
   ==> "GenerateHelp"
   ==> "GenerateReferenceDocs"
   ==> "GenerateDocs"
+  ==> "ReleaseDocs"
 
 "CleanDocs"
   ==> "GenerateHelpDebug"
@@ -270,10 +272,8 @@ Target "All" DoNothing
 "GenerateHelp"
   ==> "KeepRunning"
     
-"ReleaseDocs"
-  ==> "Release"
-
 "BuildPackage"
+"ReleaseDocs"
   ==> "Release"
 
 RunTargetOrDefault "RunTests"

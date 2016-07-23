@@ -46,3 +46,8 @@
 * Delete entire partitions
 * Better handling with large batches
 * Blob listing on folders
+
+### 1.6.0 - ???
+* Async support for Tables
+* BREAKING CHANGE: Lazy deserialization of AsString and AsBytes members on Queue messages. 
+* Minor bug fixes
