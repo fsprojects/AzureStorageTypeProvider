@@ -83,8 +83,11 @@ Target "CleanDocs" (fun _ -> CleanDirs ["docs/output"])
 // --------------------------------------------------------------------------------------
 // Build library & test project
 
+// --------------------------------------------------------------------------------------
+// Build library & test project
+
 Target "Build" (fun _ ->
-    !!("*.sln")
+    !!("FSharp.Azure.StorageTypeProvider.sln")
     |> MSBuildRelease "" "Rebuild"
     |> ignore)
 
@@ -109,7 +112,9 @@ Target "ResetTestData" (fun _ ->
 )
 
 // Run integration tests
-Target "RunTests" (fun _ -> !!(testAssemblies) |> xUnit id)
+Target "RunTests" (fun _ ->
+    !!("UnitTests.sln") |> MSBuildRelease "" "Rebuild" |> ignore
+    !!(testAssemblies) |> xUnit id)
 
 // --------------------------------------------------------------------------------------
 // Build a NuGet package
