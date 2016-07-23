@@ -93,12 +93,9 @@ type AzureTable internal (defaultConnection, tableName) =
     /// Asynchronously deletes an entire partition from the table
     member __.DeletePartitionAsync(partitionKey, ?connectionString) = async {
         let table = getTableForConnection (defaultArg connectionString defaultConnection)
-        let connStringToUse = 
-            match connectionString with
-            | Some c -> c
-            | None -> defaultConnection
+        let connectionString = defaultArg connectionString defaultConnection
         let filter = Table.TableQuery.GenerateFilterCondition ("PartitionKey", Table.QueryComparisons.Equal, partitionKey)
-        let! response = executeGenericQueryAsync connStringToUse table.Name Int32.MaxValue filter (fun e -> (Partition(e.PartitionKey), Row(e.RowKey)))
+        let! response = executeGenericQueryAsync connectionString table.Name Int32.MaxValue filter (fun e -> (Partition(e.PartitionKey), Row(e.RowKey)))
         return!
             response
             |> __.DeleteAsync
