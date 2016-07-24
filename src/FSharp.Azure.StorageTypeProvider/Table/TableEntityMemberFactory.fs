@@ -115,11 +115,11 @@ let setPropertiesForEntity (entityType : ProvidedTypeDefinition) (sampleEntities
     properties
 
 /// Gets all the members for a Table Entity type
-let buildTableEntityMembers (parentTableType:ProvidedTypeDefinition, parentTableEntityType, domainType:ProvidedTypeDefinition, connection, tableName) = 
+let buildTableEntityMembers schemaInferenceRowCount (parentTableType:ProvidedTypeDefinition, parentTableEntityType, domainType:ProvidedTypeDefinition, connection, tableName) = 
     parentTableType.AddMembersDelayed(fun () ->
         let propertiesCreated = 
             tableName
-            |> getRowsForSchema 10 connection
+            |> getRowsForSchema schemaInferenceRowCount connection
             |> setPropertiesForEntity parentTableEntityType
         match propertiesCreated with
         | [] -> []

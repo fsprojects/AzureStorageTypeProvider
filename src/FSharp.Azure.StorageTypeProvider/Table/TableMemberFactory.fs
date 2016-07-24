@@ -6,13 +6,13 @@ open Microsoft.WindowsAzure.Storage.Table
 open ProviderImplementation.ProvidedTypes
 
 /// Builds up the Table Storage member
-let getTableStorageMembers (connectionString, domainType : ProvidedTypeDefinition) =     
+let getTableStorageMembers schemaInferenceRowCount (connectionString, domainType : ProvidedTypeDefinition) =     
     /// Creates an individual Table member
     let createTableType connectionString tableName = 
         let tableEntityType = ProvidedTypeDefinition(tableName + "Entity", Some typeof<LightweightTableEntity>, HideObjectMethods = true)
         let tableType = ProvidedTypeDefinition(tableName + "Table", Some typeof<AzureTable>, HideObjectMethods = true)
         domainType.AddMembers [ tableEntityType; tableType ]
-        TableEntityMemberFactory.buildTableEntityMembers (tableType, tableEntityType, domainType, connectionString, tableName)
+        TableEntityMemberFactory.buildTableEntityMembers schemaInferenceRowCount (tableType, tableEntityType, domainType, connectionString, tableName)
         let tableProp = ProvidedProperty(tableName, tableType, GetterCode = (fun _ -> <@@ TableBuilder.createAzureTable connectionString tableName @@>))
         tableProp.AddXmlDoc <| sprintf "Provides access to the '%s' table." tableName
         tableProp

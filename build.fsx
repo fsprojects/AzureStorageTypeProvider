@@ -251,8 +251,8 @@ Target "All" DoNothing
 
 "Clean"
   ==> "AssemblyInfo"
-  ==> "ResetTestData"
   ==> "Build"
+  ==> "ResetTestData"
   ==> "RunTests"
 
 "RunTests"

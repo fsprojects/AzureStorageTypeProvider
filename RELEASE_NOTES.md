@@ -50,4 +50,5 @@
 ### 1.6.0 - ???
 * Async support for Tables
 * BREAKING CHANGE: Lazy deserialization of AsString and AsBytes members on Queue messages. 
+* BREAKING CHANGE: Automatic inference of option types for fields that are missing for some rows.
 * Minor bug fixes
