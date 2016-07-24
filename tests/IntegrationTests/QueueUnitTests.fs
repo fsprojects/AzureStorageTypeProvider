@@ -6,6 +6,8 @@ open Swensen.Unquote
 open Swensen.Unquote.Operators
 open System
 open System.Linq
+open System.Net
+open System.Text
 open Xunit
 
 type Local = AzureTypeProvider<"DevStorageAccount", "">
@@ -46,13 +48,23 @@ let ``Dequeues a message of bytes``() =
                   |> Async.RunSynchronously
     test <@ message.Value.AsBytes.Value = [| 0uy; 1uy; 2uy; |] @>
 
-[<Fact(Skip = "Waiting for reproducable test case")>]
+[<Fact>]
 [<ResetQueueData>]
 let ``Safely supports lazy evaluation of "bad data"``() =
-    let message = async { do! queue.Enqueue [| 0uy; 1uy; 2uy; |]
-                          return! queue.Dequeue() }
-                  |> Async.RunSynchronously
-    test <@ message.Value.AsString.Value <> null @>
+    let uri =
+        let sas = queue.GenerateSharedAccessSignature(TimeSpan.FromDays 7.)
+        sprintf "http://127.0.0.1:10001/devstoreaccount1/%s/messages%s" queue.Name sas
+
+    //Create a broken message to send to the queue. The queue system expects "Test" to be a Base64 encoded string.
+    let request = Encoding.UTF8.GetBytes @"<QueueMessage><MessageText>Test</MessageText></QueueMessage>"
+    
+    // Send the request
+    use wc = new WebClient()
+    wc.UploadData(uri, request) |> ignore
+
+    let msg = queue.Dequeue() |> Async.RunSynchronously
+    test <@ msg.IsSome @>
+    raises<DecoderFallbackException> <@ msg.Value.AsString.Value @>
 
 [<Fact>]
 [<ResetQueueData>]
@@ -131,7 +143,7 @@ let ``Cloud Queue is the same queue as the Type Provider``() =
 [<ResetQueueData>]
 let ``Queue message with visibility timeout reappears correctly``() =
     queue.Enqueue "test" |> Async.RunSynchronously
-    let message = queue.Dequeue(TimeSpan.FromSeconds 1.) |> Async.RunSynchronously
+    do queue.Dequeue(TimeSpan.FromSeconds 1.) |> Async.RunSynchronously |> ignore
     Threading.Thread.Sleep 2000
     let message = queue.Dequeue() |> Async.RunSynchronously
     test <@ Option.isSome message @>
