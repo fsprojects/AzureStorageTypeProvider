@@ -293,7 +293,7 @@ let ``Async query without arguments brings back all rows``() =
 [<Fact>]
 [<ResetTableData>]
 let ``Missing fields are correctly shown as optionals``() =
-    let row = Local.Tables.optionals.Get(Row "1", Partition "men")
+    let row = Local.Tables.optionals.Get(Row "1", Partition "partition")
     test <@ row.IsSome @>
     
     // Compiles!

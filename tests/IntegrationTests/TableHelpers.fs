@@ -81,5 +81,5 @@ let resetData() =
     employeeTable |> insertRow("women", 2, "rachel", 20, DateTime(1965, 8, 20, 0, 0, 0, DateTimeKind.Utc), 5.5, false)
 
     let optionalTable = recreateTable "optionals"
-    optionalTable |> insertRow("men", 1, "fred", 10, DateTime(1990, 5, 1, 0, 0, 0, DateTimeKind.Utc), 0., true)
-    optionalTable |> insertSampleRow("men", 2, "fred", DateTime(1990, 5, 1, 0, 0, 0, DateTimeKind.Utc), 0., true, false)
+    optionalTable |> insertRow("partition", 1, "fred", 10, DateTime(1990, 5, 1, 0, 0, 0, DateTimeKind.Utc), 0., true)
+    optionalTable |> insertSampleRow("partition", 2, "fred", DateTime(1990, 5, 1, 0, 0, 0, DateTimeKind.Utc), 0., true, false)
