@@ -5,7 +5,6 @@ open FSharp.Azure.StorageTypeProvider.Queue
 open System.Xml.Linq
 open System
 type Azure = AzureTypeProvider<"UseDevelopmentStorage=true">
-let printMessage (msg:ProvidedQueueMessage) = printfn "Message %A with body '%s' has been dequeued %d times." msg.Id msg.AsString msg.DequeueCount
 (**
 Working with Queues
 ==================
@@ -29,8 +28,7 @@ printfn "Queue '%s' has %d items on it." queue.Name (queue.GetCurrentLength())
 ## Processing messages
 It is easy to push and pop messages onto / off a queue - simply call the Enqueue() and Dequeue()
 methods on the appropriate queue. Enqueue will return an option message, in case there is nothing
-on the queue. Once you have finished processing the message, simply call Delete().
-*)
+on the queue. Once you have finished processing the message, simply call Delete(). *)
 
 (*** define-output: queue1 ***)
 async {
@@ -55,9 +53,13 @@ async {
 (**
 ## Modifying Queues
 You can easily modify the contents of an existing message and push it back onto the queue, or clear
-the queue entirely.
+the queue entirely. Note that the properties to access the payload (AsString and AsBytes) are lazily
+evaluated and as such are exposed as Lazy<T>.
 *)
 (*** define-output: queue2 ***)
+let printMessage msg =
+    printfn "Message %A with body '%s' has been dequeued %d times." msg.Id msg.AsString.Value msg.DequeueCount
+
 async {
     printfn "Enqueuing a message!"
     do! queue.Enqueue("Hello from Azure Type Provider")
