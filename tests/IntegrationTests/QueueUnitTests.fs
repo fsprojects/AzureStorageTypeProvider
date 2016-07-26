@@ -107,13 +107,13 @@ let ``Update Message affects the bytes message body``() =
 let ``Dequeue Count is correctly emitted``() =
     let message = async {
             do! queue.Enqueue("Foo")
-            do! Async.Sleep 250
+            do! Async.Sleep 100
             let! message = queue.Dequeue()
             do! queue.UpdateMessage(message.Value.Id, TimeSpan.FromSeconds 0.)
-            do! Async.Sleep 250
+            do! Async.Sleep 100
             let! message = queue.Dequeue()
             do! queue.UpdateMessage(message.Value.Id, TimeSpan.FromSeconds 0.)
-            do! Async.Sleep 250
+            do! Async.Sleep 100
             return! queue.Dequeue() } |> Async.RunSynchronously
     test <@ message.Value.DequeueCount = 3 @>
 

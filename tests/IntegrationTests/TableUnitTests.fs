@@ -15,8 +15,8 @@ let lgeTable = Local.Tables.large
 
 type ResetTableDataAttribute() =
     inherit BeforeAfterTestAttribute()
-    override x.Before(methodUnderTest) = TableHelpers.resetData()
-    override x.After(methodUnderTest) = TableHelpers.resetData()
+    override __.Before _ = TableHelpers.resetData()
+    override __.After _ = TableHelpers.resetData()
 
 [<Fact>]
 let ``Correctly identifies tables``() =
@@ -181,34 +181,23 @@ let ``Inserts many rows using provided types correctly``() =
 let ``Inserts many rows asyncronously using provided types correctly``() =
     table.InsertAsync [| Local.Domain.employeeEntity(Partition "sample", Row "x", DateTime.MaxValue, true, "Hello", 5.2, 2)
                          Local.Domain.employeeEntity(Partition "sample", Row "y", DateTime.MaxValue, true, "Hello", 1.8, 2) |] 
-                         |> Async.RunSynchronously
-                         |> ignore
+    |> Async.RunSynchronously
+    |> ignore
     test <@ table.GetPartition("sample").Length = 2 @>
 
 [<Fact>]
 [<ResetTableData>]
-let ``Query with multiple batches returns all results``() =
+let ``Query with multiple batches returns all results in the correct order``() =
     [| 1 .. 1001 |]
-    |> Array.map(fun i -> sprintf "Row %i" i)
+    |> Array.map(sprintf "%04i")
     |> Array.map(fun i -> Local.Domain.employeeEntity(Partition "bulk insert", Row i, DateTime.MaxValue, true, "Hello", 100.0, 10 ))
     |> table.Insert
     |> ignore
 
     let retrievedEntries = table.GetPartitionAsync("bulk insert") |> Async.RunSynchronously
     test <@ retrievedEntries.Length = 1001 @>
-
-[<Fact>]
-[<ResetTableData>]
-let ``Query with multiple batches returns data in the correct order``() =
-    [| 1 .. 1001 |]
-    |> Array.map(fun i -> sprintf "Row %04i" i)
-    |> Array.map(fun i -> Local.Domain.employeeEntity(Partition "bulk insert", Row i, DateTime.MaxValue, true, "Hello", 100.0, 10 ))
-    |> table.Insert
-    |> ignore
-
-    let retrievedEntries = table.GetPartitionAsync("bulk insert") |> Async.RunSynchronously
-    test <@ retrievedEntries.[0].RowKey = "Row 0001" @>
-    test <@ retrievedEntries.[1000].RowKey = "Row 1001" @>
+    test <@ retrievedEntries.[0].RowKey = "0001" @>
+    test <@ retrievedEntries.[1000].RowKey = "1001" @>
 
 [<Fact>]
 let ``Query without arguments brings back all rows``() =
