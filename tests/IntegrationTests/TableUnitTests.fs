@@ -56,7 +56,7 @@ let ``Non matching row key returns None``() =
 
 [<Fact>]
 [<ResetTableData>]
-let ``Delete called with empty entitites sequnce should not throw``() =
+let ``Delete called with empty sequence should not fail``() =
      table.Delete []
 
 [<Fact>]
