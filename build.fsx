@@ -114,6 +114,7 @@ Target "ResetTestData" (fun _ ->
 open Fake.AppVeyor
 Target "RunTests" (fun _ ->
     !!("UnitTests.sln") |> MSBuildRelease "" "Rebuild" |> ignore
+    FileHelper.CreateDir "TestOutput"
     !!(testAssemblies) |> xUnit (fun args -> { args with XmlOutputPath = Some "TestOutput/xml" })
     if buildServer = AppVeyor then UploadTestResultsXml TestResultsType.Xunit "TestOutput")
 
