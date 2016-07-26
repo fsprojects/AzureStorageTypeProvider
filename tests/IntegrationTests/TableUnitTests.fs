@@ -1,4 +1,4 @@
-﻿module ``Table Unit Tests``
+﻿module ``Table Tests``
 
 open FSharp.Azure.StorageTypeProvider
 open FSharp.Azure.StorageTypeProvider.Table

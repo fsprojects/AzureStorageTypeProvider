@@ -1,4 +1,4 @@
-﻿module ``Blob Unit Tests``
+﻿module ``Blob Tests``
 
 open FSharp.Azure.StorageTypeProvider
 open Microsoft.WindowsAzure.Storage.Blob
