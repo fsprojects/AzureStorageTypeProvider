@@ -48,12 +48,10 @@ type BlobFile internal (defaultConnectionString, container, file, getBlobRef : _
     member this.OpenStreamAsText() = new StreamReader(this.OpenStream())
 
     /// Lazily read the contents of this blob a line at a time.
-    member this.ReadLines() =
-        seq {
-            use stream = this.OpenStreamAsText()
-            while not stream.EndOfStream do
-                yield stream.ReadLine()
-        }
+    member this.ReadLines() = seq {
+        use stream = this.OpenStreamAsText()
+        while not stream.EndOfStream do
+            yield stream.ReadLine() }
 
     /// Gets the blob size in bytes.
     member __.Size = blobProperties.Value.Length
@@ -90,11 +88,9 @@ type XmlFile internal (defaultConnectionString, container, file) =
     member this.ReadAsXDocument(?connectionString) = this.Read(defaultArg connectionString defaultConnectionString) |> XDocument.Parse
     
     /// Reads this file as an XDocument asynchronously.
-    member this.ReadAsXDocumentAsync(?connectionString) =
-        async {
-            let! text = this.ReadAsync(defaultArg connectionString defaultConnectionString)
-            return XDocument.Parse text
-        }
+    member this.ReadAsXDocumentAsync(?connectionString) = async {
+        let! text = this.ReadAsync(defaultArg connectionString defaultConnectionString)
+        return XDocument.Parse text }
 
 module BlobBuilder = 
     let internal (|Text|Binary|XML|) (name : string) = 

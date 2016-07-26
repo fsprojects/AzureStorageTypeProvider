@@ -41,8 +41,8 @@ module internal Factory =
           InsertionTime = message.InsertionTime |> Option.ofNullable
           ExpirationTime = message.ExpirationTime |> Option.ofNullable
           NextVisibleTime = message.NextVisibleTime |> Option.ofNullable
-          AsBytes = Lazy.Create(fun _ -> message.AsBytes)
-          AsString = Lazy.Create(fun _ -> message.AsString) }
+          AsBytes = lazy message.AsBytes
+          AsString = lazy message.AsString }
     
     let toAzureQueueMessage providedMessageId = 
         let messageId, popReceipt = providedMessageId |> unpackId
