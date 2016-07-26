@@ -1,4 +1,4 @@
-﻿module FSharp.Azure.StorageTypeProvider.``Queue Unit Tests``
+﻿module ``Queue Unit Tests``
 
 open FSharp.Azure.StorageTypeProvider
 open FSharp.Azure.StorageTypeProvider.Queue
