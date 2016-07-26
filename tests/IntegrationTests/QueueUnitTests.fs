@@ -85,7 +85,8 @@ let ``Dequeue with nothing on the queue returns None``() =
 let ``Update Message affects the text message body``() =
     let message = async { do! queue.Enqueue "Foo"
                           let! message = queue.Dequeue()
-                          do! queue.UpdateMessage(message.Value.Id, "Bar", TimeSpan.FromSeconds(0.))
+                          do! queue.UpdateMessage(message.Value.Id, "Bar", TimeSpan.FromSeconds 0.)
+                          do! Async.Sleep 100
                           return! queue.Dequeue() }
                   |> Async.RunSynchronously
 
@@ -96,7 +97,8 @@ let ``Update Message affects the text message body``() =
 let ``Update Message affects the bytes message body``() =
     let message = async { do! queue.Enqueue [| 0uy; 1uy; 2uy |]
                           let! message = queue.Dequeue()
-                          do! queue.UpdateMessage(message.Value.Id, [| 2uy; 1uy; 0uy |], TimeSpan.FromSeconds(0.))
+                          do! queue.UpdateMessage(message.Value.Id, [| 2uy; 1uy; 0uy |], TimeSpan.FromSeconds 0.)
+                          do! Async.Sleep 100
                           return! queue.Dequeue() }
                   |> Async.RunSynchronously
 
