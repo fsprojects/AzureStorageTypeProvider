@@ -122,7 +122,7 @@ let frame =
 ##Querying data
 The storage provider has an easy-to-use query API that is also flexble and powerful, and uses the 
 inferred schema to generate the appropriate query functionality. Data can be queried in several
-ways: -
+ways, both synchronously or asynchronously: -
 
 ###Key Lookups
 These are the simplest (and best performing) queries, based on a partition / row key combination,
@@ -130,6 +130,7 @@ returning an optional result. You can also retrieve an entire partition.
 *)
 let sara = employeeTable.Get(Row "1", Partition "women") // try to get a single row
 let allWomen = employeeTable.GetPartition("women") // get all rows in the "women" partition
+let allWomenAsync = employeeTable.GetPartitionAsync "women" |> Async.RunSynchronously // As above but async version
 
 (**
 ###Plain Text Queries
@@ -200,6 +201,7 @@ Both mechanisms will also return a TableResponse discriminated union on the outc
 
 type Person = { Name : string; City : string }
 let emptyTable = Azure.Tables.emptytable
+
 // insert a single row into an empty table
 let response = emptyTable.Insert(Partition "Europe", Row "1", { Name = "Isaac"; City = "London" })
 
@@ -241,14 +243,19 @@ let batchResults = emptyTable.Insert(people)
 
 (**
 ##Deleting data
-Delete data is also extremely easy - simply supply the set of Partition / Row Key combinations that
-you wish to delete. Unfortunately there is no way to delete an entire partition - this is a limitation
-of the Table Storage service 
-*)
+Deleting data is also extremely easy - simply supply the set of Partition / Row Key combinations that
+you wish to delete. *)
 
-let deleteResult = emptyTable.Delete [ for row in 1 .. 3 -> Partition "Europe", Row (row.ToString()) ]
+let deleteResult = emptyTable.Delete [ for row in 1 .. 2 -> Partition "Europe", Row (row.ToString()) ]
 
 (*** include-value: deleteResult ***)
+
+(** Alternatively, you can delete an entire partition (although due to the limitations
+of the Table Storage service, this will require loading all row keys for that partition into memory). *)
+
+let deletePartitionResult = emptyTable.DeletePartition "Europe"
+
+(*** include-value: deletePartitionResult ***)
 
 (**
 ##Error handling

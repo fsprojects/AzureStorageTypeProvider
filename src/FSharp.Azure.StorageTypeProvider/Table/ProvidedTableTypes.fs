@@ -45,6 +45,10 @@ type AzureTable internal (defaultConnection, tableName) =
                 LightweightTableEntity(partitionKey, rowKey, DateTimeOffset.MinValue, values) |> buildDynamicTableEntity)
         tblEntities, insertOp, table
     
+    let getSinglePartitionResult partitionKey = function
+        | [| partition |] -> partition
+        | _ -> partitionKey, [||]
+
     /// Gets a handle to the Azure SDK client for this table.
     member __.AsCloudTable(?connectionString) = getTableForConnection (defaultArg connectionString defaultConnection)
 
@@ -93,29 +97,26 @@ type AzureTable internal (defaultConnection, tableName) =
             let Partition(partitionKey), Row(rowKey) = entityId
             DynamicTableEntity(partitionKey, rowKey, ETag = "*"))
         |> executeBatchOperationAsync TableOperation.Delete table }
-        
+       
     /// Deletes an entire partition from the table
     member __.DeletePartition(partitionKey, ?connectionString) = 
         let table = getTableForConnection (defaultArg connectionString defaultConnection)
         let filter = Table.TableQuery.GenerateFilterCondition ("PartitionKey", Table.QueryComparisons.Equal, partitionKey)
-        let projection = [|"RowKey"|]
 
-        (new Table.TableQuery<Table.DynamicTableEntity>()).Where(filter).Select(projection)
+        (new Table.TableQuery<Table.DynamicTableEntity>()).Where(filter).Select [| "RowKey" |]
         |> table.ExecuteQuery
-        |> Seq.map(fun e -> (Partition(e.PartitionKey), Row(e.RowKey)))
+        |> Seq.map(fun e -> (Partition e.PartitionKey, Row e.RowKey))
         |> __.Delete
-        |> ignore   
-        
+        |> getSinglePartitionResult partitionKey
+ 
     /// Asynchronously deletes an entire partition from the table
     member __.DeletePartitionAsync(partitionKey, ?connectionString) = async {
         let table = getTableForConnection (defaultArg connectionString defaultConnection)
         let connectionString = defaultArg connectionString defaultConnection
         let filter = Table.TableQuery.GenerateFilterCondition ("PartitionKey", Table.QueryComparisons.Equal, partitionKey)
-        let! response = executeGenericQueryAsync connectionString table.Name Int32.MaxValue filter (fun e -> (Partition(e.PartitionKey), Row(e.RowKey)))
-        return!
-            response
-            |> __.DeleteAsync
-            |> Async.Ignore }
+        let! queryResponse = executeGenericQueryAsync connectionString table.Name Int32.MaxValue filter (fun e -> (Partition e.PartitionKey, Row e.RowKey))
+        let! deleteResponse = queryResponse |> __.DeleteAsync
+        return deleteResponse |> getSinglePartitionResult partitionKey }
     
     /// Gets the name of the table.
     member __.Name = tableName
