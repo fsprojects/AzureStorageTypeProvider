@@ -152,17 +152,20 @@ let private batch size source =
         | head::tail -> doBatch output (head::currentBatch) (counter + 1) tail
     doBatch [] [] 0 (source |> Seq.toList)
 
-let private splitIntoBatches createTableOp entities = 
-    let batchSize = entities |> Seq.head |> BatchCalculator.getBatchSize
-    entities
-    |> Seq.groupBy(fun (entity:DynamicTableEntity) -> entity.PartitionKey)
-    |> Seq.collect(fun (partitionKey, entities) -> 
-           entities
-           |> batch batchSize
-           |> Seq.map(fun entityBatch ->
-                let batchForPartition = TableBatchOperation()
-                entityBatch |> Seq.iter (createTableOp >> batchForPartition.Add)
-                partitionKey, entityBatch, batchForPartition))
+let private splitIntoBatches createTableOp entities =
+    match entities with
+    | entities when Seq.isEmpty entities -> Seq.empty
+    | entities -> 
+        let batchSize = entities |> Seq.head |> BatchCalculator.getBatchSize
+        entities
+        |> Seq.groupBy(fun (entity:DynamicTableEntity) -> entity.PartitionKey)
+        |> Seq.collect(fun (partitionKey, entities) -> 
+                entities
+                |> batch batchSize
+                |> Seq.map(fun entityBatch ->
+                    let batchForPartition = TableBatchOperation()
+                    entityBatch |> Seq.iter (createTableOp >> batchForPartition.Add)
+                    partitionKey, entityBatch, batchForPartition))
 
 let private processErrorResp entityBatch buildEntityId (ex:StorageException) =
     let requestInformation = ex.RequestInformation
