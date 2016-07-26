@@ -1,4 +1,4 @@
-﻿module FSharp.Azure.StorageTypeProvider.``Queue Unit Tests``
+﻿module ``Queue Tests``
 
 open FSharp.Azure.StorageTypeProvider
 open FSharp.Azure.StorageTypeProvider.Queue
@@ -107,10 +107,13 @@ let ``Update Message affects the bytes message body``() =
 let ``Dequeue Count is correctly emitted``() =
     let message = async {
             do! queue.Enqueue("Foo")
+            do! Async.Sleep 100
             let! message = queue.Dequeue()
             do! queue.UpdateMessage(message.Value.Id, TimeSpan.FromSeconds 0.)
+            do! Async.Sleep 100
             let! message = queue.Dequeue()
             do! queue.UpdateMessage(message.Value.Id, TimeSpan.FromSeconds 0.)
+            do! Async.Sleep 100
             return! queue.Dequeue() } |> Async.RunSynchronously
     test <@ message.Value.DequeueCount = 3 @>
 
