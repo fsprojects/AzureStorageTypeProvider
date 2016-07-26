@@ -140,6 +140,22 @@ Target "NuGet"
                           @ [ "StorageTypeProvider.fsx", None, None ] }) 
               ("nuget/" + project + ".nuspec"))
 
+[<AutoOpen>]
+module AppVeyorHelpers =
+  let execOnAppveyor arguments =
+    let result =
+        ExecProcess
+            (fun info ->
+                info.FileName <- "appveyor"
+                info.Arguments <- arguments)
+            (TimeSpan.FromMinutes 2.0)
+    if result <> 0 then failwith (sprintf "Failed to execute appveyor command: %s" arguments)
+    trace "Published packages"
+
+  let publishOnAppveyor folder =
+    !! (folder + "*.nupkg")
+    |> Seq.iter (sprintf "PushArtifact %s" >> execOnAppveyor)
+
 // --------------------------------------------------------------------------------------
 // Generate the documentation
 
@@ -238,6 +254,8 @@ Target "LocalDeploy" (fun _ ->
 
 Target "BuildPackage" DoNothing
 
+Target "BuildServerDeploy" (fun _ -> publishOnAppveyor buildDir)
+
 FinalTarget "PublishTestsResultsToAppveyor" (fun _ ->
     UploadTestResultsXml TestResultsType.Xunit "TestOutput")
 
@@ -254,8 +272,10 @@ Target "All" DoNothing
 
 "RunTests"
   ==> "NuGet"
-  ==> "LocalDeploy"
+  =?> ("LocalDeploy", buildServer = LocalBuild)
+  =?> ("BuildServerDeploy", buildServer = AppVeyor)
   ==> "BuildPackage"
+
 "RunTests"
   ==> "CleanDocs"
   ==> "GenerateHelp"
@@ -274,4 +294,4 @@ Target "All" DoNothing
   ==> "Release"
 
 ActivateFinalTarget "PublishTestsResultsToAppveyor"
-RunTargetOrDefault "RunTests"
+RunTargetOrDefault "BuildPackage"
