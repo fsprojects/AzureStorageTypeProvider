@@ -72,8 +72,7 @@ Target "AssemblyInfo" (fun _ ->
                                         Attribute.Product project
                                         Attribute.Description summary
                                         Attribute.Version release.AssemblyVersion
-                                        Attribute.FileVersion release.AssemblyVersion ]
-)
+                                        Attribute.FileVersion release.AssemblyVersion ])
 
 // --------------------------------------------------------------------------------------
 // Clean build results
@@ -115,8 +114,7 @@ open Fake.AppVeyor
 Target "RunTests" (fun _ ->
     !!("UnitTests.sln") |> MSBuildRelease "" "Rebuild" |> ignore
     FileHelper.CreateDir "TestOutput"
-    !!(testAssemblies) |> xUnit (fun args -> { args with XmlOutputPath = Some "TestOutput/xml" })
-    if buildServer = AppVeyor then UploadTestResultsXml TestResultsType.Xunit "TestOutput")
+    !!(testAssemblies) |> xUnit (fun args -> { args with XmlOutputPath = Some "TestOutput/xml" }))
 
 // --------------------------------------------------------------------------------------
 // Build a NuGet package
@@ -140,9 +138,7 @@ Target "NuGet"
                             "Microsoft.WindowsAzure.Storage.dll"; "Newtonsoft.Json.dll"; "System.Spatial.dll" ] 
                           |> List.map (fun file -> @"..\bin\" + file, Some "lib/net40", None))
                           @ [ "StorageTypeProvider.fsx", None, None ] }) 
-              ("nuget/" + project + ".nuspec")
-)
-
+              ("nuget/" + project + ".nuspec"))
 
 // --------------------------------------------------------------------------------------
 // Generate the documentation
@@ -174,8 +170,7 @@ Target "GenerateHelp" (fun _ ->
     CopyFile buildDir "packages/FSharp.Core/lib/net40/FSharp.Core.sigdata"
     CopyFile buildDir "packages/FSharp.Core/lib/net40/FSharp.Core.optdata"
 
-    generateHelp false false
-)
+    generateHelp false false)
 
 Target "GenerateHelpDebug" (fun _ ->
     DeleteFile "docs/content/release-notes.md"
@@ -186,8 +181,7 @@ Target "GenerateHelpDebug" (fun _ ->
     CopyFile "docs/content/" "LICENSE.txt"
     Rename "docs/content/license.md" "docs/content/LICENSE.txt"
 
-    generateHelp true true
-)
+    generateHelp true true)
 
 Target "KeepRunning" (fun _ ->    
     use watcher = !! "docs/content/**/*.*" |> WatchChanges (fun changes ->
@@ -212,8 +206,7 @@ Target "ReleaseDocs" (fun _ ->
     
     StageAll tempDocsDir
     Git.Commit.Commit tempDocsDir (sprintf "Update generated documentation for version %s" release.NugetVersion)
-    Branches.push tempDocsDir
-)
+    Branches.push tempDocsDir)
 
 Target "Release" (fun _ ->
     let user =
@@ -237,7 +230,6 @@ Target "Release" (fun _ ->
     Branches.tag "" release.NugetVersion
     Branches.pushTag "" remote release.NugetVersion)
 
-
 Target "LocalDeploy" (fun _ ->
     directoryInfo @"bin"
     |> filesInDirMatching "*.nupkg"
@@ -245,6 +237,9 @@ Target "LocalDeploy" (fun _ ->
     |> CopyFiles "..\..\LocalPackages")
 
 Target "BuildPackage" DoNothing
+
+FinalTarget "PublishTestsResultsToAppveyor" (fun _ ->
+    UploadTestResultsXml TestResultsType.Xunit "TestOutput")
 
 // --------------------------------------------------------------------------------------
 // Run all targets by default. Invoke 'build <Target>' to override
@@ -278,4 +273,5 @@ Target "All" DoNothing
 "ReleaseDocs"
   ==> "Release"
 
+ActivateFinalTarget "PublishTestsResultsToAppveyor"
 RunTargetOrDefault "RunTests"
