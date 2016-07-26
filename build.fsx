@@ -276,15 +276,17 @@ Target "All" DoNothing
   =?> ("BuildServerDeploy", buildServer = AppVeyor)
   ==> "BuildPackage"
 
+"CleanDocs"
+  ==> "GenerateHelp"
+
+"CleanDocs"
+  ==> "GenerateHelpDebug"
+
 "RunTests"
-  ==> "CleanDocs"
   ==> "GenerateHelp"
   ==> "GenerateReferenceDocs"
   ==> "GenerateDocs"
   ==> "ReleaseDocs"
-
-"CleanDocs"
-  ==> "GenerateHelpDebug"
 
 "GenerateHelp"
   ==> "KeepRunning"
