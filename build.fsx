@@ -106,15 +106,16 @@ Target "ResetTestData" (fun _ ->
     { defaultParams with
         CommandLine = "start"
         Program = ProgramFilesX86 </> emulatorPath } |> shellExec |> ignore
-    FSIHelper.executeFSI (Path.Combine(__SOURCE_DIRECTORY__, @"tests\IntegrationTests")) "ResetTestData.fsx" []
+    FSIHelper.executeFSI (__SOURCE_DIRECTORY__ </> @"tests\IntegrationTests") "ResetTestData.fsx" []
     |> snd
-    |> Seq.iter(fun x -> printfn "%s" x.Message)
-)
+    |> Seq.iter(fun x -> printfn "%s" x.Message))
 
 // Run integration tests
+open Fake.AppVeyor
 Target "RunTests" (fun _ ->
     !!("UnitTests.sln") |> MSBuildRelease "" "Rebuild" |> ignore
-    !!(testAssemblies) |> xUnit id)
+    !!(testAssemblies) |> xUnit (fun args -> { args with XmlOutputPath = Some "TestOutput/xml" })
+    if buildServer = AppVeyor then UploadTestResultsXml TestResultsType.Xunit "TestOutput")
 
 // --------------------------------------------------------------------------------------
 // Build a NuGet package
