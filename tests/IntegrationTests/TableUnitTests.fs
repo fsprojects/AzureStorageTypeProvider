@@ -243,13 +243,21 @@ let ``Cloud Table Client relates to the same data as the type provider``() =
 [<Fact>]
 [<ResetTableData>]
 let ``DeletePartition deletes entries with given partition key``() =
-    table.DeletePartition "men"
+    let results = table.DeletePartition "men"
+    test <@ fst results = "men" @>
+    test <@ snd results = [| SuccessfulResponse((Partition "men", Row "3"), 204)
+                             SuccessfulResponse((Partition "men", Row "2"), 204)
+                             SuccessfulResponse((Partition "men", Row "1"), 204) |] @>
     test <@ table.Query().``Where Partition Key Is``.``Equal To``("men").Execute().Length = 0 @>
 
 [<Fact>]
 [<ResetTableData>]
 let ``DeletePartitionAsync deletes entries with given partition key``() =
-    table.DeletePartitionAsync "men" |> Async.RunSynchronously
+    let results = table.DeletePartitionAsync "men" |> Async.RunSynchronously
+    test <@ fst results = "men" @>
+    test <@ snd results = [| SuccessfulResponse((Partition "men", Row "3"), 204)
+                             SuccessfulResponse((Partition "men", Row "2"), 204)
+                             SuccessfulResponse((Partition "men", Row "1"), 204) |] @>
     test <@ table.Query().``Where Partition Key Is``.``Equal To``("men").Execute().Length = 0 @>
 
 [<Fact>]
