@@ -38,10 +38,9 @@ printfn "The table is called '%s'." employeeTable.Name
 (**
 
 ##Automatic schema inference
-Unlike some non-relational data stores, Azure Table Storage does actually maintain schema information
-at the row level in the form of EDM metadata. This can be interrogated in order to infer a table's shape,
-as well as help query data. Let's look at the schema of the row ``fred.1`` in the ``employee``
-table. 
+Unlike some non-relational data stores, Azure Table Storage *does* maintain schema information at the
+row level in the form of EDM metadata. This can be interrogated in order to infer a table's shape, as
+well as help query data. Let's look at the schema of the row ``fred.1`` in the ``employee`` table.
 *)
 
 (*** hide ***)
@@ -74,7 +73,10 @@ printfn "Fred has Name '%s', Years Working '%d', Dob '%O', Salary '%f' and Is Ma
     fred.Name fred.YearsWorking fred.Dob fred.Salary fred.IsManager
 (*** include-output: fred ***)
 
-(** The Storage Type Provider will also intelligently map fields which are not always populated in the table.
+(**
+### Optional type generation
+
+The Storage Type Provider will also intelligently map fields which are not always populated in the table.
 For example, given the following rows, we can see that two columns are not always populated. *)
 
 (*** hide ***)
@@ -88,7 +90,7 @@ this to the type system *)
 
 (*** define-output: blip ***)
 Azure.Tables.optionals.Get(Row "1", Partition "partition")
-|> Option.iter(fun row -> printfn "IsAnimal: %A, YearsWorking: %A" row.IsAnimal row.YearsWorking)
+|> Option.iter(fun row -> printfn "IsAnimal has a value: %b, YearsWorking value: %A" row.IsAnimal.IsSome row.YearsWorking)
 
 (*** include-output: blip ***)
 
@@ -102,6 +104,8 @@ storage account for development purposes, you can probably manually generate a f
 type FirstTwentyRows = AzureTypeProvider<"UseDevelopmentStorage=true", schemaSize = 20>
 
 (** 
+### Data Frame interoperability
+
 In addition, an extra "Values" property is available which exposes all properties on the entity
 in a key/value collection - this is useful for binding scenarios or e.g. mapping in Deedle frames.
 *)
@@ -122,7 +126,7 @@ let frame =
 ##Querying data
 The storage provider has an easy-to-use query API that is also flexble and powerful, and uses the 
 inferred schema to generate the appropriate query functionality. Data can be queried in several
-ways, both synchronously or asynchronously: -
+ways, in both synchronous or asynchronous forms.
 
 ###Key Lookups
 These are the simplest (and best performing) queries, based on a partition / row key combination,
