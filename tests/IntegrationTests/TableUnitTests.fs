@@ -186,6 +186,7 @@ let ``Inserts many rows asyncronously using provided types correctly``() =
     test <@ table.GetPartition("sample").Length = 2 @>
 
 [<Fact>]
+[<ResetTableData>]
 let ``Query with multiple batches returns all results``() =
     [| 1 .. 1001 |]
     |> Array.map(fun i -> sprintf "Row %i" i)
@@ -197,6 +198,7 @@ let ``Query with multiple batches returns all results``() =
     test <@ retrievedEntries.Length = 1001 @>
 
 [<Fact>]
+[<ResetTableData>]
 let ``Query with multiple batches returns data in the correct order``() =
     [| 1 .. 1001 |]
     |> Array.map(fun i -> sprintf "Row %04i" i)
