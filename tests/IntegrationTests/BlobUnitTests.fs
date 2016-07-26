@@ -140,3 +140,7 @@ let ``Can access List blobs method on a folder`` =
     let allBlobs = childFolder.ListBlobs(true)
     let count = allBlobs |> Seq.length
     test <@ count = 4 @>
+
+[<Fact>]
+let ``Container name is correct``() =
+    test <@ Local.Containers.samples.Name = "samples" @>
