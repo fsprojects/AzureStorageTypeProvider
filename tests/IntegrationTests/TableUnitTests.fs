@@ -55,21 +55,19 @@ let ``Non matching row key returns None``() =
     test <@ table.Get(Row "random", Partition "fred") = None @>
 
 [<Fact>]
+[<ResetTableData>]
 let ``Delete called with empty entitites sequnce should not throw``() =
      table.Delete []
 
 [<Fact>]
-[<ResetTableData>]
 let ``Gets all rows in a table``() =
     test <@ table.Query().Execute().Length = 5 @>
 
 [<Fact>]
-[<ResetTableData>]
 let ``Gets all rows in a partition``() =
     test <@ table.GetPartition("men").Length = 3 @>
 
 [<Fact>]
-[<ResetTableData>]
 let ``Gets all rows in a partition asyncronously``() =
     let partition = table.GetPartitionAsync("men") |> Async.RunSynchronously
     test <@ partition.Length = 3 @>
@@ -188,7 +186,6 @@ let ``Inserts many rows asyncronously using provided types correctly``() =
     test <@ table.GetPartition("sample").Length = 2 @>
 
 [<Fact>]
-[<ResetTableData>]
 let ``Query with multiple batches returns all results``() =
     [| 1 .. 1001 |]
     |> Array.map(fun i -> sprintf "Row %i" i)
@@ -200,7 +197,6 @@ let ``Query with multiple batches returns all results``() =
     test <@ retrievedEntries.Length = 1001 @>
 
 [<Fact>]
-[<ResetTableData>]
 let ``Query with multiple batches returns data in the correct order``() =
     [| 1 .. 1001 |]
     |> Array.map(fun i -> sprintf "Row %04i" i)
@@ -213,24 +209,20 @@ let ``Query with multiple batches returns data in the correct order``() =
     test <@ retrievedEntries.[1000].RowKey = "Row 1001" @>
 
 [<Fact>]
-[<ResetTableData>]
 let ``Query without arguments brings back all rows``() =
     test <@ table.Query().Execute().Length = 5 @>
 
 [<Fact>]
-[<ResetTableData>]
 let ``Query with single query part brings back correct rows``() =
     test <@ table.Query().``Where Name Is``.``Equal To``("fred").Execute().Length = 2 @>
 
 [<Fact>]
-[<ResetTableData>]
 let ``Query with many query parts brings back correct rows``() =
      test <@ table.Query().``Where Name Is``.``Equal To``("fred")
                           .``Where Years Working Is``.``Equal To``(35)
                           .Execute().Length = 1 @>
 
 [<Fact>]
-[<ResetTableData>]
 let ``Query conditions on floats are correctly generated``() =
     let query = table.Query().``Where Salary Is``.``Greater Than``(1.0)
     test <@ query.Execute().Length = 4 @>
@@ -289,7 +281,6 @@ let ``Insert suceeds for entries over 4Mb``() =
     test <@ failureCount = 0 @>
 
 [<Fact>]
-[<ResetTableData>]
 let ``Async query without arguments brings back all rows``() =
     let length =
         async {
