@@ -55,6 +55,10 @@ let ``Non matching row key returns None``() =
     test <@ table.Get(Row "random", Partition "fred") = None @>
 
 [<Fact>]
+let ``Delete called with empty entitites sequnce should not throw``() =
+     table.Delete []
+
+[<Fact>]
 [<ResetTableData>]
 let ``Gets all rows in a table``() =
     test <@ table.Query().Execute().Length = 5 @>
