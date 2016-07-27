@@ -54,15 +54,15 @@
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '52', 52)" onmouseover="showTip(event, '52', 52)">
+          <code onmouseout="hideTip(event, '53', 53)" onmouseover="showTip(event, '53', 53)">
             AsCloudTable(connectionString)
           </code>
-          <div class="tip" id="52">
+          <div class="tip" id="53">
             <strong>Signature:</strong> (connectionString:string option) -&gt; CloudTable<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Table/ProvidedTableTypes.fs#L16-16" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Table/ProvidedTableTypes.fs#L53-53" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
@@ -75,15 +75,15 @@
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '53', 53)" onmouseover="showTip(event, '53', 53)">
+          <code onmouseout="hideTip(event, '54', 54)" onmouseover="showTip(event, '54', 54)">
             Delete(entities, connectionString)
           </code>
-          <div class="tip" id="53">
+          <div class="tip" id="54">
             <strong>Signature:</strong> (entities:seq&lt;Partition * Row&gt; * connectionString:string option) -&gt; (string * TableResponse []) []<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Table/ProvidedTableTypes.fs#L46-46" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Table/ProvidedTableTypes.fs#L84-84" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
@@ -96,15 +96,36 @@
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '54', 54)" onmouseover="showTip(event, '54', 54)">
-            DeletePartition(...)
+          <code onmouseout="hideTip(event, '55', 55)" onmouseover="showTip(event, '55', 55)">
+            DeleteAsync(entities, connectionString)
           </code>
-          <div class="tip" id="54">
-            <strong>Signature:</strong> (partitionKey:string * connectionString:string option) -&gt; unit<br />
+          <div class="tip" id="55">
+            <strong>Signature:</strong> (entities:seq&lt;Partition * Row&gt; * connectionString:string option) -&gt; Async&lt;(string * TableResponse []) []&gt;<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Table/ProvidedTableTypes.fs#L55-55" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Table/ProvidedTableTypes.fs#L93-93" class="github-link">
+              <img src="../content/img/github.png" class="normal" />
+              <img src="../content/img/github-blue.png" class="hover" />
+            </a>
+          <p>Asynchronously deletes a batch of entities from the table using the supplied pairs of Partition and Row keys.</p>
+
+
+
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '56', 56)" onmouseover="showTip(event, '56', 56)">
+            DeletePartition(...)
+          </code>
+          <div class="tip" id="56">
+            <strong>Signature:</strong> (partitionKey:string * connectionString:string option) -&gt; string * TableResponse []<br />
+                      </div>
+        </td>
+        <td class="xmldoc">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Table/ProvidedTableTypes.fs#L102-102" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
@@ -117,15 +138,36 @@
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '55', 55)" onmouseover="showTip(event, '55', 55)">
-            Insert(...)
+          <code onmouseout="hideTip(event, '57', 57)" onmouseover="showTip(event, '57', 57)">
+            DeletePartitionAsync(...)
           </code>
-          <div class="tip" id="55">
-            <strong>Signature:</strong> (partitionKey:Partition * rowKey:Row * entity:&#39;?7234 * insertMode:TableInsertMode option * connectionString:string option) -&gt; TableResponse<br />
-                          <strong>Type parameters:</strong> '?7234          </div>
+          <div class="tip" id="57">
+            <strong>Signature:</strong> (partitionKey:string * connectionString:string option) -&gt; Async&lt;string * TableResponse []&gt;<br />
+                      </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Table/ProvidedTableTypes.fs#L38-38" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Table/ProvidedTableTypes.fs#L113-113" class="github-link">
+              <img src="../content/img/github.png" class="normal" />
+              <img src="../content/img/github-blue.png" class="hover" />
+            </a>
+          <p>Asynchronously deletes an entire partition from the table</p>
+
+
+
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '58', 58)" onmouseover="showTip(event, '58', 58)">
+            Insert(...)
+          </code>
+          <div class="tip" id="58">
+            <strong>Signature:</strong> (partitionKey:Partition * rowKey:Row * entity:&#39;?6910 * insertMode:TableInsertMode option * connectionString:string option) -&gt; TableResponse<br />
+                          <strong>Type parameters:</strong> '?6910          </div>
+        </td>
+        <td class="xmldoc">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Table/ProvidedTableTypes.fs#L66-66" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
@@ -138,15 +180,15 @@
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '56', 56)" onmouseover="showTip(event, '56', 56)">
+          <code onmouseout="hideTip(event, '59', 59)" onmouseover="showTip(event, '59', 59)">
             Insert(...)
           </code>
-          <div class="tip" id="56">
+          <div class="tip" id="59">
             <strong>Signature:</strong> (entities:seq&lt;Partition * Row * &#39;b&gt; * insertMode:TableInsertMode option * connectionString:string option) -&gt; (string * TableResponse []) []<br />
                           <strong>Type parameters:</strong> 'b          </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Table/ProvidedTableTypes.fs#L19-19" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Table/ProvidedTableTypes.fs#L56-56" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
@@ -159,15 +201,57 @@
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '57', 57)" onmouseover="showTip(event, '57', 57)">
+          <code onmouseout="hideTip(event, '60', 60)" onmouseover="showTip(event, '60', 60)">
+            InsertAsync(...)
+          </code>
+          <div class="tip" id="60">
+            <strong>Signature:</strong> (partitionKey:Partition * rowKey:Row * entity:&#39;?6912 * insertMode:TableInsertMode option * connectionString:string option) -&gt; Async&lt;TableResponse&gt;<br />
+                          <strong>Type parameters:</strong> '?6912          </div>
+        </td>
+        <td class="xmldoc">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Table/ProvidedTableTypes.fs#L74-74" class="github-link">
+              <img src="../content/img/github.png" class="normal" />
+              <img src="../content/img/github-blue.png" class="hover" />
+            </a>
+          <p>Inserts a single entity into the table asynchronously, using public properties on the object as fields.</p>
+
+
+
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '61', 61)" onmouseover="showTip(event, '61', 61)">
+            InsertAsync(...)
+          </code>
+          <div class="tip" id="61">
+            <strong>Signature:</strong> (entities:seq&lt;Partition * Row * &#39;b&gt; * insertMode:TableInsertMode option * connectionString:string option) -&gt; Async&lt;(string * TableResponse []) []&gt;<br />
+                          <strong>Type parameters:</strong> 'b          </div>
+        </td>
+        <td class="xmldoc">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Table/ProvidedTableTypes.fs#L61-61" class="github-link">
+              <img src="../content/img/github.png" class="normal" />
+              <img src="../content/img/github-blue.png" class="hover" />
+            </a>
+          <p>Inserts a batch of entities into the table, using all public properties on the object as fields.</p>
+
+
+
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '62', 62)" onmouseover="showTip(event, '62', 62)">
             Name
           </code>
-          <div class="tip" id="57">
+          <div class="tip" id="62">
             <strong>Signature:</strong> string<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Table/ProvidedTableTypes.fs#L66-66" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Table/ProvidedTableTypes.fs#L122-122" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
