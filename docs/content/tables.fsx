@@ -95,7 +95,7 @@ Azure.Tables.optionals.Get(Row "1", Partition "partition")
 (*** include-output: blip ***)
 
 (** Of course, all other fields remain mandatory. This will also cascade to the provider constructor for the type -
-optional fields will become optional constructor arguments. The type provider will download the first 5 rows by default
+optional fields will become optional constructor arguments. The type provider will download the first 10 rows by default
 to infer schema for each table, but this can be increased during creation of the type provider. Obviously, a large
 sample increases the chance of the type provider correctly inferring option fields - but if you use a local development
 storage account for development purposes, you can probably manually generate a few rows to guide the inference system. *)
@@ -238,6 +238,7 @@ already have schema or do not.
 
 let people = [ Partition "Europe", Row "2", { Name = "Tony"; City = "Milan"}
                Partition "North America", Row "1", { Name = "Sally"; City = "New York"}
+               Partition "North America", Row "2", { Name = "Tom"; City = "Chicago"}
                Partition "Europe", Row "3", { Name = "Dirk"; City = "Frankfurt"} ]
 
 // results are grouped by the batch that they were inserted in.
@@ -250,7 +251,7 @@ let batchResults = emptyTable.Insert(people)
 Deleting data is also extremely easy - simply supply the set of Partition / Row Key combinations that
 you wish to delete. *)
 
-let deleteResult = emptyTable.Delete [ for row in 1 .. 2 -> Partition "Europe", Row (row.ToString()) ]
+let deleteResult = emptyTable.Delete [ for row in 1 .. 2 -> Partition "North America", Row (row.ToString()) ]
 
 (*** include-value: deleteResult ***)
 
