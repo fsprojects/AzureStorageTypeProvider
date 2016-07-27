@@ -2,16 +2,12 @@
 
 open FSharp.Azure.StorageTypeProvider
 open FSharp.Azure.StorageTypeProvider.Table
-open Microsoft.WindowsAzure.Storage.Table
 open Swensen.Unquote
 open System
-open System.Linq
 open Xunit
 
 type Local = AzureTypeProvider<"DevStorageAccount", "">
-
 let table = Local.Tables.employee
-let lgeTable = Local.Tables.large
 
 type ResetTableDataAttribute() =
     inherit BeforeAfterTestAttribute()
@@ -153,7 +149,7 @@ let ``Inserts a row using provided types correctly``() =
     test <@ result.Dob = DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc) @>
     test <@ result.Name = "Hello" @>
     test <@ result.Salary = 6.1 @>
-    test <@ result.IsManager = true @>
+    test <@ result.IsManager @>
 
 [<Fact>]
 [<ResetTableData>]
@@ -167,7 +163,7 @@ let ``Inserts a row asyncronously using provided types correctly``() =
     test <@ result.Dob = DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc) @>
     test <@ result.Name = "Hello" @>
     test <@ result.Salary = 6.1 @>
-    test <@ result.IsManager = true @>
+    test <@ result.IsManager @>
 
 [<Fact>]
 [<ResetTableData>]
@@ -268,9 +264,9 @@ let ``Insert suceeds for entries over 4Mb``() =
         Local.Domain.largeEntity(partitionKey,rowKey,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb,byteArr20kb)
     
     let generateBatchOfLargeEntities partitionKey size = 
-        [| for i in 1 .. size do yield generateLargeEntity partitionKey (Row(Guid.NewGuid().ToString())) |]
+        [| for _ in 1 .. size -> generateLargeEntity partitionKey (Row(Guid.NewGuid().ToString())) |]
 
-    let resultsOfInsert = generateBatchOfLargeEntities (Partition "1") 10 |> lgeTable.Insert
+    let resultsOfInsert = generateBatchOfLargeEntities (Partition "1") 10 |> Local.Tables.large.Insert
 
     let failureCount = 
         resultsOfInsert        
@@ -287,3 +283,45 @@ let ``Async query without arguments brings back all rows``() =
             return results.Length } 
         |> Async.RunSynchronously
     test <@ length = 5 @>
+
+[<Fact>]
+[<ResetTableData>]
+let ``Missing fields are correctly shown as optionals``() =
+    let row = Local.Tables.optionals.Get(Row "1", Partition "partition")
+    test <@ row.IsSome @>
+    
+    // Compiles!
+    match row with
+    | Some row ->
+        ignore row.IsAnimal.IsSome
+        ignore row.YearsWorking.IsSome
+        ignore row.Dob
+    | None -> ()
+
+[<Fact>]
+[<ResetTableData>]
+let ``Can insert an row with optionals filled in``() =
+    let entity = Local.Domain.optionalsEntity(Partition "foo", Row "1", DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc), true, "bar", 1., Some true, Some 10)
+    Local.Tables.optionals.Insert entity |> ignore
+    let entity = Local.Tables.optionals.Get(Row "1", Partition "foo")
+    test <@ entity.IsSome @>
+    let entity = entity.Value
+    test <@ entity.Dob = DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc) @>
+    test <@ entity.IsAnimal = Some true @>
+    test <@ entity.IsManager @>
+    test <@ entity.Name = "bar" @>
+    test <@ entity.PartitionKey = "foo" @>
+    test <@ entity.RowKey = "1" @>
+    test <@ entity.Salary = 1. @>
+    test <@ entity.YearsWorking = Some 10 @>
+
+[<Fact>]
+[<ResetTableData>]
+let ``Can insert an row with optionals omitted in``() =
+    let entity = Local.Domain.optionalsEntity(Partition "foo", Row "1", DateTime(2000, 1, 1), true, "bar", 1.)
+    Local.Tables.optionals.Insert entity |> ignore
+    let entity = Local.Tables.optionals.Get(Row "1", Partition "foo")
+    test <@ entity.IsSome @>
+    let entity = entity.Value
+    test <@ entity.IsAnimal = None @>
+    test <@ entity.YearsWorking = None @>

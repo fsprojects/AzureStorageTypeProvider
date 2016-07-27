@@ -7,6 +7,15 @@ open Microsoft.WindowsAzure.Storage.Table
 open System
 type Azure = AzureTypeProvider<"UseDevelopmentStorage=true">
 
+let createFrame (rows:array<_>) =
+    rows
+    |> Frame.ofRecords
+    |> Frame.expandCols [ "Values" ] // expand the "Values" nested column
+    |> Frame.indexRowsUsing(fun c -> sprintf "%O.%O" c.["PartitionKey"] c.["RowKey"]) // Generate a useful row index
+    |> Frame.dropCol "PartitionKey"
+    |> Frame.dropCol "RowKey"
+    |> fun f -> f |> Frame.indexColsWith (f.ColumnKeys |> Seq.map(fun c -> c.Replace("Values.", ""))) // rename columns to omit "Values."
+
 (**
 Working with Tables
 ===================
@@ -29,10 +38,9 @@ printfn "The table is called '%s'." employeeTable.Name
 (**
 
 ##Automatic schema inference
-Unlike some non-relational data stores, Azure Table Storage does maintain schema information at the
-row level in the form of EDM metadata. This can be interrogated in order to infer a table's shape,
-as well as help query data. Let's look at the schema of the row ``fred.1`` in the ``employee``
-table.
+Unlike some non-relational data stores, Azure Table Storage *does* maintain schema information at the
+row level in the form of EDM metadata. This can be interrogated in order to infer a table's shape, as
+well as help query data. Let's look at the schema of the row ``fred.1`` in the ``employee`` table.
 *)
 
 (*** hide ***)
@@ -65,7 +73,39 @@ printfn "Fred has Name '%s', Years Working '%d', Dob '%O', Salary '%f' and Is Ma
     fred.Name fred.YearsWorking fred.Dob fred.Salary fred.IsManager
 (*** include-output: fred ***)
 
+(**
+### Optional type generation
+
+The Storage Type Provider will also intelligently map fields which are not always populated in the table.
+For example, given the following rows, we can see that two columns are not always populated. *)
+
+(*** hide ***)
+let optionalFrame = Azure.Tables.optionals.Query().Execute() |> createFrame
+(** *)
+
+(*** include-value: optionalFrame ***)
+
+(** The type provider will correctly infer that YearsWorking and IsAnimal are optional fields are will cascade
+this to the type system *)
+
+(*** define-output: blip ***)
+Azure.Tables.optionals.Get(Row "1", Partition "partition")
+|> Option.iter(fun row -> printfn "IsAnimal has a value: %b, YearsWorking value: %A" row.IsAnimal.IsSome row.YearsWorking)
+
+(*** include-output: blip ***)
+
+(** Of course, all other fields remain mandatory. This will also cascade to the provider constructor for the type -
+optional fields will become optional constructor arguments. The type provider will download the first 5 rows by default
+to infer schema for each table, but this can be increased during creation of the type provider. Obviously, a large
+sample increases the chance of the type provider correctly inferring option fields - but if you use a local development
+storage account for development purposes, you can probably manually generate a few rows to guide the inference system. *)
+
+/// Uses first twenty rows of each table for schema inference.
+type FirstTwentyRows = AzureTypeProvider<"UseDevelopmentStorage=true", schemaSize = 20>
+
 (** 
+### Data Frame interoperability
+
 In addition, an extra "Values" property is available which exposes all properties on the entity
 in a key/value collection - this is useful for binding scenarios or e.g. mapping in Deedle frames.
 *)
@@ -86,7 +126,7 @@ let frame =
 ##Querying data
 The storage provider has an easy-to-use query API that is also flexble and powerful, and uses the 
 inferred schema to generate the appropriate query functionality. Data can be queried in several
-ways, both synchronously or asynchronously: -
+ways, in both synchronous or asynchronous forms.
 
 ###Key Lookups
 These are the simplest (and best performing) queries, based on a partition / row key combination,

@@ -12,6 +12,8 @@ type AzureTable internal (defaultConnection, tableName) =
         defaultArg insertMode TableInsertMode.Insert, defaultArg connectionString defaultConnection
     let getTableForConnection = getTable tableName
 
+    let safeGetOption name = function | Some value -> Some(name, box value) | _ -> None
+
     let buildInsertParams insertMode connectionString (entities : seq<Partition * Row * 'b>) = 
         let insertMode, connectionString = getConnectionDetails (insertMode, connectionString)
         let table = getTableForConnection connectionString
@@ -25,7 +27,21 @@ type AzureTable internal (defaultConnection, tableName) =
         let tblEntities = 
             entities
             |> Seq.map (fun (partitionKey, rowKey, entity) -> 
-                let values = propBuilders |> Seq.map (fun builder -> builder entity) |> Map.ofSeq
+                let values =
+                    propBuilders
+                    |> Seq.map (fun builder -> builder entity)
+                    |> Seq.choose(fun (name, value) ->
+                        match value with
+                        | :? Option<(byte [])> as value -> safeGetOption name value
+                        | :? Option<string> as value -> safeGetOption name value
+                        | :? Option<int> as value -> safeGetOption name value
+                        | :? Option<bool> as value -> safeGetOption name value
+                        | :? Option<DateTime> as value -> safeGetOption name value
+                        | :? Option<double> as value -> safeGetOption name value
+                        | :? Option<System.Guid> as value -> safeGetOption name value
+                        | :? Option<int64> as value -> safeGetOption name value
+                        | _ -> Some (name, value))
+                    |> Map.ofSeq
                 LightweightTableEntity(partitionKey, rowKey, DateTimeOffset.MinValue, values) |> buildDynamicTableEntity)
         tblEntities, insertOp, table
     

@@ -49,21 +49,27 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
             domainTypes.AddMembers <| ProvidedTypeGenerator.generateTypes()
             typeProviderForAccount.AddMember(domainTypes)
 
+            let schemaInferenceRowCount = args.[4] :?> int
+
             // Now create child members e.g. containers, tables etc.
             typeProviderForAccount.AddMembers
                 ([ BlobMemberFactory.getBlobStorageMembers 
-                   TableMemberFactory.getTableStorageMembers
+                   TableMemberFactory.getTableStorageMembers schemaInferenceRowCount
                    QueueMemberFactory.getQueueStorageMembers ]
                 |> List.map (fun builder -> builder(connectionString, domainTypes)))
             typeProviderForAccount
         | Failure ex -> failwith (sprintf "Unable to validate connection string (%s)" ex.Message)
     
     // Parameterising the provider
-    let parameters = 
+    let parameters =
+        let schemaSize = ProvidedStaticParameter("schemaSize", typeof<int>, 10)
+        schemaSize.AddXmlDoc "The maximum number of rows to read per table, from which to infer schema"
+
         [ ProvidedStaticParameter("accountName", typeof<string>, String.Empty)
           ProvidedStaticParameter("accountKey", typeof<string>, String.Empty)
           ProvidedStaticParameter("connectionStringName", typeof<string>, String.Empty)
-          ProvidedStaticParameter("configFileName", typeof<string>, "app.config") ]
+          ProvidedStaticParameter("configFileName", typeof<string>, "app.config")
+          schemaSize ]
     
     do
         azureAccountType.DefineStaticParameters(parameters, buildTypes)

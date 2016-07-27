@@ -7,23 +7,45 @@ open Microsoft.WindowsAzure.Storage.Table
 open ProviderImplementation.ProvidedTypes
 open System
 
-let private getDistinctProperties (tableEntities : #seq<DynamicTableEntity>) = 
-    tableEntities
-    |> Seq.collect (fun x -> x.Properties)
-    |> Seq.distinctBy (fun x -> x.Key)
-    |> Seq.map (fun x -> x.Key, x.Value)
-    |> Seq.sortBy fst
-    |> Seq.toList
+let private getPropsForEntity (entity:DynamicTableEntity) =
+    entity.Properties
+    |> Seq.filter(fun p -> p.Value.PropertyAsObject <> null)
+    |> Seq.map(fun p -> p.Key, p.Value.PropertyType)
+    |> Set
+
+let private getDistinctProperties tableEntities = 
+    let optionalProperties, mandatoryProperties, _ =
+        ((Set [], Set [], true), tableEntities)
+        ||> Seq.fold(fun (optionals, mandatory, initialRun) entity ->
+            if initialRun then
+                optionals, entity, false
+            else
+                let optionals = (mandatory - entity) + (entity - mandatory) + optionals
+                let mandatory = Set.intersect mandatory entity
+                optionals, mandatory, false)
+
+    (optionalProperties |> Set.toList |> List.map(fun (name, edmType) -> name, edmType, PropertyNeed.Optional)) @
+    (mandatoryProperties |> Set.toList |> List.map(fun (name, edmType) -> name, edmType, PropertyNeed.Mandatory))
+    |> List.sortBy(fun (name, _, _) -> name)
 
 /// Builds a property for a single entity for a specific type
-let private buildEntityProperty<'a> key = 
-    let getter = 
-        fun (args : Expr list) -> 
-            <@@ let entity = (%%args.[0] : LightweightTableEntity)
-                if entity.Values.ContainsKey(key) then entity.Values.[key] :?> 'a
-                else Unchecked.defaultof<'a> @@>
+let private buildEntityProperty<'a> key need = 
+    let getter, propType = 
+        match need with
+        | PropertyNeed.Mandatory ->
+            fun (args : Expr list) -> 
+                <@@ let entity = (%%args.[0] : LightweightTableEntity)
+                    if entity.Values.ContainsKey key then entity.Values.[key] :?> 'a
+                    else Unchecked.defaultof<'a> @@>
+            , typeof<'a>
+        | PropertyNeed.Optional ->
+            fun (args : Expr list) -> 
+                <@@ let entity = (%%args.[0] : LightweightTableEntity)
+                    if entity.Values.ContainsKey key then Some(entity.Values.[key] :?> 'a)
+                    else None @@>
+            , typeof<Option<'a>>
     
-    let prop = ProvidedProperty(key, typeof<'a>, GetterCode = getter)
+    let prop = ProvidedProperty(key, propType, GetterCode = getter)
     prop.AddXmlDocDelayed <| fun _ -> (sprintf "Returns the value of the %s property" key)
     prop
 
@@ -40,51 +62,64 @@ let private buildEdmParameter edmType builder =
     | EdmType.String -> builder typeof<string>
     | _ -> builder typeof<obj>
 
-let buildParameter name buildType = ProvidedParameter(name, buildType)
-
 /// Sets the properties on a specific entity based on the inferred schema from the sample provided
 let setPropertiesForEntity (entityType : ProvidedTypeDefinition) (sampleEntities : #seq<DynamicTableEntity>) = 
-    let properties = sampleEntities |> getDistinctProperties
+    let properties = sampleEntities |> Seq.map getPropsForEntity |> getDistinctProperties
     entityType.AddMembersDelayed(fun _ -> 
         properties
-        |> Seq.map (fun (key, value) -> 
-               match value.PropertyType with
-               | EdmType.Binary -> buildEntityProperty<byte []> key
-               | EdmType.Boolean -> buildEntityProperty<bool> key
-               | EdmType.DateTime -> buildEntityProperty<DateTime> key
-               | EdmType.Double -> buildEntityProperty<float> key
-               | EdmType.Guid -> buildEntityProperty<Guid> key
-               | EdmType.Int32 -> buildEntityProperty<int> key
-               | EdmType.Int64 -> buildEntityProperty<int64> key
-               | EdmType.String -> buildEntityProperty<string> key
-               | _ -> buildEntityProperty<obj> key)
+        |> Seq.map (fun (name, edmType, need) -> 
+               match edmType with
+               | EdmType.Binary -> buildEntityProperty<byte []> name need
+               | EdmType.Boolean -> buildEntityProperty<bool> name need
+               | EdmType.DateTime -> buildEntityProperty<DateTime> name need
+               | EdmType.Double -> buildEntityProperty<float> name need
+               | EdmType.Guid -> buildEntityProperty<Guid> name need
+               | EdmType.Int32 -> buildEntityProperty<int> name need
+               | EdmType.Int64 -> buildEntityProperty<int64> name need
+               | EdmType.String -> buildEntityProperty<string> name need
+               | _ -> buildEntityProperty<obj> name need)
         |> Seq.toList)
+    
+    let buildParameter name need buildType =
+        match need with
+        | Mandatory -> ProvidedParameter(name, buildType)
+        | Optional ->
+            let optionOfBuildType = typeof<Option<_>>.GetGenericTypeDefinition().MakeGenericType(buildType)
+            ProvidedParameter(name, optionOfBuildType, optionalValue = None)
+
+    // Build a constructor as well.
     entityType.AddMemberDelayed(fun () -> 
+        // Split into mandatory and optional parameters - we add the mandatory ones first.
+        let mandatoryParams, optionalParams = properties |> List.partition(function (_,_, Mandatory) -> true | _ -> false) 
         let parameters = 
             [ ProvidedParameter("PartitionKey", typeof<Partition>)
               ProvidedParameter("RowKey", typeof<Row>) ] 
-            @ [ for (name, entityProp) in properties -> buildEdmParameter entityProp.PropertyType (buildParameter name) ]
+            @ [ for (name, edmType, need) in mandatoryParams -> buildEdmParameter edmType (buildParameter name need) ]
+            @ [ for (name, edmType, need) in optionalParams -> buildEdmParameter edmType (buildParameter name need) ]
         ProvidedConstructor(
             parameters, 
-            InvokeCode = fun args -> 
-                let fieldNames = 
-                    properties
-                    |> Seq.map fst
-                    |> Seq.toList                
+            InvokeCode = fun args ->
                 let fieldValues = 
                     args
                     |> Seq.skip 2
                     |> Seq.map (fun arg -> Expr.Coerce(arg, typeof<obj>))
-                    |> Seq.toList                
+                    |> Seq.toList
+
+                let fieldNames =
+                    (mandatoryParams @ optionalParams)
+                    |> Seq.take fieldValues.Length
+                    |> Seq.map(fun (name, _, _) -> name)
+                    |> Seq.toList
+
                 <@@ buildTableEntity (%%args.[0] : Partition) (%%args.[1] : Row) fieldNames (%%(Expr.NewArray(typeof<obj>, fieldValues))) @@>))
     properties
 
 /// Gets all the members for a Table Entity type
-let buildTableEntityMembers (parentTableType:ProvidedTypeDefinition, parentTableEntityType, domainType:ProvidedTypeDefinition, connection, tableName) = 
+let buildTableEntityMembers schemaInferenceRowCount (parentTableType:ProvidedTypeDefinition, parentTableEntityType, domainType:ProvidedTypeDefinition, connection, tableName) = 
     parentTableType.AddMembersDelayed(fun () ->
         let propertiesCreated = 
             tableName
-            |> getRowsForSchema 5 connection
+            |> getRowsForSchema schemaInferenceRowCount connection
             |> setPropertiesForEntity parentTableEntityType
         match propertiesCreated with
         | [] -> []

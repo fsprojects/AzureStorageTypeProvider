@@ -41,8 +41,25 @@ module private BatchCalculator =
 
 let internal getTableClient connection = CloudStorageAccount.Parse(connection).CreateCloudTableClient()
 
-let buildTableEntity partitionKey rowKey names (values: obj []) = 
-    LightweightTableEntity(partitionKey, rowKey, DateTimeOffset.MinValue, (Seq.zip names values) |> Map.ofSeq)
+let private boxedNone = box None
+let buildTableEntity partitionKey rowKey names (values: obj []) =
+    let properties =
+        Seq.zip names values
+        |> Seq.choose(fun (name, value) ->
+            match value with
+            | value when value = boxedNone -> None
+            | :? Option<byte []> as option -> Some(name, box (option.Value))
+            | :? Option<string> as option -> Some(name, box (option.Value))
+            | :? Option<int> as option -> Some(name, box (option.Value))
+            | :? Option<bool> as option -> Some(name, box (option.Value))
+            | :? Option<DateTime> as option -> Some(name, box (option.Value))
+            | :? Option<double> as option -> Some(name, box (option.Value))
+            | :? Option<Guid> as option -> Some(name, box (option.Value))
+            | :? Option<int64> as option -> Some(name, box (option.Value))
+            | value -> Some(name, value))
+        |> Map.ofSeq
+
+    LightweightTableEntity(partitionKey, rowKey, DateTimeOffset.MinValue, properties)
 
 let internal getTable tableName connection = 
     let client = getTableClient connection
