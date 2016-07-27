@@ -47,8 +47,10 @@
 * Better handling with large batches
 * Blob listing on folders
 
-### 1.6.0 - ???
+### 1.6.0 - 27th July 2016
 * Async support for Tables
-* BREAKING CHANGE: Lazy deserialization of AsString and AsBytes members on Queue messages. 
-* BREAKING CHANGE: Automatic inference of option types for fields that are missing for some rows.
+* BREAKING CHANGE: Lazy deserialization of AsString and AsBytes members on Queue messages
+* BREAKING CHANGE: Automatic inference of option types for fields that are missing for some rows
+* Name property on containers
+* Visibility Timeout control on queue messages
 * Minor bug fixes
