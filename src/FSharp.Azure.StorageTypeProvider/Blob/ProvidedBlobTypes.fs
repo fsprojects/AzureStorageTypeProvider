@@ -150,6 +150,8 @@ type BlobContainer internal (defaultConnectionString, container) =
         let fileName = path |> Path.GetFileName
         let blobRef = getBlockBlobRef ((defaultArg connectionString defaultConnectionString), container, fileName)
         awaitUnit (blobRef.UploadFromFileAsync(path, FileMode.Open))
+    
+    member val Name = container
 
 module internal ProvidedTypeGenerator = 
     let generateTypes() = 
