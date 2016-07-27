@@ -1,4 +1,4 @@
-﻿module FSharp.Azure.StorageTypeProvider.``Connection Tests``
+﻿module ``Connection Tests``
 
 open FSharp.Azure.StorageTypeProvider
 open Swensen.Unquote
