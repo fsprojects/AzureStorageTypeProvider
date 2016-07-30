@@ -77,39 +77,26 @@ type MatchingTableRow =
 [<ResetTableData>]
 let ``Inserts and deletes a row using lightweight syntax correctly``() =
     let result = table.Insert(Partition "isaac", Row "500", { Name = "isaac"; YearsWorking = 500; Dob = DateTime.UtcNow })
-    match result with
-    | SuccessfulResponse ((Partition "isaac", Row "500"), 204) ->
-        let deleteResponse = table.Delete([ Partition "isaac", Row "500"] )
-        match deleteResponse with
-        | [| "isaac", [| SuccessfulResponse((Partition "isaac", Row "500"), 204) |] |] -> ()
-        | _ -> failwith "error deleting"
-    | _ -> failwith "error inserting"
+    test <@ result = SuccessfulResponse ((Partition "isaac", Row "500"), 204) @>
+    let deleteResponse = table.Delete([ Partition "isaac", Row "500"] )
+    test <@ deleteResponse = [| "isaac", [| SuccessfulResponse((Partition "isaac", Row "500"), 204) |] |] @>
    
 [<Fact>]
 [<ResetTableData>]
 let ``Inserts and deletes a row asynchronously using lightweight syntax correctly``() =
     let result = table.InsertAsync(Partition "isaac", Row "500", { Name = "isaac"; YearsWorking = 500; Dob = DateTime.UtcNow }) |> Async.RunSynchronously
-    match result with
-    | SuccessfulResponse ((Partition "isaac", Row "500"), 204) ->
-        let deleteResponse = table.DeleteAsync([ Partition "isaac", Row "500"] ) |> Async.RunSynchronously
-        match deleteResponse with
-        | [| "isaac", [| SuccessfulResponse((Partition "isaac", Row "500"), 204) |] |] -> ()
-        | _ -> failwith "error deleting"
-    | _ -> failwith "error inserting"
+    test <@ result = SuccessfulResponse ((Partition "isaac", Row "500"), 204) @>
+    let deleteResponse = table.DeleteAsync([ Partition "isaac", Row "500"] ) |> Async.RunSynchronously
+    test <@ deleteResponse = [| "isaac", [| SuccessfulResponse((Partition "isaac", Row "500"), 204) |] |] @>
 
 [<Fact>]
 [<ResetTableData>]
 let ``Inserts and deletes a batch on same partition using lightweight syntax correctly``() =
     let result = table.Insert( [ Partition "men", Row "5", { Name = "isaac"; YearsWorking = 500; Dob = DateTime.UtcNow }
-                                 Partition "men", Row "6", { Name = "isaac"; YearsWorking = 250; Dob = DateTime.UtcNow }
-                               ])
-    match result with
-    | [| "men", [| SuccessfulResponse _; SuccessfulResponse _ |] |] ->
-        let deleteResponse = table.Delete([ Partition "men", Row "5"; Partition "men", Row "6" ] )
-        match deleteResponse with
-        | [| "men", [| SuccessfulResponse _; SuccessfulResponse _ |] |] -> ()
-        | res -> failwith <| sprintf "error deleting %A" res
-    | res -> failwith <| sprintf "error inserting: %A" res
+                                 Partition "men", Row "6", { Name = "isaac"; YearsWorking = 250; Dob = DateTime.UtcNow } ])
+    test <@ result = [| "men", [| SuccessfulResponse((Partition "men", Row "6"), 204); SuccessfulResponse((Partition "men", Row "5"), 204) |] |] @>  
+    let deleteResponse = table.Delete([ Partition "men", Row "5"; Partition "men", Row "6" ] )
+    test <@ deleteResponse = [| "men", [| SuccessfulResponse((Partition "men", Row "6"), 204); SuccessfulResponse((Partition "men", Row "5"), 204) |] |] @>  
 
 [<Fact>]
 [<ResetTableData>]
@@ -124,6 +111,18 @@ let ``Deletes rows asynchronously using overload for multiple entities``() =
     let entitiesToDelete = table.GetPartition("men");
     table.DeleteAsync(entitiesToDelete) |> Async.RunSynchronously |> ignore
     test<@ table.GetPartition("men").Length = 0 @>
+
+[<Fact>]
+[<ResetTableData>]
+let ``Deleting a non-existant row raises an error``() =
+    let deleteResponse = table.Delete [ Partition "blah", Row "500"]
+    test <@ deleteResponse = [| "blah", [| EntityError((Partition "blah", Row "500"), 404, "ResourceNotFound") |] |] @>
+
+[<Fact>]
+[<ResetTableData>]
+let ``Deleting a non-existant row asynchronously raises an error``() =
+    let deleteResponse = table.DeleteAsync [ Partition "blah", Row "500"] |> Async.RunSynchronously
+    test <@ deleteResponse = [| "blah", [| EntityError((Partition "blah", Row "500"), 404, "ResourceNotFound") |] |] @>
 
 [<Fact>]
 [<ResetTableData>]
