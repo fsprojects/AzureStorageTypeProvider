@@ -56,4 +56,5 @@
 * Minor bug fixes
 
 ### 1.6.1 - ???
-* Improve synchronous bulk operation performance 
+* Improve synchronous bulk table operation performance
+* Fix asynchronous bulk table operation error handling

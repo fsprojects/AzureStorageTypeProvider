@@ -64,7 +64,7 @@ let ``Gets all rows in a partition``() =
     test <@ table.GetPartition("men").Length = 3 @>
 
 [<Fact>]
-let ``Gets all rows in a partition asyncronously``() =
+let ``Gets all rows in a partition asynchronously``() =
     let partition = table.GetPartitionAsync("men") |> Async.RunSynchronously
     test <@ partition.Length = 3 @>
 
@@ -87,7 +87,7 @@ let ``Inserts and deletes a row using lightweight syntax correctly``() =
    
 [<Fact>]
 [<ResetTableData>]
-let ``Inserts and deletes a row asyncronously using lightweight syntax correctly``() =
+let ``Inserts and deletes a row asynchronously using lightweight syntax correctly``() =
     let result = table.InsertAsync(Partition "isaac", Row "500", { Name = "isaac"; YearsWorking = 500; Dob = DateTime.UtcNow }) |> Async.RunSynchronously
     match result with
     | SuccessfulResponse ((Partition "isaac", Row "500"), 204) ->
@@ -113,14 +113,14 @@ let ``Inserts and deletes a batch on same partition using lightweight syntax cor
 
 [<Fact>]
 [<ResetTableData>]
-let ``Deletes row asyncronously using overload for single entity``() =
+let ``Deletes row asynchronously using overload for single entity``() =
     let entityToDelete = table.Get(Row "1", Partition "men");
     table.DeleteAsync(entityToDelete.Value) |> Async.RunSynchronously |> ignore
     test<@ table.Get(Row "1", Partition "men").IsNone @>
 
 [<Fact>]
 [<ResetTableData>]
-let ``Deletes rows asyncronously using overload for multiple entities``() =
+let ``Deletes rows asynchronously using overload for multiple entities``() =
     let entitiesToDelete = table.GetPartition("men");
     table.DeleteAsync(entitiesToDelete) |> Async.RunSynchronously |> ignore
     test<@ table.GetPartition("men").Length = 0 @>
@@ -139,6 +139,12 @@ let ``Inserting an existing row returns an error``() =
 
 [<Fact>]
 [<ResetTableData>]
+let ``Inserting an existing row asynchronously returns an error``() =
+    let result = table.InsertAsync(Partition "men", Row "1", { Name = "fred"; YearsWorking = 35; Dob = DateTime.MaxValue }) |> Async.RunSynchronously
+    test <@ result = EntityError((Partition "men", Row "1"), 409, "EntityAlreadyExists") @>
+
+[<Fact>]
+[<ResetTableData>]
 let ``Inserts a row using provided types correctly``() =
     table.Insert(Local.Domain.employeeEntity(Partition "sample", Row "x", DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc), true, "Hello", 6.1, 1)) |> ignore
     let result = table.Get(Row "x", Partition "sample").Value
@@ -153,7 +159,7 @@ let ``Inserts a row using provided types correctly``() =
 
 [<Fact>]
 [<ResetTableData>]
-let ``Inserts a row asyncronously using provided types correctly``() =
+let ``Inserts a row asynchronously using provided types correctly``() =
     table.InsertAsync(Local.Domain.employeeEntity(Partition "sample", Row "x", DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc), true, "Hello", 6.1, 1)) |> Async.RunSynchronously |> ignore
     let result = table.Get(Row "x", Partition "sample").Value
     
@@ -174,7 +180,7 @@ let ``Inserts many rows using provided types correctly``() =
 
 [<Fact>]
 [<ResetTableData>]
-let ``Inserts many rows asyncronously using provided types correctly``() =
+let ``Inserts many rows asynchronously using provided types correctly``() =
     table.InsertAsync [| Local.Domain.employeeEntity(Partition "sample", Row "x", DateTime.MaxValue, true, "Hello", 5.2, 2)
                          Local.Domain.employeeEntity(Partition "sample", Row "y", DateTime.MaxValue, true, "Hello", 1.8, 2) |] 
     |> Async.RunSynchronously

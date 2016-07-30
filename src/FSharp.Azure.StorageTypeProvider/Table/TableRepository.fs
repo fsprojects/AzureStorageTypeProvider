@@ -181,23 +181,30 @@ let private processErrorResp entityBatch buildEntityId (ex:StorageException) =
     | [| _ |] -> entityBatch |> Seq.map(fun entity -> EntityError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
     | _ -> entityBatch |> Seq.map(fun entity -> BatchError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
 
-let internal executeBatchAsynchronously batchOp entityBatch buildEntityId (table:CloudTable) = async{
-    let! response =  table.ExecuteBatchAsync(batchOp) |> Async.AwaitTask |> Async.Catch
-    match response with
-    | Choice1Of2 successResp -> 
-        return 
-            successResp
-            |> Seq.zip entityBatch
-            |> Seq.map(fun (entity, res) -> SuccessfulResponse(buildEntityId entity, res.HttpStatusCode))
-    | Choice2Of2 err ->
-        return
-            match err with
-            | :? StorageException as ex -> processErrorResp entityBatch buildEntityId ex
-            | _  -> raise (err) }
+let (|AsyncSuccess|AggregationError|) (asyncComputation:Choice<_,exn>) =
+    match asyncComputation with
+    | Choice1Of2 success -> AsyncSuccess success
+    | Choice2Of2 (:? AggregateException as agg) -> AggregationError (agg.InnerExceptions |> Seq.toList)
+    | Choice2Of2 err -> AggregationError [ err ]
+
+let internal executeBatchAsynchronously batchOp entityBatch buildEntityId (table:CloudTable) =
+    batchOp
+    |> table.ExecuteBatchAsync
+    |> Async.AwaitTask
+    |> Async.Catch
+    |> Async.map(function
+    | AsyncSuccess reponse -> 
+        reponse
+        |> Seq.zip entityBatch
+        |> Seq.map(fun (entity, res) -> SuccessfulResponse(buildEntityId entity, res.HttpStatusCode))
+    | AggregationError ([ :? StorageException as ex ]) -> processErrorResp entityBatch buildEntityId ex
+    | AggregationError [] -> failwith "An unknown error occurred."
+    | AggregationError (topException :: _) -> raise topException)
 
 let internal executeBatchSyncronously batchOp entityBatch buildEntityId (table:CloudTable) =
     try 
-    table.ExecuteBatch(batchOp)
+    batchOp
+    |> table.ExecuteBatch
     |> Seq.zip entityBatch
     |> Seq.map(fun (entity, res) -> SuccessfulResponse(buildEntityId entity, res.HttpStatusCode))
     with :? StorageException as ex -> processErrorResp entityBatch buildEntityId ex
@@ -208,12 +215,12 @@ let internal executeBatchOperationAsync createTableOp (table:CloudTable) entitie
         |> Seq.map(fun (partitionKey, entityBatch, batchOperation) -> async{
             let buildEntityId (entity:DynamicTableEntity) = Partition(entity.PartitionKey), Row(entity.RowKey)
             let! responses = executeBatchAsynchronously batchOperation entityBatch buildEntityId table
-            return (partitionKey, responses |> Seq.toArray)
-            })
+            return (partitionKey, responses |> Seq.toArray) })
         |> Async.Parallel }
 
 let internal executeBatchOperation createTableOp (table:CloudTable) entities =
-    splitIntoBatches createTableOp entities
+    entities
+    |> splitIntoBatches createTableOp
     |> Seq.toArray
     |> Array.Parallel.map(fun (partitionKey, entityBatch, batchOperation) ->
         let buildEntityId (entity:DynamicTableEntity) = Partition(entity.PartitionKey), Row(entity.RowKey)
