@@ -214,11 +214,11 @@ let internal executeBatchOperationAsync createTableOp (table:CloudTable) entitie
 
 let internal executeBatchOperation createTableOp (table:CloudTable) entities =
     splitIntoBatches createTableOp entities
-    |> Seq.map(fun (partitionKey, entityBatch, batchOperation) ->
+    |> Seq.toArray
+    |> Array.Parallel.map(fun (partitionKey, entityBatch, batchOperation) ->
         let buildEntityId (entity:DynamicTableEntity) = Partition(entity.PartitionKey), Row(entity.RowKey)
         let responses = executeBatchSyncronously batchOperation entityBatch buildEntityId table
         partitionKey, responses |> Seq.toArray)
-    |> Seq.toArray
 
 let deleteEntities connection tableName entities =
     let table = getTable tableName connection

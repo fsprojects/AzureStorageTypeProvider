@@ -54,3 +54,6 @@
 * Name property on containers
 * Visibility Timeout control on queue messages
 * Minor bug fixes
+
+### 1.6.1 - ???
+* Improve synchronous bulk operation performance 
