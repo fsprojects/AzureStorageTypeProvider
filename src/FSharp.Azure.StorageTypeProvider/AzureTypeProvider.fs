@@ -7,8 +7,8 @@ open FSharp.Azure.StorageTypeProvider.Configuration
 open Microsoft.FSharp.Core.CompilerServices
 open ProviderImplementation.ProvidedTypes
 open System
+open System.Collections.Generic
 open System.Reflection
-
 
 [<TypeProvider>]
 /// [omit]
@@ -71,8 +71,15 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
           ProvidedStaticParameter("configFileName", typeof<string>, "app.config")
           schemaSize ]
     
+    let memoize func =
+        let cache = Dictionary()
+        fun argsAsString args ->
+            if not (cache.ContainsKey argsAsString) then
+                cache.Add(argsAsString, func argsAsString args)
+            cache.[argsAsString]
+
     do
-        azureAccountType.DefineStaticParameters(parameters, buildTypes)
+        azureAccountType.DefineStaticParameters(parameters, memoize buildTypes)
         this.AddNamespace(namespaceName, [ azureAccountType ])
         azureAccountType.AddXmlDoc("The entry type to connect to Azure Storage assets.")
 
