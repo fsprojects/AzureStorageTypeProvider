@@ -70,6 +70,25 @@ let internal getTables connection =
     let client = getTableClient connection
     client.ListTables() |> Seq.map(fun table -> table.Name)
 
+let internal getMetricsTables connection =
+    let client = getTableClient connection
+    let services = [ "Blob"; "Queue"; "Table"; "File" ]
+    let locations = [ "Primary"; "Secondary" ]
+    let periods = [ "Hourly", "Hour"; "Per Minute", "Minute" ]
+
+    seq {
+        for (description, period) in periods do
+            yield description, seq { 
+                for location in locations do
+                    yield location, seq {
+                        for service in services do
+                            let tableName = sprintf "$Metrics%s%sTransactions%s" period location service
+                            if (client.GetTableReference(tableName).Exists()) then
+                                yield service, tableName
+                    }
+            }
+    }
+
 type private DynamicQuery = TableQuery<DynamicTableEntity>
 
 let internal getRowsForSchema (rowCount: int) connection tableName = 
