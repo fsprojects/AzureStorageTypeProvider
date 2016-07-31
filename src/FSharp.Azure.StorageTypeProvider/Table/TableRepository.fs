@@ -78,16 +78,11 @@ let internal getMetricsTables connection =
 
     seq {
         for (description, period) in periods do
-            yield description, seq { 
-                for location in locations do
-                    yield location, seq {
-                        for service in services do
-                            let tableName = sprintf "$Metrics%s%sTransactions%s" period location service
-                            if (client.GetTableReference(tableName).Exists()) then
-                                yield service, tableName
-                    }
-            }
-    }
+            for location in locations do
+                for service in services do
+                    let tableName = sprintf "$Metrics%s%sTransactions%s" period location service
+                    if (client.GetTableReference(tableName).Exists()) then
+                        yield description, location, service, tableName }
 
 type private DynamicQuery = TableQuery<DynamicTableEntity>
 

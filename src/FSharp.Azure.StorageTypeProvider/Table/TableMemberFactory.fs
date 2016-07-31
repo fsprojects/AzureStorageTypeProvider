@@ -25,19 +25,16 @@ let getTableStorageMembers schemaInferenceRowCount (connectionString, domainType
     |> tableListingType.AddMembers
 
     // Get any metrics tables that are available
-    match getMetricsTables connectionString with
-    | metrics when metrics = Seq.empty -> ()
-    | metrics ->
-        let metricsTablesType = ProvidedTypeDefinition("Metrics", Some typeof<obj>, HideObjectMethods = true)
+    let metrics = getMetricsTables connectionString    
+    if metrics <> Seq.empty then
+        let metricsTablesType = ProvidedTypeDefinition("$Azure_Metrics", Some typeof<obj>, HideObjectMethods = true)
         domainType.AddMember metricsTablesType
 
-        for (period, locations) in metrics do
-            for (location, services) in locations do
-                for (service, tableName) in services do
-                    createTableType connectionString tableName (sprintf "%s %s metrics (%s)" period service location)
-                    |> metricsTablesType.AddMember
+        for (period, theLocation, service, tableName) in metrics do
+            createTableType connectionString tableName (sprintf "%s %s metrics (%s)" period service theLocation)
+            |> metricsTablesType.AddMember
 
-        let metricsTablesProp = ProvidedProperty("Metrics", metricsTablesType, GetterCode = (fun _ -> <@@ () @@>))
+        let metricsTablesProp = ProvidedProperty("Azure Metrics", metricsTablesType, GetterCode = (fun _ -> <@@ () @@>))
         metricsTablesProp.AddXmlDoc "Provides access to metrics tables populated by Azure that are available on this storage account."
         tableListingType.AddMember metricsTablesProp
 
