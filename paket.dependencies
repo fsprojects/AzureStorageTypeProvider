@@ -12,6 +12,7 @@ nuget FSharp.Formatting
 nuget Deedle
 nuget FSharp.Core ~> 3
 nuget Newtonsoft.Json 6.0.8
+nuget FSharp.Charting
 
 github fsprojects/FSharp.TypeProviders.StarterPack src/ProvidedTypes.fsi
 github fsprojects/FSharp.TypeProviders.StarterPack src/ProvidedTypes.fs

@@ -3,6 +3,7 @@ NUGET
   remote: https://www.nuget.org/api/v2
     Deedle (1.2.4)
     FAKE (4.4.5)
+    FSharp.Charting (0.90.14)
     FSharp.Compiler.Service (0.0.90)
     FSharp.Core (3.1.2.5)
     FSharp.Formatting (2.11)
