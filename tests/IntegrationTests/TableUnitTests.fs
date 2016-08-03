@@ -6,7 +6,8 @@ open Swensen.Unquote
 open System
 open Xunit
 
-type Local = AzureTypeProvider<"DevStorageAccount", "">
+type Local = AzureTypeProvider<"DevStorageAccount">
+type Humanized = AzureTypeProvider<"DevStorageAccount", humanize = true>
 let table = Local.Tables.employee
 
 type ResetTableDataAttribute() =
@@ -296,12 +297,10 @@ let ``Missing fields are correctly shown as optionals``() =
     test <@ row.IsSome @>
     
     // Compiles!
-    match row with
-    | Some row ->
-        ignore row.IsAnimal.IsSome
-        ignore row.YearsWorking.IsSome
-        ignore row.Dob
-    | None -> ()
+    let row = row.Value
+    ignore row.IsAnimal.IsSome
+    ignore row.YearsWorking.IsSome
+    ignore row.Dob
 
 [<Fact>]
 [<ResetTableData>]
@@ -330,3 +329,17 @@ let ``Can insert an row with optionals omitted in``() =
     let entity = entity.Value
     test <@ entity.IsAnimal = None @>
     test <@ entity.YearsWorking = None @>
+
+[<Fact>]
+let ``Correctly humanizes column names``() =
+    let entity = Humanized.Tables.optionals.Get(Row "1", Partition "partition").Value
+    ignore <| entity.Dob
+    ignore <| entity.``Is Animal``
+    ignore <| entity.``Is Manager``
+    ignore <| entity.Name
+    ignore <| entity.``PartitionKey``
+    ignore <| entity.``RowKey``
+    ignore <| entity.Salary
+    ignore <| entity.``Years Working``
+
+ 

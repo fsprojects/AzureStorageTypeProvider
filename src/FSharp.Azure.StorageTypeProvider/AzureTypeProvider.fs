@@ -50,11 +50,12 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
             typeProviderForAccount.AddMember(domainTypes)
 
             let schemaInferenceRowCount = args.[4] :?> int
+            let humanizeColumns = args.[5] :?> bool
 
             // Now create child members e.g. containers, tables etc.
             typeProviderForAccount.AddMembers
                 ([ BlobMemberFactory.getBlobStorageMembers 
-                   TableMemberFactory.getTableStorageMembers schemaInferenceRowCount
+                   TableMemberFactory.getTableStorageMembers schemaInferenceRowCount humanizeColumns
                    QueueMemberFactory.getQueueStorageMembers ]
                 |> List.map (fun builder -> builder(connectionString, domainTypes)))
             typeProviderForAccount
@@ -65,11 +66,15 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
         let schemaSize = ProvidedStaticParameter("schemaSize", typeof<int>, 10)
         schemaSize.AddXmlDoc "The maximum number of rows to read per table, from which to infer schema"
 
+        let humanize = ProvidedStaticParameter("humanize", typeof<bool>, false)
+        humanize.AddXmlDoc "Whether to humanize table column names"
+
         [ ProvidedStaticParameter("accountName", typeof<string>, String.Empty)
           ProvidedStaticParameter("accountKey", typeof<string>, String.Empty)
           ProvidedStaticParameter("connectionStringName", typeof<string>, String.Empty)
           ProvidedStaticParameter("configFileName", typeof<string>, "app.config")
-          schemaSize ]
+          schemaSize
+          humanize ]
     
     let memoize func =
         let cache = Dictionary()

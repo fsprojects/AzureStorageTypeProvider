@@ -28,8 +28,10 @@ let private getDistinctProperties tableEntities =
     (mandatoryProperties |> Set.toList |> List.map(fun (name, edmType) -> name, edmType, PropertyNeed.Mandatory))
     |> List.sortBy(fun (name, _, _) -> name)
 
+let regex = System.Text.RegularExpressions.Regex (@"(?<=[A-Z])(?=[A-Z][a-z]) |(?<=[^A-Z])(?=[A-Z]) |(?<=[A-Za-z])(?=[^A-Za-z])", System.Text.RegularExpressions.RegexOptions.IgnorePatternWhitespace)
+
 /// Builds a property for a single entity for a specific type
-let private buildEntityProperty<'a> key need = 
+let private buildEntityProperty<'a> humanize key need = 
     let getter, propType = 
         match need with
         | PropertyNeed.Mandatory ->
@@ -45,8 +47,9 @@ let private buildEntityProperty<'a> key need =
                     else None @@>
             , typeof<Option<'a>>
     
-    let prop = ProvidedProperty(key, propType, GetterCode = getter)
-    prop.AddXmlDocDelayed <| fun _ -> (sprintf "Returns the value of the %s property" key)
+    let propName = if humanize then regex.Replace(key, " ") else key
+    let prop = ProvidedProperty(propName, propType, GetterCode = getter)
+    prop.AddXmlDocDelayed <| fun _ -> (sprintf "Returns the value of the '%s' property" propName)
     prop
 
 /// builds a single EDM parameter
@@ -63,21 +66,21 @@ let private buildEdmParameter edmType builder =
     | _ -> builder typeof<obj>
 
 /// Sets the properties on a specific entity based on the inferred schema from the sample provided
-let setPropertiesForEntity (entityType : ProvidedTypeDefinition) (sampleEntities : #seq<DynamicTableEntity>) = 
+let setPropertiesForEntity humanize (entityType : ProvidedTypeDefinition) (sampleEntities : #seq<DynamicTableEntity>) = 
     let properties = sampleEntities |> Seq.map getPropsForEntity |> getDistinctProperties
     entityType.AddMembersDelayed(fun _ -> 
         properties
         |> Seq.map (fun (name, edmType, need) -> 
                match edmType with
-               | EdmType.Binary -> buildEntityProperty<byte []> name need
-               | EdmType.Boolean -> buildEntityProperty<bool> name need
-               | EdmType.DateTime -> buildEntityProperty<DateTime> name need
-               | EdmType.Double -> buildEntityProperty<float> name need
-               | EdmType.Guid -> buildEntityProperty<Guid> name need
-               | EdmType.Int32 -> buildEntityProperty<int> name need
-               | EdmType.Int64 -> buildEntityProperty<int64> name need
-               | EdmType.String -> buildEntityProperty<string> name need
-               | _ -> buildEntityProperty<obj> name need)
+               | EdmType.Binary -> buildEntityProperty<byte []> humanize name need
+               | EdmType.Boolean -> buildEntityProperty<bool> humanize name need
+               | EdmType.DateTime -> buildEntityProperty<DateTime> humanize name need
+               | EdmType.Double -> buildEntityProperty<float> humanize name need
+               | EdmType.Guid -> buildEntityProperty<Guid> humanize name need
+               | EdmType.Int32 -> buildEntityProperty<int> humanize name need
+               | EdmType.Int64 -> buildEntityProperty<int64> humanize name need
+               | EdmType.String -> buildEntityProperty<string> humanize name need
+               | _ -> buildEntityProperty<obj> humanize name need)
         |> Seq.toList)
     
     let buildParameter name need buildType =
@@ -115,12 +118,12 @@ let setPropertiesForEntity (entityType : ProvidedTypeDefinition) (sampleEntities
     properties
 
 /// Gets all the members for a Table Entity type
-let buildTableEntityMembers schemaInferenceRowCount (parentTableType:ProvidedTypeDefinition, parentTableEntityType, domainType:ProvidedTypeDefinition, connection, tableName) = 
+let buildTableEntityMembers schemaInferenceRowCount humanize (parentTableType:ProvidedTypeDefinition, parentTableEntityType, domainType:ProvidedTypeDefinition, connection, tableName) = 
     parentTableType.AddMembersDelayed(fun () ->
         let propertiesCreated = 
             tableName
             |> getRowsForSchema schemaInferenceRowCount connection
-            |> setPropertiesForEntity parentTableEntityType
+            |> setPropertiesForEntity humanize parentTableEntityType
         match propertiesCreated with
         | [] -> []
         | _ -> 
