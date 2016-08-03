@@ -291,9 +291,8 @@ Target "All" DoNothing
 "GenerateHelp"
   ==> "KeepRunning"
     
-"BuildPackage"
-"ReleaseDocs"
-  ==> "Release"
+"BuildPackage" ==> "Release"
+"ReleaseDocs" ==> "Release"
 
 ActivateFinalTarget "PublishTestsResultsToAppveyor"
 RunTargetOrDefault "BuildPackage"
