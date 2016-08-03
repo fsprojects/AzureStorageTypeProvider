@@ -54,3 +54,7 @@
 * Name property on containers
 * Visibility Timeout control on queue messages
 * Minor bug fixes
+
+### 1.6.1 - 3rd August 2016
+* Improve synchronous bulk table operation performance
+* Fix asynchronous bulk table operation error handling
