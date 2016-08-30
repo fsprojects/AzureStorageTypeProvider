@@ -58,3 +58,7 @@
 ### 1.6.1 - 3rd August 2016
 * Improve synchronous bulk table operation performance
 * Fix asynchronous bulk table operation error handling
+
+### 1.7.0 - ???
+* Support for Azure Metrics tables.
+* Support for simple humanization of table properties.
