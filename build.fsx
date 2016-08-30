@@ -263,6 +263,7 @@ FinalTarget "PublishTestsResultsToAppveyor" (fun _ ->
 // Run all targets by default. Invoke 'build <Target>' to override
 
 Target "All" DoNothing
+Target "PackageAfterTest" DoNothing
 
 "Clean"
   ==> "AssemblyInfo"
@@ -270,8 +271,12 @@ Target "All" DoNothing
   ==> "ResetTestData"
   ==> "RunTests"
 
+"Build"
+  ==> "Nuget"
+  ==> "PackageAfterTest"
+
 "RunTests"
-  ==> "NuGet"
+  ==> "PackageAfterTest"
   =?> ("LocalDeploy", buildServer = LocalBuild)
   =?> ("BuildServerDeploy", buildServer = AppVeyor)
   ==> "BuildPackage"
@@ -291,9 +296,8 @@ Target "All" DoNothing
 "GenerateHelp"
   ==> "KeepRunning"
     
-"BuildPackage"
-"ReleaseDocs"
-  ==> "Release"
+"BuildPackage" ==> "Release"
+"ReleaseDocs" ==> "Release"
 
 ActivateFinalTarget "PublishTestsResultsToAppveyor"
 RunTargetOrDefault "BuildPackage"
