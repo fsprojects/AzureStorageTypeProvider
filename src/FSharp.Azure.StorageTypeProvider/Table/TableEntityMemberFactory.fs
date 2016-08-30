@@ -6,6 +6,7 @@ open Microsoft.FSharp.Quotations
 open Microsoft.WindowsAzure.Storage.Table
 open ProviderImplementation.ProvidedTypes
 open System
+open System.Text
 
 let private getPropsForEntity (entity:DynamicTableEntity) =
     entity.Properties
@@ -28,7 +29,8 @@ let private getDistinctProperties tableEntities =
     (mandatoryProperties |> Set.toList |> List.map(fun (name, edmType) -> name, edmType, PropertyNeed.Mandatory))
     |> List.sortBy(fun (name, _, _) -> name)
 
-let regex = System.Text.RegularExpressions.Regex (@"(?<=[A-Z])(?=[A-Z][a-z]) |(?<=[^A-Z])(?=[A-Z]) |(?<=[A-Za-z])(?=[^A-Za-z])", System.Text.RegularExpressions.RegexOptions.IgnorePatternWhitespace)
+let humanizeRegex =
+    RegularExpressions.Regex (@"(?<=[A-Z])(?=[A-Z][a-z]) |(?<=[^A-Z])(?=[A-Z]) |(?<=[A-Za-z])(?=[^A-Za-z])", RegularExpressions.RegexOptions.IgnorePatternWhitespace)
 
 /// Builds a property for a single entity for a specific type
 let private buildEntityProperty<'a> humanize key need = 
@@ -47,7 +49,7 @@ let private buildEntityProperty<'a> humanize key need =
                     else None @@>
             , typeof<Option<'a>>
     
-    let propName = if humanize then regex.Replace(key, " ") else key
+    let propName = if humanize then humanizeRegex.Replace(key, " ") else key
     let prop = ProvidedProperty(propName, propType, GetterCode = getter)
     prop.AddXmlDocDelayed <| fun _ -> (sprintf "Returns the value of the '%s' property" propName)
     prop

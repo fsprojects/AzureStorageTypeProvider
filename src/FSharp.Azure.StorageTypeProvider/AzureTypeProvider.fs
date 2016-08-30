@@ -61,20 +61,19 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
             typeProviderForAccount
         | Failure ex -> failwith (sprintf "Unable to validate connection string (%s)" ex.Message)
     
+    let createParam (name, defaultValue:'a, help) =
+        let providedParameter = ProvidedStaticParameter(name, typeof<'a>, defaultValue)
+        providedParameter.AddXmlDoc help
+        providedParameter
+    
     // Parameterising the provider
     let parameters =
-        let schemaSize = ProvidedStaticParameter("schemaSize", typeof<int>, 10)
-        schemaSize.AddXmlDoc "The maximum number of rows to read per table, from which to infer schema"
-
-        let humanize = ProvidedStaticParameter("humanize", typeof<bool>, false)
-        humanize.AddXmlDoc "Whether to humanize table column names"
-
-        [ ProvidedStaticParameter("accountName", typeof<string>, String.Empty)
-          ProvidedStaticParameter("accountKey", typeof<string>, String.Empty)
-          ProvidedStaticParameter("connectionStringName", typeof<string>, String.Empty)
-          ProvidedStaticParameter("configFileName", typeof<string>, "app.config")
-          schemaSize
-          humanize ]
+        [ createParam("accountName", String.Empty, "The Storage Account name, or full connection string in the format 'DefaultEndpointsProtocol=protocol;AccountName=account;AccountKey=key;'.")
+          createParam("accountKey", String.Empty, "The Storage Account key. Ignored if the accountName argument is the full connection string.")
+          createParam("connectionStringName", String.Empty, "The Connection String key from the configuration file to use to retrieve the connection string. If set, accountName and accountKey are ignored.")
+          createParam("configFileName", "app.config", "The name of the configuration file to look for. Defaults to 'app.config'")
+          createParam("schemaSize", 10, "The maximum number of rows to read per table, from which to infer schema. Defaults to 10.")
+          createParam("humanize", false, "Whether to humanize table column names. Defaults to false.") ]
     
     let memoize func =
         let cache = Dictionary()
