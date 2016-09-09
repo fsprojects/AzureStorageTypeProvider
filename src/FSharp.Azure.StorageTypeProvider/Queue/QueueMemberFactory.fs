@@ -53,8 +53,7 @@ let getQueueStorageMembers (connectionString, domainType : ProvidedTypeDefinitio
     queueListingType.AddMembersDelayed(fun () ->
         connectionString
         |> getQueues
-        |> List.map createQueueMember 
-        |> List.map(fun (name, queueType) ->
+        |> List.map (createQueueMember >> fun (name, queueType) ->
             ProvidedProperty(name, queueType, GetterCode = fun _ -> <@@ ProvidedQueue(connectionString, name) @@> )))
     domainType.AddMember queueListingType
     queueListingType.AddMember(ProvidedProperty("CloudQueueClient", typeof<CloudQueueClient>, GetterCode = (fun _ -> <@@ QueueBuilder.getQueueClient connectionString @@>)))
