@@ -252,8 +252,6 @@ Target "LocalDeploy" (fun _ ->
     |> Seq.map(fun x -> x.FullName)
     |> CopyFiles "..\..\LocalPackages")
 
-Target "BuildPackage" DoNothing
-
 Target "BuildServerDeploy" (fun _ -> publishOnAppveyor buildDir)
 
 FinalTarget "PublishTestsResultsToAppveyor" (fun _ ->
@@ -267,17 +265,11 @@ Target "All" DoNothing
 "Clean"
   ==> "AssemblyInfo"
   ==> "Build"
+  ==> "Nuget"
   ==> "ResetTestData"
   ==> "RunTests"
-
-"Build"
-  ==> "Nuget"
-  ==> "PackageAfterTest"
-
-"RunTests"
   =?> ("LocalDeploy", buildServer = LocalBuild)
   =?> ("BuildServerDeploy", buildServer = AppVeyor)
-  ==> "BuildPackage"
 
 "CleanDocs"
   ==> "GenerateHelp"
@@ -290,12 +282,10 @@ Target "All" DoNothing
   ==> "GenerateReferenceDocs"
   ==> "GenerateDocs"
   ==> "ReleaseDocs"
+  ==> "Release"
 
 "GenerateHelp"
   ==> "KeepRunning"
-    
-"BuildPackage" ==> "Release"
-"ReleaseDocs" ==> "Release"
 
 ActivateFinalTarget "PublishTestsResultsToAppveyor"
-RunTargetOrDefault "BuildPackage"
+RunTargetOrDefault "RunTests"
