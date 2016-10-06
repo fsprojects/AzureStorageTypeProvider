@@ -153,7 +153,7 @@ For example, given the following rows, we can see that two columns are not alway
 <tbody>
 <tr class="odd">
 <td><p>partition.1</p></td>
-<td><p>03/08/2016 2:14:25 +00:00</p></td>
+<td><p>06/10/2016 21:39:35 +00:00</p></td>
 <td><p>01/05/1990 0:00:00</p></td>
 <td><p>True</p></td>
 <td><p> ... </p></td>
@@ -163,7 +163,7 @@ For example, given the following rows, we can see that two columns are not alway
 </tr>
 <tr class="even">
 <td><p>partition.2</p></td>
-<td><p>03/08/2016 2:14:25 +00:00</p></td>
+<td><p>06/10/2016 21:39:35 +00:00</p></td>
 <td><p>01/05/1990 0:00:00</p></td>
 <td><p>True</p></td>
 <td><p> ... </p></td>
@@ -240,32 +240,32 @@ in a key/value collection - this is useful for binding scenarios or e.g. mapping
 <thead>
 <tr class="header">
 <th></th>
-<th><p>Timestamp</p></th>
 <th><p>Dob</p></th>
 <th><p>IsManager</p></th>
 <th><p>Name</p></th>
 <th><p>Salary</p></th>
 <th><p>YearsWorking</p></th>
+<th><p>Timestamp</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td><p>women.1</p></td>
-<td><p>03/08/2016 2:14:25 +00:00</p></td>
 <td><p>30/04/2005 0:00:00</p></td>
 <td><p>True</p></td>
 <td><p>sara</p></td>
 <td><p>3.5</p></td>
 <td><p>35</p></td>
+<td><p>06/10/2016 21:39:35 +00:00</p></td>
 </tr>
 <tr class="even">
 <td><p>women.2</p></td>
-<td><p>03/08/2016 2:14:25 +00:00</p></td>
 <td><p>20/08/1965 0:00:00</p></td>
 <td><p>False</p></td>
 <td><p>rachel</p></td>
 <td><p>5.5</p></td>
 <td><p>20</p></td>
+<td><p>06/10/2016 21:39:35 +00:00</p></td>
 </tr>
 </tbody>
 </table>
@@ -610,11 +610,11 @@ Entity (Partition "North America", Row "1") was ignored as part of a failed batc
 <div class="tip" id="fs48">Multiple items<br />union case Partition.Partition: string -&gt; Partition<br /><br />--------------------<br />type Partition = | Partition of string<br /><br />Full name: FSharp.Azure.StorageTypeProvider.Table.Partition</div>
 <div class="tip" id="fs49">property LightweightTableEntity.PartitionKey: string</div>
 <div class="tip" id="fs50">property LightweightTableEntity.RowKey: string</div>
-<div class="tip" id="fs51">property AzureTypeProvider&lt;...&gt;.Domain.employeeEntity.Name: string<br /><em><br /><br />Returns the value of the Name property</em></div>
-<div class="tip" id="fs52">property AzureTypeProvider&lt;...&gt;.Domain.employeeEntity.YearsWorking: int<br /><em><br /><br />Returns the value of the YearsWorking property</em></div>
-<div class="tip" id="fs53">property AzureTypeProvider&lt;...&gt;.Domain.employeeEntity.Dob: DateTime<br /><em><br /><br />Returns the value of the Dob property</em></div>
-<div class="tip" id="fs54">property AzureTypeProvider&lt;...&gt;.Domain.employeeEntity.Salary: float<br /><em><br /><br />Returns the value of the Salary property</em></div>
-<div class="tip" id="fs55">property AzureTypeProvider&lt;...&gt;.Domain.employeeEntity.IsManager: bool<br /><em><br /><br />Returns the value of the IsManager property</em></div>
+<div class="tip" id="fs51">property AzureTypeProvider&lt;...&gt;.Domain.employeeEntity.Name: string<br /><em><br /><br />Returns the value of the &#39;Name&#39; property</em></div>
+<div class="tip" id="fs52">property AzureTypeProvider&lt;...&gt;.Domain.employeeEntity.YearsWorking: int<br /><em><br /><br />Returns the value of the &#39;YearsWorking&#39; property</em></div>
+<div class="tip" id="fs53">property AzureTypeProvider&lt;...&gt;.Domain.employeeEntity.Dob: DateTime<br /><em><br /><br />Returns the value of the &#39;Dob&#39; property</em></div>
+<div class="tip" id="fs54">property AzureTypeProvider&lt;...&gt;.Domain.employeeEntity.Salary: float<br /><em><br /><br />Returns the value of the &#39;Salary&#39; property</em></div>
+<div class="tip" id="fs55">property AzureTypeProvider&lt;...&gt;.Domain.employeeEntity.IsManager: bool<br /><em><br /><br />Returns the value of the &#39;IsManager&#39; property</em></div>
 <div class="tip" id="fs56">val optionalFrame : Frame&lt;string,string&gt;<br /><br />Full name: Tables.optionalFrame</div>
 <div class="tip" id="fs57">property AzureTypeProvider&lt;...&gt;.Domain.Tables.optionals: AzureTypeProvider&lt;...&gt;.Domain.optionalsTable<br /><em><br /><br />Provides access to the &#39;optionals&#39; table.</em></div>
 <div class="tip" id="fs58">AzureTypeProvider&lt;...&gt;.Domain.optionalsTable.Query() : AzureTypeProvider&lt;...&gt;.Domain.optionalsQueryBuilder<br /><em><br /><br />Creates a strongly-typed query against the table.</em><br />AzureTypeProvider&lt;...&gt;.Domain.optionalsTable.Query(rawQuery: string, ?connectionString: string) : AzureTypeProvider&lt;...&gt;.Domain.optionalsEntity []<br /><em><br /><br />Executes a weakly-type query and returns the results in the shape for this table.</em></div>
@@ -622,9 +622,9 @@ Entity (Partition "North America", Row "1") was ignored as part of a failed batc
 <div class="tip" id="fs60">module Option<br /><br />from Microsoft.FSharp.Core</div>
 <div class="tip" id="fs61">val iter : action:(&#39;T -&gt; unit) -&gt; option:&#39;T option -&gt; unit<br /><br />Full name: Microsoft.FSharp.Core.Option.iter</div>
 <div class="tip" id="fs62">val row : AzureTypeProvider&lt;...&gt;.Domain.optionalsEntity</div>
-<div class="tip" id="fs63">property AzureTypeProvider&lt;...&gt;.Domain.optionalsEntity.IsAnimal: Option&lt;bool&gt;<br /><em><br /><br />Returns the value of the IsAnimal property</em></div>
+<div class="tip" id="fs63">property AzureTypeProvider&lt;...&gt;.Domain.optionalsEntity.IsAnimal: Option&lt;bool&gt;<br /><em><br /><br />Returns the value of the &#39;IsAnimal&#39; property</em></div>
 <div class="tip" id="fs64">property Option.IsSome: bool</div>
-<div class="tip" id="fs65">property AzureTypeProvider&lt;...&gt;.Domain.optionalsEntity.YearsWorking: Option&lt;int&gt;<br /><em><br /><br />Returns the value of the YearsWorking property</em></div>
+<div class="tip" id="fs65">property AzureTypeProvider&lt;...&gt;.Domain.optionalsEntity.YearsWorking: Option&lt;int&gt;<br /><em><br /><br />Returns the value of the &#39;YearsWorking&#39; property</em></div>
 <div class="tip" id="fs66">type FirstTwentyRows = AzureTypeProvider&lt;...&gt;<br /><br />Full name: Tables.FirstTwentyRows<br /><em><br /><br />&#160;Uses first twenty rows of each table for schema inference.</em></div>
 <div class="tip" id="fs67">val frame : Frame&lt;string,string&gt;<br /><br />Full name: Tables.frame</div>
 <div class="tip" id="fs68">AzureTypeProvider&lt;...&gt;.Domain.employeeTable.GetPartition(key: string, ?connectionString: string) : AzureTypeProvider&lt;...&gt;.Domain.employeeEntity []<br /><em><br /><br />Eagerly retrieves all entities in a table partition by its key.</em></div>
@@ -653,7 +653,7 @@ Entity (Partition "North America", Row "1") was ignored as part of a failed batc
 <div class="tip" id="fs91">val response : TableResponse<br /><br />Full name: Tables.response</div>
 <div class="tip" id="fs92">member AzureTable.Insert : entities:seq&lt;Partition * Row * &#39;b&gt; * ?insertMode:TableInsertMode * ?connectionString:string -&gt; (string * TableResponse []) []<br />member AzureTable.Insert : partitionKey:Partition * rowKey:Row * entity:&#39;a0 * ?insertMode:TableInsertMode * ?connectionString:string -&gt; TableResponse</div>
 <div class="tip" id="fs93">val newEmployee : AzureTypeProvider&lt;...&gt;.Domain.employeeEntity<br /><br />Full name: Tables.newEmployee</div>
-<div class="tip" id="fs94">type Domain =<br />&#160;&#160;nested type BlobFile<br />&#160;&#160;nested type BlockBlob<br />&#160;&#160;nested type Containers<br />&#160;&#160;nested type PageBlob<br />&#160;&#160;nested type Queues<br />&#160;&#160;nested type Tables<br />&#160;&#160;nested type XmlBlob<br />&#160;&#160;nested type employee.DobQueryOperators<br />&#160;&#160;nested type employee.IsManagerQueryOperators<br />&#160;&#160;nested type employee.NameQueryOperators<br />&#160;&#160;...<br /><br />Full name: FSharp.Azure.StorageTypeProvider.AzureTypeProvider,accountName=&quot;UseDevelopmentStorage=true&quot;.Domain</div>
+<div class="tip" id="fs94">type Domain =<br />&#160;&#160;nested type $Azure_Metrics<br />&#160;&#160;nested type BlobFile<br />&#160;&#160;nested type BlockBlob<br />&#160;&#160;nested type Containers<br />&#160;&#160;nested type PageBlob<br />&#160;&#160;nested type Queues<br />&#160;&#160;nested type Tables<br />&#160;&#160;nested type XmlBlob<br />&#160;&#160;nested type employee.DobQueryOperators<br />&#160;&#160;nested type employee.IsManagerQueryOperators<br />&#160;&#160;...<br /><br />Full name: FSharp.Azure.StorageTypeProvider.AzureTypeProvider,accountName=&quot;UseDevelopmentStorage=true&quot;.Domain</div>
 <div class="tip" id="fs95">type employeeEntity =<br />&#160;&#160;inherit LightweightTableEntity<br />&#160;&#160;new : PartitionKey: Partition * RowKey: Row * Dob: DateTime * IsManager: bool * Name: string * Salary: float * YearsWorking: int -&gt; employeeEntity<br />&#160;&#160;member Dob : DateTime<br />&#160;&#160;member IsManager : bool<br />&#160;&#160;member Name : string<br />&#160;&#160;member PartitionKey : string<br />&#160;&#160;member RowKey : string<br />&#160;&#160;member Salary : float<br />&#160;&#160;member Timestamp : DateTimeOffset<br />&#160;&#160;member Values : Map&lt;string,obj&gt;<br />&#160;&#160;...<br /><br />Full name: FSharp.Azure.StorageTypeProvider.AzureTypeProvider,accountName=&quot;UseDevelopmentStorage=true&quot;.Domain.employeeEntity</div>
 <div class="tip" id="fs96">Multiple items<br />type DateTime =<br />&#160;&#160;struct<br />&#160;&#160;&#160;&#160;new : ticks:int64 -&gt; DateTime + 10 overloads<br />&#160;&#160;&#160;&#160;member Add : value:TimeSpan -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddDays : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddHours : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddMilliseconds : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddMinutes : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddMonths : months:int -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddSeconds : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddTicks : value:int64 -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddYears : value:int -&gt; DateTime<br />&#160;&#160;&#160;&#160;...<br />&#160;&#160;end<br /><br />Full name: System.DateTime<br /><br />--------------------<br />DateTime()<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(ticks: int64) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(ticks: int64, kind: DateTimeKind) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, calendar: Globalization.Calendar) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int, kind: DateTimeKind) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int, calendar: Globalization.Calendar) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int, millisecond: int) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int, millisecond: int, kind: DateTimeKind) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em></div>
 <div class="tip" id="fs97">val newEmployeeResponse : TableResponse<br /><br />Full name: Tables.newEmployeeResponse</div>
