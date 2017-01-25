@@ -1,6 +1,4 @@
 Unquote
 WindowsAzure.Storage
-xunit
-xunit.runners
-xunit.runner.visualstudio
 FSharp.Core
+Expecto

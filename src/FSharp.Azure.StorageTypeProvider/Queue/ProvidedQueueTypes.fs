@@ -69,8 +69,9 @@ type ProvidedQueue(defaultConnectionString, name) =
     member __.GetCurrentLength(?connectionString) = 
         let queueRef = getQueue connectionString
         queueRef.FetchAttributes()
-        if queueRef.ApproximateMessageCount.HasValue then queueRef.ApproximateMessageCount.Value
-        else 0
+        queueRef.ApproximateMessageCount
+        |> Option.ofNullable
+        |> defaultArg <| 0
     
     /// Dequeues the next message and optionally sets the visibility timeout (i.e. how long you can work with the message before it reappears in the queue)
     member __.Dequeue(?connectionString, ?visibilityTimeout) = 

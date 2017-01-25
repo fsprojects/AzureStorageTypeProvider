@@ -36,7 +36,7 @@ let tags = "azure, f#, fsharp, type provider, blob, table, queue, script"
 // (<solutionFile>.sln is built during the building process)
 let solutionFile = "UnitTests"
 // Pattern specifying assemblies to be tested using XUnit
-let testAssemblies = "tests/**/bin/Release/*Tests*.dll"
+let testAssemblies = "tests/**/bin/Release/*Tests*.exe"
 
 // Git configuration (used for publishing documentation in gh-pages branch)
 // The profile where the project is posted
@@ -114,7 +114,7 @@ open Fake.AppVeyor
 Target "RunTests" (fun _ ->
     !!("UnitTests.sln") |> MSBuildRelease "" "Rebuild" |> ignore
     FileHelper.CreateDir "TestOutput"
-    !!(testAssemblies) |> xUnit (fun args -> { args with XmlOutputPath = Some "TestOutput/xml" }))
+    !!(testAssemblies) |> Fake.Testing.Expecto.Expecto id)
 
 // --------------------------------------------------------------------------------------
 // Build a NuGet package

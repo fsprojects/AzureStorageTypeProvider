@@ -161,7 +161,7 @@ let internal createInsertOperation(insertMode) =
 let private batch size source =
     let rec doBatch output currentBatch counter remainder =
         match remainder with
-        | [] -> if currentBatch = [] then output else currentBatch::output |> List.rev
+        | [] -> if List.isEmpty currentBatch then output else currentBatch::output |> List.rev
         | theList when counter = size -> doBatch ((currentBatch |> List.rev) ::output) [] 0 theList
         | head::tail -> doBatch output (head::currentBatch) (counter + 1) tail
     doBatch [] [] 0 (source |> Seq.toList)

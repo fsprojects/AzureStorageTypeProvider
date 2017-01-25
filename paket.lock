@@ -1,8 +1,13 @@
 REDIRECTS: ON
 NUGET
   remote: https://www.nuget.org/api/v2
+    Argu (3.2)
     Deedle (1.2.4)
-    FAKE (4.4.5)
+    Expecto (3.2)
+      Argu (>= 3.2)
+      FSharp.Core (>= 3.1.2.5)
+      Mono.Cecil (>= 0.9.6.4)
+    FAKE (4.50)
     FSharp.Charting (0.90.14)
     FSharp.Compiler.Service (0.0.90)
     FSharp.Core (3.1.2.5)
@@ -18,19 +23,17 @@ NUGET
       System.Spatial (5.6.4)
     Microsoft.Data.Services.Client (5.6.4) - framework: >= net40
       Microsoft.Data.OData (5.6.4)
+    Mono.Cecil (0.9.6.4)
     Newtonsoft.Json (6.0.8)
     NuGet.CommandLine (2.8.6)
     System.Spatial (5.6.4) - framework: >= net40, winv4.5, wpv8.0, wpav8.1
-    Unquote (3.0)
+    Unquote (3.1.2)
     WindowsAzure.Storage (6.0)
       Microsoft.Azure.KeyVault.Core (>= 1.0) - framework: >= net40, wpv8.0
       Microsoft.Data.OData (>= 5.6.4) - framework: >= net40, winv4.5, wpv8.0, wpav8.1
       Microsoft.Data.Services.Client (>= 5.6.4) - framework: >= net40
       Newtonsoft.Json (>= 6.0.8) - framework: >= net40, winv4.5, wpv8.0, wpav8.1
-    xunit (1.9.2)
-    xunit.runner.visualstudio (2.1.0) - version_in_path: true
-    xunit.runners (1.9.2)
 GITHUB
   remote: fsprojects/FSharp.TypeProviders.StarterPack
-    src/ProvidedTypes.fs (dfbca9b83fb70067e85abddcb8b89332aae4c28d)
-    src/ProvidedTypes.fsi (dfbca9b83fb70067e85abddcb8b89332aae4c28d)
+    src/ProvidedTypes.fs (2bf9330417734c6e4976691bc88c9335f2337c6e)
+    src/ProvidedTypes.fsi (2bf9330417734c6e4976691bc88c9335f2337c6e)
