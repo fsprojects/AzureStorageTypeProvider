@@ -3,8 +3,8 @@
 open System.Collections.Generic
 open System.Configuration
 open System.IO
+open Microsoft.WindowsAzure
 open Microsoft.WindowsAzure.Storage
-open Microsoft.Azure
 open Microsoft.WindowsAzure.Storage.Table
 
 let private doesFileExist folder file =
@@ -57,7 +57,7 @@ module ConnectionValidation =
                 .Parse(connectionString)
                 .CreateCloudTableClient()
                 .GetTableReference("a")
-                .Exists()                  //throws an exception if attempted with an invalid connection string
+                .Exists() //throws an exception if attempted with an invalid connection string
                 |> ignore
             Success
         with | ex -> Failure ex

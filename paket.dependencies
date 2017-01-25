@@ -9,6 +9,9 @@ nuget FSharp.Formatting
 nuget Deedle
 nuget FSharp.Core ~> 3
 nuget Newtonsoft.Json 6.0.8
+nuget Microsoft.Data.OData 5.6.4
+nuget Microsoft.Data.Services.Client 5.6.4
+nuget Microsoft.Azure.KeyVault.Core 1.0
 nuget FSharp.Charting
 nuget Expecto
 
