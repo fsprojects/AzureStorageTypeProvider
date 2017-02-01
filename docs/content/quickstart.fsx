@@ -43,6 +43,8 @@ type FromConfig = AzureTypeProvider<connectionStringName = "myConnection", confi
 
 (**
 
+An example ``sample.config`` file can be found  at ``AzureStorageTypeProvider/docs/content/sample.config``. 
+
 Common Themes
 =============
 
