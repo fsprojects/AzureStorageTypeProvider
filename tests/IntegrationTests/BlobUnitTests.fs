@@ -124,18 +124,18 @@ let ``Can correctly download a folder``() = testFolderDownload container.``folde
 let ``Can correctly download a container``() = testFolderDownload container.Download 12 5
 
 [<Fact>]
-let ``Can access Path property on a folder`` = 
+let ``Can access Path property on a folder`` () = 
     let childFolder = Local.Containers.samples.``folder2/``.``child/``
     test <@ "folder2/child/" = childFolder.Path @>
 
 [<Fact>]
-let ``ListBlobs method returns correct number of blobs`` = 
+let ``ListBlobs method returns correct number of blobs`` () = 
     let childFolder = Local.Containers.samples.``folder2/``.``child/``
     let allBlobs = childFolder.ListBlobs()
     test <@ Seq.length allBlobs = 1 @>
 
 [<Fact>]
-let ``Can access List blobs method on a folder`` = 
+let ``Can access List blobs method on a folder`` () = 
     let childFolder = Local.Containers.samples.``folder2/``.``child/``
     let allBlobs = childFolder.ListBlobs(true)
     let count = allBlobs |> Seq.length
