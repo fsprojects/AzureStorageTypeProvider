@@ -8,24 +8,24 @@ open Microsoft.WindowsAzure.Storage.Blob
 
 let rec private createBlobItem (domainType : ProvidedTypeDefinition) connectionString containerName fileItem = 
     match fileItem with
-    | Folder(path, name, getContents) -> 
+    | Folder(path, name, contents) -> 
         let folderProp = ProvidedTypeDefinition((sprintf "%s.%s" containerName path), Some typeof<BlobFolder>, HideObjectMethods = true)
         domainType.AddMember(folderProp)
         folderProp.AddMembersDelayed(fun _ -> 
-            (getContents()
+            (contents.Value
              |> Array.choose (createBlobItem domainType connectionString containerName)
              |> Array.toList))
         Some <| ProvidedProperty(name, folderProp, GetterCode = fun _ -> <@@ ContainerBuilder.createBlobFolder connectionString containerName path @@>)
-    | Blob(path, name, properties) -> 
+    | Blob(path, name, blobType, length) -> 
         let fileTypeDefinition = 
-            match properties.BlobType, path with
+            match blobType, path with
             | BlobType.PageBlob, _ -> "PageBlob"
             | _, BlobBuilder.XML -> "XmlBlob"
             | _, BlobBuilder.Binary | _, BlobBuilder.Text -> "BlockBlob"
             |> fun typeName -> domainType.GetMember(typeName).[0] :?> ProvidedTypeDefinition
 
-        match properties.BlobType, properties.Length with
-        | _, 0L -> None
+        match blobType, length with
+        | _, Some 0L -> None
         | BlobType.PageBlob, _ -> Some <| ProvidedProperty(name, fileTypeDefinition, GetterCode = fun _ -> <@@ BlobBuilder.createPageBlobFile connectionString containerName path @@>)
         | BlobType.BlockBlob, _ -> Some <| ProvidedProperty(name, fileTypeDefinition, GetterCode = fun _ -> <@@ BlobBuilder.createBlockBlobFile connectionString containerName path @@>)
         | _ -> None
@@ -34,7 +34,7 @@ let private createContainerType (domainType : ProvidedTypeDefinition) connection
     let individualContainerType = ProvidedTypeDefinition(container.Name + "Container", Some typeof<BlobContainer>, HideObjectMethods = true)
     individualContainerType.AddXmlDoc <| sprintf "Provides access to the '%s' container." container.Name
     individualContainerType.AddMembersDelayed(fun _ -> 
-        (container.GetFiles()
+        (container.Contents.Value
          |> Seq.choose (createBlobItem domainType connectionString container.Name)
          |> Seq.toList))
     domainType.AddMember(individualContainerType)

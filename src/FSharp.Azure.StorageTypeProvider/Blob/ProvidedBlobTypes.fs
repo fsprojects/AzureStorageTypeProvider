@@ -128,8 +128,8 @@ type BlobFolder internal (defaultConnectionString, container, file) =
         
         listBlobs includeSubfolders container file
         |> Seq.choose (function
-            | Blob(path, _, properties) -> 
-                match properties.BlobType with
+            | Blob(path, _, blobType, _) -> 
+                match blobType with
                 | BlobType.PageBlob -> (BlobBuilder.createPageBlobFile defaultConnectionString container.Name path) :> BlobFile 
                 | _ -> (BlobBuilder.createBlockBlobFile defaultConnectionString container.Name path) :> BlobFile 
                 |> Some
