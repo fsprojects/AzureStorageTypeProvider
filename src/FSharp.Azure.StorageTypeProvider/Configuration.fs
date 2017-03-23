@@ -3,9 +3,7 @@
 open System.Collections.Generic
 open System.Configuration
 open System.IO
-open Microsoft.WindowsAzure
 open Microsoft.WindowsAzure.Storage
-open Microsoft.WindowsAzure.Storage.Table
 
 let private doesFileExist folder file =
     let fullPath = Path.Combine(folder, file) 
@@ -44,7 +42,7 @@ let getConnectionString(connectionName: string, resolutionFolder, requestedConfi
 
 [<AutoOpen>]
 module ConnectionValidation =
-    type ConnectionStringValidationResult = | Success | Failure of exn
+    type ConnectionStringValidationResult = Success | Failure of exn
     let private memoize code =
         let cache = Dictionary()
         fun arg ->

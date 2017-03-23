@@ -8,7 +8,7 @@ open Microsoft.WindowsAzure.Storage.Blob
 
 let rec private createBlobItem (domainType : ProvidedTypeDefinition) connectionString containerName fileItem = 
     match fileItem with
-    | Folder(path, name, contents) -> 
+    | Folder(path, name, contents) ->
         let folderProp = ProvidedTypeDefinition((sprintf "%s.%s" containerName path), Some typeof<BlobFolder>, HideObjectMethods = true)
         domainType.AddMember(folderProp)
         folderProp.AddMembersDelayed(fun _ -> 
@@ -46,9 +46,22 @@ let private createContainerType (domainType : ProvidedTypeDefinition) connection
     containerProp
 
 /// Builds up the Blob Storage container members
-let getBlobStorageMembers (connectionString, domainType : ProvidedTypeDefinition) = 
+let getBlobStorageMembers staticSchema (connectionString, domainType : ProvidedTypeDefinition) = 
     let containerListingType = ProvidedTypeDefinition("Containers", Some typeof<obj>, HideObjectMethods = true)
-    containerListingType.AddMembersDelayed(fun _ -> getBlobStorageAccountManifest (connectionString) |> List.map (createContainerType domainType connectionString))
+    
+    match staticSchema with
+    | Some schema ->
+        let schema =
+            { Name = "samples"
+              Contents =
+                lazy
+                    [ Folder("folder", "folder/", lazy [| Blob("folder/childFile.txt", "childFile.txt", BlobType.BlockBlob, None) |])
+                      Blob("file1.txt", "file1.txt", BlobType.BlockBlob, None)
+                    ] |> Seq.ofList }
+        containerListingType.AddMembers ([ schema ] |> List.map (createContainerType domainType connectionString))
+    | None ->
+        containerListingType.AddMembersDelayed(fun _ -> getBlobStorageAccountManifest (connectionString) |> List.map (createContainerType domainType connectionString))
+    
     domainType.AddMember containerListingType
 
     let cbcProp = ProvidedProperty("CloudBlobClient", typeof<CloudBlobClient>, GetterCode = (fun _ -> <@@ ContainerBuilder.createBlobClient connectionString @@>))

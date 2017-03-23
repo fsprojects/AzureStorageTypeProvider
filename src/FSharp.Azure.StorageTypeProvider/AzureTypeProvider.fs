@@ -41,7 +41,7 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
     let buildTypes (typeName : string) (args : obj []) = 
         // Create the top level property
         let typeProviderForAccount = ProvidedTypeDefinition(thisAssembly, namespaceName, typeName, baseType = Some typeof<obj>)
-        typeProviderForAccount.AddMember(ProvidedConstructor(parameters = [], InvokeCode = (fun args -> <@@ null @@>)))
+        typeProviderForAccount.AddMember(ProvidedConstructor(parameters = [], InvokeCode = (fun _ -> <@@ null @@>)))
         let connectionString = buildConnectionString args
         match validateConnectionString connectionString with
         | Success ->
@@ -51,10 +51,16 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
 
             let schemaInferenceRowCount = args.[4] :?> int
             let humanizeColumns = args.[5] :?> bool
+            let blobStaticSchema =
+                try
+                match args.[6] :?> string with
+                | "" -> None
+                | path -> Some(IO.Path.Combine(config.ResolutionFolder, path) |> IO.File.ReadAllLines)
+                with ex -> failwithf "An error occurred when trying to read the static blob schema file: %O" ex
 
             // Now create child members e.g. containers, tables etc.
             typeProviderForAccount.AddMembers
-                ([ BlobMemberFactory.getBlobStorageMembers 
+                ([ BlobMemberFactory.getBlobStorageMembers blobStaticSchema 
                    TableMemberFactory.getTableStorageMembers schemaInferenceRowCount humanizeColumns
                    QueueMemberFactory.getQueueStorageMembers ]
                 |> List.map (fun builder -> builder(connectionString, domainTypes)))
@@ -73,7 +79,8 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
           createParam("connectionStringName", String.Empty, "The Connection String key from the configuration file to use to retrieve the connection string. If set, accountName and accountKey are ignored.")
           createParam("configFileName", "app.config", "The name of the configuration file to look for. Defaults to 'app.config'")
           createParam("schemaSize", 10, "The maximum number of rows to read per table, from which to infer schema. Defaults to 10.")
-          createParam("humanize", false, "Whether to humanize table column names. Defaults to false.") ]
+          createParam("humanize", false, "Whether to humanize table column names. Defaults to false.")
+          createParam("blobSchema", String.Empty, "Provide a path to a local file containing a fixed schema to eagerly use, instead of lazily generating the schema from a live storage account.") ]
     
     let memoize func =
         let cache = Dictionary()
