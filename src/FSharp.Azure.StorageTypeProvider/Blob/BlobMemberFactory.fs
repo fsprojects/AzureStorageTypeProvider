@@ -50,17 +50,8 @@ let getBlobStorageMembers staticSchema (connectionString, domainType : ProvidedT
     let containerListingType = ProvidedTypeDefinition("Containers", Some typeof<obj>, HideObjectMethods = true)
     
     match staticSchema with
-    | Some schema ->
-        let schema =
-            { Name = "samples"
-              Contents =
-                lazy
-                    [ Folder("folder", "folder/", lazy [| Blob("folder/childFile.txt", "childFile.txt", BlobType.BlockBlob, None) |])
-                      Blob("file1.txt", "file1.txt", BlobType.BlockBlob, None)
-                    ] |> Seq.ofList }
-        containerListingType.AddMembers ([ schema ] |> List.map (createContainerType domainType connectionString))
-    | None ->
-        containerListingType.AddMembersDelayed(fun _ -> getBlobStorageAccountManifest (connectionString) |> List.map (createContainerType domainType connectionString))
+    | Some staticSchema -> containerListingType.AddMembers ([ staticSchema ] |> List.map (createContainerType domainType connectionString))
+    | None -> containerListingType.AddMembersDelayed(fun _ -> getBlobStorageAccountManifest (connectionString) |> List.map (createContainerType domainType connectionString))
     
     domainType.AddMember containerListingType
 

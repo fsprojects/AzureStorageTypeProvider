@@ -5,6 +5,8 @@ open System.Configuration
 open System.IO
 open Microsoft.WindowsAzure.Storage
 
+type Result<'T> = Success of result:'T | Failure of exn
+
 let private doesFileExist folder file =
     let fullPath = Path.Combine(folder, file) 
     if fullPath |> File.Exists then Some fullPath else None
@@ -42,7 +44,6 @@ let getConnectionString(connectionName: string, resolutionFolder, requestedConfi
 
 [<AutoOpen>]
 module ConnectionValidation =
-    type ConnectionStringValidationResult = Success | Failure of exn
     let private memoize code =
         let cache = Dictionary()
         fun arg ->
@@ -57,6 +58,6 @@ module ConnectionValidation =
                 .GetTableReference("a")
                 .Exists() //throws an exception if attempted with an invalid connection string
                 |> ignore
-            Success
+            Success()
         with | ex -> Failure ex
     let validateConnectionString = memoize checkConnectionString

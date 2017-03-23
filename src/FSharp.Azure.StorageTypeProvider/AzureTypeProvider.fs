@@ -43,29 +43,30 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
         let typeProviderForAccount = ProvidedTypeDefinition(thisAssembly, namespaceName, typeName, baseType = Some typeof<obj>)
         typeProviderForAccount.AddMember(ProvidedConstructor(parameters = [], InvokeCode = (fun _ -> <@@ null @@>)))
         let connectionString = buildConnectionString args
-        match validateConnectionString connectionString with
-        | Success ->
+        let blobSchema = 
+            match StaticSchema.createSchema config.ResolutionFolder (args.[6] :?> string) with
+            | Some (Success schema) -> Success(Some schema)
+            | Some (Failure ex) -> Failure ex
+            | None -> Success None
+
+        match validateConnectionString connectionString, blobSchema with
+        | Success(), Success blobSchema ->
             let domainTypes = ProvidedTypeDefinition("Domain", Some typeof<obj>)
             domainTypes.AddMembers <| ProvidedTypeGenerator.generateTypes()
             typeProviderForAccount.AddMember(domainTypes)
 
             let schemaInferenceRowCount = args.[4] :?> int
             let humanizeColumns = args.[5] :?> bool
-            let blobStaticSchema =
-                try
-                match args.[6] :?> string with
-                | "" -> None
-                | path -> Some(IO.Path.Combine(config.ResolutionFolder, path) |> IO.File.ReadAllLines)
-                with ex -> failwithf "An error occurred when trying to read the static blob schema file: %O" ex
 
             // Now create child members e.g. containers, tables etc.
             typeProviderForAccount.AddMembers
-                ([ BlobMemberFactory.getBlobStorageMembers blobStaticSchema 
+                ([ BlobMemberFactory.getBlobStorageMembers blobSchema
                    TableMemberFactory.getTableStorageMembers schemaInferenceRowCount humanizeColumns
                    QueueMemberFactory.getQueueStorageMembers ]
                 |> List.map (fun builder -> builder(connectionString, domainTypes)))
             typeProviderForAccount
-        | Failure ex -> failwith (sprintf "Unable to validate connection string (%s)" ex.Message)
+        | Failure ex, _ -> failwith (sprintf "Unable to validate connection string (%s)" ex.Message)
+        | _, Failure ex -> failwith (sprintf "Unable to parse blob schema file (%s)" ex.Message)
     
     let createParam (name, defaultValue:'a, help) =
         let providedParameter = ProvidedStaticParameter(name, typeof<'a>, defaultValue)
