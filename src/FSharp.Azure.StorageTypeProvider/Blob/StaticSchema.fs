@@ -23,5 +23,6 @@ let createSchema resolutionFolder path =
                     [ Folder("folder", "folder/", lazy [| Blob("folder/childFile.txt", "childFile.txt", BlobType.BlockBlob, None) |])
                       Blob("file1.txt", "file1.txt", BlobType.BlockBlob, None) ]
                     |> Seq.ofList }
-        Success schema
+        Success [ schema ]
         with ex -> Failure ex)
+    |> defaultArg <| Success []

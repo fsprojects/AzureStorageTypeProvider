@@ -48,10 +48,11 @@ let private createContainerType (domainType : ProvidedTypeDefinition) connection
 /// Builds up the Blob Storage container members
 let getBlobStorageMembers staticSchema (connectionString, domainType : ProvidedTypeDefinition) = 
     let containerListingType = ProvidedTypeDefinition("Containers", Some typeof<obj>, HideObjectMethods = true)
+    let createContainerType = createContainerType domainType connectionString
     
     match staticSchema with
-    | Some staticSchema -> containerListingType.AddMembers ([ staticSchema ] |> List.map (createContainerType domainType connectionString))
-    | None -> containerListingType.AddMembersDelayed(fun _ -> getBlobStorageAccountManifest (connectionString) |> List.map (createContainerType domainType connectionString))
+    | [] -> containerListingType.AddMembersDelayed(fun _ -> connectionString |> getBlobStorageAccountManifest |> List.map createContainerType)
+    | staticSchema -> containerListingType.AddMembers (staticSchema |> List.map createContainerType)
     
     domainType.AddMember containerListingType
 

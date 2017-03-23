@@ -43,13 +43,7 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
         let typeProviderForAccount = ProvidedTypeDefinition(thisAssembly, namespaceName, typeName, baseType = Some typeof<obj>)
         typeProviderForAccount.AddMember(ProvidedConstructor(parameters = [], InvokeCode = (fun _ -> <@@ null @@>)))
         let connectionString = buildConnectionString args
-        let blobSchema = 
-            match StaticSchema.createSchema config.ResolutionFolder (args.[6] :?> string) with
-            | Some (Success schema) -> Success(Some schema)
-            | Some (Failure ex) -> Failure ex
-            | None -> Success None
-
-        match validateConnectionString connectionString, blobSchema with
+        match validateConnectionString connectionString, StaticSchema.createSchema config.ResolutionFolder (args.[6] :?> string)  with
         | Success(), Success blobSchema ->
             let domainTypes = ProvidedTypeDefinition("Domain", Some typeof<obj>)
             domainTypes.AddMembers <| ProvidedTypeGenerator.generateTypes()
