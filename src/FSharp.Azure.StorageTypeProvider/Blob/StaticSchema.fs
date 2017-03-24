@@ -15,14 +15,8 @@ let createSchema resolutionFolder path =
     |> Option.map(fun path ->
         try
         printfn "FOUND A SCHEMA!"   
-        let path = Path.Combine(resolutionFolder, path) |> File.ReadAllLines
-        let schema =
-            { Name = "samples"
-              Contents =
-                lazy
-                    [ Folder("folder", "folder/", lazy [| Blob("folder/childFile.txt", "childFile.txt", BlobType.BlockBlob, None) |])
-                      Blob("file1.txt", "file1.txt", BlobType.BlockBlob, None) ]
-                    |> Seq.ofList }
-        Success [ schema ]
+        let paths = Path.Combine(resolutionFolder, path) |> File.ReadAllLines
+        let schema = pathsToFileTrees paths
+        Success schema
         with ex -> Failure ex)
     |> defaultArg <| Success []

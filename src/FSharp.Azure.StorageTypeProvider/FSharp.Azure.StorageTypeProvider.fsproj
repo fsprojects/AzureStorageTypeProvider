@@ -9,8 +9,9 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>fb7ca8f3-c158-49e9-b816-501741e2921f</ProjectGuid>
     <OutputType>Library</OutputType>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFSharpCoreVersion>4.3.1.0</TargetFSharpCoreVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFSharpCoreVersion>4.4.1.0</TargetFSharpCoreVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -43,6 +44,45 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
   <Import Project="..\..\.paket\paket.targets" />
+  <ItemGroup>
+    <Compile Include="..\..\paket-files\fsprojects\FSharp.TypeProviders.StarterPack\src\ProvidedTypes.fsi">
+      <Paket>True</Paket>
+      <Link>paket-files/ProvidedTypes.fsi</Link>
+    </Compile>
+    <Compile Include="..\..\paket-files\fsprojects\FSharp.TypeProviders.StarterPack\src\ProvidedTypes.fs">
+      <Paket>True</Paket>
+      <Link>paket-files/ProvidedTypes.fs</Link>
+    </Compile>
+    <Compile Include="Shared.fs" />
+    <Compile Include="Configuration.fs" />
+    <Compile Include="Table/SharedTableTypes.fs" />
+    <Compile Include="Table/TableRepository.fs" />
+    <Compile Include="Table/ProvidedTableTypes.fs" />
+    <Compile Include="Table/TableQueryBuilder.fs" />
+    <Compile Include="Table/TableEntityMemberFactory.fs" />
+    <Compile Include="Table/TableMemberFactory.fs" />
+    <Compile Include="Blob/BlobRepository.fs" />
+    <Compile Include="Blob/ProvidedBlobTypes.fs" />
+    <Compile Include="Blob/BlobMemberFactory.fs" />
+    <Compile Include="Blob/StaticSchema.fs" />
+    <Compile Include="Queue/QueueRepository.fs" />
+    <Compile Include="Queue/ProvidedQueueTypes.fs" />
+    <Compile Include="Queue/QueueMemberFactory.fs" />
+    <Compile Include="AzureTypeProvider.fs" />
+    <None Include="App.config" />
+    <Content Include="paket.references" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.Services.Client" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v2.0' Or $(TargetFrameworkVersion) == 'v3.0' Or $(TargetFrameworkVersion) == 'v3.5')">
       <ItemGroup>
@@ -377,43 +417,4 @@
       </ItemGroup>
     </When>
   </Choose>
-  <ItemGroup>
-    <Compile Include="..\..\paket-files\fsprojects\FSharp.TypeProviders.StarterPack\src\ProvidedTypes.fsi">
-      <Paket>True</Paket>
-      <Link>paket-files/ProvidedTypes.fsi</Link>
-    </Compile>
-    <Compile Include="..\..\paket-files\fsprojects\FSharp.TypeProviders.StarterPack\src\ProvidedTypes.fs">
-      <Paket>True</Paket>
-      <Link>paket-files/ProvidedTypes.fs</Link>
-    </Compile>
-    <Compile Include="Shared.fs" />
-    <Compile Include="Configuration.fs" />
-    <Compile Include="Table/SharedTableTypes.fs" />
-    <Compile Include="Table/TableRepository.fs" />
-    <Compile Include="Table/ProvidedTableTypes.fs" />
-    <Compile Include="Table/TableQueryBuilder.fs" />
-    <Compile Include="Table/TableEntityMemberFactory.fs" />
-    <Compile Include="Table/TableMemberFactory.fs" />
-    <Compile Include="Blob/BlobRepository.fs" />
-    <Compile Include="Blob/ProvidedBlobTypes.fs" />
-    <Compile Include="Blob/BlobMemberFactory.fs" />
-    <Compile Include="Blob/StaticSchema.fs" />
-    <Compile Include="Queue/QueueRepository.fs" />
-    <Compile Include="Queue/ProvidedQueueTypes.fs" />
-    <Compile Include="Queue/QueueMemberFactory.fs" />
-    <Compile Include="AzureTypeProvider.fs" />
-    <None Include="App.config" />
-    <Content Include="paket.references" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="mscorlib" />
-    <Reference Include="System" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Data.Services.Client" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq" />
-  </ItemGroup>
 </Project>
