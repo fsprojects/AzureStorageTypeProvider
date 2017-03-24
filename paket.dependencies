@@ -7,7 +7,7 @@ nuget Unquote
 nuget WindowsAzure.Storage 6.0.0
 nuget FSharp.Formatting
 nuget Deedle
-nuget FSharp.Core ~> 3
+nuget FSharp.Core 4.0.0.1
 nuget Newtonsoft.Json 6.0.8
 nuget Microsoft.Data.OData 5.6.4
 nuget Microsoft.Data.Services.Client 5.6.4

@@ -10,7 +10,7 @@ NUGET
     FAKE (4.50)
     FSharp.Charting (0.90.14)
     FSharp.Compiler.Service (2.0.0.6)
-    FSharp.Core (3.1.2.5)
+    FSharp.Core (4.0.0.1)
     FSharp.Formatting (2.14.4)
       FSharp.Compiler.Service (2.0.0.6)
       FSharpVSPowerTools.Core (>= 2.3 < 2.4)
@@ -35,5 +35,5 @@ NUGET
       Newtonsoft.Json (>= 6.0.8) - framework: >= net40, winv4.5, wpv8.0, wpav8.1
 GITHUB
   remote: fsprojects/FSharp.TypeProviders.StarterPack
-    src/ProvidedTypes.fs (2bf9330417734c6e4976691bc88c9335f2337c6e)
-    src/ProvidedTypes.fsi (2bf9330417734c6e4976691bc88c9335f2337c6e)
+    src/ProvidedTypes.fs (45f4d8780b3213ef61ba4fccc716cd495565c1a4)
+    src/ProvidedTypes.fsi (45f4d8780b3213ef61ba4fccc716cd495565c1a4)
