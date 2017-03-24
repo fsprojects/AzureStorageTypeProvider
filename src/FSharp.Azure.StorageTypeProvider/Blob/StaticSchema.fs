@@ -12,8 +12,7 @@ module private Option =
 let private pathsToContainerItems paths =
     let segmentedPaths =
         paths
-        |> Seq.map (fun (path:string) -> path.Split([| '/' |], System.StringSplitOptions.RemoveEmptyEntries) |> Array.toList)
-        |> Seq.toList
+        |> Seq.map (fun (path:string) -> path.Split([| '/' |], StringSplitOptions.RemoveEmptyEntries) |> Array.toList)
     
     let rec toFileTrees prevPath childPaths = 
         childPaths
@@ -21,15 +20,14 @@ let private pathsToContainerItems paths =
             | [] -> None
             | [ fileName ] -> Some (fileName, true)
             | dirName :: _ -> Some (dirName, false))
-        |> Seq.toList
-        |> List.choose (function (Some k, v) -> Some (k, v) | _ -> None)
-        |> List.map (fun ((name, isFile), childPaths) ->
+        |> Seq.choose (function (Some k, v) -> Some (k, v) | _ -> None)
+        |> Seq.map (fun ((name, isFile), childPaths) ->
             if isFile then Blob (prevPath + name, name, BlobType.BlockBlob, None)
             else
                 let folderName = name + "/"
-                let subPaths = childPaths |> Seq.toList |> List.map List.tail
+                let subPaths = childPaths |> Seq.map List.tail
                 let path = prevPath + folderName
-                Folder (path, folderName, lazy (toFileTrees path subPaths |> List.toArray)))
+                Folder (path, folderName, lazy (toFileTrees path subPaths |> Seq.toArray)))
 
     toFileTrees "" segmentedPaths
 
@@ -42,7 +40,7 @@ let private schemaLinesToContainers lines =
     |> Seq.groupBy fst
     |> Seq.map (fun (containerName, paths) ->
         { Name = containerName
-          Contents = lazy (paths |> Seq.map snd |> pathsToContainerItems |> List.toSeq) })
+          Contents = lazy (paths |> Seq.map snd |> pathsToContainerItems) })
     |> Seq.toList
 
 let createSchema resolutionFolder path =
