@@ -10,8 +10,8 @@ open System.Xml.Linq
 
 /// Represents a file in blob storage.
 [<AbstractClass>]
-type BlobFile internal (defaultConnectionString, container, path, getBlobRef : _ -> ICloudBlob) =
-    let getBlobRef connectionString = getBlobRef (defaultArg connectionString defaultConnectionString, container, path)
+type BlobFile internal (defaultConnectionString, container, file, getBlobRef : _ -> ICloudBlob) =
+    let getBlobRef connectionString = getBlobRef (defaultArg connectionString defaultConnectionString, container, file)
     let blobProperties =
         lazy
             let blobRef = getBlobRef None
@@ -61,9 +61,9 @@ type BlobFile internal (defaultConnectionString, container, path, getBlobRef : _
 
     override this.ToString() = this.Name
 
-type BlockBlobFile internal (defaultConnectionString, container, path) =
-    inherit BlobFile(defaultConnectionString, container, path, (getBlockBlobRef >> fun x -> x :> ICloudBlob))
-    let getBlobRef connectionString = getBlockBlobRef(defaultArg connectionString defaultConnectionString, container, path)
+type BlockBlobFile internal (defaultConnectionString, container, file) =
+    inherit BlobFile(defaultConnectionString, container, file, (getBlockBlobRef >> fun x -> x :> ICloudBlob))
+    let getBlobRef connectionString = getBlockBlobRef(defaultArg connectionString defaultConnectionString, container, file)
 
     /// Gets a handle to the Azure SDK client for this blob.
     member __.AsCloudBlockBlob(?connectionString) = getBlobRef connectionString
@@ -74,15 +74,15 @@ type BlockBlobFile internal (defaultConnectionString, container, path) =
     /// Reads this file as a string asynchronously.
     member __.ReadAsync(?connectionString) = getBlobRef(connectionString).DownloadTextAsync() |> Async.AwaitTask
 
-type PageBlobFile internal (defaultConnectionString, container, path) =
-    inherit BlobFile(defaultConnectionString, container, path, (getPageBlobRef >> fun x -> x :> ICloudBlob))
+type PageBlobFile internal (defaultConnectionString, container, file) =
+    inherit BlobFile(defaultConnectionString, container, file, (getPageBlobRef >> fun x -> x :> ICloudBlob))
 
     /// Gets a handle to the Azure SDK client for this blob.
-    member __.AsCloudPageBlob(?connectionString) = getPageBlobRef(defaultArg connectionString defaultConnectionString, container, path)
+    member __.AsCloudPageBlob(?connectionString) = getPageBlobRef(defaultArg connectionString defaultConnectionString, container, file)
 
 /// Represents an XML file stored in blob storage.
-type XmlFile internal (defaultConnectionString, container, path) = 
-    inherit BlockBlobFile(defaultConnectionString, container, path)
+type XmlFile internal (defaultConnectionString, container, file) = 
+    inherit BlockBlobFile(defaultConnectionString, container, file)
     
     /// Reads this file as an XDocument.
     member this.ReadAsXDocument(?connectionString) = this.Read(defaultArg connectionString defaultConnectionString) |> XDocument.Parse
@@ -112,21 +112,21 @@ module BlobBuilder =
         PageBlobFile(connectionString, containerName, path)
 
 /// Represents a pseudo-folder in blob storage.
-type BlobFolder internal (defaultConnectionString, container, path) = 
+type BlobFolder internal (defaultConnectionString, container, file) = 
     /// Downloads the entire folder contents to the local file system asynchronously.
     member __.Download(path, ?connectionString) =
-        let connectionDetails = defaultArg connectionString defaultConnectionString, container, path
+        let connectionDetails = defaultArg connectionString defaultConnectionString, container, file
         downloadFolder (connectionDetails, path)
 
     /// The Path of the current folder
-    member __.Path = path
+    member __.Path = file
 
     /// Lists all blobs contained in this folder
     member __.ListBlobs(?includeSubfolders) = 
         let includeSubfolders = defaultArg includeSubfolders false
         let container = getContainerRef (defaultConnectionString, container)
         
-        listBlobs includeSubfolders container path
+        listBlobs includeSubfolders container file
         |> Seq.choose (function
             | Blob(path, _, blobType, _) -> 
                 match blobType with
