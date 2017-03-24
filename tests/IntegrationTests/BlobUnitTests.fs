@@ -109,17 +109,28 @@ let mainTests =
             let count = allBlobs |> Seq.length
             count |> shouldEqual 4)
 
-        testCase "Container name is correct" (fun _ -> Local.Containers.samples.Name |> shouldEqual "samples")
+        testCase "Container name is correct" (fun _ -> Local.Containers.samples.Name |> shouldEqual "samples") ]
 
+[<Tests>]
+let staticSchemaTests =
+    testList "Static Schema Tests" [
         testCase "Correct container name from a static schema" (fun _ ->
-            let container = BlobSchema.Containers.container2
-            container.Name |> shouldEqual "container2")
+            let container = BlobSchema.Containers.samples
+            container.Name |> shouldEqual "samples")
 
         testCase "Correct folder path from a static schema" (fun _ ->
-            let folder = BlobSchema.Containers.container1.``folder2/``.``subfolder/``
-            folder.Path |> shouldEqual "folder2/subfolder/")
+            let folder = BlobSchema.Containers.samples.``folder2/``.``child/``
+            folder.Path |> shouldEqual "folder2/child/")
         
         testCase "Correct blob name from a static schema" (fun _ ->
-            let blob = BlobSchema.Containers.container1.``folder1/``.item3
-            blob.Name |> shouldEqual "folder1/item3")
+            let blob = BlobSchema.Containers.samples.``folder/``.``childFile.txt``
+            blob.Name |> shouldEqual "folder/childFile.txt")
+
+        testCase "Can access a real file using static schema" (fun _ ->
+            let blob = BlobSchema.Containers.samples.``file1.txt``
+            blob.Size |> shouldEqual 5L)
+
+        testCase "Compiles with a non-existant file" (fun _ ->
+            BlobSchema.Containers.random.``file.txt``
+            |> ignore) // compiles!
     ]

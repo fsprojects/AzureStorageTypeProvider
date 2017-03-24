@@ -1,6 +1,6 @@
-﻿container1@folder1/item1
-container1@folder1/item2
-container1@folder1/item3
-container1@folder2/item
-container1@folder2/subfolder/foo.txt
-container2@folder2/subfolder/subsubfolder/foo.txt
+﻿samples@file1.txt
+samples@file2.txt
+samples@file3.txt
+samples@folder/childFile.txt
+samples@folder2/child/descedant4.txt
+random@file.txt
