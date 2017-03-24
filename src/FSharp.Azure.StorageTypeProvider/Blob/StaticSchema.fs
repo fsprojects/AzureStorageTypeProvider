@@ -9,39 +9,38 @@ open System.IO
 module private Option =
     let ofString text = if String.IsNullOrWhiteSpace text then None else Some text
 
-let private pathsToContainerItems paths =
-    let segmentedPaths =
-        paths
-        |> Seq.map (fun (path:string) -> path.Split([| '/' |], StringSplitOptions.RemoveEmptyEntries) |> Array.toList)
-    
+let private splitOn (c:char) (value:string) = value.Split([| c |], StringSplitOptions.RemoveEmptyEntries)
+
+let private pathsToContainerItems paths =   
     let rec toFileTrees prevPath childPaths = 
         childPaths
-        |> Seq.groupBy (function
+        |> Array.groupBy (function
             | [] -> None
             | [ fileName ] -> Some (fileName, true)
             | dirName :: _ -> Some (dirName, false))
-        |> Seq.choose (function (Some k, v) -> Some (k, v) | _ -> None)
-        |> Seq.map (fun ((name, isFile), childPaths) ->
+        |> Array.choose (function (Some k, v) -> Some (k, v) | _ -> None)
+        |> Array.map (fun ((name, isFile), childPaths) ->
             if isFile then Blob (prevPath + name, name, BlobType.BlockBlob, None)
             else
                 let folderName = name + "/"
-                let subPaths = childPaths |> Seq.map List.tail
+                let subPaths = childPaths |> Array.map List.tail
                 let path = prevPath + folderName
                 Folder (path, folderName, lazy (toFileTrees path subPaths |> Seq.toArray)))
 
-    toFileTrees "" segmentedPaths
+    toFileTrees "" paths
 
 let private schemaLinesToContainers lines =
     lines
-    |> Seq.map (fun line ->
-        match (line:string).Split '@' with
+    |> Seq.toArray
+    |> Array.map (fun line ->
+        match line |> splitOn '@' with
         | [| container; path |] -> (container, path)
         | _ -> failwith (sprintf "Invalid blob path in static schema: %s" line))
-    |> Seq.groupBy fst
-    |> Seq.map (fun (containerName, paths) ->
+    |> Array.groupBy fst
+    |> Array.map (fun (containerName, paths) ->
         { Name = containerName
-          Contents = lazy (paths |> Seq.map snd |> pathsToContainerItems) })
-    |> Seq.toList
+          Contents = lazy (paths |> Array.map (snd >> splitOn '/' >> Array.toList) |> pathsToContainerItems |> Array.toSeq) })
+    |> Array.toList
 
 let createSchema resolutionFolder path =
     path
