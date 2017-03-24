@@ -52,7 +52,7 @@ let getBlobStorageMembers staticSchema (connectionString, domainType : ProvidedT
     
     match staticSchema with
     | [] -> containerListingType.AddMembersDelayed(fun _ -> connectionString |> getBlobStorageAccountManifest |> List.map createContainerType)
-    | staticSchema -> containerListingType.AddMembers (staticSchema |> List.map createContainerType)
+    | staticSchema -> staticSchema |> List.map createContainerType |> containerListingType.AddMembers
     
     domainType.AddMember containerListingType
 
