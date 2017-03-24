@@ -24,7 +24,7 @@ let private pathsToContainerItems paths =
         |> Seq.toList
         |> List.choose (function (Some k, v) -> Some (k, v) | _ -> None)
         |> List.map (fun ((name, isFile), childPaths) ->
-            if isFile then Blob (prevPath, name, BlobType.BlockBlob, None)
+            if isFile then Blob (prevPath + name, name, BlobType.BlockBlob, None)
             else
                 let folderName = name + "/"
                 let subPaths = childPaths |> Seq.toList |> List.map List.tail

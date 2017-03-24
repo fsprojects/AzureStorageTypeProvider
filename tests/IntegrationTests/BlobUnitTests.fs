@@ -121,5 +121,5 @@ let mainTests =
         
         testCase "Correct blob name from a static schema" (fun _ ->
             let blob = BlobSchema.Containers.container1.``folder1/``.item3
-            blob.Name |> shouldEqual "item3")
+            blob.Name |> shouldEqual "folder1/item3")
     ]
