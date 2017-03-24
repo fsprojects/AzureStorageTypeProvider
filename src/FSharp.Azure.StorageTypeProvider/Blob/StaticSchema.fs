@@ -46,8 +46,12 @@ let createSchema resolutionFolder path =
     path
     |> Option.ofString
     |> Option.map(fun path ->
+        let paths = [ path; Path.Combine(resolutionFolder, path) ]
+        match paths |> List.tryFind File.Exists with
+        | None -> Failure (exn (sprintf "Could not locate schema file. Searched: %A " paths))
+        | Some file ->
         try
-        Path.Combine(resolutionFolder, path)
+        file
         |> File.ReadAllLines
         |> schemaLinesToContainers
         |> Success
