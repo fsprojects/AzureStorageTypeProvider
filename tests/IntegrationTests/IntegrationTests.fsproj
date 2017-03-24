@@ -29,32 +29,6 @@
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="FSharp.Azure.StorageTypeProvider">
-      <HintPath>..\..\bin\FSharp.Azure.StorageTypeProvider.dll</HintPath>
-    </Reference>
-    <Reference Include="mscorlib" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Data.Services.Client" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="ExpectoHelpers.fs" />
-    <Compile Include="QueueHelpers.fs" />
-    <Compile Include="BlobUnitTests.fs" />
-    <Compile Include="TableHelpers.fs" />
-    <Compile Include="QueueUnitTests.fs" />
-    <Compile Include="ConnectionTests.fs" />
-    <Compile Include="TableUnitTests.fs" />
-    <Compile Include="Program.fs" />
-    <None Include="ResetTestData.fsx" />
-    <None Include="paket.references" />
-    <None Include="app.config" />
-  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '11.0'">
@@ -571,4 +545,31 @@
       </ItemGroup>
     </When>
   </Choose>
+  <ItemGroup>
+    <Compile Include="ExpectoHelpers.fs" />
+    <Compile Include="QueueHelpers.fs" />
+    <Compile Include="BlobUnitTests.fs" />
+    <Compile Include="TableHelpers.fs" />
+    <Compile Include="QueueUnitTests.fs" />
+    <Compile Include="ConnectionTests.fs" />
+    <Compile Include="TableUnitTests.fs" />
+    <Compile Include="Program.fs" />
+    <None Include="ResetTestData.fsx" />
+    <Content Include="BlobSchema.txt" />
+    <None Include="paket.references" />
+    <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="FSharp.Azure.StorageTypeProvider">
+      <HintPath>..\..\bin\FSharp.Azure.StorageTypeProvider.dll</HintPath>
+    </Reference>
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.Services.Client" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
 </Project>

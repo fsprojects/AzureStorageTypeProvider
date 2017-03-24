@@ -1,0 +1,6 @@
+﻿container1@folder1/item1
+container1@folder1/item2
+container1@folder1/item3
+container1@folder2/item
+container1@folder2/subfolder/foo.txt
+container2@folder2/subfolder/subsubfolder/foo.txt

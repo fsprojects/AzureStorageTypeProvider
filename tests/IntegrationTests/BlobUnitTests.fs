@@ -2,13 +2,14 @@
 
 open FSharp.Azure.StorageTypeProvider
 open Microsoft.WindowsAzure.Storage.Blob
-open Swensen.Unquote
 open System.Linq
 open System.IO
 open FSharp.Azure.StorageTypeProvider.Blob
 open Expecto
 
 type Local = AzureTypeProvider<"DevStorageAccount", "">
+
+type BlobSchema = AzureTypeProvider<blobSchema = "BlobSchema.txt">
 
 let container = Local.Containers.samples
 [<Tests>]
@@ -109,4 +110,16 @@ let mainTests =
             count |> shouldEqual 4)
 
         testCase "Container name is correct" (fun _ -> Local.Containers.samples.Name |> shouldEqual "samples")
+
+        testCase "Correct container name from a static schema" (fun _ ->
+            let container = BlobSchema.Containers.container2
+            container.Name |> shouldEqual "container2")
+
+        testCase "Correct folder path from a static schema" (fun _ ->
+            let folder = BlobSchema.Containers.container1.``folder2/``.``subfolder/``
+            folder.Path |> shouldEqual "folder2/subfolder/")
+        
+        testCase "Correct blob name from a static schema" (fun _ ->
+            let blob = BlobSchema.Containers.container1.``folder1/``.item3
+            blob.Name |> shouldEqual "item3")
     ]
