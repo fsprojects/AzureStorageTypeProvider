@@ -42,9 +42,17 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
         // Create the top level property
         let typeProviderForAccount = ProvidedTypeDefinition(thisAssembly, namespaceName, typeName, baseType = Some typeof<obj>)
         typeProviderForAccount.AddMember(ProvidedConstructor(parameters = [], InvokeCode = (fun _ -> <@@ null @@>)))
+        
         let connectionString = buildConnectionString args
-        match validateConnectionString connectionString, StaticSchema.createSchema config.ResolutionFolder (args.[6] :?> string)  with
-        | Success(), Success blobSchema ->
+        let staticSchema = args.[6] :?> string |> StaticSchema.Option.ofString
+        let connectionStringValidation =
+            match staticSchema with
+            | Some _ -> None
+            | None -> Some (validateConnectionString connectionString)
+            
+        match connectionStringValidation, StaticSchema.createSchema config.ResolutionFolder staticSchema with
+        | Some (Success _), Success blobSchema
+        | None, Success blobSchema ->
             let domainTypes = ProvidedTypeDefinition("Domain", Some typeof<obj>)
             domainTypes.AddMembers <| ProvidedTypeGenerator.generateTypes()
             typeProviderForAccount.AddMember(domainTypes)
@@ -54,13 +62,15 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
 
             // Now create child members e.g. containers, tables etc.
             typeProviderForAccount.AddMembers
-                ([ BlobMemberFactory.getBlobStorageMembers blobSchema
-                   TableMemberFactory.getTableStorageMembers schemaInferenceRowCount humanizeColumns
-                   QueueMemberFactory.getQueueStorageMembers ]
-                |> List.map (fun builder -> builder(connectionString, domainTypes)))
+                ([ (BlobMemberFactory.getBlobStorageMembers blobSchema, "blobs")
+                   (TableMemberFactory.getTableStorageMembers schemaInferenceRowCount humanizeColumns, "tables")
+                   (QueueMemberFactory.getQueueStorageMembers, "queues") ]
+                |> List.map (fun (builder, name) ->
+                    try builder(connectionString, domainTypes)
+                    with ex -> failwithf "An error occurred during initial type generation for %s: %O" name ex))
             typeProviderForAccount
-        | Failure ex, _ -> failwith (sprintf "Unable to validate connection string (%s)" ex.Message)
-        | _, Failure ex -> failwith (sprintf "Unable to parse blob schema file (%s)" ex.Message)
+        | Some (Failure ex), _ -> failwithf "Unable to validate connection string (%s)" ex.Message
+        | _, Failure ex -> failwithf "Unable to parse blob schema file (%s)" ex.Message
     
     let createParam (name, defaultValue:'a, help) =
         let providedParameter = ProvidedStaticParameter(name, typeof<'a>, defaultValue)

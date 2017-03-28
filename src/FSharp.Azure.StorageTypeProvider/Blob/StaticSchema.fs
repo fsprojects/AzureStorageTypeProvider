@@ -6,7 +6,7 @@ open Microsoft.WindowsAzure.Storage.Blob
 open System
 open System.IO
 
-module private Option =
+module Option =
     let ofString text = if String.IsNullOrWhiteSpace text then None else Some text
 
 let private splitOn (c:char) (value:string) = value.Split([| c |], StringSplitOptions.RemoveEmptyEntries)
@@ -44,7 +44,6 @@ let private schemaLinesToContainers lines =
 
 let createSchema resolutionFolder path =
     path
-    |> Option.ofString
     |> Option.map(fun path ->
         let paths = [ path; Path.Combine(resolutionFolder, path) ]
         match paths |> List.tryFind File.Exists with
