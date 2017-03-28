@@ -59,11 +59,11 @@
 * Improve synchronous bulk table operation performance
 * Fix asynchronous bulk table operation error handling
 
-### 1.7.0 - ???
+### 1.7.0 - 6th October 2016
 * Support for Azure Metrics tables.
 * Support for simple humanization of table properties.
 
-### 1.8.0 - ???
+### 1.8.0 - 28th March 2017
 * Upgrade to F# 4.0
 * Upgrade to .NET452
 * Support for static blob schemas
