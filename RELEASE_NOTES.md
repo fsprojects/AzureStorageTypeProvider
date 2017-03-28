@@ -66,4 +66,4 @@
 ### 1.8.0 - ???
 * Upgrade to F# 4.0
 * Upgrade to .NET452
-* Support for static schemas
+* Support for static blob schemas

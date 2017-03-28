@@ -116,11 +116,38 @@ printfn "finished reading all lines"
 
 (**
 
+## Offline development
+In addition to using the Azure Storage Emulator, you can also simply provide the type provider
+with a text file containing the list of blob containers, folders and files. This is particularly
+useful within the context of a CI process, or when you know a specific "known good" structure of
+blobs within a storage account.
+
+You can still access the blobs using the compile-time storage connection string if provided,
+or override as normal at runtime.
+
+**Note that Tables and Queues still require a valid compile-time storage connection string!**
+*)
+
+type BlobSchema = AzureTypeProvider<blobSchema = "BlobSchema.txt">
+let fileFromSchema = BlobSchema.Containers.samples.``file3.txt``
+
+(**
+The contents of `BlobSchema.txt` looks as follows, using the format `{container}@{folder}/{folder}/../{file}`: -
+
+*)
+
+(*** define-output: blobSchema ***)
+IO.File.ReadAllLines "BlobSchema.txt" |> Array.iter (printfn "%s")
+
+(*** include-output: blobSchema ***)
+
+(**
+
 ## Download assets
 You can quickly and easily download files, folders or entire containers to local disk.
 *)
 
-// download a single file into "C:\temp\files"
+// download file1.txt asynchronously into "C:\temp\files"
 let asyncFileDownload = container.``file1.txt``.Download(@"C:\temp\files\")
 
 (**

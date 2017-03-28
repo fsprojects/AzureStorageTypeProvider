@@ -62,3 +62,8 @@
 ### 1.7.0 - ???
 * Support for Azure Metrics tables.
 * Support for simple humanization of table properties.
+
+### 1.8.0 - ???
+* Upgrade to F# 4.0
+* Upgrade to .NET452
+* Support for static blob schemas
