@@ -43,7 +43,6 @@
 <div class="xmldoc">
 <p>Represents an erased provided constructor.</p>
 
-
 </div>
   <h3>Constructors</h3>
   <table class="table table-bordered member-list">
@@ -54,22 +53,22 @@
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '80', 80)" onmouseover="showTip(event, '80', 80)">
+          <code onmouseout="hideTip(event, '81', 81)" onmouseover="showTip(event, '81', 81)">
             new(parameters)
           </code>
-          <div class="tip" id="80">
+          <div class="tip" id="81">
             <strong>Signature:</strong> (parameters:ProvidedParameter list) -&gt; ProvidedConstructor<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1269-1269" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1284-1284" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
           <p>Create a new provided constructor. It is not initially associated with any specific provided type definition.</p>
 
 
-
+              <p>CompiledName: <code>.ctor</code></p>
         </td>
       </tr>
     </tbody>
@@ -83,41 +82,19 @@
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '81', 81)" onmouseover="showTip(event, '81', 81)">
+          <code onmouseout="hideTip(event, '82', 82)" onmouseover="showTip(event, '82', 82)">
             AddDefinitionLocation(...)
           </code>
-          <div class="tip" id="81">
+          <div class="tip" id="82">
             <strong>Signature:</strong> (line:int * column:int * filePath:string) -&gt; unit<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1292-1292" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1307-1307" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
           <p>Add definition location information to the provided constructor.</p>
-
-
-
-        </td>
-      </tr>
-      <tr>
-        <td class="member-name">
-
-          <code onmouseout="hideTip(event, '82', 82)" onmouseover="showTip(event, '82', 82)">
-            AddObsoleteAttribute(message, isError)
-          </code>
-          <div class="tip" id="82">
-            <strong>Signature:</strong> (message:string * isError:bool option) -&gt; unit<br />
-                      </div>
-        </td>
-        <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1291-1291" class="github-link">
-              <img src="../content/img/github.png" class="normal" />
-              <img src="../content/img/github-blue.png" class="hover" />
-            </a>
-          <p>Add a 'Obsolete' attribute to this provided constructor</p>
-
 
 
         </td>
@@ -126,19 +103,18 @@
         <td class="member-name">
 
           <code onmouseout="hideTip(event, '83', 83)" onmouseover="showTip(event, '83', 83)">
-            AddXmlDoc(xmlDoc)
+            AddObsoleteAttribute(message, isError)
           </code>
           <div class="tip" id="83">
-            <strong>Signature:</strong> xmlDoc:string -&gt; unit<br />
+            <strong>Signature:</strong> (message:string * isError:bool option) -&gt; unit<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1290-1290" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1306-1306" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
-          <p>Add XML documentation information to this provided constructor</p>
-
+          <p>Add a 'Obsolete' attribute to this provided constructor</p>
 
 
         </td>
@@ -147,19 +123,18 @@
         <td class="member-name">
 
           <code onmouseout="hideTip(event, '84', 84)" onmouseover="showTip(event, '84', 84)">
-            AddXmlDocComputed(xmlDocFunction)
+            AddXmlDoc(xmlDoc)
           </code>
           <div class="tip" id="84">
-            <strong>Signature:</strong> (xmlDocFunction:(unit -&gt; string)) -&gt; unit<br />
+            <strong>Signature:</strong> xmlDoc:string -&gt; unit<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1288-1288" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1305-1305" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
-          <p>Add XML documentation information to this provided constructor, where the documentation is re-computed  every time it is required.</p>
-
+          <p>Add XML documentation information to this provided constructor</p>
 
 
         </td>
@@ -168,19 +143,18 @@
         <td class="member-name">
 
           <code onmouseout="hideTip(event, '85', 85)" onmouseover="showTip(event, '85', 85)">
-            AddXmlDocDelayed(xmlDocFunction)
+            AddXmlDocComputed(xmlDocFunction)
           </code>
           <div class="tip" id="85">
             <strong>Signature:</strong> (xmlDocFunction:(unit -&gt; string)) -&gt; unit<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1289-1289" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1303-1303" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
-          <p>Add XML documentation information to this provided constructor, where the computation of the documentation is delayed until necessary</p>
-
+          <p>Add XML documentation information to this provided constructor, where the documentation is re-computed  every time it is required.</p>
 
 
         </td>
@@ -189,19 +163,18 @@
         <td class="member-name">
 
           <code onmouseout="hideTip(event, '86', 86)" onmouseover="showTip(event, '86', 86)">
-            BaseConstructorCall()
+            AddXmlDocDelayed(xmlDocFunction)
           </code>
           <div class="tip" id="86">
-            <strong>Signature:</strong> unit -&gt; Expr list -&gt; ConstructorInfo * Expr list<br />
+            <strong>Signature:</strong> (xmlDocFunction:(unit -&gt; string)) -&gt; unit<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1311-1311" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1304-1304" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
-          <p>Set the target and arguments of the base constructor call. Only used for generated types.</p>
-
+          <p>Add XML documentation information to this provided constructor, where the computation of the documentation is delayed until necessary</p>
 
 
         </td>
@@ -213,39 +186,39 @@
             BaseConstructorCall()
           </code>
           <div class="tip" id="87">
-            <strong>Signature:</strong> unit -&gt; unit<br />
+            <strong>Signature:</strong> unit -&gt; Expr list -&gt; ConstructorInfo * Expr list<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1311-1311" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1326-1326" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
           <p>Set the target and arguments of the base constructor call. Only used for generated types.</p>
 
 
-
+              <p>CompiledName: <code>set_BaseConstructorCall</code></p>
         </td>
       </tr>
       <tr>
         <td class="member-name">
 
           <code onmouseout="hideTip(event, '88', 88)" onmouseover="showTip(event, '88', 88)">
-            InvokeCode()
+            BaseConstructorCall()
           </code>
           <div class="tip" id="88">
-            <strong>Signature:</strong> unit -&gt; Expr list -&gt; Expr<br />
+            <strong>Signature:</strong> unit -&gt; unit<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1305-1305" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1326-1326" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
-          <p>Set the quotation used to compute the implementation of invocations of this constructor.</p>
+          <p>Set the target and arguments of the base constructor call. Only used for generated types.</p>
 
 
-
+              <p>CompiledName: <code>set_BaseConstructorCall</code></p>
         </td>
       </tr>
       <tr>
@@ -255,41 +228,39 @@
             InvokeCode()
           </code>
           <div class="tip" id="89">
-            <strong>Signature:</strong> unit -&gt; unit<br />
+            <strong>Signature:</strong> unit -&gt; Expr list -&gt; Expr<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1305-1305" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1320-1320" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
           <p>Set the quotation used to compute the implementation of invocations of this constructor.</p>
 
 
-
+              <p>CompiledName: <code>set_InvokeCode</code></p>
         </td>
       </tr>
       <tr>
         <td class="member-name">
 
           <code onmouseout="hideTip(event, '90', 90)" onmouseover="showTip(event, '90', 90)">
-            IsImplicitCtor()
+            InvokeCode()
           </code>
           <div class="tip" id="90">
-            <strong>Signature:</strong> unit -&gt; bool<br />
+            <strong>Signature:</strong> unit -&gt; unit<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1333-1333" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1320-1320" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
-          <p>Set a flag indicating that the constructor acts like an F# implicit constructor, so the
-parameters of the constructor become fields and can be accessed using Expr.GlobalVar with the
-same name.</p>
+          <p>Set the quotation used to compute the implementation of invocations of this constructor.</p>
 
 
-
+              <p>CompiledName: <code>set_InvokeCode</code></p>
         </td>
       </tr>
       <tr>
@@ -299,11 +270,11 @@ same name.</p>
             IsImplicitCtor()
           </code>
           <div class="tip" id="91">
-            <strong>Signature:</strong> unit -&gt; unit<br />
+            <strong>Signature:</strong> unit -&gt; bool<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1333-1333" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1348-1348" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
@@ -312,25 +283,30 @@ parameters of the constructor become fields and can be accessed using Expr.Globa
 same name.</p>
 
 
-
+              <p>CompiledName: <code>set_IsImplicitCtor</code></p>
         </td>
       </tr>
       <tr>
         <td class="member-name">
 
           <code onmouseout="hideTip(event, '92', 92)" onmouseover="showTip(event, '92', 92)">
-            IsTypeInitializer()
+            IsImplicitCtor()
           </code>
           <div class="tip" id="92">
-            <strong>Signature:</strong> unit -&gt; bool<br />
+            <strong>Signature:</strong> unit -&gt; unit<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1284-1284" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1348-1348" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
-          
+          <p>Set a flag indicating that the constructor acts like an F# implicit constructor, so the
+parameters of the constructor become fields and can be accessed using Expr.GlobalVar with the
+same name.</p>
+
+
+              <p>CompiledName: <code>get_IsImplicitCtor</code></p>
         </td>
       </tr>
       <tr>
@@ -340,15 +316,35 @@ same name.</p>
             IsTypeInitializer()
           </code>
           <div class="tip" id="93">
-            <strong>Signature:</strong> unit -&gt; unit<br />
+            <strong>Signature:</strong> unit -&gt; bool<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1283-1283" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1299-1299" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
           
+              <p>CompiledName: <code>set_IsTypeInitializer</code></p>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '94', 94)" onmouseover="showTip(event, '94', 94)">
+            IsTypeInitializer()
+          </code>
+          <div class="tip" id="94">
+            <strong>Signature:</strong> unit -&gt; unit<br />
+                      </div>
+        </td>
+        <td class="xmldoc">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1298-1298" class="github-link">
+              <img src="../content/img/github.png" class="normal" />
+              <img src="../content/img/github-blue.png" class="hover" />
+            </a>
+          
+              <p>CompiledName: <code>get_IsTypeInitializer</code></p>
         </td>
       </tr>
     </tbody>

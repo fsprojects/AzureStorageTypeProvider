@@ -35,24 +35,18 @@
             <div class="span9" id="main">
                 
 <h1><a name="Introducing-the-Azure-Storage-Type-Provider" class="anchor" href="#Introducing-the-Azure-Storage-Type-Provider">Introducing the Azure Storage Type Provider</a></h1>
-
 <p>The Azure Storage Type Provider is designed to let you rapidly access your
 storage assets in Azure from F# without the need to resort to third party tools
 or the server explorer in Visual Studio.</p>
-
 <p>The provider is designed to be as easy as possible to consume, whilst allowing
 several benefits over using the standard .NET SDK, such as removing the need for
 magic strings when access tables / queues / blobs, as well as strengthening the
 typing of queries over tables.</p>
-
 <h1><a name="Connecting-to-Azure" class="anchor" href="#Connecting-to-Azure">Connecting to Azure</a></h1>
-
 <p>Connecting to your storage account is simple.</p>
-
 <p>From within a script, first <code>#load "AzureStorageProvider.fsx"</code> to reference all dependencies.
 Then, you can generate a type for a storage account simply by providing your Azure
 account credentials via a number of ways.</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
 <span class="l"> 2: </span>
 <span class="l"> 3: </span>
@@ -85,21 +79,17 @@ account credentials via a number of ways.</p>
 </code></pre></td>
 </tr>
 </table>
-
 <p>An example <code>sample.config</code> file can be found  at <code>AzureStorageTypeProvider/docs/content/sample.config</code>.</p>
-
 <h1><a name="Common-Themes" class="anchor" href="#Common-Themes">Common Themes</a></h1>
-
 <p>The API is split into three areas: <strong>Tables</strong>, <strong>Queues</strong> and <strong>Containers</strong>.</p>
-
 <p>All three share some common themes: -</p>
-
 <ul>
-<li>Where possible, entities such as queues, tables, containers, folders or blobs are typed based on
+<li>
+Where possible, entities such as queues, tables, containers, folders or blobs are typed based on
 live queries to the appropriate underlying storage SDK. Thus there's no requirement to enter magic
-strings for blobs, tables or queues.</li>
+strings for blobs, tables or queues.
+</li>
 </ul>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -120,12 +110,12 @@ strings for blobs, tables or queues.</li>
 </code></pre></td>
 </tr>
 </table>
-
 <ul>
-<li>Common methods and functionality are made available directly on the appropriate assets, but
-there's always access to the raw Azure SDK if you need it to do anything more.</li>
+<li>
+Common methods and functionality are made available directly on the appropriate assets, but
+there's always access to the raw Azure SDK if you need it to do anything more.
+</li>
 </ul>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -148,14 +138,14 @@ there's always access to the raw Azure SDK if you need it to do anything more.</
 </code></pre></td>
 </tr>
 </table>
-
 <ul>
-<li>You can override the connection to the destination asset at runtime. This is useful if not using
+<li>
+You can override the connection to the destination asset at runtime. This is useful if not using
 configuration files so that you can use your local (free) storage emulator for development, and then
 move to a live account when testing or moving to production etc.. In addition it's also useful for
-data migration scenarios.</li>
+data migration scenarios.
+</li>
 </ul>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>

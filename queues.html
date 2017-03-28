@@ -35,16 +35,12 @@
             <div class="span9" id="main">
                 
 <h1><a name="Working-with-Queues" class="anchor" href="#Working-with-Queues">Working with Queues</a></h1>
-
 <p>For more information on Queues in general, please see some of the many articles on
 <a href="https://msdn.microsoft.com/en-us/library/microsoft.windowsazure.storage.queue.aspx">MSDN</a> or the <a href="http://azure.microsoft.com/en-us/documentation/services/storage/">Azure</a> <a href="http://azure.microsoft.com/en-us/documentation/articles/storage-dotnet-how-to-use-queues/">documentation</a>. Some of the core features of the Queue provider are: -</p>
-
 <h2><a name="Rapid-navigation" class="anchor" href="#Rapid-navigation">Rapid navigation</a></h2>
-
 <p>You can easily move between queues and view key information on that queue. Simply dotting into
 a queue will automatically request the latest details on the queue. This allows easy exploration
 of your queue assets, directly from within the REPL.</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 </pre></td>
@@ -53,15 +49,11 @@ of your queue assets, directly from within the REPL.</p>
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>Queue 'sample-queue' has 0 items on it.</code></pre></td></tr></table>
-
 <h2><a name="Processing-messages" class="anchor" href="#Processing-messages">Processing messages</a></h2>
-
 <p>It is easy to push and pop messages onto / off a queue - simply call the Enqueue() and Dequeue()
 methods on the appropriate queue. Enqueue will return an option message, in case there is nothing
 on the queue. Once you have finished processing the message, simply call Delete().</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
 <span class="l"> 2: </span>
 <span class="l"> 3: </span>
@@ -100,29 +92,25 @@ on the queue. Once you have finished processing the message, simply call Delete(
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>Queue length is 0.
 Enqueuing a message!
 Queue length is 1.
 {Id =
   ProvidedMessageId
-    (MessageId "da4cefe4-69e0-4711-a672-152220140a37",
-     PopReceipt "4Oj6WZBM1AgBAAAA");
+    (MessageId "ba5bd61d-04a1-47a9-a87d-2317523b65b1",
+     PopReceipt "UBn+aOt11AgBAAAA");
  DequeueCount = 1;
- InsertionTime = Some 03/02/2017 23:56:33 +00:00;
- ExpirationTime = Some 10/02/2017 23:56:33 +00:00;
- NextVisibleTime = Some 03/02/2017 23:57:03 +00:00;
+ InsertionTime = Some 28/03/2017 15:01:40 +00:00;
+ ExpirationTime = Some 04/04/2017 15:01:40 +00:00;
+ NextVisibleTime = Some 28/03/2017 15:02:10 +00:00;
  AsBytes = Value is not created.;
  AsString = Value is not created.;}
 Deleting the message.
 Queue length is 0.</code></pre></td></tr></table>
-
 <h2><a name="Modifying-Queues" class="anchor" href="#Modifying-Queues">Modifying Queues</a></h2>
-
 <p>You can easily modify the contents of an existing message and push it back onto the queue, or clear
 the queue entirely. Note that the properties to access the payload (AsString and AsBytes) are lazily
 evaluated and as such are exposed as Lazy<T>.</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
 <span class="l"> 2: </span>
 <span class="l"> 3: </span>
@@ -177,19 +165,16 @@ evaluated and as such are exposed as Lazy<T>.</p>
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>Enqueuing a message!
 Dequeuing it.
 Message ProvidedMessageId
-  (MessageId "cafe1eb2-d8dd-42a3-820c-a08e6e6c07f3",
-   PopReceipt "YG0ZWpBM1AgBAAAA") with body 'Hello from Azure Type Provider' has been dequeued 1 times.
+  (MessageId "8c35bc2e-d5a0-4879-9f45-832be6445b6a",
+   PopReceipt "kMUlaet11AgBAAAA") with body 'Hello from Azure Type Provider' has been dequeued 1 times.
 Updating it and dequeuing it again.
 Message ProvidedMessageId
-  (MessageId "cafe1eb2-d8dd-42a3-820c-a08e6e6c07f3",
-   PopReceipt "4IcfWpBM1AgCAAAA") with body 'Goodbye from Azure Type Provider' has been dequeued 2 times.</code></pre></td></tr></table>
-
+  (MessageId "8c35bc2e-d5a0-4879-9f45-832be6445b6a",
+   PopReceipt "0JYyaet11AgCAAAA") with body 'Goodbye from Azure Type Provider' has been dequeued 2 times.</code></pre></td></tr></table>
 <h2><a name="Peeking-the-queue" class="anchor" href="#Peeking-the-queue">Peeking the queue</a></h2>
-
 <p>The Queue Provider allows you to preview messages on the queue directly in intellisense. Simply
 dot into the "Peek" property on the queue, and the first 32 messages on the queue will appear.
 Properties on them can be bound with their values.</p>

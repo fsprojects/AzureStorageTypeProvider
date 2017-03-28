@@ -43,7 +43,6 @@
 <div class="xmldoc">
 <p>Represents an Azure Storage Queue.</p>
 
-
 </div>
   <h3>Constructors</h3>
   <table class="table table-bordered member-list">
@@ -54,10 +53,10 @@
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '33', 33)" onmouseover="showTip(event, '33', 33)">
+          <code onmouseout="hideTip(event, '34', 34)" onmouseover="showTip(event, '34', 34)">
             new(defaultConnectionString, name)
           </code>
-          <div class="tip" id="33">
+          <div class="tip" id="34">
             <strong>Signature:</strong> (defaultConnectionString:string * name:string) -&gt; ProvidedQueue<br />
                       </div>
         </td>
@@ -67,6 +66,7 @@
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
           
+              <p>CompiledName: <code>.ctor</code></p>
         </td>
       </tr>
     </tbody>
@@ -80,10 +80,10 @@
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '34', 34)" onmouseover="showTip(event, '34', 34)">
+          <code onmouseout="hideTip(event, '35', 35)" onmouseover="showTip(event, '35', 35)">
             AsCloudQueue(connectionString)
           </code>
-          <div class="tip" id="34">
+          <div class="tip" id="35">
             <strong>Signature:</strong> (connectionString:string option) -&gt; CloudQueue<br />
                       </div>
         </td>
@@ -95,47 +95,24 @@
           <p>Gets a handle to the Azure SDK client for this queue.</p>
 
 
-
-        </td>
-      </tr>
-      <tr>
-        <td class="member-name">
-
-          <code onmouseout="hideTip(event, '35', 35)" onmouseover="showTip(event, '35', 35)">
-            Clear(connectionString)
-          </code>
-          <div class="tip" id="35">
-            <strong>Signature:</strong> (connectionString:string option) -&gt; Async&lt;unit&gt;<br />
-                      </div>
-        </td>
-        <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L123-123" class="github-link">
-              <img src="../content/img/github.png" class="normal" />
-              <img src="../content/img/github-blue.png" class="hover" />
-            </a>
-          <p>Clears the queue of all messages.</p>
-
-
-
         </td>
       </tr>
       <tr>
         <td class="member-name">
 
           <code onmouseout="hideTip(event, '36', 36)" onmouseover="showTip(event, '36', 36)">
-            DeleteMessage(...)
+            Clear(connectionString)
           </code>
           <div class="tip" id="36">
-            <strong>Signature:</strong> (providedMessageId:ProvidedMessageId * connectionString:string option) -&gt; Async&lt;unit&gt;<br />
+            <strong>Signature:</strong> (connectionString:string option) -&gt; Async&lt;unit&gt;<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L101-101" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L124-124" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
-          <p>Deletes an existing message.</p>
-
+          <p>Clears the queue of all messages.</p>
 
 
         </td>
@@ -144,19 +121,18 @@
         <td class="member-name">
 
           <code onmouseout="hideTip(event, '37', 37)" onmouseover="showTip(event, '37', 37)">
-            Dequeue(visibilityTimeout)
+            DeleteMessage(...)
           </code>
           <div class="tip" id="37">
-            <strong>Signature:</strong> visibilityTimeout:TimeSpan -&gt; Async&lt;ProvidedQueueMessage option&gt;<br />
+            <strong>Signature:</strong> (providedMessageId:ProvidedMessageId * connectionString:string option) -&gt; Async&lt;unit&gt;<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L86-86" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L102-102" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
-          <p>Dequeues the next message using the default connection string and sets the visibility timeout (i.e. how long you can work with the message before it reappears in the queue)</p>
-
+          <p>Deletes an existing message.</p>
 
 
         </td>
@@ -165,19 +141,18 @@
         <td class="member-name">
 
           <code onmouseout="hideTip(event, '38', 38)" onmouseover="showTip(event, '38', 38)">
-            Dequeue(...)
+            Dequeue(visibilityTimeout)
           </code>
           <div class="tip" id="38">
-            <strong>Signature:</strong> (connectionString:string option * visibilityTimeout:TimeSpan option) -&gt; Async&lt;ProvidedQueueMessage option&gt;<br />
+            <strong>Signature:</strong> visibilityTimeout:TimeSpan -&gt; Async&lt;ProvidedQueueMessage option&gt;<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L76-76" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L87-87" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
-          <p>Dequeues the next message and optionally sets the visibility timeout (i.e. how long you can work with the message before it reappears in the queue)</p>
-
+          <p>Dequeues the next message using the default connection string and sets the visibility timeout (i.e. how long you can work with the message before it reappears in the queue)</p>
 
 
         </td>
@@ -186,19 +161,18 @@
         <td class="member-name">
 
           <code onmouseout="hideTip(event, '39', 39)" onmouseover="showTip(event, '39', 39)">
-            Enqueue(content, connectionString)
+            Dequeue(...)
           </code>
           <div class="tip" id="39">
-            <strong>Signature:</strong> (content:byte array * connectionString:string option) -&gt; Async&lt;unit&gt;<br />
+            <strong>Signature:</strong> (connectionString:string option * visibilityTimeout:TimeSpan option) -&gt; Async&lt;ProvidedQueueMessage option&gt;<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L97-97" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L77-77" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
-          <p>Enqueues a new message.</p>
-
+          <p>Dequeues the next message and optionally sets the visibility timeout (i.e. how long you can work with the message before it reappears in the queue)</p>
 
 
         </td>
@@ -210,16 +184,15 @@
             Enqueue(content, connectionString)
           </code>
           <div class="tip" id="40">
-            <strong>Signature:</strong> (content:string * connectionString:string option) -&gt; Async&lt;unit&gt;<br />
+            <strong>Signature:</strong> (content:byte array * connectionString:string option) -&gt; Async&lt;unit&gt;<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L93-93" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L98-98" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
           <p>Enqueues a new message.</p>
-
 
 
         </td>
@@ -228,19 +201,18 @@
         <td class="member-name">
 
           <code onmouseout="hideTip(event, '41', 41)" onmouseover="showTip(event, '41', 41)">
-            GenerateSharedAccessSignature(...)
+            Enqueue(content, connectionString)
           </code>
           <div class="tip" id="41">
-            <strong>Signature:</strong> (duration:TimeSpan * start:DateTime option * connectionString:string option) -&gt; string<br />
+            <strong>Signature:</strong> (content:string * connectionString:string option) -&gt; Async&lt;unit&gt;<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L89-89" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L94-94" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
-          <p>Generates a full-access shared access signature, defaulting to start from now.</p>
-
+          <p>Enqueues a new message.</p>
 
 
         </td>
@@ -249,9 +221,29 @@
         <td class="member-name">
 
           <code onmouseout="hideTip(event, '42', 42)" onmouseover="showTip(event, '42', 42)">
-            GetCurrentLength(connectionString)
+            GenerateSharedAccessSignature(...)
           </code>
           <div class="tip" id="42">
+            <strong>Signature:</strong> (duration:TimeSpan * start:DateTime option * connectionString:string option) -&gt; string<br />
+                      </div>
+        </td>
+        <td class="xmldoc">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L90-90" class="github-link">
+              <img src="../content/img/github.png" class="normal" />
+              <img src="../content/img/github-blue.png" class="hover" />
+            </a>
+          <p>Generates a full-access shared access signature, defaulting to start from now.</p>
+
+
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '43', 43)" onmouseover="showTip(event, '43', 43)">
+            GetCurrentLength(connectionString)
+          </code>
+          <div class="tip" id="43">
             <strong>Signature:</strong> (connectionString:string option) -&gt; int<br />
                       </div>
         </td>
@@ -263,49 +255,27 @@
           <p>Gets the queue length.</p>
 
 
-
-        </td>
-      </tr>
-      <tr>
-        <td class="member-name">
-
-          <code onmouseout="hideTip(event, '43', 43)" onmouseover="showTip(event, '43', 43)">
-            Name
-          </code>
-          <div class="tip" id="43">
-            <strong>Signature:</strong> string<br />
-                      </div>
-        </td>
-        <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L130-130" class="github-link">
-              <img src="../content/img/github.png" class="normal" />
-              <img src="../content/img/github-blue.png" class="hover" />
-            </a>
-          <p>Gets the name of the queue.</p>
-
-
-
         </td>
       </tr>
       <tr>
         <td class="member-name">
 
           <code onmouseout="hideTip(event, '44', 44)" onmouseover="showTip(event, '44', 44)">
-            UpdateMessage(...)
+            Name
           </code>
           <div class="tip" id="44">
-            <strong>Signature:</strong> (messageId:ProvidedMessageId * contents:byte array * newTimeout:TimeSpan option * connectionString:string option) -&gt; Async&lt;unit&gt;<br />
+            <strong>Signature:</strong> string<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L117-117" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L131-131" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
-          <p>Updates the visibility and the binary contents of an existing message. If no timeout is provided, the update is immediately visible.</p>
+          <p>Gets the name of the queue.</p>
 
 
-
+              <p>CompiledName: <code>get_Name</code></p>
         </td>
       </tr>
       <tr>
@@ -315,16 +285,15 @@
             UpdateMessage(...)
           </code>
           <div class="tip" id="45">
-            <strong>Signature:</strong> (messageId:ProvidedMessageId * contents:string * newTimeout:TimeSpan option * connectionString:string option) -&gt; Async&lt;unit&gt;<br />
+            <strong>Signature:</strong> (messageId:ProvidedMessageId * contents:byte array * newTimeout:TimeSpan option * connectionString:string option) -&gt; Async&lt;unit&gt;<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L111-111" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L118-118" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
-          <p>Updates the visibility and the string contents of an existing message. If no timeout is provided, the update is immediately visible.</p>
-
+          <p>Updates the visibility and the binary contents of an existing message. If no timeout is provided, the update is immediately visible.</p>
 
 
         </td>
@@ -336,16 +305,35 @@
             UpdateMessage(...)
           </code>
           <div class="tip" id="46">
+            <strong>Signature:</strong> (messageId:ProvidedMessageId * contents:string * newTimeout:TimeSpan option * connectionString:string option) -&gt; Async&lt;unit&gt;<br />
+                      </div>
+        </td>
+        <td class="xmldoc">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L112-112" class="github-link">
+              <img src="../content/img/github.png" class="normal" />
+              <img src="../content/img/github-blue.png" class="hover" />
+            </a>
+          <p>Updates the visibility and the string contents of an existing message. If no timeout is provided, the update is immediately visible.</p>
+
+
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '47', 47)" onmouseover="showTip(event, '47', 47)">
+            UpdateMessage(...)
+          </code>
+          <div class="tip" id="47">
             <strong>Signature:</strong> (messageId:ProvidedMessageId * newTimeout:TimeSpan * connectionString:string option) -&gt; Async&lt;unit&gt;<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L106-106" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L107-107" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
           <p>Updates the visibility of an existing message.</p>
-
 
 
         </td>

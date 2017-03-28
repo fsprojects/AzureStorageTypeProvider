@@ -35,16 +35,12 @@
             <div class="span9" id="main">
                 
 <h1><a name="Working-with-Tables" class="anchor" href="#Working-with-Tables">Working with Tables</a></h1>
-
 <p>For more information on Tables in general, please see some of the many articles on
 <a href="https://msdn.microsoft.com/en-us/library/microsoft.windowsazure.storage.table.aspx">MSDN</a> or the <a href="http://azure.microsoft.com/en-us/documentation/services/storage/">Azure</a> <a href="http://azure.microsoft.com/en-us/documentation/articles/storage-dotnet-how-to-use-tables/">documentation</a>. Some of the core features of the Tables provider are: -</p>
-
 <h2><a name="Rapid-navigation" class="anchor" href="#Rapid-navigation">Rapid navigation</a></h2>
-
 <p>You can easily move between tables within a storage account. Simply dotting into a Tables property
 will automatically retrieve the list of tables in the storage account. This allows
 easy exploration of your table assets, directly from within the REPL.</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 </pre></td>
@@ -53,17 +49,12 @@ easy exploration of your table assets, directly from within the REPL.</p>
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>The table is called 'employee'.</code></pre></td></tr></table>
-
 <h2><a name="Automatic-schema-inference" class="anchor" href="#Automatic-schema-inference">Automatic schema inference</a></h2>
-
 <p>Unlike some non-relational data stores, Azure Table Storage <em>does</em> maintain schema information at the
 row level in the form of EDM metadata. This can be interrogated in order to infer a table's shape, as
 well as help query data. Let's look at the schema of the row <code>fred.1</code> in the <code>employee</code> table.</p>
-
 <div class="deedleframe">
-
 <table>
 <thead>
 <tr class="header">
@@ -111,11 +102,8 @@ well as help query data. Let's look at the schema of the row <code>fred.1</code>
 </tbody>
 </table>
 
-
 </div>
-
 <p>Based on this EDM metadata, an appropriate .NET type can be generated and used within the provider.</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -126,17 +114,12 @@ well as help query data. Let's look at the schema of the row <code>fred.1</code>
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>Fred has Partition Key of men and Row Key of 1
 Fred has Name 'fred', Years Working '10', Dob '01/05/1990 0:00:00', Salary '0.000000' and Is Manager 'true'.</code></pre></td></tr></table>
-
 <h3><a name="Optional-type-generation" class="anchor" href="#Optional-type-generation">Optional type generation</a></h3>
-
 <p>The Storage Type Provider will also intelligently map fields which are not always populated in the table.
 For example, given the following rows, we can see that two columns are not always populated.</p>
-
 <div class="deedleframe">
-
 <table>
 <thead>
 <tr class="header">
@@ -153,7 +136,7 @@ For example, given the following rows, we can see that two columns are not alway
 <tbody>
 <tr class="odd">
 <td><p>partition.1</p></td>
-<td><p>03/02/2017 23:56:40 +00:00</p></td>
+<td><p>28/03/2017 15:01:48 +00:00</p></td>
 <td><p>01/05/1990 0:00:00</p></td>
 <td><p>True</p></td>
 <td><p> ... </p></td>
@@ -163,7 +146,7 @@ For example, given the following rows, we can see that two columns are not alway
 </tr>
 <tr class="even">
 <td><p>partition.2</p></td>
-<td><p>03/02/2017 23:56:40 +00:00</p></td>
+<td><p>28/03/2017 15:01:48 +00:00</p></td>
 <td><p>01/05/1990 0:00:00</p></td>
 <td><p>True</p></td>
 <td><p> ... </p></td>
@@ -174,12 +157,9 @@ For example, given the following rows, we can see that two columns are not alway
 </tbody>
 </table>
 
-
 </div>
-
 <p>The type provider will correctly infer that YearsWorking and IsAnimal are optional fields are will cascade
 this to the type system</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 </pre></td>
@@ -188,15 +168,12 @@ this to the type system</p>
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>IsAnimal has a value: false, YearsWorking value: Some 10</code></pre></td></tr></table>
-
 <p>Of course, all other fields remain mandatory. This will also cascade to the provider constructor for the type -
 optional fields will become optional constructor arguments. The type provider will download the first 10 rows by default
 to infer schema for each table, but this can be increased during creation of the type provider. Obviously, a large
 sample increases the chance of the type provider correctly inferring option fields - but if you use a local development
 storage account for development purposes, you can probably manually generate a few rows to guide the inference system.</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 </pre></td>
@@ -205,12 +182,9 @@ storage account for development purposes, you can probably manually generate a f
 </code></pre></td>
 </tr>
 </table>
-
 <h3><a name="Data-Frame-interoperability" class="anchor" href="#Data-Frame-interoperability">Data Frame interoperability</a></h3>
-
 <p>In addition, an extra "Values" property is available which exposes all properties on the entity
 in a key/value collection - this is useful for binding scenarios or e.g. mapping in Deedle frames.</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -233,57 +207,49 @@ in a key/value collection - this is useful for binding scenarios or e.g. mapping
 </code></pre></td>
 </tr>
 </table>
-
 <div class="deedleframe">
-
 <table>
 <thead>
 <tr class="header">
 <th></th>
+<th><p>Timestamp</p></th>
 <th><p>Dob</p></th>
 <th><p>IsManager</p></th>
 <th><p>Name</p></th>
 <th><p>Salary</p></th>
 <th><p>YearsWorking</p></th>
-<th><p>Timestamp</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td><p>women.1</p></td>
+<td><p>28/03/2017 15:01:48 +00:00</p></td>
 <td><p>30/04/2005 0:00:00</p></td>
 <td><p>True</p></td>
 <td><p>sara</p></td>
 <td><p>3.5</p></td>
 <td><p>35</p></td>
-<td><p>03/02/2017 23:56:40 +00:00</p></td>
 </tr>
 <tr class="even">
 <td><p>women.2</p></td>
+<td><p>28/03/2017 15:01:48 +00:00</p></td>
 <td><p>20/08/1965 0:00:00</p></td>
 <td><p>False</p></td>
 <td><p>rachel</p></td>
 <td><p>5.5</p></td>
 <td><p>20</p></td>
-<td><p>03/02/2017 23:56:40 +00:00</p></td>
 </tr>
 </tbody>
 </table>
 
-
 </div>
-
 <h2><a name="Querying-data" class="anchor" href="#Querying-data">Querying data</a></h2>
-
-<p>The storage provider has an easy-to-use query API that is also flexble and powerful, and uses the 
+<p>The storage provider has an easy-to-use query API that is also flexble and powerful, and uses the
 inferred schema to generate the appropriate query functionality. Data can be queried in several
 ways, in both synchronous or asynchronous forms.</p>
-
 <h3><a name="Key-Lookups" class="anchor" href="#Key-Lookups">Key Lookups</a></h3>
-
 <p>These are the simplest (and best performing) queries, based on a partition / row key combination,
 returning an optional result. You can also retrieve an entire partition.</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -294,12 +260,9 @@ returning an optional result. You can also retrieve an entire partition.</p>
 </code></pre></td>
 </tr>
 </table>
-
 <h3><a name="Plain-Text-Queries" class="anchor" href="#Plain-Text-Queries">Plain Text Queries</a></h3>
-
 <p>If you need to search for a set of entities, you can enter a plain text search, either manually or
 using the Azure SDK query builder.</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -320,35 +283,27 @@ using the Azure SDK query builder.</p>
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>The query returned 2 rows.
 Generated query is 'YearsWorking eq 35'</code></pre></td></tr></table>
-
 <h3><a name="Query-DSL" class="anchor" href="#Query-DSL">Query DSL</a></h3>
-
 <p>A third alternative to querying with the Azure SDK is to use the LINQ IQueryable implementation.
 This works in F# as well using the <code>query { }</code> computation expression. However, this
 implementation has two main limitations: -
-    - You need to manually create a type to handle the result
-    - IQueryable does not guarantee runtime safety for a query that compiles. This is particularly
-    evident with the Azure Storage Tables, which allow a very limited set of queries.</p>
-
+- You need to manually create a type to handle the result
+- IQueryable does not guarantee runtime safety for a query that compiles. This is particularly
+evident with the Azure Storage Tables, which allow a very limited set of queries.</p>
 <p>The Table provider allows an alternative that has the same sort of composability of IQueryable, yet
 is strongly typed at compile- and runtime, whilst being extremely easy to use. It generates query
 methods appropriate for each property on the entity, including appropriate clauses e.g. Greater
 Than, Less Than etc. as supported by the Azure Storage Table service</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs83', 167)" onmouseover="showTip(event, 'fs83', 167)" class="i">tpQuery</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs30', 168)" onmouseover="showTip(event, 'fs30', 168)" class="i">employeeTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs76', 169)" onmouseover="showTip(event, 'fs76', 169)" class="f">Query</span>()<span class="o">.</span><span class="i">``Where Years Working Is``</span><span class="o">.</span><span class="f">``Equal To``</span>(<span class="n">35</span>)
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>["YearsWorking eq 35"]</code></pre></td></tr></table>
-
 <p>These can be composed and chained. When you have completed building, simply call <code>Execute()</code>.</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -361,29 +316,21 @@ Than, Less Than etc. as supported by the Azure Storage Table service</p>
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>["IsManager eq true"; "Name eq 'Fred'"; "YearsWorking gt 14"]</code></pre></td></tr></table>
-
 <p>Query operators are strongly typed, so <code>Equal To</code> on <code>Years Working</code> takes in an int, whereas
 on <code>Name</code> it takes in a string, whilst for booleans there is no such provided method.</p>
-
 <h2><a name="Inserting-data" class="anchor" href="#Inserting-data">Inserting data</a></h2>
-
 <p>Inserting data is extremely easy with Azure Type Provider. A table will always have an Insert
 method on it, with various overloads that will appear depending on whether the table has data in
 it (and thus a schema could be inferred) or is empty.</p>
-
 <h3><a name="Inserting-single-records" class="anchor" href="#Inserting-single-records">Inserting single records</a></h3>
-
 <p>If the table is newly-created (and has no existing data from which to infer schema), you can insert
 data by calling one of the two available Insert overloads. The first one takes a single
 PartitionKey, RowKey and any object. It will automatically generate the appropriate Azure Storage
 request for all public properties. Conversely, if the table exists and has schema associated with
 it, you can use a strongly-typed Insert method. You can also choose whether to insert or upsert
 (insert or update) data.</p>
-
 <p>Both mechanisms will also return a TableResponse discriminated union on the outcome of the operation.</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -398,9 +345,7 @@ it, you can use a strongly-typed Insert method. You can also choose whether to i
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>SuccessfulResponse ((Partition "Europe", Row "1"),204)</code></pre></td></tr></table>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -423,25 +368,19 @@ it, you can use a strongly-typed Insert method. You can also choose whether to i
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>SuccessfulResponse ((Partition "women", Row "3"),204)</code></pre></td></tr></table>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs99', 198)" onmouseover="showTip(event, 'fs99', 198)" class="i">upsertResponse</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs30', 199)" onmouseover="showTip(event, 'fs30', 199)" class="i">employeeTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs98', 200)" onmouseover="showTip(event, 'fs98', 200)" class="f">Insert</span>(<span onmouseout="hideTip(event, 'fs93', 201)" onmouseover="showTip(event, 'fs93', 201)" class="i">newEmployee</span>, <span onmouseout="hideTip(event, 'fs100', 202)" onmouseover="showTip(event, 'fs100', 202)" class="t">TableInsertMode</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs101', 203)" onmouseover="showTip(event, 'fs101', 203)" class="i">Upsert</span>)
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>SuccessfulResponse ((Partition "women", Row "3"),204)</code></pre></td></tr></table>
-
 <h3><a name="Inserting-batches" class="anchor" href="#Inserting-batches">Inserting batches</a></h3>
-
 <p>The Storage provider makes it easier to insert large amounts of data by automatically grouping
 large datasets into the appropriate batches, which for Azure Tables have to be across the same
 partition and in sizes of up to 100 entities. You can insert batches for tables that either
 already have schema or do not.</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -460,51 +399,40 @@ already have schema or do not.</p>
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>[|("Europe",
    [|SuccessfulResponse ((Partition "Europe", Row "3"),204);
      SuccessfulResponse ((Partition "Europe", Row "2"),204)|]);
   ("North America",
    [|SuccessfulResponse ((Partition "North America", Row "2"),204);
      SuccessfulResponse ((Partition "North America", Row "1"),204)|])|]</code></pre></td></tr></table>
-
 <h2><a name="Deleting-data" class="anchor" href="#Deleting-data">Deleting data</a></h2>
-
 <p>Deleting data is also extremely easy - simply supply the set of Partition / Row Key combinations that
 you wish to delete.</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs104', 217)" onmouseover="showTip(event, 'fs104', 217)" class="i">deleteResult</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs89', 218)" onmouseover="showTip(event, 'fs89', 218)" class="i">emptyTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs105', 219)" onmouseover="showTip(event, 'fs105', 219)" class="f">Delete</span> [ <span class="k">for</span> <span onmouseout="hideTip(event, 'fs106', 220)" onmouseover="showTip(event, 'fs106', 220)" class="i">row</span> <span class="k">in</span> <span class="n">1</span> <span class="o">..</span> <span class="n">2</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs48', 221)" onmouseover="showTip(event, 'fs48', 221)" class="p">Partition</span> <span class="s">&quot;North America&quot;</span>, <span onmouseout="hideTip(event, 'fs47', 222)" onmouseover="showTip(event, 'fs47', 222)" class="p">Row</span> (<span onmouseout="hideTip(event, 'fs106', 223)" onmouseover="showTip(event, 'fs106', 223)" class="i">row</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs107', 224)" onmouseover="showTip(event, 'fs107', 224)" class="f">ToString</span>()) ]
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>[|("North America",
    [|SuccessfulResponse ((Partition "North America", Row "2"),204);
      SuccessfulResponse ((Partition "North America", Row "1"),204)|])|]</code></pre></td></tr></table>
-
 <p>Alternatively, you can delete an entire partition (although due to the limitations
 of the Table Storage service, this will require loading all row keys for that partition into memory).</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs108', 225)" onmouseover="showTip(event, 'fs108', 225)" class="i">deletePartitionResult</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs89', 226)" onmouseover="showTip(event, 'fs89', 226)" class="i">emptyTable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs109', 227)" onmouseover="showTip(event, 'fs109', 227)" class="f">DeletePartition</span> <span class="s">&quot;Europe&quot;</span>
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>("Europe",
  [|SuccessfulResponse ((Partition "Europe", Row "3"),204);
    SuccessfulResponse ((Partition "Europe", Row "2"),204);
    SuccessfulResponse ((Partition "Europe", Row "1"),204)|])</code></pre></td></tr></table>
-
 <h2><a name="Error-handling" class="anchor" href="#Error-handling">Error handling</a></h2>
-
 <p>Operations should not raise exceptions. Instead, return codes of any write operations return a
 TableResponse. This contains the Partition and Row Keys of the affected row as well as the
 associated TableResult, wrapped in a discriminated union to allow easy matching.</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -521,7 +449,6 @@ associated TableResult, wrapped in a discriminated union to allow easy matching.
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 </pre></td>
@@ -530,9 +457,7 @@ associated TableResult, wrapped in a discriminated union to allow easy matching.
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>Entity (Partition "women", Row "3") failed: 409 - EntityAlreadyExists.</code></pre></td></tr></table>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -543,12 +468,10 @@ associated TableResult, wrapped in a discriminated union to allow easy matching.
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>Entity (Partition "Europe", Row "3") failed: 409 - EntityAlreadyExists.
 Entity (Partition "Europe", Row "2") was ignored as part of a failed batch operation.
 Entity (Partition "North America", Row "2") failed: 409 - EntityAlreadyExists.
 Entity (Partition "North America", Row "1") was ignored as part of a failed batch operation.</code></pre></td></tr></table>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 </pre></td>
@@ -557,7 +480,6 @@ Entity (Partition "North America", Row "1") was ignored as part of a failed batc
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>Entity (Partition "Foo", Row "Bar") failed: 404 - ResourceNotFound.</code></pre></td></tr></table>
 
 <div class="tip" id="fs1">namespace Deedle</div>
@@ -599,8 +521,8 @@ Entity (Partition "North America", Row "1") was ignored as part of a failed batc
 <div class="tip" id="fs37">val series : ISeries&lt;int&gt; list</div>
 <div class="tip" id="fs38">Multiple items<br />module List<br /><br />from Microsoft.FSharp.Collections<br /><br />--------------------<br />type List&lt;&#39;T&gt; =<br />&#160;&#160;| ( [] )<br />&#160;&#160;| ( :: ) of Head: &#39;T * Tail: &#39;T list<br />&#160;&#160;interface IEnumerable<br />&#160;&#160;interface IEnumerable&lt;&#39;T&gt;<br />&#160;&#160;member GetSlice : startIndex:int option * endIndex:int option -&gt; &#39;T list<br />&#160;&#160;member Head : &#39;T<br />&#160;&#160;member IsEmpty : bool<br />&#160;&#160;member Item : index:int -&gt; &#39;T with get<br />&#160;&#160;member Length : int<br />&#160;&#160;member Tail : &#39;T list<br />&#160;&#160;static member Cons : head:&#39;T * tail:&#39;T list -&gt; &#39;T list<br />&#160;&#160;static member Empty : &#39;T list<br /><br />Full name: Microsoft.FSharp.Collections.List&lt;_&gt;</div>
 <div class="tip" id="fs39">val map : mapping:(&#39;T -&gt; &#39;U) -&gt; list:&#39;T list -&gt; &#39;U list<br /><br />Full name: Microsoft.FSharp.Collections.List.map</div>
-<div class="tip" id="fs40">Multiple items<br />module Series<br /><br />from Deedle<br /><br />--------------------<br />type Series =<br />&#160;&#160;static member ofNullables : values:seq&lt;Nullable&lt;&#39;a0&gt;&gt; -&gt; Series&lt;int,&#39;a0&gt; (requires default constructor and value type and &#39;a0 :&gt; ValueType)<br />&#160;&#160;static member ofObservations : observations:seq&lt;&#39;a0 * &#39;a1&gt; -&gt; Series&lt;&#39;a0,&#39;a1&gt; (requires equality)<br />&#160;&#160;static member ofOptionalObservations : observations:seq&lt;&#39;K * &#39;a1 option&gt; -&gt; Series&lt;&#39;K,&#39;a1&gt; (requires equality)<br />&#160;&#160;static member ofValues : values:seq&lt;&#39;a0&gt; -&gt; Series&lt;int,&#39;a0&gt;<br /><br />Full name: Deedle.F# Series extensions.Series<br /><br />--------------------<br />type Series&lt;&#39;K,&#39;V (requires equality)&gt; =<br />&#160;&#160;interface IFsiFormattable<br />&#160;&#160;interface ISeries&lt;&#39;K&gt;<br />&#160;&#160;new : pairs:seq&lt;KeyValuePair&lt;&#39;K,&#39;V&gt;&gt; -&gt; Series&lt;&#39;K,&#39;V&gt;<br />&#160;&#160;new : keys:&#39;K [] * values:&#39;V [] -&gt; Series&lt;&#39;K,&#39;V&gt;<br />&#160;&#160;new : keys:seq&lt;&#39;K&gt; * values:seq&lt;&#39;V&gt; -&gt; Series&lt;&#39;K,&#39;V&gt;<br />&#160;&#160;new : index:IIndex&lt;&#39;K&gt; * vector:IVector&lt;&#39;V&gt; * vectorBuilder:IVectorBuilder * indexBuilder:IIndexBuilder -&gt; Series&lt;&#39;K,&#39;V&gt;<br />&#160;&#160;member After : lowerExclusive:&#39;K -&gt; Series&lt;&#39;K,&#39;V&gt;<br />&#160;&#160;member Aggregate : aggregation:Aggregation&lt;&#39;K&gt; * observationSelector:Func&lt;DataSegment&lt;Series&lt;&#39;K,&#39;V&gt;&gt;,KeyValuePair&lt;&#39;TNewKey,OptionalValue&lt;&#39;R&gt;&gt;&gt; -&gt; Series&lt;&#39;TNewKey,&#39;R&gt; (requires equality)<br />&#160;&#160;member Aggregate : aggregation:Aggregation&lt;&#39;K&gt; * keySelector:Func&lt;DataSegment&lt;Series&lt;&#39;K,&#39;V&gt;&gt;,&#39;TNewKey&gt; * valueSelector:Func&lt;DataSegment&lt;Series&lt;&#39;K,&#39;V&gt;&gt;,OptionalValue&lt;&#39;R&gt;&gt; -&gt; Series&lt;&#39;TNewKey,&#39;R&gt; (requires equality)<br />&#160;&#160;member AsyncMaterialize : unit -&gt; Async&lt;Series&lt;&#39;K,&#39;V&gt;&gt;<br />&#160;&#160;...<br /><br />Full name: Deedle.Series&lt;_,_&gt;<br /><br />--------------------<br />new : pairs:seq&lt;Collections.Generic.KeyValuePair&lt;&#39;K,&#39;V&gt;&gt; -&gt; Series&lt;&#39;K,&#39;V&gt;<br />new : keys:seq&lt;&#39;K&gt; * values:seq&lt;&#39;V&gt; -&gt; Series&lt;&#39;K,&#39;V&gt;<br />new : keys:&#39;K [] * values:&#39;V [] -&gt; Series&lt;&#39;K,&#39;V&gt;<br />new : index:Indices.IIndex&lt;&#39;K&gt; * vector:IVector&lt;&#39;V&gt; * vectorBuilder:Vectors.IVectorBuilder * indexBuilder:Indices.IIndexBuilder -&gt; Series&lt;&#39;K,&#39;V&gt;</div>
-<div class="tip" id="fs41">static member Series.ofValues : values:seq&lt;&#39;a0&gt; -&gt; Series&lt;int,&#39;a0&gt;</div>
+<div class="tip" id="fs40">Multiple items<br />module Series<br /><br />from Deedle<br /><br />--------------------<br />type Series =<br />&#160;&#160;static member ofNullables : values:seq&lt;Nullable&lt;&#39;a0&gt;&gt; -&gt; Series&lt;int,&#39;a0&gt; (requires default constructor and value type and &#39;a0 :&gt; ValueType)<br />&#160;&#160;static member ofObservations : observations:seq&lt;&#39;c * &#39;d&gt; -&gt; Series&lt;&#39;c,&#39;d&gt; (requires equality)<br />&#160;&#160;static member ofOptionalObservations : observations:seq&lt;&#39;K * &#39;a1 option&gt; -&gt; Series&lt;&#39;K,&#39;a1&gt; (requires equality)<br />&#160;&#160;static member ofValues : values:seq&lt;&#39;a&gt; -&gt; Series&lt;int,&#39;a&gt;<br /><br />Full name: Deedle.F# Series extensions.Series<br /><br />--------------------<br />type Series&lt;&#39;K,&#39;V (requires equality)&gt; =<br />&#160;&#160;interface IFsiFormattable<br />&#160;&#160;interface ISeries&lt;&#39;K&gt;<br />&#160;&#160;new : pairs:seq&lt;KeyValuePair&lt;&#39;K,&#39;V&gt;&gt; -&gt; Series&lt;&#39;K,&#39;V&gt;<br />&#160;&#160;new : keys:&#39;K [] * values:&#39;V [] -&gt; Series&lt;&#39;K,&#39;V&gt;<br />&#160;&#160;new : keys:seq&lt;&#39;K&gt; * values:seq&lt;&#39;V&gt; -&gt; Series&lt;&#39;K,&#39;V&gt;<br />&#160;&#160;new : index:IIndex&lt;&#39;K&gt; * vector:IVector&lt;&#39;V&gt; * vectorBuilder:IVectorBuilder * indexBuilder:IIndexBuilder -&gt; Series&lt;&#39;K,&#39;V&gt;<br />&#160;&#160;member After : lowerExclusive:&#39;K -&gt; Series&lt;&#39;K,&#39;V&gt;<br />&#160;&#160;member Aggregate : aggregation:Aggregation&lt;&#39;K&gt; * observationSelector:Func&lt;DataSegment&lt;Series&lt;&#39;K,&#39;V&gt;&gt;,KeyValuePair&lt;&#39;TNewKey,OptionalValue&lt;&#39;R&gt;&gt;&gt; -&gt; Series&lt;&#39;TNewKey,&#39;R&gt; (requires equality)<br />&#160;&#160;member Aggregate : aggregation:Aggregation&lt;&#39;K&gt; * keySelector:Func&lt;DataSegment&lt;Series&lt;&#39;K,&#39;V&gt;&gt;,&#39;TNewKey&gt; * valueSelector:Func&lt;DataSegment&lt;Series&lt;&#39;K,&#39;V&gt;&gt;,OptionalValue&lt;&#39;R&gt;&gt; -&gt; Series&lt;&#39;TNewKey,&#39;R&gt; (requires equality)<br />&#160;&#160;member AsyncMaterialize : unit -&gt; Async&lt;Series&lt;&#39;K,&#39;V&gt;&gt;<br />&#160;&#160;...<br /><br />Full name: Deedle.Series&lt;_,_&gt;<br /><br />--------------------<br />new : pairs:seq&lt;Collections.Generic.KeyValuePair&lt;&#39;K,&#39;V&gt;&gt; -&gt; Series&lt;&#39;K,&#39;V&gt;<br />new : keys:seq&lt;&#39;K&gt; * values:seq&lt;&#39;V&gt; -&gt; Series&lt;&#39;K,&#39;V&gt;<br />new : keys:&#39;K [] * values:&#39;V [] -&gt; Series&lt;&#39;K,&#39;V&gt;<br />new : index:Indices.IIndex&lt;&#39;K&gt; * vector:IVector&lt;&#39;V&gt; * vectorBuilder:Vectors.IVectorBuilder * indexBuilder:Indices.IIndexBuilder -&gt; Series&lt;&#39;K,&#39;V&gt;</div>
+<div class="tip" id="fs41">static member Series.ofValues : values:seq&lt;&#39;a&gt; -&gt; Series&lt;int,&#39;a&gt;</div>
 <div class="tip" id="fs42">val s : Series&lt;int,string&gt;</div>
 <div class="tip" id="fs43">type ISeries&lt;&#39;K (requires equality)&gt; =<br />&#160;&#160;interface<br />&#160;&#160;&#160;&#160;abstract member TryGetObject : &#39;K -&gt; OptionalValue&lt;obj&gt;<br />&#160;&#160;&#160;&#160;abstract member Index : IIndex&lt;&#39;K&gt;<br />&#160;&#160;&#160;&#160;abstract member Vector : IVector<br />&#160;&#160;&#160;&#160;abstract member VectorBuilder : IVectorBuilder<br />&#160;&#160;end<br /><br />Full name: Deedle.ISeries&lt;_&gt;</div>
 <div class="tip" id="fs44">val indexRowsString : column:&#39;C -&gt; frame:Frame&lt;&#39;R1,&#39;C&gt; -&gt; Frame&lt;string,&#39;C&gt; (requires equality and equality)<br /><br />Full name: Deedle.Frame.indexRowsString</div>
@@ -651,13 +573,13 @@ Entity (Partition "North America", Row "1") was ignored as part of a failed batc
 <div class="tip" id="fs89">val emptyTable : AzureTypeProvider&lt;...&gt;.Domain.emptytableTable<br /><br />Full name: Tables.emptyTable</div>
 <div class="tip" id="fs90">property AzureTypeProvider&lt;...&gt;.Domain.Tables.emptytable: AzureTypeProvider&lt;...&gt;.Domain.emptytableTable<br /><em><br /><br />Provides access to the &#39;emptytable&#39; table.</em></div>
 <div class="tip" id="fs91">val response : TableResponse<br /><br />Full name: Tables.response</div>
-<div class="tip" id="fs92">member AzureTable.Insert : entities:seq&lt;Partition * Row * &#39;b&gt; * ?insertMode:TableInsertMode * ?connectionString:string -&gt; (string * TableResponse []) []<br />member AzureTable.Insert : partitionKey:Partition * rowKey:Row * entity:&#39;a0 * ?insertMode:TableInsertMode * ?connectionString:string -&gt; TableResponse</div>
+<div class="tip" id="fs92">member AzureTable.Insert : entities:seq&lt;Partition * Row * &#39;b&gt; * ?insertMode:TableInsertMode * ?connectionString:string -&gt; (string * TableResponse []) []<br />member AzureTable.Insert : partitionKey:Partition * rowKey:Row * entity:&#39;a * ?insertMode:TableInsertMode * ?connectionString:string -&gt; TableResponse</div>
 <div class="tip" id="fs93">val newEmployee : AzureTypeProvider&lt;...&gt;.Domain.employeeEntity<br /><br />Full name: Tables.newEmployee</div>
 <div class="tip" id="fs94">type Domain =<br />&#160;&#160;nested type $Azure_Metrics<br />&#160;&#160;nested type BlobFile<br />&#160;&#160;nested type BlockBlob<br />&#160;&#160;nested type Containers<br />&#160;&#160;nested type PageBlob<br />&#160;&#160;nested type Queues<br />&#160;&#160;nested type Tables<br />&#160;&#160;nested type XmlBlob<br />&#160;&#160;nested type employee.DobQueryOperators<br />&#160;&#160;nested type employee.IsManagerQueryOperators<br />&#160;&#160;...<br /><br />Full name: FSharp.Azure.StorageTypeProvider.AzureTypeProvider,accountName=&quot;UseDevelopmentStorage=true&quot;.Domain</div>
 <div class="tip" id="fs95">type employeeEntity =<br />&#160;&#160;inherit LightweightTableEntity<br />&#160;&#160;new : PartitionKey: Partition * RowKey: Row * Dob: DateTime * IsManager: bool * Name: string * Salary: float * YearsWorking: int -&gt; employeeEntity<br />&#160;&#160;member Dob : DateTime<br />&#160;&#160;member IsManager : bool<br />&#160;&#160;member Name : string<br />&#160;&#160;member PartitionKey : string<br />&#160;&#160;member RowKey : string<br />&#160;&#160;member Salary : float<br />&#160;&#160;member Timestamp : DateTimeOffset<br />&#160;&#160;member Values : Map&lt;string,obj&gt;<br />&#160;&#160;...<br /><br />Full name: FSharp.Azure.StorageTypeProvider.AzureTypeProvider,accountName=&quot;UseDevelopmentStorage=true&quot;.Domain.employeeEntity</div>
 <div class="tip" id="fs96">Multiple items<br />type DateTime =<br />&#160;&#160;struct<br />&#160;&#160;&#160;&#160;new : ticks:int64 -&gt; DateTime + 10 overloads<br />&#160;&#160;&#160;&#160;member Add : value:TimeSpan -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddDays : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddHours : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddMilliseconds : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddMinutes : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddMonths : months:int -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddSeconds : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddTicks : value:int64 -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddYears : value:int -&gt; DateTime<br />&#160;&#160;&#160;&#160;...<br />&#160;&#160;end<br /><br />Full name: System.DateTime<br /><br />--------------------<br />DateTime()<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(ticks: int64) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(ticks: int64, kind: DateTimeKind) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, calendar: Globalization.Calendar) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int, kind: DateTimeKind) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int, calendar: Globalization.Calendar) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int, millisecond: int) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int, millisecond: int, kind: DateTimeKind) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em></div>
 <div class="tip" id="fs97">val newEmployeeResponse : TableResponse<br /><br />Full name: Tables.newEmployeeResponse</div>
-<div class="tip" id="fs98">member AzureTable.Insert : entities:seq&lt;Partition * Row * &#39;b&gt; * ?insertMode:TableInsertMode * ?connectionString:string -&gt; (string * TableResponse []) []<br />AzureTypeProvider&lt;...&gt;.Domain.employeeTable.Insert(entities: AzureTypeProvider&lt;...&gt;.Domain.employeeEntity [], ?insertMode: TableInsertMode, ?connectionString: string) : (string * TableResponse []) []<br /><em><br /><br />Inserts a batch of entities with the inferred table schema into the table.</em><br />AzureTypeProvider&lt;...&gt;.Domain.employeeTable.Insert(entity: AzureTypeProvider&lt;...&gt;.Domain.employeeEntity, ?insertMode: TableInsertMode, ?connectionString: string) : TableResponse<br /><em><br /><br />Inserts a single entity with the inferred table schema into the table.</em><br />member AzureTable.Insert : partitionKey:Partition * rowKey:Row * entity:&#39;a0 * ?insertMode:TableInsertMode * ?connectionString:string -&gt; TableResponse</div>
+<div class="tip" id="fs98">member AzureTable.Insert : entities:seq&lt;Partition * Row * &#39;b&gt; * ?insertMode:TableInsertMode * ?connectionString:string -&gt; (string * TableResponse []) []<br />AzureTypeProvider&lt;...&gt;.Domain.employeeTable.Insert(entities: AzureTypeProvider&lt;...&gt;.Domain.employeeEntity [], ?insertMode: TableInsertMode, ?connectionString: string) : (string * TableResponse []) []<br /><em><br /><br />Inserts a batch of entities with the inferred table schema into the table.</em><br />AzureTypeProvider&lt;...&gt;.Domain.employeeTable.Insert(entity: AzureTypeProvider&lt;...&gt;.Domain.employeeEntity, ?insertMode: TableInsertMode, ?connectionString: string) : TableResponse<br /><em><br /><br />Inserts a single entity with the inferred table schema into the table.</em><br />member AzureTable.Insert : partitionKey:Partition * rowKey:Row * entity:&#39;a * ?insertMode:TableInsertMode * ?connectionString:string -&gt; TableResponse</div>
 <div class="tip" id="fs99">val upsertResponse : TableResponse<br /><br />Full name: Tables.upsertResponse</div>
 <div class="tip" id="fs100">type TableInsertMode =<br />&#160;&#160;|  Insert  =  0<br />&#160;&#160;|  Upsert  =  1<br /><br />Full name: FSharp.Azure.StorageTypeProvider.Table.TableInsertMode</div>
 <div class="tip" id="fs101">TableInsertMode.Upsert: TableInsertMode = 1</div>

@@ -35,17 +35,13 @@
             <div class="span9" id="main">
                 
 <h1><a name="Working-with-Blobs" class="anchor" href="#Working-with-Blobs">Working with Blobs</a></h1>
-
 <p>For more information on Blobs in general, please see some of the many articles on
 <a href="https://msdn.microsoft.com/en-us/library/microsoft.windowsazure.storage.blob.aspx">MSDN</a> or the <a href="http://azure.microsoft.com/en-us/documentation/services/storage/">Azure</a> <a href="http://azure.microsoft.com/en-us/documentation/articles/storage-dotnet-how-to-use-blobs/">documentation</a>. Some of the core features of the Blob provider are: -</p>
-
 <h2><a name="Rapid-navigation" class="anchor" href="#Rapid-navigation">Rapid navigation</a></h2>
-
 <p>You can easily move between containers, folders and blobs. Simply dotting into a container
 or folder will automatically request the children of that node from Azure. This allows
 easy exploration of your blob assets, directly from within the REPL. Support exists for both
 page and block blobs.</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -56,11 +52,8 @@ page and block blobs.</p>
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>Blob 'folder/childFile.txt' is 16 bytes big.</code></pre></td></tr></table>
-
 <p>You can also perform useful helper actions on folders, such as pulling back all blobs in a folder.</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -71,16 +64,12 @@ page and block blobs.</p>
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>Folder 'folder2/' has the following blobs: seq
   [folder2/child/descedant4.txt; folder2/child/grandchild1/descedant1.txt;
    folder2/child/grandchild1/descedant2.txt;
    folder2/child/grandchild2/descedant3.txt]</code></pre></td></tr></table>
-
 <h2><a name="Shared-types" class="anchor" href="#Shared-types">Shared types</a></h2>
-
 <p>Individual files, folders and containers share a common base type so list operations are possible e.g.</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -101,13 +90,9 @@ page and block blobs.</p>
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>These files take up 220 bytes.</code></pre></td></tr></table>
-
 <h2><a name="Flexible-API-for-read-operations" class="anchor" href="#Flexible-API-for-read-operations">Flexible API for read operations</a></h2>
-
 <p>You can quickly read the contents of a blob synchronously or asynchronously.</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -130,12 +115,9 @@ page and block blobs.</p>
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>sync contents = 'child file stuff'
 async contents = 'child file stuff'</code></pre></td></tr></table>
-
 <p>In addition, the provider has support for custom methods for different document types e.g. XML.</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -152,19 +134,15 @@ async contents = 'child file stuff'</code></pre></td></tr></table>
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>text output = '&lt;data&gt;&lt;items&gt;&lt;item&gt;thing&lt;/item&gt;&lt;/items&gt;&lt;/data&gt;'
 xml output = '&lt;data&gt;
   &lt;items&gt;
     &lt;item&gt;thing&lt;/item&gt;
   &lt;/items&gt;
 &lt;/data&gt;'</code></pre></td></tr></table>
-
 <h2><a name="Streaming-support" class="anchor" href="#Streaming-support">Streaming support</a></h2>
-
 <p>The provider exposes the ability to easily open a stream to a document for sequential reading.
 This is extremely useful for previewing large files etc.</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -175,13 +153,10 @@ This is extremely useful for previewing large files etc.</p>
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>LINE: 'the quick brown fox jumps over the lazy dog'
 LINE: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras malesuada.'
 LINE: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla porttitor.'</code></pre></td></tr></table>
-
 <p>Again, since files share a common type, you can easily merge multiple sequential streams into one: -</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
 <span class="l"> 2: </span>
 <span class="l"> 3: </span>
@@ -208,7 +183,6 @@ LINE: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla porttitor.
 </code></pre></td>
 </tr>
 </table>
-
 <table class="pre"><tr><td><pre><code>starting to read all lines
 stuff
 more stuff
@@ -217,43 +191,65 @@ the quick brown fox jumps over the lazy dog
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras malesuada.
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla porttitor.
 finished reading all lines</code></pre></td></tr></table>
-
-<h2><a name="Download-assets" class="anchor" href="#Download-assets">Download assets</a></h2>
-
-<p>You can quickly and easily download files, folders or entire containers to local disk.</p>
-
+<h2><a name="Offline-development" class="anchor" href="#Offline-development">Offline development</a></h2>
+<p>In addition to using the Azure Storage Emulator, you can also simply provide the type provider
+with a text file containing the list of blob containers, folders and files. This is particularly
+useful within the context of a CI process, or when you know a specific "known good" structure of
+blobs within a storage account.</p>
+<p>You can still access the blobs using the compile-time storage connection string if provided,
+or override as normal at runtime.</p>
+<p><strong>Note that Tables and Queues still require a valid compile-time storage connection string!</strong></p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// download a single file into &quot;C:\temp\files&quot;</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs46', 93)" onmouseover="showTip(event, 'fs46', 93)" class="i">asyncFileDownload</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs10', 94)" onmouseover="showTip(event, 'fs10', 94)" class="i">container</span><span class="o">.</span><span class="i">``file1.txt``</span><span class="o">.</span><span class="f">Download</span>(<span class="s">@&quot;C:\temp\files\&quot;</span>)
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">type</span> <span onmouseout="hideTip(event, 'fs46', 93)" onmouseover="showTip(event, 'fs46', 93)" class="t">BlobSchema</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs9', 94)" onmouseover="showTip(event, 'fs9', 94)" class="t">AzureTypeProvider</span><span class="o">&lt;</span><span class="i">blobSchema</span> <span class="o">=</span> <span class="s">&quot;BlobSchema.txt&quot;</span><span class="o">&gt;</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs47', 95)" onmouseover="showTip(event, 'fs47', 95)" class="i">fileFromSchema</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs46', 96)" onmouseover="showTip(event, 'fs46', 96)" class="t">BlobSchema</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs11', 97)" onmouseover="showTip(event, 'fs11', 97)" class="i">Containers</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 98)" onmouseover="showTip(event, 'fs12', 98)" class="i">samples</span><span class="o">.</span><span class="i">``file3.txt``</span>
 </code></pre></td>
 </tr>
 </table>
-
+<p>The contents of <code>BlobSchema.txt</code> looks as follows, using the format <code>{container}@{folder}/{folder}/../{file}</code>: -</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs48', 99)" onmouseover="showTip(event, 'fs48', 99)" class="i">IO</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs49', 100)" onmouseover="showTip(event, 'fs49', 100)" class="t">File</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs50', 101)" onmouseover="showTip(event, 'fs50', 101)" class="f">ReadAllLines</span> <span class="s">&quot;BlobSchema.txt&quot;</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs51', 102)" onmouseover="showTip(event, 'fs51', 102)" class="t">Array</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs52', 103)" onmouseover="showTip(event, 'fs52', 103)" class="f">iter</span> (<span onmouseout="hideTip(event, 'fs14', 104)" onmouseover="showTip(event, 'fs14', 104)" class="f">printfn</span> <span class="s">&quot;</span><span class="pf">%s</span><span class="s">&quot;</span>)
+</code></pre></td>
+</tr>
+</table>
+<table class="pre"><tr><td><pre><code>samples@file1.txt
+samples@file2.txt
+samples@file3.txt
+samples@folder/childFile.txt
+samples@folder2/child/descedant4.txt
+random@file.txt</code></pre></td></tr></table>
+<h2><a name="Download-assets" class="anchor" href="#Download-assets">Download assets</a></h2>
+<p>You can quickly and easily download files, folders or entire containers to local disk.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// download file1.txt asynchronously into &quot;C:\temp\files&quot;</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs53', 105)" onmouseover="showTip(event, 'fs53', 105)" class="i">asyncFileDownload</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs10', 106)" onmouseover="showTip(event, 'fs10', 106)" class="i">container</span><span class="o">.</span><span class="i">``file1.txt``</span><span class="o">.</span><span class="f">Download</span>(<span class="s">@&quot;C:\temp\files\&quot;</span>)
+</code></pre></td>
+</tr>
+</table>
 <h2><a name="Shared-Access-Signature-generation" class="anchor" href="#Shared-Access-Signature-generation">Shared Access Signature generation</a></h2>
-
 <p>The type provider exposes a simple method for generating time-dependant SAS codes for
 single files.</p>
-
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
 <span class="l">4: </span>
 <span class="l">5: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs47', 95)" onmouseover="showTip(event, 'fs47', 95)" class="i">duration</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs48', 96)" onmouseover="showTip(event, 'fs48', 96)" class="t">TimeSpan</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs49', 97)" onmouseover="showTip(event, 'fs49', 97)" class="f">FromMinutes</span> <span class="n">37.</span>
-<span onmouseout="hideTip(event, 'fs14', 98)" onmouseover="showTip(event, 'fs14', 98)" class="f">printfn</span> <span class="s">&quot;Current time: </span><span class="pf">%O</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs50', 99)" onmouseover="showTip(event, 'fs50', 99)" class="t">DateTime</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs51', 100)" onmouseover="showTip(event, 'fs51', 100)" class="i">UtcNow</span>
-<span onmouseout="hideTip(event, 'fs14', 101)" onmouseover="showTip(event, 'fs14', 101)" class="f">printfn</span> <span class="s">&quot;SAS expiry: </span><span class="pf">%O</span><span class="s">&quot;</span> (<span onmouseout="hideTip(event, 'fs50', 102)" onmouseover="showTip(event, 'fs50', 102)" class="t">DateTime</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs51', 103)" onmouseover="showTip(event, 'fs51', 103)" class="i">UtcNow</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs52', 104)" onmouseover="showTip(event, 'fs52', 104)" class="f">Add</span> <span onmouseout="hideTip(event, 'fs47', 105)" onmouseover="showTip(event, 'fs47', 105)" class="i">duration</span>)
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs53', 106)" onmouseover="showTip(event, 'fs53', 106)" class="i">sasCode</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs10', 107)" onmouseover="showTip(event, 'fs10', 107)" class="i">container</span><span class="o">.</span><span class="i">``file1.txt``</span><span class="o">.</span><span class="f">GenerateSharedAccessSignature</span> <span onmouseout="hideTip(event, 'fs47', 108)" onmouseover="showTip(event, 'fs47', 108)" class="i">duration</span>
-<span onmouseout="hideTip(event, 'fs14', 109)" onmouseover="showTip(event, 'fs14', 109)" class="f">printfn</span> <span class="s">&quot;SAS URI: </span><span class="pf">%O</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs53', 110)" onmouseover="showTip(event, 'fs53', 110)" class="i">sasCode</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs54', 107)" onmouseover="showTip(event, 'fs54', 107)" class="i">duration</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs55', 108)" onmouseover="showTip(event, 'fs55', 108)" class="t">TimeSpan</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs56', 109)" onmouseover="showTip(event, 'fs56', 109)" class="f">FromMinutes</span> <span class="n">37.</span>
+<span onmouseout="hideTip(event, 'fs14', 110)" onmouseover="showTip(event, 'fs14', 110)" class="f">printfn</span> <span class="s">&quot;Current time: </span><span class="pf">%O</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs57', 111)" onmouseover="showTip(event, 'fs57', 111)" class="t">DateTime</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs58', 112)" onmouseover="showTip(event, 'fs58', 112)" class="i">UtcNow</span>
+<span onmouseout="hideTip(event, 'fs14', 113)" onmouseover="showTip(event, 'fs14', 113)" class="f">printfn</span> <span class="s">&quot;SAS expiry: </span><span class="pf">%O</span><span class="s">&quot;</span> (<span onmouseout="hideTip(event, 'fs57', 114)" onmouseover="showTip(event, 'fs57', 114)" class="t">DateTime</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs58', 115)" onmouseover="showTip(event, 'fs58', 115)" class="i">UtcNow</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs59', 116)" onmouseover="showTip(event, 'fs59', 116)" class="f">Add</span> <span onmouseout="hideTip(event, 'fs54', 117)" onmouseover="showTip(event, 'fs54', 117)" class="i">duration</span>)
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs60', 118)" onmouseover="showTip(event, 'fs60', 118)" class="i">sasCode</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs10', 119)" onmouseover="showTip(event, 'fs10', 119)" class="i">container</span><span class="o">.</span><span class="i">``file1.txt``</span><span class="o">.</span><span class="f">GenerateSharedAccessSignature</span> <span onmouseout="hideTip(event, 'fs54', 120)" onmouseover="showTip(event, 'fs54', 120)" class="i">duration</span>
+<span onmouseout="hideTip(event, 'fs14', 121)" onmouseover="showTip(event, 'fs14', 121)" class="f">printfn</span> <span class="s">&quot;SAS URI: </span><span class="pf">%O</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs60', 122)" onmouseover="showTip(event, 'fs60', 122)" class="i">sasCode</span>
 </code></pre></td>
 </tr>
 </table>
-
-<table class="pre"><tr><td><pre><code>Current time: 03/02/2017 23:56:28
-SAS expiry: 04/02/2017 0:33:28
-SAS URI: http://127.0.0.1:10000/devstoreaccount1/samples/file1.txt?sv=2015-04-05&amp;sr=b&amp;sig=CoiCuoeKiN2v6ZqRTOvQWtNqFi0DcJJPKiJ2CWFWVho=&amp;se=2017-02-04T00:33:28Z&amp;sp=rwdl</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>Current time: 28/03/2017 15:01:33
+SAS expiry: 28/03/2017 15:38:33
+SAS URI: http://127.0.0.1:10000/devstoreaccount1/samples/file1.txt?sv=2015-04-05&amp;sr=b&amp;sig=TLkVugHboYzRgjd8r0c0tV4dUEdVG2HBFQFRMwyuR2M=&amp;se=2017-03-28T15:38:33Z&amp;sp=rwdl</code></pre></td></tr></table>
 
 <div class="tip" id="fs1">Multiple items<br />namespace FSharp<br /><br />--------------------<br />namespace Microsoft.FSharp</div>
 <div class="tip" id="fs2">namespace FSharp.Azure</div>
@@ -300,14 +296,21 @@ SAS URI: http://127.0.0.1:10000/devstoreaccount1/samples/file1.txt?sv=2015-04-05
 <div class="tip" id="fs43">val file : AzureTypeProvider&lt;...&gt;.Domain.BlockBlob</div>
 <div class="tip" id="fs44">member BlobFile.ReadLines : unit -&gt; seq&lt;string&gt;</div>
 <div class="tip" id="fs45">val line : string</div>
-<div class="tip" id="fs46">val asyncFileDownload : Async&lt;unit&gt;<br /><br />Full name: Blobs.asyncFileDownload</div>
-<div class="tip" id="fs47">val duration : TimeSpan<br /><br />Full name: Blobs.duration</div>
-<div class="tip" id="fs48">Multiple items<br />type TimeSpan =<br />&#160;&#160;struct<br />&#160;&#160;&#160;&#160;new : ticks:int64 -&gt; TimeSpan + 3 overloads<br />&#160;&#160;&#160;&#160;member Add : ts:TimeSpan -&gt; TimeSpan<br />&#160;&#160;&#160;&#160;member CompareTo : value:obj -&gt; int + 1 overload<br />&#160;&#160;&#160;&#160;member Days : int<br />&#160;&#160;&#160;&#160;member Duration : unit -&gt; TimeSpan<br />&#160;&#160;&#160;&#160;member Equals : value:obj -&gt; bool + 1 overload<br />&#160;&#160;&#160;&#160;member GetHashCode : unit -&gt; int<br />&#160;&#160;&#160;&#160;member Hours : int<br />&#160;&#160;&#160;&#160;member Milliseconds : int<br />&#160;&#160;&#160;&#160;member Minutes : int<br />&#160;&#160;&#160;&#160;...<br />&#160;&#160;end<br /><br />Full name: System.TimeSpan<br /><br />--------------------<br />TimeSpan()<br />TimeSpan(ticks: int64) : unit<br />TimeSpan(hours: int, minutes: int, seconds: int) : unit<br />TimeSpan(days: int, hours: int, minutes: int, seconds: int) : unit<br />TimeSpan(days: int, hours: int, minutes: int, seconds: int, milliseconds: int) : unit</div>
-<div class="tip" id="fs49">TimeSpan.FromMinutes(value: float) : TimeSpan</div>
-<div class="tip" id="fs50">Multiple items<br />type DateTime =<br />&#160;&#160;struct<br />&#160;&#160;&#160;&#160;new : ticks:int64 -&gt; DateTime + 10 overloads<br />&#160;&#160;&#160;&#160;member Add : value:TimeSpan -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddDays : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddHours : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddMilliseconds : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddMinutes : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddMonths : months:int -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddSeconds : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddTicks : value:int64 -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddYears : value:int -&gt; DateTime<br />&#160;&#160;&#160;&#160;...<br />&#160;&#160;end<br /><br />Full name: System.DateTime<br /><br />--------------------<br />DateTime()<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(ticks: int64) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(ticks: int64, kind: DateTimeKind) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, calendar: Globalization.Calendar) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int, kind: DateTimeKind) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int, calendar: Globalization.Calendar) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int, millisecond: int) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int, millisecond: int, kind: DateTimeKind) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em></div>
-<div class="tip" id="fs51">property DateTime.UtcNow: DateTime</div>
-<div class="tip" id="fs52">DateTime.Add(value: TimeSpan) : DateTime</div>
-<div class="tip" id="fs53">val sasCode : Uri<br /><br />Full name: Blobs.sasCode</div>
+<div class="tip" id="fs46">type BlobSchema = AzureTypeProvider&lt;...&gt;<br /><br />Full name: Blobs.BlobSchema</div>
+<div class="tip" id="fs47">val fileFromSchema : AzureTypeProvider&lt;...&gt;.Domain.BlockBlob<br /><br />Full name: Blobs.fileFromSchema</div>
+<div class="tip" id="fs48">namespace System.IO</div>
+<div class="tip" id="fs49">type File =<br />&#160;&#160;static member AppendAllLines : path:string * contents:IEnumerable&lt;string&gt; -&gt; unit + 1 overload<br />&#160;&#160;static member AppendAllText : path:string * contents:string -&gt; unit + 1 overload<br />&#160;&#160;static member AppendText : path:string -&gt; StreamWriter<br />&#160;&#160;static member Copy : sourceFileName:string * destFileName:string -&gt; unit + 1 overload<br />&#160;&#160;static member Create : path:string -&gt; FileStream + 3 overloads<br />&#160;&#160;static member CreateText : path:string -&gt; StreamWriter<br />&#160;&#160;static member Decrypt : path:string -&gt; unit<br />&#160;&#160;static member Delete : path:string -&gt; unit<br />&#160;&#160;static member Encrypt : path:string -&gt; unit<br />&#160;&#160;static member Exists : path:string -&gt; bool<br />&#160;&#160;...<br /><br />Full name: System.IO.File</div>
+<div class="tip" id="fs50">IO.File.ReadAllLines(path: string) : string []<br />IO.File.ReadAllLines(path: string, encoding: Text.Encoding) : string []</div>
+<div class="tip" id="fs51">type Array =<br />&#160;&#160;member Clone : unit -&gt; obj<br />&#160;&#160;member CopyTo : array:Array * index:int -&gt; unit + 1 overload<br />&#160;&#160;member GetEnumerator : unit -&gt; IEnumerator<br />&#160;&#160;member GetLength : dimension:int -&gt; int<br />&#160;&#160;member GetLongLength : dimension:int -&gt; int64<br />&#160;&#160;member GetLowerBound : dimension:int -&gt; int<br />&#160;&#160;member GetUpperBound : dimension:int -&gt; int<br />&#160;&#160;member GetValue : [&lt;ParamArray&gt;] indices:int[] -&gt; obj + 7 overloads<br />&#160;&#160;member Initialize : unit -&gt; unit<br />&#160;&#160;member IsFixedSize : bool<br />&#160;&#160;...<br /><br />Full name: System.Array</div>
+<div class="tip" id="fs52">val iter : action:(&#39;T -&gt; unit) -&gt; array:&#39;T [] -&gt; unit<br /><br />Full name: Microsoft.FSharp.Collections.Array.iter</div>
+<div class="tip" id="fs53">val asyncFileDownload : Async&lt;unit&gt;<br /><br />Full name: Blobs.asyncFileDownload</div>
+<div class="tip" id="fs54">val duration : TimeSpan<br /><br />Full name: Blobs.duration</div>
+<div class="tip" id="fs55">Multiple items<br />type TimeSpan =<br />&#160;&#160;struct<br />&#160;&#160;&#160;&#160;new : ticks:int64 -&gt; TimeSpan + 3 overloads<br />&#160;&#160;&#160;&#160;member Add : ts:TimeSpan -&gt; TimeSpan<br />&#160;&#160;&#160;&#160;member CompareTo : value:obj -&gt; int + 1 overload<br />&#160;&#160;&#160;&#160;member Days : int<br />&#160;&#160;&#160;&#160;member Duration : unit -&gt; TimeSpan<br />&#160;&#160;&#160;&#160;member Equals : value:obj -&gt; bool + 1 overload<br />&#160;&#160;&#160;&#160;member GetHashCode : unit -&gt; int<br />&#160;&#160;&#160;&#160;member Hours : int<br />&#160;&#160;&#160;&#160;member Milliseconds : int<br />&#160;&#160;&#160;&#160;member Minutes : int<br />&#160;&#160;&#160;&#160;...<br />&#160;&#160;end<br /><br />Full name: System.TimeSpan<br /><br />--------------------<br />TimeSpan()<br />TimeSpan(ticks: int64) : unit<br />TimeSpan(hours: int, minutes: int, seconds: int) : unit<br />TimeSpan(days: int, hours: int, minutes: int, seconds: int) : unit<br />TimeSpan(days: int, hours: int, minutes: int, seconds: int, milliseconds: int) : unit</div>
+<div class="tip" id="fs56">TimeSpan.FromMinutes(value: float) : TimeSpan</div>
+<div class="tip" id="fs57">Multiple items<br />type DateTime =<br />&#160;&#160;struct<br />&#160;&#160;&#160;&#160;new : ticks:int64 -&gt; DateTime + 10 overloads<br />&#160;&#160;&#160;&#160;member Add : value:TimeSpan -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddDays : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddHours : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddMilliseconds : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddMinutes : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddMonths : months:int -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddSeconds : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddTicks : value:int64 -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddYears : value:int -&gt; DateTime<br />&#160;&#160;&#160;&#160;...<br />&#160;&#160;end<br /><br />Full name: System.DateTime<br /><br />--------------------<br />DateTime()<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(ticks: int64) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(ticks: int64, kind: DateTimeKind) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, calendar: Globalization.Calendar) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int, kind: DateTimeKind) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int, calendar: Globalization.Calendar) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int, millisecond: int) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int, millisecond: int, kind: DateTimeKind) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em></div>
+<div class="tip" id="fs58">property DateTime.UtcNow: DateTime</div>
+<div class="tip" id="fs59">DateTime.Add(value: TimeSpan) : DateTime</div>
+<div class="tip" id="fs60">val sasCode : Uri<br /><br />Full name: Blobs.sasCode</div>
 
             </div>
             <div class="span3">
