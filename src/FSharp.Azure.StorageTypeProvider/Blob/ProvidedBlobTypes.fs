@@ -54,7 +54,7 @@ type BlobFile internal (defaultConnectionString, container, file, getBlobRef : _
             yield stream.ReadLine() }
 
     /// Gets the blob size in bytes.
-    member __.Size = blobProperties.Value.Length
+    member __.Size with get() = blobProperties.Value.Length
 
     /// Gets the name of the blob
     member __.Name with get() = (getBlobRef None).Name
@@ -119,7 +119,7 @@ type BlobFolder internal (defaultConnectionString, container, file) =
         downloadFolder (connectionDetails, path)
 
     /// The Path of the current folder
-    member __.Path = file
+    member __.Path with get() = file
 
     /// Lists all blobs contained in this folder
     member __.ListBlobs(?includeSubfolders) = 
@@ -152,7 +152,7 @@ type BlobContainer internal (defaultConnectionString, container) =
         awaitUnit (blobRef.UploadFromFileAsync(path, FileMode.Open))
     
     /// Gets the name of this container.
-    member __.Name = container
+    member __.Name with get() = container
 
 module internal ProvidedTypeGenerator = 
     let generateTypes() = 
