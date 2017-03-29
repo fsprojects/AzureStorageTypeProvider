@@ -42,19 +42,32 @@ type BlobFile internal (defaultConnectionString, container, file, getBlobRef : _
         this.BlobRef(connectionString).DownloadToFileAsync(path, FileMode.Create) |> awaitUnit
     
     /// Opens this file as a stream for reading.
-    member this.OpenStream(?connectionString) = this.BlobRef(connectionString).OpenRead()
+    member this.OpenStream(?connectionString:string) = this.BlobRef(connectionString).OpenRead()
     
     /// Opens this file as a text stream for reading.
-    member this.OpenStreamAsText() = new StreamReader(this.OpenStream())
+    member this.OpenStreamAsText(?connectionString) =
+        match connectionString with
+        | Some connectionString -> new StreamReader(this.OpenStream(connectionString))
+        | None -> new StreamReader(this.OpenStream())
 
     /// Lazily read the contents of this blob a line at a time.
-    member this.ReadLines() = seq {
-        use stream = this.OpenStreamAsText()
+    member this.ReadLines(?connectionString) = seq {
+        use stream =
+            match connectionString with
+            | Some connectionString -> this.OpenStreamAsText(connectionString)
+            | None -> this.OpenStreamAsText()
         while not stream.EndOfStream do
             yield stream.ReadLine() }
 
     /// Gets the blob size in bytes.
-    member __.Size with get() = blobProperties.Value.Length
+    member __.Size(?connectionString) =
+        match connectionString with
+        | Some _ ->
+            let blobRef = getBlobRef connectionString
+            blobRef.FetchAttributes()
+            blobRef.Properties
+        | None -> blobProperties.Value
+        |> fun props -> props.Length
 
     /// Gets the name of the blob
     member __.Name with get() = (getBlobRef None).Name
@@ -62,7 +75,7 @@ type BlobFile internal (defaultConnectionString, container, file, getBlobRef : _
     override this.ToString() = this.Name
 
 type BlockBlobFile internal (defaultConnectionString, container, file) =
-    inherit BlobFile(defaultConnectionString, container, file, (getBlockBlobRef >> fun x -> x :> ICloudBlob))
+    inherit BlobFile(defaultConnectionString, container, file, (fun blob -> getBlockBlobRef blob :> ICloudBlob))
     let getBlobRef connectionString = getBlockBlobRef(defaultArg connectionString defaultConnectionString, container, file)
 
     /// Gets a handle to the Azure SDK client for this blob.
@@ -75,7 +88,7 @@ type BlockBlobFile internal (defaultConnectionString, container, file) =
     member __.ReadAsync(?connectionString) = getBlobRef(connectionString).DownloadTextAsync() |> Async.AwaitTask
 
 type PageBlobFile internal (defaultConnectionString, container, file) =
-    inherit BlobFile(defaultConnectionString, container, file, (getPageBlobRef >> fun x -> x :> ICloudBlob))
+    inherit BlobFile(defaultConnectionString, container, file, (fun blob -> getPageBlobRef blob :> ICloudBlob))
 
     /// Gets a handle to the Azure SDK client for this blob.
     member __.AsCloudPageBlob(?connectionString) = getPageBlobRef(defaultArg connectionString defaultConnectionString, container, file)
@@ -113,6 +126,20 @@ module BlobBuilder =
 
 /// Represents a pseudo-folder in blob storage.
 type BlobFolder internal (defaultConnectionString, container, file) = 
+    let getSafe getBlobFile connectionString path =
+        let connectionString = connectionString |> defaultArg <| defaultConnectionString
+        let blob : #BlobFile = getBlobFile connectionString container (Path.Combine(file, path))
+        async {
+            try
+            let! exists = blob.AsICloudBlob().ExistsAsync() |> Async.AwaitTask
+            return if exists then Some blob else None
+            with
+            | :? AggregateException as ex when
+                match ex.InnerException with
+                | :? StorageException as ex when ex.Message = "Blob type of the blob reference doesn't match blob type of the blob." -> true
+                | _ -> false
+                -> return None }
+
     /// Downloads the entire folder contents to the local file system asynchronously.
     member __.Download(path, ?connectionString) =
         let connectionDetails = defaultArg connectionString defaultConnectionString, container, file
@@ -134,6 +161,10 @@ type BlobFolder internal (defaultConnectionString, container, file) =
                 | _ -> (BlobBuilder.createBlockBlobFile defaultConnectionString container.Name path) :> BlobFile 
                 |> Some
             | _ -> None)
+
+    member __.Item with get(path) = BlobBuilder.createBlockBlobFile defaultConnectionString container (Path.Combine(file, path))
+    member __.TryGetBlockBlob(path, ?connectionString) = getSafe BlobBuilder.createBlockBlobFile connectionString path
+    member __.TryGetPageBlob(path, ?connectionString) = getSafe BlobBuilder.createPageBlobFile connectionString path
 
 /// Represents a container in blob storage.
 type BlobContainer internal (defaultConnectionString, container) =
