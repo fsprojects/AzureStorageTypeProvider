@@ -4,3 +4,4 @@ samples@file3.txt
 samples@folder/childFile.txt
 samples@folder2/child/descedant4.txt
 random@file.txt
+random@folder/emptyFolder/

@@ -133,4 +133,8 @@ let staticSchemaTests =
         testCase "Compiles with a non-existant file" (fun _ ->
             BlobSchema.Containers.random.``file.txt``
             |> ignore) // compiles!
+
+        testCase "Compiles with folder-only paths" (fun _ ->
+            BlobSchema.Containers.random.``folder/``.``emptyFolder/``
+            |> ignore) //compiles!
     ]

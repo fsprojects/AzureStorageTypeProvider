@@ -9,13 +9,13 @@ open System.IO
 module Option =
     let ofString text = if String.IsNullOrWhiteSpace text then None else Some text
 
-let private splitOn (c:char) (value:string) = value.Split([| c |], StringSplitOptions.RemoveEmptyEntries)
+let private splitOn (c:char) (value:string) = value.Split c
 
 let private pathsToContainerItems paths =   
     let rec toFileTrees prevPath childPaths = 
         childPaths
         |> Array.groupBy (function
-            | [] -> None
+            | [] | [ "" ] -> None
             | [ fileName ] -> Some (fileName, true)
             | dirName :: _ -> Some (dirName, false))
         |> Array.choose (function (Some k, v) -> Some (k, v) | _ -> None)
@@ -49,10 +49,10 @@ let createSchema resolutionFolder path =
         match paths |> List.tryFind File.Exists with
         | None -> Failure (exn (sprintf "Could not locate schema file. Searched: %A " paths))
         | Some file ->
-        try
-        file
-        |> File.ReadAllLines
-        |> schemaLinesToContainers
-        |> Success
-        with ex -> Failure ex)
+            try
+            file
+            |> File.ReadAllLines
+            |> schemaLinesToContainers
+            |> Success
+            with ex -> Failure ex)
     |> defaultArg <| Success []
