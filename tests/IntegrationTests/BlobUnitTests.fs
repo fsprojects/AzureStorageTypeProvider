@@ -31,7 +31,7 @@ let testFileDownload (blobFile:BlobFile) =
     blobFile.Download filename |> Async.RunSynchronously
     let predicates = 
         [ File.Exists
-          FileInfo >> fun fi -> fi.Length = blobFile.Size ]
+          FileInfo >> fun fi -> fi.Length = blobFile.Size() ]
         |> List.map(fun pred -> pred filename)
     File.Delete filename
     predicates |> List.iter(fun item -> Expect.isTrue item "")
@@ -49,7 +49,7 @@ let testFolderDownload download expectedFiles expectedFolders =
 [<Tests>]
 let mainTests =
     testList "Main Blob Tests" [
-        testCase "Correctly gets size of a blob" (fun _ -> container .``sample.txt``.Size |> shouldEqual 190L)
+        testCase "Correctly gets size of a blob" (fun _ -> container .``sample.txt``.Size() |> shouldEqual 190L)
 
         testCase "Reads a text file as text" (fun _ ->
             let text = container .``sample.txt``.Read()
@@ -88,7 +88,7 @@ let mainTests =
             let blob = container.``pageData.bin``.AsCloudPageBlob()
             blob.Name |> shouldEqual "pageData.bin")
 
-        testCase "Page Blobs calculate size correctly" (fun _ -> container.``pageData.bin``.Size |> shouldEqual 512L)
+        testCase "Page Blobs calculate size correctly" (fun _ -> container.``pageData.bin``.Size() |> shouldEqual 512L)
         testCase "Can correctly download a block blob" (fun _ -> testFileDownload container.``file1.txt``)
         testCase "Can correctly download a page blob" (fun _ -> testFileDownload container.``pageData.bin``)
         testCase "Can correctly download a folder" (fun _ -> testFolderDownload container.``folder/``.Download 2 0)
@@ -128,7 +128,7 @@ let staticSchemaTests =
 
         testCase "Can access a real file using static schema" (fun _ ->
             let blob = BlobSchema.Containers.samples.``file1.txt``
-            blob.Size |> shouldEqual 5L)
+            blob.Size() |> shouldEqual 5L)
 
         testCase "Compiles with a non-existant file" (fun _ ->
             BlobSchema.Containers.random.``file.txt``
@@ -137,4 +137,25 @@ let staticSchemaTests =
         testCase "Compiles with folder-only paths" (fun _ ->
             BlobSchema.Containers.random.``folder/``.``emptyFolder/``
             |> ignore) //compiles!
+    ]
+
+[<Tests>]
+let programmaticBlobTests =
+    testList "Programmatic Blob Schema Tests" [
+        testCase "Can return an unsafe handle to a blob" <| fun _ ->
+            let blob = Local.Containers.samples.``folder/``.["childFile.txt"]
+            blob.Name |> shouldEqual "folder/childFile.txt"
+            blob.Size() |> shouldEqual 16L
+        testCase "Safe handle to an existing block blob returns Some" <| fun _ -> 
+            let blob = Local.Containers.samples.``folder/``.TryGetBlockBlob "childFile.txt" |> Async.RunSynchronously
+            Expect.isSome blob ""
+        testCase "Safe handle to a non-existant block blob returns None" <| fun _ -> 
+            let blob = Local.Containers.samples.``folder/``.TryGetBlockBlob "childFilexxx.txt" |> Async.RunSynchronously
+            Expect.isNone blob ""
+        testCase "Safe handle to a non-existant page blob returns None" <| fun _ -> 
+            let blob = Local.Containers.samples.``folder/``.TryGetBlockBlob "childFilexxx.txt" |> Async.RunSynchronously
+            Expect.isNone blob ""
+        testCase "Safe handle to the wrong blob type returns None" <| fun _ -> 
+            let blob = Local.Containers.samples.``folder/``.TryGetPageBlob "childFile.txt" |> Async.RunSynchronously
+            Expect.isNone blob ""
     ]

@@ -49,7 +49,7 @@ type MatchingTableRow =
 [<Tests>]
 let readOnlyTableTests =
     TableHelpers.resetData()
-    testList "Basic Table Tests" [
+    testList "Read-only Table Tests" [
         testCase "Table name is correctly identified" <| (fun _ -> table.Name |> shouldEqual "employee")
         testCase "Matching row and partition key returns Some row" (fun _ ->
             match table.Get(Row "2", Partition "men") with
@@ -98,7 +98,7 @@ let readOnlyTableTests =
 
 [<Tests>]
 let detailedTableTests =
-    testSequenced <| testList "Detailed Table Tests" [
+    testSequenced <| testList "Write Table Tests" [
         testCase "Inserts and deletes a row using lightweight syntax correctly" <| tableSafe (fun _ ->
             let result = table.Insert(Partition "isaac", Row "500", { Name = "isaac"; YearsWorking = 500; Dob = DateTime.UtcNow })
             result |> shouldEqual <| SuccessfulResponse ((Partition "isaac", Row "500"), 204)
