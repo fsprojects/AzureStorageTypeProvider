@@ -15,7 +15,7 @@
                 },
                 {
                     "Column": "ColumnC",
-                    "Type": "Int64"
+                    "Type": "Boolean"
                 }
             ]
         }
