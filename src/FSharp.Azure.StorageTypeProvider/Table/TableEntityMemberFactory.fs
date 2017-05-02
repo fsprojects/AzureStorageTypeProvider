@@ -10,11 +10,11 @@ open System.Text
 
 let private getPropsForEntity (entity:DynamicTableEntity) =
     entity.Properties
-    |> Seq.filter(fun p -> p.Value.PropertyAsObject <> null)
+    |> Seq.filter(fun p -> p.Value.PropertyAsObject |> isNull |> not)
     |> Seq.map(fun p -> p.Key, p.Value.PropertyType)
     |> Set
 
-let private getDistinctProperties tableEntities = 
+let private toDistinctColumnDefinitions tableEntities = 
     let optionalProperties, mandatoryProperties, _ =
         ((Set [], Set [], true), tableEntities)
         ||> Seq.fold(fun (optionals, mandatory, initialRun) entity ->
@@ -25,9 +25,11 @@ let private getDistinctProperties tableEntities =
                 let mandatory = Set.intersect mandatory entity
                 optionals, mandatory, false)
 
-    (optionalProperties |> Set.toList |> List.map(fun (name, edmType) -> name, edmType, PropertyNeed.Optional)) @
-    (mandatoryProperties |> Set.toList |> List.map(fun (name, edmType) -> name, edmType, PropertyNeed.Mandatory))
-    |> List.sortBy(fun (name, _, _) -> name)
+    (optionalProperties |> Set.map(fun (name, edmType) -> name, edmType, Optional)) +
+    (mandatoryProperties |> Set.map(fun (name, edmType) -> name, edmType, Mandatory))
+    |> Set.toList
+    |> List.map(fun (name, edmType, need) -> { Name = name; ColumnType = edmType; PropertyNeed = need })
+    |> List.sortBy(fun columnDef -> columnDef.Name)
 
 let humanizeRegex =
     RegularExpressions.Regex (@"(?<=[A-Z])(?=[A-Z][a-z]) |(?<=[^A-Z])(?=[A-Z]) |(?<=[A-Za-z])(?=[^A-Za-z])", RegularExpressions.RegexOptions.IgnorePatternWhitespace)
@@ -68,21 +70,20 @@ let private buildEdmParameter edmType builder =
     | _ -> builder typeof<obj>
 
 /// Sets the properties on a specific entity based on the inferred schema from the sample provided
-let setPropertiesForEntity humanize (entityType : ProvidedTypeDefinition) (sampleEntities : #seq<DynamicTableEntity>) = 
-    let properties = sampleEntities |> Seq.map getPropsForEntity |> getDistinctProperties
+let setPropertiesForEntity humanize (entityType : ProvidedTypeDefinition) columnDefinitions = 
     entityType.AddMembersDelayed(fun _ -> 
-        properties
-        |> Seq.map (fun (name, edmType, need) -> 
-               match edmType with
-               | EdmType.Binary -> buildEntityProperty<byte []> humanize name need
-               | EdmType.Boolean -> buildEntityProperty<bool> humanize name need
-               | EdmType.DateTime -> buildEntityProperty<DateTime> humanize name need
-               | EdmType.Double -> buildEntityProperty<float> humanize name need
-               | EdmType.Guid -> buildEntityProperty<Guid> humanize name need
-               | EdmType.Int32 -> buildEntityProperty<int> humanize name need
-               | EdmType.Int64 -> buildEntityProperty<int64> humanize name need
-               | EdmType.String -> buildEntityProperty<string> humanize name need
-               | _ -> buildEntityProperty<obj> humanize name need)
+        columnDefinitions
+        |> Seq.map (fun { Name = name; ColumnType = columnType; PropertyNeed = propertyNeed } -> 
+               match columnType with
+               | EdmType.Binary -> buildEntityProperty<byte []> humanize name propertyNeed
+               | EdmType.Boolean -> buildEntityProperty<bool> humanize name propertyNeed
+               | EdmType.DateTime -> buildEntityProperty<DateTime> humanize name propertyNeed
+               | EdmType.Double -> buildEntityProperty<float> humanize name propertyNeed
+               | EdmType.Guid -> buildEntityProperty<Guid> humanize name propertyNeed
+               | EdmType.Int32 -> buildEntityProperty<int> humanize name propertyNeed
+               | EdmType.Int64 -> buildEntityProperty<int64> humanize name propertyNeed
+               | EdmType.String -> buildEntityProperty<string> humanize name propertyNeed
+               | _ -> buildEntityProperty<obj> humanize name propertyNeed)
         |> Seq.toList)
     
     let buildParameter name need buildType =
@@ -95,12 +96,12 @@ let setPropertiesForEntity humanize (entityType : ProvidedTypeDefinition) (sampl
     // Build a constructor as well.
     entityType.AddMemberDelayed(fun () -> 
         // Split into mandatory and optional parameters - we add the mandatory ones first.
-        let mandatoryParams, optionalParams = properties |> List.partition(function (_,_, Mandatory) -> true | _ -> false) 
+        let mandatoryParams, optionalParams = columnDefinitions |> List.partition(fun r -> r.PropertyNeed = Mandatory)
         let parameters = 
             [ ProvidedParameter("PartitionKey", typeof<Partition>)
               ProvidedParameter("RowKey", typeof<Row>) ] 
-            @ [ for (name, edmType, need) in mandatoryParams -> buildEdmParameter edmType (buildParameter name need) ]
-            @ [ for (name, edmType, need) in optionalParams -> buildEdmParameter edmType (buildParameter name need) ]
+            @ [ for { Name = name; ColumnType = columnType; PropertyNeed = need } in mandatoryParams -> buildEdmParameter columnType (buildParameter name need) ]
+            @ [ for { Name = name; ColumnType = columnType; PropertyNeed = need } in optionalParams -> buildEdmParameter columnType (buildParameter name need) ]
         ProvidedConstructor(
             parameters, 
             InvokeCode = fun args ->
@@ -113,20 +114,23 @@ let setPropertiesForEntity humanize (entityType : ProvidedTypeDefinition) (sampl
                 let fieldNames =
                     (mandatoryParams @ optionalParams)
                     |> Seq.take fieldValues.Length
-                    |> Seq.map(fun (name, _, _) -> name)
+                    |> Seq.map(fun r -> r.Name)
                     |> Seq.toList
 
                 <@@ buildTableEntity (%%args.[0] : Partition) (%%args.[1] : Row) fieldNames (%%(Expr.NewArray(typeof<obj>, fieldValues))) @@>))
-    properties
+
+let generateSchema tableName schemaInferenceRowCount connection =
+    let sampleEntities = tableName |> getRowsForSchema schemaInferenceRowCount connection
+    sampleEntities
+    |> Seq.map getPropsForEntity
+    |> toDistinctColumnDefinitions
 
 /// Gets all the members for a Table Entity type
-let buildTableEntityMembers schemaInferenceRowCount humanize (parentTableType:ProvidedTypeDefinition, parentTableEntityType, domainType:ProvidedTypeDefinition, connection, tableName) = 
+let buildTableEntityMembers columnDefinitions humanize (parentTableType:ProvidedTypeDefinition, parentTableEntityType:ProvidedTypeDefinition, domainType:ProvidedTypeDefinition, connection, tableName) = 
+    columnDefinitions |> setPropertiesForEntity humanize parentTableEntityType
+    
     parentTableType.AddMembersDelayed(fun () ->
-        let propertiesCreated = 
-            tableName
-            |> getRowsForSchema schemaInferenceRowCount connection
-            |> setPropertiesForEntity humanize parentTableEntityType
-        match propertiesCreated with
+        match columnDefinitions with
         | [] -> []
         | _ -> 
             let getPartition = 
@@ -146,7 +150,7 @@ let buildTableEntityMembers schemaInferenceRowCount humanize (parentTableType:Pr
                        InvokeCode = (fun args -> <@@ getPartitionRowsAsync %%args.[1] %%args.[2] tableName @@>))
             getPartitionAsync.AddXmlDocDelayed <| fun _ -> "Asynchronously retrieves all entities in a table partition by its key."
             
-            let queryBuilderType, childTypes = TableQueryBuilder.createTableQueryType parentTableEntityType connection tableName propertiesCreated
+            let queryBuilderType, childTypes = TableQueryBuilder.createTableQueryType parentTableEntityType connection tableName columnDefinitions
             let executeQuery = 
                 ProvidedMethod
                     ("Query", 

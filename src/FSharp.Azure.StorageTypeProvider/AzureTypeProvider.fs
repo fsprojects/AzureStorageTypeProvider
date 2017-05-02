@@ -1,5 +1,6 @@
 ﻿namespace ProviderImplementation
 
+open FSharp.Azure.StorageTypeProvider
 open FSharp.Azure.StorageTypeProvider.Blob
 open FSharp.Azure.StorageTypeProvider.Queue
 open FSharp.Azure.StorageTypeProvider.Table
@@ -44,15 +45,19 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
         typeProviderForAccount.AddMember(ProvidedConstructor(parameters = [], InvokeCode = (fun _ -> <@@ null @@>)))
         
         let connectionString = buildConnectionString args
-        let staticSchema = args.[6] :?> string |> StaticSchema.Option.ofString
+        let staticBlobSchema = args.[6] :?> string |> Option.ofString
+        let staticTableSchema = args.[7] :?> string |> Option.ofString
         let connectionStringValidation =
-            match staticSchema with
-            | Some _ -> None
-            | None -> Some (validateConnectionString connectionString)
+            match staticBlobSchema, staticTableSchema with
+            | Some _, _ | _, Some _ -> None
+            | _ -> Some (validateConnectionString connectionString)
             
-        match connectionStringValidation, StaticSchema.createSchema config.ResolutionFolder staticSchema with
-        | Some (Success _), Success blobSchema
-        | None, Success blobSchema ->
+        let parsedBlobSchema = Blob.StaticSchema.createSchema config.ResolutionFolder staticBlobSchema
+        let parsedTableSchema = Table.StaticSchema.createSchema config.ResolutionFolder staticTableSchema
+
+        match connectionStringValidation, parsedBlobSchema, parsedTableSchema with
+        | Some (Success _), Success blobSchema, Success tableSchema
+        | None, Success blobSchema, Success tableSchema ->
             let domainTypes = ProvidedTypeDefinition("Domain", Some typeof<obj>)
             domainTypes.AddMembers <| ProvidedTypeGenerator.generateTypes()
             typeProviderForAccount.AddMember(domainTypes)
@@ -63,14 +68,15 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
             // Now create child members e.g. containers, tables etc.
             typeProviderForAccount.AddMembers
                 ([ (BlobMemberFactory.getBlobStorageMembers blobSchema, "blobs")
-                   (TableMemberFactory.getTableStorageMembers schemaInferenceRowCount humanizeColumns, "tables")
+                   (TableMemberFactory.getTableStorageMembers tableSchema schemaInferenceRowCount humanizeColumns, "tables")
                    (QueueMemberFactory.getQueueStorageMembers, "queues") ]
                 |> List.map (fun (builder, name) ->
                     try builder(connectionString, domainTypes)
                     with ex -> failwithf "An error occurred during initial type generation for %s: %O" name ex))
             typeProviderForAccount
-        | Some (Failure ex), _ -> failwithf "Unable to validate connection string (%s)" ex.Message
-        | _, Failure ex -> failwithf "Unable to parse blob schema file (%s)" ex.Message
+        | Some (Failure ex), _, _ -> failwithf "Unable to validate connection string (%s)" ex.Message
+        | _, Failure ex, _ -> failwithf "Unable to parse blob schema file (%s)" ex.Message
+        | _, _, Failure ex -> failwithf "Unable to parse table schema file (%s)" ex.Message
     
     let createParam (name, defaultValue:'a, help) =
         let providedParameter = ProvidedStaticParameter(name, typeof<'a>, defaultValue)
@@ -85,7 +91,8 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
           createParam("configFileName", "app.config", "The name of the configuration file to look for. Defaults to 'app.config'")
           createParam("schemaSize", 10, "The maximum number of rows to read per table, from which to infer schema. Defaults to 10.")
           createParam("humanize", false, "Whether to humanize table column names. Defaults to false.")
-          createParam("blobSchema", String.Empty, "Provide a path to a local file containing a fixed schema to eagerly use, instead of lazily generating the schema from a live storage account.") ]
+          createParam("blobSchema", String.Empty, "Provide a path to a local file containing a fixed schema to eagerly use, instead of lazily generating the blob schema from a live storage account.")
+          createParam("tableSchema", String.Empty, "Provide a path to a local file containing a fixed schema to eagerly use, instead of lazily generating the table schema from a live storage account.") ]
     
     let memoize func =
         let cache = Dictionary()

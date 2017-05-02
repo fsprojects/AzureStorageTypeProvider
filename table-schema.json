@@ -1,19 +1,21 @@
 {
     "tables": [
         {
-            "table": "myTable",
+            "table": "MyTable",
             "columns": [
                 {
-                    "Column": "columnA",
-                    "Type": "string"
+                    "Column": "ColumnA",
+                    "Type": "String",
+                    "Optional": true
                 },
                 {
-                    "Column": "columnB",
-                    "Type": "string"
+                    "Column": "ColumnB",
+                    "Type": "DateTime",
+                    "Optional": true
                 },
                 {
-                    "Column": "columnC",
-                    "Type": "string"
+                    "Column": "ColumnC",
+                    "Type": "Int64"
                 }
             ]
         }

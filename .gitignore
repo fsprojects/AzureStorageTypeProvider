@@ -182,3 +182,4 @@ paket-files/
 #Fake build files
 .fake
 testoutput/
+.paket/load/

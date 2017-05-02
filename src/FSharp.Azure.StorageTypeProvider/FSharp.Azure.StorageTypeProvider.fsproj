@@ -55,6 +55,7 @@
     <Compile Include="Table/ProvidedTableTypes.fs" />
     <Compile Include="Table/TableQueryBuilder.fs" />
     <Compile Include="Table/TableEntityMemberFactory.fs" />
+    <Compile Include="Table/StaticSchema.fs" />
     <Compile Include="Table/TableMemberFactory.fs" />
     <Compile Include="Blob/BlobRepository.fs" />
     <Compile Include="Blob/ProvidedBlobTypes.fs" />

@@ -1,5 +1,6 @@
 ﻿namespace FSharp.Azure.StorageTypeProvider.Table
 
+open Microsoft.WindowsAzure.Storage.Table
 open System
 
 /// The different types of insertion mechanism to use.
@@ -9,12 +10,15 @@ type TableInsertMode =
     /// Insert if the entity does not already exist; otherwise overwrite the entity.
     | Upsert = 1
 
+
 /// The type of property
 type internal PropertyNeed =
     /// The property is optional.
     | Optional
     /// The property is mandatory.
     | Mandatory
+
+type internal ColumnDefinition = { Name : string; ColumnType : EdmType; PropertyNeed : PropertyNeed }
 
 /// The name of the partition.
 type Partition = | Partition of string

@@ -18,6 +18,8 @@ module Option =
         | Some x -> x
         | None -> null 
 
+    let ofString text = if String.IsNullOrWhiteSpace text then None else Some text
+
 ///[omit]
 module Async =
     let map mapper workflow =
