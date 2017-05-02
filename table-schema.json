@@ -1,0 +1,21 @@
+{
+    "tables": [
+        {
+            "table": "myTable",
+            "columns": [
+                {
+                    "Column": "columnA",
+                    "Type": "string"
+                },
+                {
+                    "Column": "columnB",
+                    "Type": "string"
+                },
+                {
+                    "Column": "columnC",
+                    "Type": "string"
+                }
+            ]
+        }
+    ]
+}
