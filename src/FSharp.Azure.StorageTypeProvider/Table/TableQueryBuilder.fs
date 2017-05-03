@@ -50,12 +50,12 @@ let private buildPropertyOperatorsType tableName propertyName propertyType paren
     propertyOperatorsType
 
 /// Creates a query property (and child methods etc.) for a given entity
-let createTableQueryType (tableEntityType: ProvidedTypeDefinition) connection tableName (properties: seq<string * EdmType * PropertyNeed>) =
+let createTableQueryType (tableEntityType: ProvidedTypeDefinition) connection tableName (columnDefinitions: ColumnDefinition seq) =
     let tableQueryType = ProvidedTypeDefinition(tableName + "QueryBuilder", Some typeof<obj>, HideObjectMethods = true)
     let operatorTypes = [ "PartitionKey", buildPropertyOperatorsType tableName "PartitionKey" EdmType.String tableQueryType
                           "RowKey", buildPropertyOperatorsType tableName "RowKey" EdmType.String tableQueryType
                           "Timestamp", buildPropertyOperatorsType tableName "Timestamp" EdmType.DateTime tableQueryType ] @
-                        [ for (name, edmType, need) in properties -> name, buildPropertyOperatorsType tableName name edmType tableQueryType ]
+                        [ for cd in columnDefinitions -> cd.Name, buildPropertyOperatorsType tableName cd.Name cd.ColumnType tableQueryType ]
     
     tableQueryType.AddMembersDelayed(fun () ->
         let executeQueryMethodAsync =

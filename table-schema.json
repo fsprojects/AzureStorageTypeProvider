@@ -1,0 +1,15 @@
+{
+    "MyTable": {
+        "ColumnA": {
+            "Type": "String",
+            "Optional": true
+        },
+        "ColumnB": {
+            "Type": "DateTime",
+            "Optional": true
+        },
+        "ColumnC": {
+            "Type": "Boolean"
+        }
+    }
+}
