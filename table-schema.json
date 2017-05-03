@@ -1,23 +1,15 @@
 {
-    "tables": [
-        {
-            "table": "MyTable",
-            "columns": [
-                {
-                    "Column": "ColumnA",
-                    "Type": "String",
-                    "Optional": true
-                },
-                {
-                    "Column": "ColumnB",
-                    "Type": "DateTime",
-                    "Optional": true
-                },
-                {
-                    "Column": "ColumnC",
-                    "Type": "Boolean"
-                }
-            ]
+    "MyTable": {
+        "ColumnA": {
+            "Type": "String",
+            "Optional": true
+        },
+        "ColumnB": {
+            "Type": "DateTime",
+            "Optional": true
+        },
+        "ColumnC": {
+            "Type": "Boolean"
         }
-    ]
+    }
 }
