@@ -253,4 +253,24 @@ let detailedTableTests =
             Expect.isNone entity.Value.IsAnimal ""
             Expect.isNone entity.Value.YearsWorking "")
     ]
- 
+
+type StaticSchema = AzureTypeProvider<"UseDevelopmentStorage=true", tableSchema = "TableSchema.json">
+
+[<Tests>]
+let staticTableSchemaTests =
+    testSequenced <| testList "Static Schema Table Tests" [
+        testCase "Can correctly parse and integrate a schema file" <| (fun _ ->
+            let table1 = StaticSchema.Tables.MyTable // compiles
+            ())
+        testCase "Works with multiple tables" <| (fun _ ->
+            let table1 = StaticSchema.Tables.MyTable // compiles
+            let table2 = StaticSchema.Tables.YourTable // compiles
+            ())
+        testCase "Can read and write data to a storage account" <| (fun _ ->
+            let table1 = StaticSchema.Tables.MyTable
+            table1.AsCloudTable().CreateIfNotExists() |> ignore
+            let response = table1.Insert(StaticSchema.Domain.MyTableEntity(Partition "A", Row "1", true, Some "Test", Some (DateTime(2000,1,1))))
+            let rows = table1.Query().``Where Partition Key Is``.``Equal To``("A").Execute()
+            rows.Length |> shouldEqual 1
+            table1.DeletePartition "A" |> ignore)
+    ]

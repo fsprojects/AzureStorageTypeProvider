@@ -1,0 +1,36 @@
+﻿{
+    "tables": [
+        {
+            "table": "MyTable",
+            "columns": [
+                {
+                    "Column": "ColumnA",
+                    "Type": "String",
+                    "Optional": true
+                },
+                {
+                    "Column": "ColumnB",
+                    "Type": "DateTime",
+                    "Optional": true
+                },
+                {
+                    "Column": "ColumnC",
+                    "Type": "Boolean"
+                }
+            ]
+        },
+        {
+            "table": "YourTable",
+            "columns": [
+                {
+                    "Column": "ColumnA",
+                    "Type": "String"
+                },
+                {
+                    "Column": "ColumnB",
+                    "Type": "DateTime"
+                }
+            ]
+        }
+    ]
+}
