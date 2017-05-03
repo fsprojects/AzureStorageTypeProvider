@@ -1,13 +1,8 @@
 ﻿module FSharp.Azure.StorageTypeProvider.Table.StaticSchema
 
 open FSharp.Azure.StorageTypeProvider.Configuration
-open Newtonsoft.Json
+open Newtonsoft.Json.Linq
 open System.IO
-
-module Raw =
-    type Column = { Column : string; Type : string; Optional : bool }
-    type Table = { Table : string; Columns : Column array }
-    type Schema = { Tables : Table array }
 
 module internal Parsed =
     open Microsoft.WindowsAzure.Storage.Table
@@ -27,18 +22,23 @@ module internal Parsed =
     type TableSchema = { Tables : Table array }
 
 let internal buildTableSchema rawJson =
-    let schema = JsonConvert.DeserializeObject<Raw.Schema>(rawJson)
+    let json = rawJson |> JToken.Parse |> Json.ofJToken
 
     { Parsed.TableSchema.Tables =
-        schema.Tables
-        |> Array.map(fun t ->
-            { Table = t.Table
+        json.AsObject
+        |> Array.map (fun (tableName, cols) ->
+            { Table = tableName
               Columns =
-                t.Columns
-                |> Array.map(fun c ->
-                    { Name = c.Column
-                      ColumnType = Parsed.parseEdmType c.Type
-                      PropertyNeed = if c.Optional then Optional else Mandatory })
+                cols.AsObject
+                |> Array.map (fun (colName, props) ->
+                    let colType = Parsed.parseEdmType (props.GetProperty "Type").AsString
+                    let propNeed =
+                        props.TryGetProperty "Optional"
+                        |> Option.map (fun b -> b.AsBoolean)
+                        |> function Some true -> Optional | _ -> Mandatory
+                    { Name = colName
+                      ColumnType = colType
+                      PropertyNeed = propNeed })
                 |> Array.toList }) }
 
 let internal createSchema resolutionFolder path =
