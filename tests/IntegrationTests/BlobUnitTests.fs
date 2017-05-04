@@ -9,7 +9,7 @@ open Expecto
 
 type Local = AzureTypeProvider<"DevStorageAccount", "">
 
-type BlobSchema = AzureTypeProvider<blobSchema = "BlobSchema.txt">
+type BlobSchema = AzureTypeProvider<blobSchema = "BlobSchema.json">
 
 let container = Local.Containers.samples
 [<Tests>]
