@@ -19,10 +19,11 @@ let rec buildBlobItem prevPath (name:string, item:Json.Json) =
 let buildBlobSchema (json:Json.Json) =
     json.AsObject |> Array.map (fun (containerName, container) ->
         { Name = containerName
-          Contents = lazy (
-            match container with
-            | Json.ObjectOrNull o -> o |> Seq.map (buildBlobItem "")
-            | _ -> failInvalidJson()) })
+          Contents =
+              lazy
+                  (match container with
+                   | Json.ObjectOrNull o -> o |> Seq.map (buildBlobItem "")
+                   | _ -> failInvalidJson()) })
     |> Array.toList
 
 let createSchema resolutionFolder path =
