@@ -67,3 +67,6 @@
 * Upgrade to F# 4.0
 * Upgrade to .NET452
 * Support for static blob schemas
+
+### 1.8.1 - ???
+* Better support for programmatic blob access
