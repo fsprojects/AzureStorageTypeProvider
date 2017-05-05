@@ -137,6 +137,10 @@ let staticSchemaTests =
         testCase "Compiles with folder-only paths" (fun _ ->
             BlobSchema.Containers.random.``folder/``.``emptyFolder/``
             |> ignore) //compiles!
+
+        testCase "Compiles with empty container" (fun _ ->
+            BlobSchema.Containers.emptyContainer
+            |> ignore) //compiles!
     ]
 
 [<Tests>]
