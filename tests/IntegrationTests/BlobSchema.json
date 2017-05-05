@@ -1,15 +1,21 @@
 ﻿{
-	"samples": {
-		"file1.txt": null,
-		"file2.txt": null,
-		"file3.txt": null,
-		"folder": { "childFile.txt": null },
-		"folder2": {
-			"child": { "descedant4.txt": null }
-		}
-	},
-	"random": {
-		"file.txt": null,
-		"folder": { "emptyFolder": {} }
-	}
+    "samples": {
+        "file1.txt": null,
+        "file2.txt": null,
+        "file3.txt": null,
+        "folder/": {
+            "childFile.txt": null
+        },
+        "folder2/": {
+            "child/": {
+                "descendant4.txt": null
+            }
+        }
+    },
+    "random": {
+        "file.txt": null,
+        "folder/": {
+            "emptyFolder/": null
+        }
+    }
 }

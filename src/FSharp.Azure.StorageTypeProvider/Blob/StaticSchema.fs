@@ -6,13 +6,12 @@ open Microsoft.WindowsAzure.Storage.Blob
 open Newtonsoft.Json.Linq
 open System.IO
 
-let rec buildBlobItem prevPath (name, item:Json.Json) =
-    match item with
-    | Json.Null -> Blob (prevPath + name, name, BlobType.BlockBlob, None)
-    | Json.Object o ->
-        let folderName = name + "/"
-        let path = prevPath + folderName
-        Folder (path, folderName, lazy (o |> Array.map (buildBlobItem path)))
+let rec buildBlobItem prevPath (name:string, item:Json.Json) =
+    match name.EndsWith "/", item with
+    | false, Json.ObjectOrNull _ -> Blob (prevPath + name, name, BlobType.BlockBlob, None)
+    | true , Json.ObjectOrNull o ->
+        let path = prevPath + name
+        Folder (path, name, lazy (o |> Array.map (buildBlobItem path)))
     | _ -> failwith "Invalid JSON structure in static blob schema."
 
 let buildBlobSchema (json:Json.Json) =

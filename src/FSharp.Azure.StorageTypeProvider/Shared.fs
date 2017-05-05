@@ -66,3 +66,9 @@ module Json =
         | :? JObject as o -> o.Properties() |> Seq.map (fun p -> p.Name, ofJToken p.Value) |> Seq.toArray |> Json.Object
         | :? JArray as a -> a.Values() |> Seq.map ofJToken |> Seq.toArray |> Json.Array
         | v -> failwithf "Cannot convert JSON type %s" (v.GetType().FullName)
+
+    /// Match an Object and treat Null as an empty Object
+    let (|ObjectOrNull|_|) = function
+        | Json.Object o -> Some o
+        | Json.Null -> Some [||]
+        | _ -> None
