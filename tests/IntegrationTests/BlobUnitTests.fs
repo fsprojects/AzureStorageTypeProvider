@@ -9,7 +9,7 @@ open Expecto
 
 type Local = AzureTypeProvider<"DevStorageAccount", "">
 
-type BlobSchema = AzureTypeProvider<blobSchema = "BlobSchema.txt">
+type BlobSchema = AzureTypeProvider<blobSchema = "BlobSchema.json">
 
 let container = Local.Containers.samples
 [<Tests>]
@@ -136,6 +136,10 @@ let staticSchemaTests =
 
         testCase "Compiles with folder-only paths" (fun _ ->
             BlobSchema.Containers.random.``folder/``.``emptyFolder/``
+            |> ignore) //compiles!
+
+        testCase "Compiles with empty container" (fun _ ->
+            BlobSchema.Containers.emptyContainer
             |> ignore) //compiles!
     ]
 

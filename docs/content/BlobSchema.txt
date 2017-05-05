@@ -1,6 +1,0 @@
-﻿samples@file1.txt
-samples@file2.txt
-samples@file3.txt
-samples@folder/childFile.txt
-samples@folder2/child/descedant4.txt
-random@file.txt

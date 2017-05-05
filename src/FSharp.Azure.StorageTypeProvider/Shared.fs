@@ -40,11 +40,11 @@ module Json =
         | Object of (string * Json)[]
         | Array of Json[]
         | Null  
-        member this.AsString = match this with Json.String s -> s | _ -> failwith "Not a string"
-        member this.AsNumber = match this with Json.Number s -> s | _ -> failwith "Not a number"
-        member this.AsBoolean = match this with Json.Boolean b -> b | _ -> failwith "Not a boolean"
-        member this.AsObject = match this with Json.Object o -> o | _ -> failwith "Not an object"
-        member this.AsArray = match this with Json.Array o -> o | _ -> failwith "Not an array"
+        member this.AsString = match this with Json.String s -> s | _ -> failwith "Expected a JSON string"
+        member this.AsNumber = match this with Json.Number s -> s | _ -> failwith "Expected a JSON number"
+        member this.AsBoolean = match this with Json.Boolean b -> b | _ -> failwith "Expected a JSON boolean"
+        member this.AsObject = match this with Json.Object o -> o | _ -> failwith "Expected a JSON object"
+        member this.AsArray = match this with Json.Array o -> o | _ -> failwith "Expected a JSON array"
         member this.GetProperty key = this.AsObject |> Array.find (fst >> (=) key) |> snd
         member this.TryGetProperty key =
             match this with Json.Object o -> Some o | _ -> None
@@ -66,3 +66,9 @@ module Json =
         | :? JObject as o -> o.Properties() |> Seq.map (fun p -> p.Name, ofJToken p.Value) |> Seq.toArray |> Json.Object
         | :? JArray as a -> a.Values() |> Seq.map ofJToken |> Seq.toArray |> Json.Array
         | v -> failwithf "Cannot convert JSON type %s" (v.GetType().FullName)
+
+    /// Match an Object and treat Null as an empty Object
+    let (|ObjectOrNull|_|) = function
+        | Json.Object o -> Some o
+        | Json.Null -> Some [||]
+        | _ -> None

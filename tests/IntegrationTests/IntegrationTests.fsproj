@@ -55,7 +55,7 @@
     <Compile Include="TableUnitTests.fs" />
     <Compile Include="Program.fs" />
     <None Include="ResetTestData.fsx" />
-    <Content Include="BlobSchema.txt" />
+    <Content Include="BlobSchema.json" />
     <None Include="paket.references" />
     <None Include="app.config" />
   </ItemGroup>

@@ -27,6 +27,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "content", "content", "{15350981-90B9-44A0-B356-776735ACC7F1}"
 	ProjectSection(SolutionItems) = preProject
 		docs\content\blobs.fsx = docs\content\blobs.fsx
+		docs\content\BlobSchema.json = docs\content\BlobSchema.json
 		docs\content\index.fsx = docs\content\index.fsx
 		docs\content\queues.fsx = docs\content\queues.fsx
 		docs\content\quickstart.fsx = docs\content\quickstart.fsx

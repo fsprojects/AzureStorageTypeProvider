@@ -24,7 +24,7 @@ page and block blobs.
 (*** define-output: blobStats ***)
 let container = Azure.Containers.samples
 let theBlob = container.``folder/``.``childFile.txt``
-printfn "Blob '%s' is %d bytes big." theBlob.Name theBlob.Size
+printfn "Blob '%s' is %d bytes big." theBlob.Name (theBlob.Size())
 (*** include-output: blobStats ***)
 
 (** 
@@ -48,7 +48,7 @@ let totalSize =
       container.``file2.txt``
       container.``file3.txt``
       container.``sample.txt`` ]
-    |> List.sumBy(fun blob -> blob.Size)
+    |> List.sumBy(fun blob -> blob.Size())
 
 printfn "These files take up %d bytes." totalSize
 (*** include-output: sumOfSizes ***)
@@ -118,26 +118,26 @@ printfn "finished reading all lines"
 
 ## Offline development
 In addition to using the Azure Storage Emulator, you can also simply provide the type provider
-with a text file containing the list of blob containers, folders and files. This is particularly
+with a JSON file containing the list of blob containers, folders and files. This is particularly
 useful within the context of a CI process, or when you know a specific "known good" structure of
 blobs within a storage account.
 
 You can still access the blobs using the compile-time storage connection string if provided,
 or override as normal at runtime.
 
-**Note that Tables and Queues still require a valid compile-time storage connection string!**
+**Note that Queues still require a valid compile-time storage connection string!**
 *)
 
-type BlobSchema = AzureTypeProvider<blobSchema = "BlobSchema.txt">
+type BlobSchema = AzureTypeProvider<blobSchema = "BlobSchema.json">
 let fileFromSchema = BlobSchema.Containers.samples.``file3.txt``
 
 (**
-The contents of `BlobSchema.txt` looks as follows, using the format `{container}@{folder}/{folder}/../{file}`: -
+The contents of `BlobSchema.json` looks as follows. Note that folder names must end with a forward slash: -
 
 *)
 
 (*** define-output: blobSchema ***)
-IO.File.ReadAllLines "BlobSchema.txt" |> Array.iter (printfn "%s")
+IO.File.ReadAllLines "BlobSchema.json" |> Array.iter (printfn "%s")
 
 (*** include-output: blobSchema ***)
 
