@@ -13,7 +13,7 @@ type BlobSchema = AzureTypeProvider<blobSchema = "BlobSchema.json">
 
 let container = Local.Containers.samples
 [<Tests>]
-let compilationTests =
+let blobCompilationTests =
     testList "Blob Compilation Tests" [
         testCase "Correctly identifies blob containers" (fun _ -> Local.Containers.samples |> ignore)
         
@@ -47,8 +47,8 @@ let testFolderDownload download expectedFiles expectedFolders =
     folders |> shouldEqual expectedFolders
 
 [<Tests>]
-let mainTests =
-    testList "Main Blob Tests" [
+let blobMainTests =
+    testList "Blob Main Tests" [
         testCase "Correctly gets size of a blob" (fun _ -> container .``sample.txt``.Size() |> shouldEqual 190L)
 
         testCase "Reads a text file as text" (fun _ ->
@@ -112,8 +112,22 @@ let mainTests =
         testCase "Container name is correct" (fun _ -> Local.Containers.samples.Name |> shouldEqual "samples") ]
 
 [<Tests>]
-let staticSchemaTests =
-    testList "Static Schema Tests" [
+let blobContainerTests =
+    testList "Blob Container Tests" [
+        testCase "Can list all blobs in a container" (fun _ ->
+            let blobs = Local.Containers.samples.ListBlobs(true) |> Seq.length
+            blobs |> shouldEqual 12)
+        testCase "Container supports unsafe blob access" (fun _ ->
+            let b = Local.Containers.samples.["file1.txt"]
+            b.Size() |> shouldEqual 5L)
+        testCase "Container supports safe blob access" (fun _ ->
+            let b = Local.Containers.samples.TryGetBlockBlob "file1.txt" |> Async.RunSynchronously
+            Expect.isSome b "Should have returned a blob")
+    ]
+
+[<Tests>]
+let blobStaticSchemaTests =
+    testList "Blob Static Schema Tests" [
         testCase "Correct container name from a static schema" (fun _ ->
             let container = BlobSchema.Containers.samples
             container.Name |> shouldEqual "samples")
@@ -144,8 +158,8 @@ let staticSchemaTests =
     ]
 
 [<Tests>]
-let programmaticBlobTests =
-    testList "Programmatic Blob Schema Tests" [
+let blobProgrammaticTests =
+    testList " Blob Folder Tests" [
         testCase "Can return an unsafe handle to a blob" <| fun _ ->
             let blob = Local.Containers.samples.``folder/``.["childFile.txt"]
             blob.Name |> shouldEqual "folder/childFile.txt"
