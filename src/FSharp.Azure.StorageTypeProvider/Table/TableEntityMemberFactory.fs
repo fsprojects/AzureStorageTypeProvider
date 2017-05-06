@@ -38,13 +38,13 @@ let humanizeRegex =
 let private buildEntityProperty<'a> humanize key need = 
     let getter, propType = 
         match need with
-        | PropertyNeed.Mandatory ->
+        | Mandatory ->
             fun (args : Expr list) -> 
                 <@@ let entity = (%%args.[0] : LightweightTableEntity)
                     if entity.Values.ContainsKey key then entity.Values.[key] :?> 'a
                     else Unchecked.defaultof<'a> @@>
             , typeof<'a>
-        | PropertyNeed.Optional ->
+        | Optional ->
             fun (args : Expr list) -> 
                 <@@ let entity = (%%args.[0] : LightweightTableEntity)
                     if entity.Values.ContainsKey key then Some(entity.Values.[key] :?> 'a)
@@ -59,6 +59,7 @@ let private buildEntityProperty<'a> humanize key need =
 /// builds a single EDM parameter
 let private buildEdmParameter edmType builder = 
     match edmType with
+    | EdmType.String -> builder typeof<string>
     | EdmType.Binary -> builder typeof<byte []>
     | EdmType.Boolean -> builder typeof<bool>
     | EdmType.DateTime -> builder typeof<DateTime>
@@ -66,7 +67,6 @@ let private buildEdmParameter edmType builder =
     | EdmType.Guid -> builder typeof<Guid>
     | EdmType.Int32 -> builder typeof<int>
     | EdmType.Int64 -> builder typeof<int64>
-    | EdmType.String -> builder typeof<string>
     | _ -> builder typeof<obj>
 
 /// Sets the properties on a specific entity based on the inferred schema from the sample provided
@@ -75,6 +75,7 @@ let setPropertiesForEntity humanize (entityType : ProvidedTypeDefinition) column
         columnDefinitions
         |> Seq.map (fun { Name = name; ColumnType = columnType; PropertyNeed = propertyNeed } -> 
                match columnType with
+               | EdmType.String -> buildEntityProperty<string> humanize name propertyNeed
                | EdmType.Binary -> buildEntityProperty<byte []> humanize name propertyNeed
                | EdmType.Boolean -> buildEntityProperty<bool> humanize name propertyNeed
                | EdmType.DateTime -> buildEntityProperty<DateTime> humanize name propertyNeed
@@ -82,7 +83,6 @@ let setPropertiesForEntity humanize (entityType : ProvidedTypeDefinition) column
                | EdmType.Guid -> buildEntityProperty<Guid> humanize name propertyNeed
                | EdmType.Int32 -> buildEntityProperty<int> humanize name propertyNeed
                | EdmType.Int64 -> buildEntityProperty<int64> humanize name propertyNeed
-               | EdmType.String -> buildEntityProperty<string> humanize name propertyNeed
                | _ -> buildEntityProperty<obj> humanize name propertyNeed)
         |> Seq.toList)
     

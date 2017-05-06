@@ -250,7 +250,7 @@ Target "LocalDeploy" (fun _ ->
     directoryInfo @"bin"
     |> filesInDirMatching "*.nupkg"
     |> Seq.map(fun x -> x.FullName)
-    |> CopyFiles "..\..\LocalPackages")
+    |> CopyFiles @"..\..\LocalPackages")
 
 Target "BuildServerDeploy" (fun _ -> publishOnAppveyor buildDir)
 

@@ -51,8 +51,7 @@ let theData =
         [ [ "Partition Key"; "Row Key"; "Years Worked"; "Dob"; "Name"; "Salary"; "Is Manager" ]
           [ "string"; "string"; "int"; "datetime"; "string"; "double"; "bool" ]
           [ "fred"; "1"; "10"; "01/05/1990"; "fred"; "0"; "true"] ]
-        |> List.map Series.ofValues
-        |> List.map (fun s -> s :> ISeries<_>)
+        |> List.map (Series.ofValues >> fun s -> s :> ISeries<_>)
     Frame(keys, series) |> Frame.indexRowsString "Column Name"
 
 (*** include-value: theData ***)
@@ -129,6 +128,8 @@ with a JSON file containing the list of tables and their schema. This is particu
 useful within the context of a CI process, or when you know a specific "known good" structure of
 tables within a storage account.
 
+### Overview
+
 You can still access blobs using the compile-time storage connection string if provided, or
 override as normal at runtime.
 
@@ -165,6 +166,25 @@ Notice that both Salary and IsManager are rendered as option types, since we've 
 marked them as such in the schema definition file. Compare this to the earlier sample, where
 the type provider inferred types based on the first n rows, where they were rendered as
 mandatory types.
+
+### Supported data types
+
+The list of types available are limited by those supported by Azure Tables: -
+
+*)
+
+(*** hide ***)
+let schemaTypes =
+    let keys = [ "EDM Data Type"; "Value in JSON config" ]
+    let series = 
+        [ [ "EdmType.Binary"; "EdmType.Boolean"; "EdmType.DateTime"; "EdmType.Double"; "EdmType.Guid"; "EdmType.Int32"; "EdmType.Int64"; "EdmType.String" ]
+          [ "binary"; "boolean"; "datetime"; "double"; "guid"; "int32"; "int64"; "string" ] ]
+        |> List.map (Series.ofValues >> fun s -> s :> ISeries<_>)
+    Frame(keys, series) |> Frame.indexRowsString "EDM Data Type"
+
+(*** include-value: schemaTypes ***)
+
+(**
 
 ##Querying data
 The storage provider has an easy-to-use query API that is also flexble and powerful, and uses the 
