@@ -142,6 +142,66 @@ let blobSchemaValue = IO.File.ReadAllText "BlobSchema.json"
 
 (**
 
+## Programmatic access
+There are times when working with blobs (particularly when working with an offline schema) that you
+need to access blobs using "stringly typed" access. There are three ways you can do this within the
+type provider.
+
+### Safe support
+For read access to blobs, you can use the Try... methods that are available on containers and
+folders. These asynchronously check if the blob exists, before returning an optional handle to it.
+
+*)
+
+(*** define-output: programmatic-access ***)
+let fileAsBlockBlob = container.TryGetBlockBlob "file1.txt" |> Async.RunSynchronously
+printfn "Does file1.txt exist as a block blob? %b" (Option.isSome fileAsBlockBlob)
+let fileAsPageBlob = container.TryGetPageBlob "file1.txt" |> Async.RunSynchronously
+printfn "Does file1.txt exist as a page blob? %b" (Option.isSome fileAsPageBlob)
+let doesNotExist = container.TryGetBlockBlob "doesNotExist" |> Async.RunSynchronously
+printfn "Does doesNotExist exist as a block blob? %b" (Option.isSome doesNotExist)
+
+(*** include-output: programmatic-access ***)
+
+(**
+
+### Unsafe support for block blob access
+You can also "unsafely" access a block blob using indexers. This returns a blob reference which may or
+may not exist but can be used quickly and easily - especially useful if you want to create a blob that
+does not yet exist. However, be aware that any attempts to access a blob that does not exist will throw
+an Azure SDK exception.
+
+*)
+
+(*** define-output: unsafe-blob ***)
+let newBlob = container.["doesNotExist"]
+newBlob.AsCloudBlockBlob().UploadText "hello"
+printfn "Contents of blob: %s" (newBlob.Read())
+newBlob.AsCloudBlockBlob().Delete()
+
+(*** include-output: unsafe-blob ***)
+
+(**
+
+### Fallback to basic Azure SDK
+Lastly, you can always fall back to the raw .NET Azure SDK (which the type provider sits on top of).
+
+*)
+
+// Access the 'samples' container using the raw SDK.
+let rawContainer = Azure.Containers.samples.AsCloudBlobContainer()
+
+// All blobs can be referred to as an ICloudBlob
+let iCloudBlob = Azure.Containers.samples.``file1.txt``.AsICloudBlob()
+
+// Only available to CloudBlockBlobs.
+let blockBlob = Azure.Containers.samples.``file1.txt``.AsCloudBlockBlob()
+
+// Only available to PageBlockBlobs.
+let pageBlob = Azure.Containers.samples.``pageData.bin``.AsCloudPageBlob()
+
+(**
+
 ## Download assets
 You can quickly and easily download files, folders or entire containers to local disk.
 *)
