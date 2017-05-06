@@ -53,15 +53,15 @@
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '10', 10)" onmouseover="showTip(event, '10', 10)">
+          <code onmouseout="hideTip(event, '13', 13)" onmouseover="showTip(event, '13', 13)">
             AsCloudBlobContainer(connectionString)
           </code>
-          <div class="tip" id="10">
+          <div class="tip" id="13">
             <strong>Signature:</strong> (connectionString:string option) -&gt; CloudBlobContainer<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L141-141" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L185-185" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
@@ -73,15 +73,15 @@
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '11', 11)" onmouseover="showTip(event, '11', 11)">
+          <code onmouseout="hideTip(event, '14', 14)" onmouseover="showTip(event, '14', 14)">
             Download(path, connectionString)
           </code>
-          <div class="tip" id="11">
+          <div class="tip" id="14">
             <strong>Signature:</strong> (path:string * connectionString:string option) -&gt; Async&lt;unit&gt;<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L144-144" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L188-188" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
@@ -93,15 +93,56 @@
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '12', 12)" onmouseover="showTip(event, '12', 12)">
+          <code onmouseout="hideTip(event, '15', 15)" onmouseover="showTip(event, '15', 15)">
+            [path]
+          </code>
+          <div class="tip" id="15">
+            <strong>Signature:</strong> path:string -&gt; BlockBlobFile<br />
+                      </div>
+        </td>
+        <td class="xmldoc">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L201-201" class="github-link">
+              <img src="../content/img/github.png" class="normal" />
+              <img src="../content/img/github-blue.png" class="hover" />
+            </a>
+          <p>Allows unsafe navigation to a blob by name.</p>
+
+
+              <p>CompiledName: <code>get_Item</code></p>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '16', 16)" onmouseover="showTip(event, '16', 16)">
+            ListBlobs(...)
+          </code>
+          <div class="tip" id="16">
+            <strong>Signature:</strong> (includeSubfolders:bool option * connectionString:string option) -&gt; seq&lt;BlobFile&gt;<br />
+                      </div>
+        </td>
+        <td class="xmldoc">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L207-207" class="github-link">
+              <img src="../content/img/github.png" class="normal" />
+              <img src="../content/img/github-blue.png" class="hover" />
+            </a>
+          <p>Lists all blobs contained in this container.</p>
+
+
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '17', 17)" onmouseover="showTip(event, '17', 17)">
             Name
           </code>
-          <div class="tip" id="12">
+          <div class="tip" id="17">
             <strong>Signature:</strong> string<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L155-155" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L199-199" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
@@ -114,15 +155,55 @@
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '13', 13)" onmouseover="showTip(event, '13', 13)">
+          <code onmouseout="hideTip(event, '18', 18)" onmouseover="showTip(event, '18', 18)">
+            TryGetBlockBlob(path, connectionString)
+          </code>
+          <div class="tip" id="18">
+            <strong>Signature:</strong> (path:string * connectionString:string option) -&gt; Async&lt;BlockBlobFile option&gt;<br />
+                      </div>
+        </td>
+        <td class="xmldoc">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L203-203" class="github-link">
+              <img src="../content/img/github.png" class="normal" />
+              <img src="../content/img/github-blue.png" class="hover" />
+            </a>
+          <p>Safely retrieves a reference to a block blob asynchronously.</p>
+
+
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '19', 19)" onmouseover="showTip(event, '19', 19)">
+            TryGetPageBlob(path, connectionString)
+          </code>
+          <div class="tip" id="19">
+            <strong>Signature:</strong> (path:string * connectionString:string option) -&gt; Async&lt;PageBlobFile option&gt;<br />
+                      </div>
+        </td>
+        <td class="xmldoc">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L205-205" class="github-link">
+              <img src="../content/img/github.png" class="normal" />
+              <img src="../content/img/github-blue.png" class="hover" />
+            </a>
+          <p>Safely retrieves a reference to a page blob asynchronously.</p>
+
+
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '20', 20)" onmouseover="showTip(event, '20', 20)">
             Upload(path, connectionString)
           </code>
-          <div class="tip" id="13">
+          <div class="tip" id="20">
             <strong>Signature:</strong> (path:string * connectionString:string option) -&gt; Async&lt;unit&gt;<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L149-149" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Blob/ProvidedBlobTypes.fs#L193-193" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
