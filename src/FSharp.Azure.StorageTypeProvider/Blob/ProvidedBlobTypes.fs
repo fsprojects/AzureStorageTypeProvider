@@ -124,11 +124,9 @@ module BlobBuilder =
     let createPageBlobFile connectionString containerName path = 
         PageBlobFile(connectionString, containerName, path)
 
-/// Represents a pseudo-folder in blob storage.
-type BlobFolder internal (defaultConnectionString, container, file) = 
-    let getSafe getBlobFile connectionString path =
+    let getSafe defaultConnectionString container getBlobFile connectionString path =
         let connectionString = connectionString |> defaultArg <| defaultConnectionString
-        let blob : #BlobFile = getBlobFile connectionString container (Path.Combine(file, path))
+        let blob : #BlobFile = getBlobFile connectionString container path
         async {
             try
             let! exists = blob.AsICloudBlob().ExistsAsync() |> Async.AwaitTask
@@ -140,6 +138,27 @@ type BlobFolder internal (defaultConnectionString, container, file) =
                 | _ -> false
                 -> return None }
 
+    let listBlobs defaultConnectionString container file includeSubfolders connectionString =
+        let connectionString = connectionString |> defaultArg <| defaultConnectionString
+        let includeSubfolders = defaultArg includeSubfolders false
+        let container = getContainerRef (connectionString, container)
+        
+        listBlobs includeSubfolders container file
+        |> Seq.choose (function
+            | Blob(path, _, blobType, _) -> 
+                match blobType with
+                | BlobType.PageBlob -> (createPageBlobFile connectionString container.Name path) :> BlobFile 
+                | _ -> (createBlockBlobFile connectionString container.Name path) :> BlobFile 
+                |> Some
+            | _ -> None)
+
+/// Represents a pseudo-folder in blob storage.
+type BlobFolder internal (defaultConnectionString, container, file) = 
+    let getSafe getBlob connectionString path =
+        let path = Path.Combine(file, path)
+        BlobBuilder.getSafe defaultConnectionString container getBlob connectionString path
+    let listBlobs = BlobBuilder.listBlobs defaultConnectionString container file
+
     /// Downloads the entire folder contents to the local file system asynchronously.
     member __.Download(path, ?connectionString) =
         let connectionDetails = defaultArg connectionString defaultConnectionString, container, file
@@ -149,25 +168,19 @@ type BlobFolder internal (defaultConnectionString, container, file) =
     member __.Path with get() = file
 
     /// Lists all blobs contained in this folder
-    member __.ListBlobs(?includeSubfolders) = 
-        let includeSubfolders = defaultArg includeSubfolders false
-        let container = getContainerRef (defaultConnectionString, container)
-        
-        listBlobs includeSubfolders container file
-        |> Seq.choose (function
-            | Blob(path, _, blobType, _) -> 
-                match blobType with
-                | BlobType.PageBlob -> (BlobBuilder.createPageBlobFile defaultConnectionString container.Name path) :> BlobFile 
-                | _ -> (BlobBuilder.createBlockBlobFile defaultConnectionString container.Name path) :> BlobFile 
-                |> Some
-            | _ -> None)
-
+    member __.ListBlobs(?includeSubfolders, ?connectionString) = listBlobs includeSubfolders connectionString
+    /// Allows unsafe navigation to a blob by name.
     member __.Item with get(path) = BlobBuilder.createBlockBlobFile defaultConnectionString container (Path.Combine(file, path))
+    /// Safely retrieves a reference to a block blob asynchronously.
     member __.TryGetBlockBlob(path, ?connectionString) = getSafe BlobBuilder.createBlockBlobFile connectionString path
+    /// Safely retrieves a reference to a page blob asynchronously.
     member __.TryGetPageBlob(path, ?connectionString) = getSafe BlobBuilder.createPageBlobFile connectionString path
 
 /// Represents a container in blob storage.
 type BlobContainer internal (defaultConnectionString, container) =
+    let getSafe getBlob connectionString path = BlobBuilder.getSafe defaultConnectionString container getBlob connectionString path
+    let listBlobs = BlobBuilder.listBlobs defaultConnectionString container ""
+
     /// Gets a handle to the Azure SDK client for this container.
     member __.AsCloudBlobContainer(?connectionString) = getContainerRef(defaultArg connectionString defaultConnectionString, container)
 
@@ -184,6 +197,14 @@ type BlobContainer internal (defaultConnectionString, container) =
     
     /// Gets the name of this container.
     member __.Name with get() = container
+    /// Allows unsafe navigation to a blob by name.
+    member __.Item with get(path) = BlobBuilder.createBlockBlobFile defaultConnectionString container path
+    /// Safely retrieves a reference to a block blob asynchronously.
+    member __.TryGetBlockBlob(path, ?connectionString) = getSafe BlobBuilder.createBlockBlobFile connectionString path
+    /// Safely retrieves a reference to a page blob asynchronously.
+    member __.TryGetPageBlob(path, ?connectionString) = getSafe BlobBuilder.createPageBlobFile connectionString path
+    /// Lists all blobs contained in this container.
+    member __.ListBlobs(?includeSubfolders, ?connectionString) = listBlobs includeSubfolders connectionString
 
 module internal ProvidedTypeGenerator = 
     let generateTypes() = 

@@ -21,9 +21,9 @@ let buildBlobSchema (json:Json.Json) =
         { Name = containerName
           Contents =
               lazy
-                  (match container with
-                   | Json.ObjectOrNull o -> o |> Seq.map (buildBlobItem "")
-                   | _ -> failInvalidJson()) })
+                  match container with
+                  | Json.ObjectOrNull o -> o |> Seq.map (buildBlobItem "")
+                  | _ -> failInvalidJson() })
     |> Array.toList
 
 let createSchema resolutionFolder path =
