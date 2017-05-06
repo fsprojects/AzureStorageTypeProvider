@@ -1,4 +1,4 @@
-{
+﻿{
     "Employee": {
         "Name": {
             "Type": "String"
@@ -10,7 +10,8 @@
             "Type": "DateTime"
         },
         "Salary": {
-            "Type": "double"
+            "Type": "double",
+            "Optional": true
         },
         "IsManager": {
             "Type": "boolean",

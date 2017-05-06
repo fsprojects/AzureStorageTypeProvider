@@ -68,5 +68,8 @@
 * Upgrade to .NET452
 * Support for static blob schemas
 
-### 1.8.1 - ???
+### 1.9.0 - ???
 * Better support for programmatic blob access
+* Static Table schema support
+* BREAKING CHANGE: Size property on Blobs now take in an optional connection string.
+* BREAKING CHANGE: Reworked static Blob schema

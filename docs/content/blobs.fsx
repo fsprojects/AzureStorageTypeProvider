@@ -122,10 +122,9 @@ with a JSON file containing the list of blob containers, folders and files. This
 useful within the context of a CI process, or when you know a specific "known good" structure of
 blobs within a storage account.
 
-You can still access the blobs using the compile-time storage connection string if provided,
-or override as normal at runtime.
+You can still access blobs using the compile-time storage connection string if provided, or
+override as normal at runtime.
 
-**Note that Queues still require a valid compile-time storage connection string!**
 *)
 
 type BlobSchema = AzureTypeProvider<blobSchema = "BlobSchema.json">
@@ -136,10 +135,10 @@ The contents of `BlobSchema.json` looks as follows. Note that folder names must 
 
 *)
 
-(*** define-output: blobSchema ***)
-IO.File.ReadAllLines "BlobSchema.json" |> Array.iter (printfn "%s")
+(*** hide ***)
+let blobSchemaValue = IO.File.ReadAllText "BlobSchema.json"
 
-(*** include-output: blobSchema ***)
+(*** include-value: blobSchemaValue ***)
 
 (**
 

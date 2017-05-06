@@ -123,6 +123,49 @@ let frame =
 
 (**
 
+## Offline development
+In addition to using the Azure Storage Emulator, you can also simply provide the type provider
+with a JSON file containing the list of tables and their schema. This is particularly
+useful within the context of a CI process, or when you know a specific "known good" structure of
+tables within a storage account.
+
+You can still access blobs using the compile-time storage connection string if provided, or
+override as normal at runtime.
+
+*)
+
+type TableSchema = AzureTypeProvider<tableSchema = "TableSchema.json">
+
+(**
+The contents of `TableSchema.json` looks as follows.
+
+*)
+
+(*** hide ***)
+let tableSchema = IO.File.ReadAllText "TableSchema.json"
+
+(*** include-value: tableSchema ***)
+
+(**
+
+We can access the data just as normal - the only difference is that the schema is defined
+by the json file rather than inferred from a set of data.
+
+*)
+
+(*** define-output: tableOfflineOutput ***)
+let staticFred = TableSchema.Tables.Employee.Get(Row "1", Partition "men").Value
+printfn "Fred has Salary '%A', Is Manager '%A'." staticFred.Salary staticFred.IsManager
+
+(*** include-output: tableOfflineOutput ***)
+
+(**
+
+Notice that both Salary and IsManager are rendered as option types, since we've explicitly
+marked them as such in the schema definition file. Compare this to the earlier sample, where
+the type provider inferred types based on the first n rows, where they were rendered as
+mandatory types.
+
 ##Querying data
 The storage provider has an easy-to-use query API that is also flexble and powerful, and uses the 
 inferred schema to generate the appropriate query functionality. Data can be queried in several
