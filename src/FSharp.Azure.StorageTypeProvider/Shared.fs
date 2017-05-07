@@ -39,7 +39,7 @@ module Json =
         member this.GetProperty key =
             match this.TryGetProperty key with
             | Some property -> property
-            | None -> failwith "Can only retrieve a property on an object"
+            | None -> failwithf "Property '%s' does not exist." key
 
     let rec ofJToken (jToken:JToken) =
         match jToken with
