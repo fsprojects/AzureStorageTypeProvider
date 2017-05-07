@@ -155,11 +155,23 @@ let blobStaticSchemaTests =
         testCase "Compiles with empty container" (fun _ ->
             BlobSchema.Containers.emptyContainer
             |> ignore) //compiles!
+
+        testCase "Default to block blob if not specified" (fun _ ->
+            BlobSchema.Containers.samples.``file2.txt``.AsICloudBlob().BlobType
+            |> shouldEqual BlobType.BlockBlob)
+
+        testCase "Sets as block blob if specified" (fun _ ->
+            BlobSchema.Containers.samples.``file1.txt``.AsICloudBlob().BlobType
+            |> shouldEqual BlobType.BlockBlob)
+
+        testCase "Sets as page blob if specified" (fun _ ->
+            BlobSchema.Containers.samples.``file3.txt``.AsICloudBlob().BlobType
+            |> shouldEqual BlobType.PageBlob)
     ]
 
 [<Tests>]
 let blobProgrammaticTests =
-    testList " Blob Folder Tests" [
+    testList "Blob Folder Tests" [
         testCase "Can return an unsafe handle to a blob" <| fun _ ->
             let blob = Local.Containers.samples.``folder/``.["childFile.txt"]
             blob.Name |> shouldEqual "folder/childFile.txt"

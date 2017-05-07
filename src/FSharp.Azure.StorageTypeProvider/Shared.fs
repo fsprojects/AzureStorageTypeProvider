@@ -3,21 +3,6 @@
 ///[omit]
 module Option =
     open System
-
-    let internal ofNullable (value : Nullable<_>) = 
-        if value.HasValue then Some value.Value
-        else None
-
-    let internal toNullable = function
-        | Some x -> Nullable x
-        | None -> Nullable()
-
-    let internal ofObj (value) = if value = null then None else Some value
-
-    let internal toObj = function
-        | Some x -> x
-        | None -> null 
-
     let ofString text = if String.IsNullOrWhiteSpace text then None else Some text
 
 ///[omit]
@@ -32,24 +17,29 @@ module Async =
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module Json =
     open Newtonsoft.Json.Linq
-
-    type Json =
+    type ObjectData = string * Json
+    and Json =
         | String of string
         | Number of decimal
         | Boolean of bool
-        | Object of (string * Json)[]
+        | Object of ObjectData[]
         | Array of Json[]
-        | Null  
+        | Null
         member this.AsString = match this with Json.String s -> s | _ -> failwith "Expected a JSON string"
         member this.AsNumber = match this with Json.Number s -> s | _ -> failwith "Expected a JSON number"
         member this.AsBoolean = match this with Json.Boolean b -> b | _ -> failwith "Expected a JSON boolean"
         member this.AsObject = match this with Json.Object o -> o | _ -> failwith "Expected a JSON object"
         member this.AsArray = match this with Json.Array o -> o | _ -> failwith "Expected a JSON array"
-        member this.GetProperty key = this.AsObject |> Array.find (fst >> (=) key) |> snd
         member this.TryGetProperty key =
-            match this with Json.Object o -> Some o | _ -> None
+            match this with
+            | Json.Object data -> Some data
+            | _ -> None
             |> Option.bind (Array.tryFind (fst >> (=) key))
             |> Option.map snd
+        member this.GetProperty key =
+            match this.TryGetProperty key with
+            | Some property -> property
+            | None -> failwith "Can only retrieve a property on an object"
 
     let rec ofJToken (jToken:JToken) =
         match jToken with

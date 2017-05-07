@@ -26,17 +26,18 @@ let internal buildTableSchema rawJson =
 
     { Parsed.TableSchema.Tables =
         json.AsObject
-        |> Array.map (fun (tableName, cols) ->
+        |> Array.map (fun (tableName, columns) ->
             { Table = tableName
               Columns =
-                cols.AsObject
-                |> Array.map (fun (colName, props) ->
-                    let colType = Parsed.parseEdmType (props.GetProperty "Type").AsString
+                columns.AsObject
+                |> Array.map (fun (columnName, properties) ->
+                    let colType = Parsed.parseEdmType (properties.GetProperty "Type").AsString
                     let propNeed =
-                        props.TryGetProperty "Optional"
-                        |> Option.map (fun b -> b.AsBoolean)
-                        |> function Some true -> Optional | _ -> Mandatory
-                    { Name = colName
+                        match properties.TryGetProperty "Optional" with
+                        | Some (Json.Boolean true) -> Optional
+                        | Some (Json.Boolean false) | None -> Mandatory
+                        | Some _ -> failwith "Optional must be a boolean value."
+                    { Name = columnName
                       ColumnType = colType
                       PropertyNeed = propNeed })
                 |> Array.toList }) }

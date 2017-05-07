@@ -8,21 +8,35 @@ open System.IO
 
 let failInvalidJson() = failwith "Invalid JSON structure in static blob schema."
 
-let rec buildBlobItem prevPath (name:string, item:Json.Json) =
-    match name.EndsWith "/", item with
-    | false, Json.ObjectOrNull _ -> Blob (prevPath + name, name, BlobType.BlockBlob, None)
-    | true , Json.ObjectOrNull o ->
-        let path = prevPath + name
-        Folder (path, name, lazy (o |> Array.map (buildBlobItem path)))
+let private (|Folder|File|) (name:string) =
+    if name.EndsWith "/" then Folder else File
+
+let private isEqualTo other (s:string) =
+    s.Equals(other, System.StringComparison.InvariantCultureIgnoreCase)
+
+let rec buildBlobItem prevPath (elementName, contents) =
+    match elementName, contents with
+    | File, Json.ObjectOrNull _ ->
+        let blobType =
+            match contents.TryGetProperty "Type" with
+            | Some (Json.String "blockblob") -> BlobType.BlockBlob
+            | Some (Json.String "pageblob") -> BlobType.PageBlob
+            | Some content -> failwithf "Unknown value for blob type ('%A'). Must be either 'blockblob' or 'pageblob'" content
+            | None -> BlobType.BlockBlob
+        Blob (prevPath + elementName, elementName, blobType, None)
+    | Folder, Json.ObjectOrNull children ->
+        let path = prevPath + elementName
+        Folder (path, elementName, lazy (children |> Array.map (buildBlobItem path)))
     | _ -> failInvalidJson()
 
 let buildBlobSchema (json:Json.Json) =
-    json.AsObject |> Array.map (fun (containerName, container) ->
+    json.AsObject
+    |> Array.map (fun (containerName, containerElements) ->
         { Name = containerName
           Contents =
               lazy
-                  match container with
-                  | Json.ObjectOrNull o -> o |> Seq.map (buildBlobItem "")
+                  match containerElements with
+                  | Json.ObjectOrNull elements -> elements |> Seq.map (buildBlobItem "")
                   | _ -> failInvalidJson() })
     |> Array.toList
 
