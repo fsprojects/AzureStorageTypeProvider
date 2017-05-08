@@ -209,21 +209,25 @@ override as normal at runtime.</p>
 <p>The contents of <code>BlobSchema.json</code> looks as follows. Note that folder names must end with a forward slash: -</p>
 <table class="pre"><tr><td><pre><code>"{
     "samples": {
-        "file1.txt": null,
+        "file1.txt": { "Type": "blockblob" },
         "file2.txt": null,
-        "file3.txt": null,
+        "file3.txt": { "Type": "pageblob" },
         "folder/": {
             "childFile.txt": null
         },
         "folder2/": {
             "child/": {
-                "descedant4.txt": null
+                "descendant4.txt": null
             }
-        },
-        "random/": {
-            "file.txt": null
         }
-    }
+    },
+    "random": {
+        "file.txt": null,
+        "folder/": {
+            "emptyFolder/": null
+        }
+    },
+    "emptyContainer": {}
 }"</code></pre></td></tr></table>
 <h2><a name="Programmatic-access" class="anchor" href="#Programmatic-access">Programmatic access</a></h2>
 <p>There are times when working with blobs (particularly when working with an offline schema) that you
@@ -324,9 +328,9 @@ single files.</p>
 </code></pre></td>
 </tr>
 </table>
-<table class="pre"><tr><td><pre><code>Current time: 08/05/2017 13:33:52
-SAS expiry: 08/05/2017 14:10:52
-SAS URI: http://127.0.0.1:10000/devstoreaccount1/samples/file1.txt?sv=2015-04-05&amp;sr=b&amp;sig=Q6ALO9LbVA/poHRwl28pxrAAyvzPbCHZFju1lg7I4Vo=&amp;se=2017-05-08T14:10:52Z&amp;sp=rwdl</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>Current time: 08/05/2017 13:39:09
+SAS expiry: 08/05/2017 14:16:09
+SAS URI: http://127.0.0.1:10000/devstoreaccount1/samples/file1.txt?sv=2015-04-05&amp;sr=b&amp;sig=FCiPDwOynHo8bMFDmiKwWoUKtBb5MsmU19O3hEmVzdY=&amp;se=2017-05-08T14:16:09Z&amp;sp=rwdl</code></pre></td></tr></table>
 
 <div class="tip" id="fs1">Multiple items<br />namespace FSharp<br /><br />--------------------<br />namespace Microsoft.FSharp</div>
 <div class="tip" id="fs2">namespace FSharp.Azure</div>
