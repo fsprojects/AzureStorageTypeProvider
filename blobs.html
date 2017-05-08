@@ -206,7 +206,7 @@ override as normal at runtime.</p>
 </code></pre></td>
 </tr>
 </table>
-<p>The contents of <code>BlobSchema.json</code> looks as follows. Note that folder names must end with a forward slash: -</p>
+<p>The contents of <code>BlobSchema.json</code> looks as follows: -</p>
 <table class="pre"><tr><td><pre><code>"{
     "samples": {
         "file1.txt": { "Type": "blockblob" },
@@ -227,8 +227,11 @@ override as normal at runtime.</p>
             "emptyFolder/": null
         }
     },
-    "emptyContainer": {}
+    "emptyContainer": { }
 }"</code></pre></td></tr></table>
+<p>Note that folder names must end with a forward slash e.g. <code>myfolder/</code>. Also observe that you can
+specify the <code>Type</code> of blob as either <code>pageblob</code> or <code>blockblob</code>. If not specified, this defaults
+to <code>blockblob</code>. You can leave "empty" values as either <code>null</code> or <code>{ }</code>.</p>
 <h2><a name="Programmatic-access" class="anchor" href="#Programmatic-access">Programmatic access</a></h2>
 <p>There are times when working with blobs (particularly when working with an offline schema) that you
 need to access blobs using "stringly typed" access. There are three ways you can do this within the
@@ -328,9 +331,9 @@ single files.</p>
 </code></pre></td>
 </tr>
 </table>
-<table class="pre"><tr><td><pre><code>Current time: 08/05/2017 13:39:09
-SAS expiry: 08/05/2017 14:16:09
-SAS URI: http://127.0.0.1:10000/devstoreaccount1/samples/file1.txt?sv=2015-04-05&amp;sr=b&amp;sig=FCiPDwOynHo8bMFDmiKwWoUKtBb5MsmU19O3hEmVzdY=&amp;se=2017-05-08T14:16:09Z&amp;sp=rwdl</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>Current time: 08/05/2017 13:52:32
+SAS expiry: 08/05/2017 14:29:32
+SAS URI: http://127.0.0.1:10000/devstoreaccount1/samples/file1.txt?sv=2015-04-05&amp;sr=b&amp;sig=EfoTAFPe6sDvxOqAa79r05SaCThrE3MN+gwDatYrTJE=&amp;se=2017-05-08T14:29:32Z&amp;sp=rwdl</code></pre></td></tr></table>
 
 <div class="tip" id="fs1">Multiple items<br />namespace FSharp<br /><br />--------------------<br />namespace Microsoft.FSharp</div>
 <div class="tip" id="fs2">namespace FSharp.Azure</div>
@@ -378,7 +381,7 @@ SAS URI: http://127.0.0.1:10000/devstoreaccount1/samples/file1.txt?sv=2015-04-05
 <div class="tip" id="fs44">member BlobFile.ReadLines : ?connectionString:string -&gt; seq&lt;string&gt;</div>
 <div class="tip" id="fs45">val line : string</div>
 <div class="tip" id="fs46">type BlobSchema = AzureTypeProvider&lt;...&gt;<br /><br />Full name: Blobs.BlobSchema</div>
-<div class="tip" id="fs47">val fileFromSchema : AzureTypeProvider&lt;...&gt;.Domain.BlockBlob<br /><br />Full name: Blobs.fileFromSchema</div>
+<div class="tip" id="fs47">val fileFromSchema : AzureTypeProvider&lt;...&gt;.Domain.PageBlob<br /><br />Full name: Blobs.fileFromSchema</div>
 <div class="tip" id="fs48">val blobSchemaValue : string<br /><br />Full name: Blobs.blobSchemaValue</div>
 <div class="tip" id="fs49">namespace System.IO</div>
 <div class="tip" id="fs50">type File =<br />&#160;&#160;static member AppendAllLines : path:string * contents:IEnumerable&lt;string&gt; -&gt; unit + 1 overload<br />&#160;&#160;static member AppendAllText : path:string * contents:string -&gt; unit + 1 overload<br />&#160;&#160;static member AppendText : path:string -&gt; StreamWriter<br />&#160;&#160;static member Copy : sourceFileName:string * destFileName:string -&gt; unit + 1 overload<br />&#160;&#160;static member Create : path:string -&gt; FileStream + 3 overloads<br />&#160;&#160;static member CreateText : path:string -&gt; StreamWriter<br />&#160;&#160;static member Decrypt : path:string -&gt; unit<br />&#160;&#160;static member Delete : path:string -&gt; unit<br />&#160;&#160;static member Encrypt : path:string -&gt; unit<br />&#160;&#160;static member Exists : path:string -&gt; bool<br />&#160;&#160;...<br /><br />Full name: System.IO.File</div>
