@@ -74,5 +74,5 @@
 * BREAKING CHANGE: Size property on Blobs now take in an optional connection string.
 * BREAKING CHANGE: Reworked static Blob schema
 
-### 1.9.1 - ???
+### 1.9.1 - 8th May 2017
 * Support for specifying blob type in blob schema definition.
