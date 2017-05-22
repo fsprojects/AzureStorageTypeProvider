@@ -109,7 +109,22 @@ let blobMainTests =
             let count = allBlobs |> Seq.length
             count |> shouldEqual 4)
 
-        testCase "Container name is correct" (fun _ -> Local.Containers.samples.Name |> shouldEqual "samples") ]
+        testCase "Container name is correct" (fun _ -> Local.Containers.samples.Name |> shouldEqual "samples")
+        
+        testCase "Sets Content Type on upload" (fun _ ->
+            let testContent extension mimeType =
+                let filename = sprintf "test.%s" extension
+                File.WriteAllText(filename, "foo")
+                Local.Containers.samples.Upload filename |> Async.RunSynchronously
+                let blob = Local.Containers.samples.[filename].AsCloudBlockBlob()
+                blob.FetchAttributes()
+                blob.Properties.ContentType |> shouldEqual mimeType
+                blob.Delete()
+                File.Delete filename
+            testContent "txt" "text/plain"
+            testContent "swf" "application/x-shockwave-flash"
+            testContent "jpg" "image/jpeg")
+         ]
 
 [<Tests>]
 let blobContainerTests =

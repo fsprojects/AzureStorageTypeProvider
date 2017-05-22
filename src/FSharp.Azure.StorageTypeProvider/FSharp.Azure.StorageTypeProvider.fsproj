@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Name>FSharp.Azure.StorageTypeProvider</Name>
@@ -57,6 +57,7 @@
     <Compile Include="Table/TableEntityMemberFactory.fs" />
     <Compile Include="Table/StaticSchema.fs" />
     <Compile Include="Table/TableMemberFactory.fs" />
+    <Compile Include="Blob/MimeTypes.fs" />
     <Compile Include="Blob/BlobRepository.fs" />
     <Compile Include="Blob/ProvidedBlobTypes.fs" />
     <Compile Include="Blob/BlobMemberFactory.fs" />

@@ -39,7 +39,7 @@ type BlobFile internal (defaultConnectionString, container, file, getBlobRef : _
     member this.Download(path, ?connectionString) = 
         let targetDirectory = Path.GetDirectoryName(path)
         if not (Directory.Exists targetDirectory) then Directory.CreateDirectory targetDirectory |> ignore
-        this.BlobRef(connectionString).DownloadToFileAsync(path, FileMode.Create) |> awaitUnit
+        this.BlobRef(connectionString).DownloadToFileAsync(path, FileMode.Create) |> Async.AwaitTask
     
     /// Opens this file as a stream for reading.
     member this.OpenStream(?connectionString:string) = this.BlobRef(connectionString).OpenRead()
@@ -191,9 +191,15 @@ type BlobContainer internal (defaultConnectionString, container) =
     
     /// Uploads a file to this container.
     member __.Upload(path, ?connectionString) = 
-        let fileName = path |> Path.GetFileName
-        let blobRef = getBlockBlobRef ((defaultArg connectionString defaultConnectionString), container, fileName)
-        awaitUnit (blobRef.UploadFromFileAsync(path, FileMode.Open))
+        let filename = path |> Path.GetFileName
+        let blobRef = getBlockBlobRef ((defaultArg connectionString defaultConnectionString), container, filename)
+
+        // Set the MIME type of the file if we can
+        Path.GetExtension filename
+        |> MimeTypes.tryFindMimeType
+        |> Option.iter(fun mimeType -> blobRef.Properties.ContentType <- mimeType)
+
+        blobRef.UploadFromFileAsync(path, FileMode.Open) |> Async.AwaitTask
     
     /// Gets the name of this container.
     member __.Name with get() = container

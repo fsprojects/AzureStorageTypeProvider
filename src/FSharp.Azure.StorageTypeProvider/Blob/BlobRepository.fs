@@ -57,13 +57,11 @@ let getBlobStorageAccountManifest connection =
                 |> getContainerStructure null
                 |> Seq.cache })
 
-let awaitUnit = Async.AwaitIAsyncResult >> Async.Ignore
-
 let downloadFolder (connectionDetails, path) =
     let downloadFile (blobRef:ICloudBlob) destination =
         let targetDirectory = Path.GetDirectoryName(destination)
         if not (Directory.Exists targetDirectory) then Directory.CreateDirectory targetDirectory |> ignore
-        blobRef.DownloadToFileAsync(destination, FileMode.Create) |> awaitUnit
+        blobRef.DownloadToFileAsync(destination, FileMode.Create) |> Async.AwaitTask
 
     let connection, container, folderPath = connectionDetails
     let containerRef = (getBlobClient connection).GetContainerReference(container)
