@@ -116,11 +116,13 @@ let blobMainTests =
                 let filename = sprintf "test.%s" extension
                 File.WriteAllText(filename, "foo")
                 Local.Containers.samples.Upload filename |> Async.RunSynchronously
+                File.Delete filename
+
                 let blob = Local.Containers.samples.[filename].AsCloudBlockBlob()
                 blob.FetchAttributes()
-                blob.Properties.ContentType |> shouldEqual mimeType
                 blob.Delete()
-                File.Delete filename
+
+                blob.Properties.ContentType |> shouldEqual mimeType
             testContent "txt" "text/plain"
             testContent "swf" "application/x-shockwave-flash"
             testContent "jpg" "image/jpeg")
