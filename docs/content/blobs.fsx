@@ -131,9 +131,10 @@ type BlobSchema = AzureTypeProvider<blobSchema = "BlobSchema.json">
 let fileFromSchema = BlobSchema.Containers.samples.``file3.txt``
 
 (**
-The contents of `BlobSchema.json` looks as follows. Note that folder names must end with a forward slash: -
+The contents of `BlobSchema.json` looks as follows: -
 
 *)
+
 
 (*** hide ***)
 let blobSchemaValue = IO.File.ReadAllText "BlobSchema.json"
@@ -141,6 +142,10 @@ let blobSchemaValue = IO.File.ReadAllText "BlobSchema.json"
 (*** include-value: blobSchemaValue ***)
 
 (**
+
+Note that folder names must end with a forward slash e.g. `myfolder/`. Also observe that you can
+specify the `Type` of blob as either `pageblob` or `blockblob`. If not specified, this defaults
+to `blockblob`. You can leave "empty" values as either `null` or `{ }`.
 
 ## Programmatic access
 There are times when working with blobs (particularly when working with an offline schema) that you

@@ -1,18 +1,22 @@
 ﻿{
     "samples": {
-        "file1.txt": null,
+        "file1.txt": { "Type": "blockblob" },
         "file2.txt": null,
-        "file3.txt": null,
+        "file3.txt": { "Type": "pageblob" },
         "folder/": {
             "childFile.txt": null
         },
         "folder2/": {
             "child/": {
-                "descedant4.txt": null
+                "descendant4.txt": null
             }
-        },
-        "random/": {
-            "file.txt": null
         }
-    }
+    },
+    "random": {
+        "file.txt": null,
+        "folder/": {
+            "emptyFolder/": null
+        }
+    },
+    "emptyContainer": { }
 }
