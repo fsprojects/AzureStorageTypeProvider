@@ -29,12 +29,12 @@ NUGET
     NuGet.CommandLine (3.5)
     System.Spatial (5.6.4)
     Unquote (3.1.2)
-    WindowsAzure.Storage (6.0)
+    WindowsAzure.Storage (7.2.1)
       Microsoft.Azure.KeyVault.Core (>= 1.0)
       Microsoft.Data.OData (>= 5.6.4)
       Microsoft.Data.Services.Client (>= 5.6.4)
       Newtonsoft.Json (>= 6.0.8)
 GITHUB
   remote: fsprojects/FSharp.TypeProviders.StarterPack
-    src/ProvidedTypes.fs (45f4d8780b3213ef61ba4fccc716cd495565c1a4)
-    src/ProvidedTypes.fsi (45f4d8780b3213ef61ba4fccc716cd495565c1a4)
+    src/ProvidedTypes.fs (1dab4f94411500794342f61f877feab772e5a754)
+    src/ProvidedTypes.fsi (1dab4f94411500794342f61f877feab772e5a754)

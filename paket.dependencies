@@ -5,7 +5,7 @@ framework: net452
 nuget FAKE
 nuget Nuget.CommandLine
 nuget Unquote
-nuget WindowsAzure.Storage 6.0.0
+nuget WindowsAzure.Storage 7.2.1
 nuget FSharp.Formatting
 nuget Deedle
 nuget FSharp.Core 4.0.0.1

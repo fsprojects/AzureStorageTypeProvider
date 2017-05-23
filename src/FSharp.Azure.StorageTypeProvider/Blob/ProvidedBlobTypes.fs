@@ -199,7 +199,7 @@ type BlobContainer internal (defaultConnectionString, container) =
         |> MimeTypes.tryFindMimeType
         |> Option.iter(fun mimeType -> blobRef.Properties.ContentType <- mimeType)
 
-        blobRef.UploadFromFileAsync(path, FileMode.Open) |> Async.AwaitTask
+        blobRef.UploadFromFileAsync path |> Async.AwaitTask
     
     /// Gets the name of this container.
     member __.Name with get() = container

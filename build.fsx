@@ -130,7 +130,7 @@ Target "NuGet"
                      ReleaseNotes = release.Notes |> String.concat Environment.NewLine
                      Tags = tags
                      OutputPath = "bin"
-                     Dependencies = [ "WindowsAzure.Storage", "6.0.0" ]
+                     Dependencies = [ "WindowsAzure.Storage", "7.2.1" ]
                      References = [ "FSharp.Azure.StorageTypeProvider.dll" ]
                      Files = 
                          ([ "FSharp.Azure.StorageTypeProvider.xml"; "FSharp.Azure.StorageTypeProvider.dll"; "Microsoft.Azure.KeyVault.Core.dll"
