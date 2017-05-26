@@ -8,16 +8,23 @@ open System
 open System.IO
 open System.Xml.Linq
 
+type BlobMetadata internal (properties:Blob.BlobProperties) =
+    let lastModified = properties.LastModified |> Option.ofNullable    
+    member __.CacheControl = properties.CacheControl
+    member __.ContentDisposition = properties.ContentDisposition
+    member __.ContentEncoding = properties.ContentEncoding
+    member __.ContentLanguage = properties.ContentLanguage
+    member __.ContentMD5 = properties.ContentMD5
+    member __.ContentType = properties.ContentType
+    member __.ETag = properties.ETag
+    member __.IsServerEncrypted = properties.IsServerEncrypted
+    member __.LastModified = lastModified
+    member __.Size = properties.Length
+
 /// Represents a file in blob storage.
 [<AbstractClass>]
 type BlobFile internal (defaultConnectionString, container, file, getBlobRef : _ -> ICloudBlob) =
     let getBlobRef connectionString = getBlobRef (defaultArg connectionString defaultConnectionString, container, file)
-    let blobProperties =
-        lazy
-            let blobRef = getBlobRef None
-            blobRef.FetchAttributes()
-            blobRef.Properties
-
     member private __.BlobRef connectionString = getBlobRef connectionString
     
     /// Gets a handle to the Azure SDK client for this blob.
@@ -58,16 +65,22 @@ type BlobFile internal (defaultConnectionString, container, file, getBlobRef : _
             | None -> this.OpenStreamAsText()
         while not stream.EndOfStream do
             yield stream.ReadLine() }
+  
+    /// Fetches the latest metadata for the blob.
+    member __.GetProperties(?connectionString) = async {
+        let blobRef = getBlobRef connectionString
+        do! blobRef.FetchAttributesAsync() |> Async.AwaitTask
+        return BlobMetadata blobRef.Properties }
 
     /// Gets the blob size in bytes.
-    member __.Size(?connectionString) =
-        match connectionString with
-        | Some _ ->
-            let blobRef = getBlobRef connectionString
-            blobRef.FetchAttributes()
-            blobRef.Properties
-        | None -> blobProperties.Value
-        |> fun props -> props.Length
+    member this.Size(?connectionString) =
+        async {
+            let! metadata =
+                match connectionString with
+                | Some connectionString -> this.GetProperties connectionString
+                | None -> this.GetProperties()
+            return metadata.Size }
+        |> Async.RunSynchronously
 
     /// Gets the name of the blob
     member __.Name with get() = (getBlobRef None).Name

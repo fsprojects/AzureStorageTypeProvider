@@ -50,7 +50,9 @@ let testFolderDownload download expectedFiles expectedFolders =
 let blobMainTests =
     testList "Blob Main Tests" [
         testCase "Correctly gets size of a blob" (fun _ -> container .``sample.txt``.Size() |> shouldEqual 190L)
-
+        testCase "Correctly gets metadata for a blob" (fun _ ->
+            let metadata = container .``sample.txt``.GetProperties() |> Async.RunSynchronously
+            metadata.Size |> shouldEqual 190L)
         testCase "Reads a text file as text" (fun _ ->
             let text = container .``sample.txt``.Read()
             text |> shouldEqual "the quick brown fox jumps over the lazy dog\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Cras malesuada.\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla porttitor." )
