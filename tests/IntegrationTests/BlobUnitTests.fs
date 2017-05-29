@@ -90,6 +90,14 @@ let blobMainTests =
             let blob = container.``pageData.bin``.AsCloudPageBlob()
             blob.Name |> shouldEqual "pageData.bin")
 
+        testCase "Correctly transforms metadata for a blob container" (fun _ ->
+            let underlyingContainer = container.AsCloudBlobContainer()
+            underlyingContainer.FetchAttributes()
+            
+            let metadata = container.GetProperties() |> Async.RunSynchronously
+            metadata.LastModified |> shouldEqual (underlyingContainer.Properties.LastModified |> Option.ofNullable)
+        )
+
         testCase "Page Blobs calculate size correctly" (fun _ -> container.``pageData.bin``.Size() |> shouldEqual 512L)
         testCase "Can correctly download a block blob" (fun _ -> testFileDownload container.``file1.txt``)
         testCase "Can correctly download a page blob" (fun _ -> testFileDownload container.``pageData.bin``)
