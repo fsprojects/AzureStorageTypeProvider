@@ -9,7 +9,11 @@ open System.IO
 open System.Xml.Linq
 
 type BlobMetadata internal (properties:Blob.BlobProperties) =
-    let lastModified = properties.LastModified |> Option.ofNullable    
+    let lastModified = properties.LastModified |> Option.ofNullable
+    let appendBlobCommittedBlockCount = properties.AppendBlobCommittedBlockCount |> Option.ofNullable
+    let pageBlobSequenceNumber = properties.PageBlobSequenceNumber |> Option.ofNullable
+    member __.AppendBlobCommittedBlockCount = appendBlobCommittedBlockCount
+    member __.BlobType = properties.BlobType
     member __.CacheControl = properties.CacheControl
     member __.ContentDisposition = properties.ContentDisposition
     member __.ContentEncoding = properties.ContentEncoding
@@ -19,7 +23,12 @@ type BlobMetadata internal (properties:Blob.BlobProperties) =
     member __.ETag = properties.ETag
     member __.IsServerEncrypted = properties.IsServerEncrypted
     member __.LastModified = lastModified
+    member __.LeaseDuration = properties.LeaseDuration
+    member __.LeaseState = properties.LeaseState
+    member __.LeaseStatus = properties.LeaseStatus
     member __.Size = properties.Length
+    member __.PageBlobSequenceNumber = pageBlobSequenceNumber
+
 
 /// Represents a file in blob storage.
 [<AbstractClass>]
