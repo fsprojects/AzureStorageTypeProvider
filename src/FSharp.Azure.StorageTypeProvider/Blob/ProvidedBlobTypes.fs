@@ -9,7 +9,11 @@ open System.IO
 open System.Xml.Linq
 
 type BlobMetadata internal (properties:Blob.BlobProperties) =
-    let lastModified = properties.LastModified |> Option.ofNullable    
+    let lastModified = properties.LastModified |> Option.ofNullable
+    let appendBlobCommittedBlockCount = properties.AppendBlobCommittedBlockCount |> Option.ofNullable
+    let pageBlobSequenceNumber = properties.PageBlobSequenceNumber |> Option.ofNullable
+    member __.AppendBlobCommittedBlockCount = appendBlobCommittedBlockCount
+    member __.BlobType = properties.BlobType
     member __.CacheControl = properties.CacheControl
     member __.ContentDisposition = properties.ContentDisposition
     member __.ContentEncoding = properties.ContentEncoding
@@ -19,7 +23,19 @@ type BlobMetadata internal (properties:Blob.BlobProperties) =
     member __.ETag = properties.ETag
     member __.IsServerEncrypted = properties.IsServerEncrypted
     member __.LastModified = lastModified
+    member __.LeaseDuration = properties.LeaseDuration
+    member __.LeaseState = properties.LeaseState
+    member __.LeaseStatus = properties.LeaseStatus
     member __.Size = properties.Length
+    member __.PageBlobSequenceNumber = pageBlobSequenceNumber
+
+type BlobContainerMetadata internal (properties:Blob.BlobContainerProperties) =
+    let lastModified = properties.LastModified |> Option.ofNullable    
+    member __.ETag = properties.ETag
+    member __.LastModified = lastModified
+    member __.LeaseStatus = properties.LeaseStatus
+    member __.LeaseState = properties.LeaseState
+    member __.LeaseDuration = properties.LeaseDuration
 
 /// Represents a file in blob storage.
 [<AbstractClass>]
@@ -193,9 +209,10 @@ type BlobFolder internal (defaultConnectionString, container, file) =
 type BlobContainer internal (defaultConnectionString, container) =
     let getSafe getBlob connectionString path = BlobBuilder.getSafe defaultConnectionString container getBlob connectionString path
     let listBlobs = BlobBuilder.listBlobs defaultConnectionString container ""
+    let getBlobContainerRef connectionString = getContainerRef(defaultArg connectionString defaultConnectionString, container)
 
     /// Gets a handle to the Azure SDK client for this container.
-    member __.AsCloudBlobContainer(?connectionString) = getContainerRef(defaultArg connectionString defaultConnectionString, container)
+    member __.AsCloudBlobContainer(?connectionString) = getBlobContainerRef connectionString
 
     /// Downloads the entire container contents to the local file system asynchronously.
     member __.Download(path, ?connectionString) = 
@@ -224,6 +241,11 @@ type BlobContainer internal (defaultConnectionString, container) =
     member __.TryGetPageBlob(path, ?connectionString) = getSafe BlobBuilder.createPageBlobFile connectionString path
     /// Lists all blobs contained in this container.
     member __.ListBlobs(?includeSubfolders, ?connectionString) = listBlobs includeSubfolders connectionString
+    /// Fetches the latest metadata for the blob container.
+    member __.GetProperties(?connectionString) = async {
+        let containerRef = getBlobContainerRef connectionString
+        do! containerRef.FetchAttributesAsync() |> Async.AwaitTask
+        return BlobContainerMetadata containerRef.Properties }
 
 module internal ProvidedTypeGenerator = 
     let generateTypes() = 
