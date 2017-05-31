@@ -1,4 +1,4 @@
-#I "lib/net40"
+#I "lib/net452"
 
 #r "Microsoft.Data.OData.dll"
 #r "Microsoft.Data.Services.Client.dll"

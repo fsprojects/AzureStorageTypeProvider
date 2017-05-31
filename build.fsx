@@ -136,7 +136,7 @@ Target "NuGet"
                          ([ "FSharp.Azure.StorageTypeProvider.xml"; "FSharp.Azure.StorageTypeProvider.dll"; "Microsoft.Azure.KeyVault.Core.dll"
                             "Microsoft.Data.Edm.dll"; "Microsoft.Data.OData.dll"; "Microsoft.Data.Services.Client.dll";
                             "Microsoft.WindowsAzure.Storage.dll"; "Newtonsoft.Json.dll"; "System.Spatial.dll" ] 
-                          |> List.map (fun file -> @"..\bin\" + file, Some "lib/net40", None))
+                          |> List.map (fun file -> @"..\bin\" + file, Some "lib/net452", None))
                           @ [ "StorageTypeProvider.fsx", None, None ] }) 
               ("nuget/" + project + ".nuspec"))
 
