@@ -71,8 +71,13 @@
 ### 1.9.0 - 6th May 2017
 * Better support for programmatic blob access
 * Static Table schema support
-* BREAKING CHANGE: Size property on Blobs now take in an optional connection string.
+* BREAKING CHANGE: Size property on Blobs changed to a method.
 * BREAKING CHANGE: Reworked static Blob schema
 
 ### 1.9.1 - 8th May 2017
 * Support for specifying blob type in blob schema definition.
+
+### 1.9.2 - 31st May 2017
+* Support for MIME type assignment on blob upload.
+* Support for blob file and container properties
+* Upgrade to Azure Storage 7.2.1
