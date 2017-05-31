@@ -61,24 +61,24 @@ provided.</p>
 <span class="l">17: </span>
 <span class="l">18: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 1)" onmouseover="showTip(event, 'fs1', 1)" class="i">FSharp</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs2', 2)" onmouseover="showTip(event, 'fs2', 2)" class="i">Azure</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs3', 3)" onmouseover="showTip(event, 'fs3', 3)" class="i">StorageTypeProvider</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">open</span> <span class="i">FSharp</span><span class="o">.</span><span class="i">Azure</span><span class="o">.</span><span class="i">StorageTypeProvider</span>
 
 <span class="c">// Get a handle to my local storage emulator</span>
-<span class="k">type</span> <span onmouseout="hideTip(event, 'fs4', 4)" onmouseover="showTip(event, 'fs4', 4)" class="t">Azure</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs5', 5)" onmouseover="showTip(event, 'fs5', 5)" class="t">AzureTypeProvider</span><span class="o">&lt;</span><span class="s">&quot;UseDevelopmentStorage=true&quot;</span><span class="o">&gt;</span>
+<span class="k">type</span> <span class="i">Azure</span> <span class="o">=</span> <span class="i">AzureTypeProvider</span><span class="o">&lt;</span><span class="s">&quot;UseDevelopmentStorage=true&quot;</span><span class="o">&gt;</span>
 
 <span class="c">// Navigate through the containers to a specific file and read the contents.</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs6', 6)" onmouseover="showTip(event, 'fs6', 6)" class="i">blobContents</span> <span class="o">=</span>
-    <span onmouseout="hideTip(event, 'fs4', 7)" onmouseover="showTip(event, 'fs4', 7)" class="t">Azure</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 8)" onmouseover="showTip(event, 'fs7', 8)" class="i">Containers</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs8', 9)" onmouseover="showTip(event, 'fs8', 9)" class="i">samples</span><span class="o">.</span><span class="i">``folder/``</span><span class="o">.</span><span class="i">``childFile.txt``</span><span class="o">.</span><span class="f">Read</span>()
+<span class="k">let</span> <span class="i">blobContents</span> <span class="o">=</span>
+    <span class="i">Azure</span><span class="o">.</span><span class="i">Containers</span><span class="o">.</span><span class="i">samples</span><span class="o">.</span><span class="i">``folder/``</span><span class="o">.</span><span class="i">``childFile.txt``</span><span class="o">.</span><span class="i">Read</span>()
 
 <span class="c">// Perform a strongly-typed query against a table with automatic schema generation.</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs9', 10)" onmouseover="showTip(event, 'fs9', 10)" class="i">results</span> <span class="o">=</span>
-    <span onmouseout="hideTip(event, 'fs4', 11)" onmouseover="showTip(event, 'fs4', 11)" class="t">Azure</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs10', 12)" onmouseover="showTip(event, 'fs10', 12)" class="i">Tables</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs11', 13)" onmouseover="showTip(event, 'fs11', 13)" class="i">employee</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 14)" onmouseover="showTip(event, 'fs12', 14)" class="f">Query</span>()
-         <span class="o">.</span><span class="i">``Where Name Is``</span><span class="o">.</span><span class="f">``Equal To``</span>(<span class="s">&quot;fred&quot;</span>)
-         <span class="o">.</span><span class="f">Execute</span>()
-         <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs13', 15)" onmouseover="showTip(event, 'fs13', 15)" class="t">Array</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs14', 16)" onmouseover="showTip(event, 'fs14', 16)" class="f">map</span>(<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs15', 17)" onmouseover="showTip(event, 'fs15', 17)" class="i">row</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs15', 18)" onmouseover="showTip(event, 'fs15', 18)" class="i">row</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs16', 19)" onmouseover="showTip(event, 'fs16', 19)" class="i">Name</span>, <span onmouseout="hideTip(event, 'fs15', 20)" onmouseover="showTip(event, 'fs15', 20)" class="i">row</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 21)" onmouseover="showTip(event, 'fs17', 21)" class="i">Dob</span>)
+<span class="k">let</span> <span class="i">results</span> <span class="o">=</span>
+    <span class="i">Azure</span><span class="o">.</span><span class="i">Tables</span><span class="o">.</span><span class="i">employee</span><span class="o">.</span><span class="i">Query</span>()
+         <span class="o">.</span><span class="i">``Where Name Is``</span><span class="o">.</span><span class="i">``Equal To``</span>(<span class="s">&quot;fred&quot;</span>)
+         <span class="o">.</span><span class="i">Execute</span>()
+         <span class="o">|&gt;</span> <span class="i">Array</span><span class="o">.</span><span class="i">map</span>(<span class="k">fun</span> <span class="i">row</span> <span class="k">-&gt;</span> <span class="i">row</span><span class="o">.</span><span class="i">Name</span>, <span class="i">row</span><span class="o">.</span><span class="i">Dob</span>)
 
 <span class="c">// Navigate through storage queues and get messages</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs18', 22)" onmouseover="showTip(event, 'fs18', 22)" class="i">queueMessage</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs4', 23)" onmouseover="showTip(event, 'fs4', 23)" class="t">Azure</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs19', 24)" onmouseover="showTip(event, 'fs19', 24)" class="i">Queues</span><span class="o">.</span><span class="i">``sample-queue``</span><span class="o">.</span><span class="f">Dequeue</span>()
+<span class="k">let</span> <span class="i">queueMessage</span> <span class="o">=</span> <span class="i">Azure</span><span class="o">.</span><span class="i">Queues</span><span class="o">.</span><span class="i">``sample-queue``</span><span class="o">.</span><span class="i">Dequeue</span>()
 </code></pre></td>
 </tr>
 </table>
@@ -105,25 +105,6 @@ also want to read the <a href="https://github.com/fsprojects/FSharp.ProjectScaff
 redistribution for both commercial and non-commercial purposes. For more information see the
 <a href="https://github.com/fsprojects/FSharp.ProjectScaffold/blob/master/LICENSE.txt">License file</a> in the GitHub repository.</p>
 
-<div class="tip" id="fs1">Multiple items<br />namespace FSharp<br /><br />--------------------<br />namespace Microsoft.FSharp</div>
-<div class="tip" id="fs2">namespace FSharp.Azure</div>
-<div class="tip" id="fs3">namespace FSharp.Azure.StorageTypeProvider</div>
-<div class="tip" id="fs4">type Azure = AzureTypeProvider&lt;...&gt;<br /><br />Full name: Index.Azure</div>
-<div class="tip" id="fs5">type AzureTypeProvider<br /><br />Full name: FSharp.Azure.StorageTypeProvider.AzureTypeProvider<br /><em><br /><br />The entry type to connect to Azure Storage assets.</em></div>
-<div class="tip" id="fs6">val blobContents : string<br /><br />Full name: Index.blobContents</div>
-<div class="tip" id="fs7">property AzureTypeProvider&lt;...&gt;.Containers: AzureTypeProvider&lt;...&gt;.Domain.Containers<br /><em><br /><br />Gets the list of all containers in this storage account.</em></div>
-<div class="tip" id="fs8">property AzureTypeProvider&lt;...&gt;.Domain.Containers.samples: AzureTypeProvider&lt;...&gt;.Domain.samplesContainer<br /><em><br /><br />Provides access to the &#39;samples&#39; container.</em></div>
-<div class="tip" id="fs9">val results : (string * System.DateTime) []<br /><br />Full name: Index.results</div>
-<div class="tip" id="fs10">property AzureTypeProvider&lt;...&gt;.Tables: AzureTypeProvider&lt;...&gt;.Domain.Tables<br /><em><br /><br />Gets the list of all tables in this storage account.</em></div>
-<div class="tip" id="fs11">property AzureTypeProvider&lt;...&gt;.Domain.Tables.employee: AzureTypeProvider&lt;...&gt;.Domain.employeeTable<br /><em><br /><br />Provides access to the &#39;employee&#39; table.</em></div>
-<div class="tip" id="fs12">AzureTypeProvider&lt;...&gt;.Domain.employeeTable.Query() : AzureTypeProvider&lt;...&gt;.Domain.employeeQueryBuilder<br /><em><br /><br />Creates a strongly-typed query against the table.</em><br />AzureTypeProvider&lt;...&gt;.Domain.employeeTable.Query(rawQuery: string, ?connectionString: string) : AzureTypeProvider&lt;...&gt;.Domain.employeeEntity []<br /><em><br /><br />Executes a weakly-type query and returns the results in the shape for this table.</em></div>
-<div class="tip" id="fs13">module Array<br /><br />from Microsoft.FSharp.Collections</div>
-<div class="tip" id="fs14">val map : mapping:(&#39;T -&gt; &#39;U) -&gt; array:&#39;T [] -&gt; &#39;U []<br /><br />Full name: Microsoft.FSharp.Collections.Array.map</div>
-<div class="tip" id="fs15">val row : AzureTypeProvider&lt;...&gt;.Domain.employeeEntity</div>
-<div class="tip" id="fs16">property AzureTypeProvider&lt;...&gt;.Domain.employeeEntity.Name: string<br /><em><br /><br />Returns the value of the &#39;Name&#39; property</em></div>
-<div class="tip" id="fs17">property AzureTypeProvider&lt;...&gt;.Domain.employeeEntity.Dob: System.DateTime<br /><em><br /><br />Returns the value of the &#39;Dob&#39; property</em></div>
-<div class="tip" id="fs18">val queueMessage : Async&lt;Queue.ProvidedQueueMessage option&gt;<br /><br />Full name: Index.queueMessage</div>
-<div class="tip" id="fs19">property AzureTypeProvider&lt;...&gt;.Queues: AzureTypeProvider&lt;...&gt;.Domain.Queues<br /><em><br /><br />Gets the list of all queues in this storage account.</em></div>
 
             </div>
             <div class="span3">

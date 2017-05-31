@@ -46,9 +46,9 @@ page and block blobs.</p>
 <span class="l">2: </span>
 <span class="l">3: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs10', 14)" onmouseover="showTip(event, 'fs10', 14)" class="i">container</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 15)" onmouseover="showTip(event, 'fs8', 15)" class="t">Azure</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs11', 16)" onmouseover="showTip(event, 'fs11', 16)" class="i">Containers</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 17)" onmouseover="showTip(event, 'fs12', 17)" class="i">samples</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs13', 18)" onmouseover="showTip(event, 'fs13', 18)" class="i">theBlob</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs10', 19)" onmouseover="showTip(event, 'fs10', 19)" class="i">container</span><span class="o">.</span><span class="i">``folder/``</span><span class="o">.</span><span class="i">``childFile.txt``</span>
-<span onmouseout="hideTip(event, 'fs14', 20)" onmouseover="showTip(event, 'fs14', 20)" class="f">printfn</span> <span class="s">&quot;Blob &#39;</span><span class="pf">%s</span><span class="s">&#39; is </span><span class="pf">%d</span><span class="s"> bytes big.&quot;</span> <span onmouseout="hideTip(event, 'fs13', 21)" onmouseover="showTip(event, 'fs13', 21)" class="i">theBlob</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs15', 22)" onmouseover="showTip(event, 'fs15', 22)" class="i">Name</span> (<span onmouseout="hideTip(event, 'fs13', 23)" onmouseover="showTip(event, 'fs13', 23)" class="i">theBlob</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs16', 24)" onmouseover="showTip(event, 'fs16', 24)" class="f">Size</span>())
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">container</span> <span class="o">=</span> <span class="i">Azure</span><span class="o">.</span><span class="i">Containers</span><span class="o">.</span><span class="i">samples</span>
+<span class="k">let</span> <span class="i">theBlob</span> <span class="o">=</span> <span class="i">container</span><span class="o">.</span><span class="i">``folder/``</span><span class="o">.</span><span class="i">``childFile.txt``</span>
+<span class="i">printfn</span> <span class="s">&quot;Blob &#39;%s&#39; is %d bytes big.&quot;</span> <span class="i">theBlob</span><span class="o">.</span><span class="i">Name</span> (<span class="i">theBlob</span><span class="o">.</span><span class="i">Size</span>())
 </code></pre></td>
 </tr>
 </table>
@@ -58,9 +58,9 @@ page and block blobs.</p>
 <span class="l">2: </span>
 <span class="l">3: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs17', 25)" onmouseover="showTip(event, 'fs17', 25)" class="i">folder</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs10', 26)" onmouseover="showTip(event, 'fs10', 26)" class="i">container</span><span class="o">.</span><span class="i">``folder2/``</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs18', 27)" onmouseover="showTip(event, 'fs18', 27)" class="i">blobs</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs17', 28)" onmouseover="showTip(event, 'fs17', 28)" class="i">folder</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs19', 29)" onmouseover="showTip(event, 'fs19', 29)" class="f">ListBlobs</span>(<span class="k">true</span>)
-<span onmouseout="hideTip(event, 'fs14', 30)" onmouseover="showTip(event, 'fs14', 30)" class="f">printfn</span> <span class="s">&quot;Folder &#39;</span><span class="pf">%s</span><span class="s">&#39; has the following blobs: </span><span class="pf">%A</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs17', 31)" onmouseover="showTip(event, 'fs17', 31)" class="i">folder</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 32)" onmouseover="showTip(event, 'fs20', 32)" class="i">Path</span> <span onmouseout="hideTip(event, 'fs18', 33)" onmouseover="showTip(event, 'fs18', 33)" class="i">blobs</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">folder</span> <span class="o">=</span> <span class="i">container</span><span class="o">.</span><span class="i">``folder2/``</span>
+<span class="k">let</span> <span class="i">blobs</span> <span class="o">=</span> <span class="i">folder</span><span class="o">.</span><span class="i">ListBlobs</span>(<span class="k">true</span>)
+<span class="i">printfn</span> <span class="s">&quot;Folder &#39;%s&#39; has the following blobs: %A&quot;</span> <span class="i">folder</span><span class="o">.</span><span class="i">Path</span> <span class="i">blobs</span>
 </code></pre></td>
 </tr>
 </table>
@@ -79,14 +79,14 @@ page and block blobs.</p>
 <span class="l">7: </span>
 <span class="l">8: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs21', 34)" onmouseover="showTip(event, 'fs21', 34)" class="i">totalSize</span> <span class="o">=</span>
-    [ <span onmouseout="hideTip(event, 'fs10', 35)" onmouseover="showTip(event, 'fs10', 35)" class="i">container</span><span class="o">.</span><span class="i">``file1.txt``</span>
-      <span onmouseout="hideTip(event, 'fs10', 36)" onmouseover="showTip(event, 'fs10', 36)" class="i">container</span><span class="o">.</span><span class="i">``file2.txt``</span>
-      <span onmouseout="hideTip(event, 'fs10', 37)" onmouseover="showTip(event, 'fs10', 37)" class="i">container</span><span class="o">.</span><span class="i">``file3.txt``</span>
-      <span onmouseout="hideTip(event, 'fs10', 38)" onmouseover="showTip(event, 'fs10', 38)" class="i">container</span><span class="o">.</span><span class="i">``sample.txt``</span> ]
-    <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs22', 39)" onmouseover="showTip(event, 'fs22', 39)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs23', 40)" onmouseover="showTip(event, 'fs23', 40)" class="f">sumBy</span>(<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs24', 41)" onmouseover="showTip(event, 'fs24', 41)" class="i">blob</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs24', 42)" onmouseover="showTip(event, 'fs24', 42)" class="i">blob</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs16', 43)" onmouseover="showTip(event, 'fs16', 43)" class="f">Size</span>())
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">totalSize</span> <span class="o">=</span>
+    [ <span class="i">container</span><span class="o">.</span><span class="i">``file1.txt``</span>
+      <span class="i">container</span><span class="o">.</span><span class="i">``file2.txt``</span>
+      <span class="i">container</span><span class="o">.</span><span class="i">``file3.txt``</span>
+      <span class="i">container</span><span class="o">.</span><span class="i">``sample.txt``</span> ]
+    <span class="o">|&gt;</span> <span class="i">List</span><span class="o">.</span><span class="i">sumBy</span>(<span class="k">fun</span> <span class="i">blob</span> <span class="k">-&gt;</span> <span class="i">blob</span><span class="o">.</span><span class="i">Size</span>())
 
-<span onmouseout="hideTip(event, 'fs14', 44)" onmouseover="showTip(event, 'fs14', 44)" class="f">printfn</span> <span class="s">&quot;These files take up </span><span class="pf">%d</span><span class="s"> bytes.&quot;</span> <span onmouseout="hideTip(event, 'fs21', 45)" onmouseover="showTip(event, 'fs21', 45)" class="i">totalSize</span>
+<span class="i">printfn</span> <span class="s">&quot;These files take up %d bytes.&quot;</span> <span class="i">totalSize</span>
 </code></pre></td>
 </tr>
 </table>
@@ -104,14 +104,14 @@ page and block blobs.</p>
 <span class="l">9: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// sync read</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs25', 46)" onmouseover="showTip(event, 'fs25', 46)" class="i">contents</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs13', 47)" onmouseover="showTip(event, 'fs13', 47)" class="i">theBlob</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs26', 48)" onmouseover="showTip(event, 'fs26', 48)" class="f">Read</span>()
-<span onmouseout="hideTip(event, 'fs14', 49)" onmouseover="showTip(event, 'fs14', 49)" class="f">printfn</span> <span class="s">&quot;sync contents = &#39;</span><span class="pf">%s</span><span class="s">&#39;&quot;</span> <span onmouseout="hideTip(event, 'fs25', 50)" onmouseover="showTip(event, 'fs25', 50)" class="i">contents</span>
+<span class="k">let</span> <span class="i">contents</span> <span class="o">=</span> <span class="i">theBlob</span><span class="o">.</span><span class="i">Read</span>()
+<span class="i">printfn</span> <span class="s">&quot;sync contents = &#39;%s&#39;&quot;</span> <span class="i">contents</span>
 
 <span class="c">// async read</span>
-<span onmouseout="hideTip(event, 'fs27', 51)" onmouseover="showTip(event, 'fs27', 51)" class="i">async</span> {
-    <span class="k">let!</span> <span onmouseout="hideTip(event, 'fs28', 52)" onmouseover="showTip(event, 'fs28', 52)" class="i">contentsAsync</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs13', 53)" onmouseover="showTip(event, 'fs13', 53)" class="i">theBlob</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs29', 54)" onmouseover="showTip(event, 'fs29', 54)" class="f">ReadAsync</span>()
-    <span onmouseout="hideTip(event, 'fs14', 55)" onmouseover="showTip(event, 'fs14', 55)" class="f">printfn</span> <span class="s">&quot;async contents = &#39;</span><span class="pf">%s</span><span class="s">&#39;&quot;</span> <span onmouseout="hideTip(event, 'fs28', 56)" onmouseover="showTip(event, 'fs28', 56)" class="i">contentsAsync</span>
-} <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs30', 57)" onmouseover="showTip(event, 'fs30', 57)" class="t">Async</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs31', 58)" onmouseover="showTip(event, 'fs31', 58)" class="f">RunSynchronously</span>
+<span class="i">async</span> {
+    <span class="k">let!</span> <span class="i">contentsAsync</span> <span class="o">=</span> <span class="i">theBlob</span><span class="o">.</span><span class="i">ReadAsync</span>()
+    <span class="i">printfn</span> <span class="s">&quot;async contents = &#39;%s&#39;&quot;</span> <span class="i">contentsAsync</span>
+} <span class="o">|&gt;</span> <span class="i">Async</span><span class="o">.</span><span class="i">RunSynchronously</span>
 </code></pre></td>
 </tr>
 </table>
@@ -125,12 +125,12 @@ async contents = 'child file stuff'</code></pre></td></tr></table>
 <span class="l">5: </span>
 <span class="l">6: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> (<span onmouseout="hideTip(event, 'fs32', 59)" onmouseover="showTip(event, 'fs32', 59)" class="i">contentsAsText</span><span class="o">:</span><span onmouseout="hideTip(event, 'fs33', 60)" onmouseover="showTip(event, 'fs33', 60)" class="t">string</span>) <span class="o">=</span> <span onmouseout="hideTip(event, 'fs10', 61)" onmouseover="showTip(event, 'fs10', 61)" class="i">container</span><span class="o">.</span><span class="i">``data.xml``</span><span class="o">.</span><span class="f">Read</span>()
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> (<span class="i">contentsAsText</span><span class="o">:</span><span class="i">string</span>) <span class="o">=</span> <span class="i">container</span><span class="o">.</span><span class="i">``data.xml``</span><span class="o">.</span><span class="i">Read</span>()
 <span class="c">// only available on XML documents</span>
-<span class="k">let</span> (<span onmouseout="hideTip(event, 'fs34', 62)" onmouseover="showTip(event, 'fs34', 62)" class="i">contentsAsXml</span><span class="o">:</span><span onmouseout="hideTip(event, 'fs35', 63)" onmouseover="showTip(event, 'fs35', 63)" class="t">XDocument</span>) <span class="o">=</span> <span onmouseout="hideTip(event, 'fs10', 64)" onmouseover="showTip(event, 'fs10', 64)" class="i">container</span><span class="o">.</span><span class="i">``data.xml``</span><span class="o">.</span><span class="f">ReadAsXDocument</span>()
+<span class="k">let</span> (<span class="i">contentsAsXml</span><span class="o">:</span><span class="i">XDocument</span>) <span class="o">=</span> <span class="i">container</span><span class="o">.</span><span class="i">``data.xml``</span><span class="o">.</span><span class="i">ReadAsXDocument</span>()
 
-<span onmouseout="hideTip(event, 'fs14', 65)" onmouseover="showTip(event, 'fs14', 65)" class="f">printfn</span> <span class="s">&quot;text output = &#39;</span><span class="pf">%O</span><span class="s">&#39;&quot;</span> <span onmouseout="hideTip(event, 'fs32', 66)" onmouseover="showTip(event, 'fs32', 66)" class="i">contentsAsText</span>
-<span onmouseout="hideTip(event, 'fs14', 67)" onmouseover="showTip(event, 'fs14', 67)" class="f">printfn</span> <span class="s">&quot;xml output = &#39;</span><span class="pf">%O</span><span class="s">&#39;&quot;</span> <span onmouseout="hideTip(event, 'fs34', 68)" onmouseover="showTip(event, 'fs34', 68)" class="i">contentsAsXml</span>
+<span class="i">printfn</span> <span class="s">&quot;text output = &#39;%O&#39;&quot;</span> <span class="i">contentsAsText</span>
+<span class="i">printfn</span> <span class="s">&quot;xml output = &#39;%O&#39;&quot;</span> <span class="i">contentsAsXml</span>
 </code></pre></td>
 </tr>
 </table>
@@ -147,9 +147,9 @@ This is extremely useful for previewing large files etc.</p>
 <span class="l">2: </span>
 <span class="l">3: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs36', 69)" onmouseover="showTip(event, 'fs36', 69)" class="i">streamReader</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs10', 70)" onmouseover="showTip(event, 'fs10', 70)" class="i">container</span><span class="o">.</span><span class="i">``sample.txt``</span><span class="o">.</span><span class="f">OpenStreamAsText</span>()
-<span class="k">while</span> (<span onmouseout="hideTip(event, 'fs37', 71)" onmouseover="showTip(event, 'fs37', 71)" class="f">not</span> <span onmouseout="hideTip(event, 'fs36', 72)" onmouseover="showTip(event, 'fs36', 72)" class="i">streamReader</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs38', 73)" onmouseover="showTip(event, 'fs38', 73)" class="i">EndOfStream</span>) <span class="k">do</span>
-    <span onmouseout="hideTip(event, 'fs14', 74)" onmouseover="showTip(event, 'fs14', 74)" class="f">printfn</span> <span class="s">&quot;LINE: &#39;</span><span class="pf">%s</span><span class="s">&#39;&quot;</span> (<span onmouseout="hideTip(event, 'fs36', 75)" onmouseover="showTip(event, 'fs36', 75)" class="i">streamReader</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs39', 76)" onmouseover="showTip(event, 'fs39', 76)" class="f">ReadLine</span>())
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">streamReader</span> <span class="o">=</span> <span class="i">container</span><span class="o">.</span><span class="i">``sample.txt``</span><span class="o">.</span><span class="i">OpenStreamAsText</span>()
+<span class="k">while</span> (<span class="i">not</span> <span class="i">streamReader</span><span class="o">.</span><span class="i">EndOfStream</span>) <span class="k">do</span>
+    <span class="i">printfn</span> <span class="s">&quot;LINE: &#39;%s&#39;&quot;</span> (<span class="i">streamReader</span><span class="o">.</span><span class="i">ReadLine</span>())
 </code></pre></td>
 </tr>
 </table>
@@ -169,17 +169,17 @@ LINE: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla porttitor.
 <span class="l">10: </span>
 <span class="l">11: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs40', 77)" onmouseover="showTip(event, 'fs40', 77)" class="i">lines</span> <span class="o">=</span>
-    [ <span onmouseout="hideTip(event, 'fs10', 78)" onmouseover="showTip(event, 'fs10', 78)" class="i">container</span><span class="o">.</span><span class="i">``file1.txt``</span>
-      <span onmouseout="hideTip(event, 'fs10', 79)" onmouseover="showTip(event, 'fs10', 79)" class="i">container</span><span class="o">.</span><span class="i">``file2.txt``</span>
-      <span onmouseout="hideTip(event, 'fs10', 80)" onmouseover="showTip(event, 'fs10', 80)" class="i">container</span><span class="o">.</span><span class="i">``file3.txt``</span>
-      <span onmouseout="hideTip(event, 'fs10', 81)" onmouseover="showTip(event, 'fs10', 81)" class="i">container</span><span class="o">.</span><span class="i">``sample.txt``</span> ]
-    <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs41', 82)" onmouseover="showTip(event, 'fs41', 82)" class="t">Seq</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs42', 83)" onmouseover="showTip(event, 'fs42', 83)" class="f">collect</span>(<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs43', 84)" onmouseover="showTip(event, 'fs43', 84)" class="i">file</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs43', 85)" onmouseover="showTip(event, 'fs43', 85)" class="i">file</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs44', 86)" onmouseover="showTip(event, 'fs44', 86)" class="f">ReadLines</span>()) <span class="c">// could also use yield! syntax within a seq { }</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">lines</span> <span class="o">=</span>
+    [ <span class="i">container</span><span class="o">.</span><span class="i">``file1.txt``</span>
+      <span class="i">container</span><span class="o">.</span><span class="i">``file2.txt``</span>
+      <span class="i">container</span><span class="o">.</span><span class="i">``file3.txt``</span>
+      <span class="i">container</span><span class="o">.</span><span class="i">``sample.txt``</span> ]
+    <span class="o">|&gt;</span> <span class="i">Seq</span><span class="o">.</span><span class="i">collect</span>(<span class="k">fun</span> <span class="i">file</span> <span class="k">-&gt;</span> <span class="i">file</span><span class="o">.</span><span class="i">ReadLines</span>()) <span class="c">// could also use yield! syntax within a seq { }</span>
       
-<span onmouseout="hideTip(event, 'fs14', 87)" onmouseover="showTip(event, 'fs14', 87)" class="f">printfn</span> <span class="s">&quot;starting to read all lines&quot;</span>
-<span class="k">for</span> <span onmouseout="hideTip(event, 'fs45', 88)" onmouseover="showTip(event, 'fs45', 88)" class="i">line</span> <span class="k">in</span> <span onmouseout="hideTip(event, 'fs40', 89)" onmouseover="showTip(event, 'fs40', 89)" class="i">lines</span> <span class="k">do</span>
-    <span onmouseout="hideTip(event, 'fs14', 90)" onmouseover="showTip(event, 'fs14', 90)" class="f">printfn</span> <span class="s">&quot;</span><span class="pf">%s</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs45', 91)" onmouseover="showTip(event, 'fs45', 91)" class="i">line</span>
-<span onmouseout="hideTip(event, 'fs14', 92)" onmouseover="showTip(event, 'fs14', 92)" class="f">printfn</span> <span class="s">&quot;finished reading all lines&quot;</span>
+<span class="i">printfn</span> <span class="s">&quot;starting to read all lines&quot;</span>
+<span class="k">for</span> <span class="i">line</span> <span class="k">in</span> <span class="i">lines</span> <span class="k">do</span>
+    <span class="i">printfn</span> <span class="s">&quot;%s&quot;</span> <span class="i">line</span>
+<span class="i">printfn</span> <span class="s">&quot;finished reading all lines&quot;</span>
 </code></pre></td>
 </tr>
 </table>
@@ -201,8 +201,8 @@ override as normal at runtime.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">type</span> <span onmouseout="hideTip(event, 'fs46', 93)" onmouseover="showTip(event, 'fs46', 93)" class="t">BlobSchema</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs9', 94)" onmouseover="showTip(event, 'fs9', 94)" class="t">AzureTypeProvider</span><span class="o">&lt;</span><span class="i">blobSchema</span> <span class="o">=</span> <span class="s">&quot;BlobSchema.json&quot;</span><span class="o">&gt;</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs47', 95)" onmouseover="showTip(event, 'fs47', 95)" class="i">fileFromSchema</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs46', 96)" onmouseover="showTip(event, 'fs46', 96)" class="t">BlobSchema</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs11', 97)" onmouseover="showTip(event, 'fs11', 97)" class="i">Containers</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 98)" onmouseover="showTip(event, 'fs12', 98)" class="i">samples</span><span class="o">.</span><span class="i">``file3.txt``</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">type</span> <span class="i">BlobSchema</span> <span class="o">=</span> <span class="i">AzureTypeProvider</span><span class="o">&lt;</span><span class="i">blobSchema</span> <span class="o">=</span> <span class="s">&quot;BlobSchema.json&quot;</span><span class="o">&gt;</span>
+<span class="k">let</span> <span class="i">fileFromSchema</span> <span class="o">=</span> <span class="i">BlobSchema</span><span class="o">.</span><span class="i">Containers</span><span class="o">.</span><span class="i">samples</span><span class="o">.</span><span class="i">``file3.txt``</span>
 </code></pre></td>
 </tr>
 </table>
@@ -246,12 +246,12 @@ folders. These asynchronously check if the blob exists, before returning an opti
 <span class="l">5: </span>
 <span class="l">6: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs52', 103)" onmouseover="showTip(event, 'fs52', 103)" class="i">fileAsBlockBlob</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs10', 104)" onmouseover="showTip(event, 'fs10', 104)" class="i">container</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs53', 105)" onmouseover="showTip(event, 'fs53', 105)" class="f">TryGetBlockBlob</span> <span class="s">&quot;file1.txt&quot;</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs30', 106)" onmouseover="showTip(event, 'fs30', 106)" class="t">Async</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs31', 107)" onmouseover="showTip(event, 'fs31', 107)" class="f">RunSynchronously</span>
-<span onmouseout="hideTip(event, 'fs14', 108)" onmouseover="showTip(event, 'fs14', 108)" class="f">printfn</span> <span class="s">&quot;Does file1.txt exist as a block blob? </span><span class="pf">%b</span><span class="s">&quot;</span> (<span onmouseout="hideTip(event, 'fs54', 109)" onmouseover="showTip(event, 'fs54', 109)" class="t">Option</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs55', 110)" onmouseover="showTip(event, 'fs55', 110)" class="f">isSome</span> <span onmouseout="hideTip(event, 'fs52', 111)" onmouseover="showTip(event, 'fs52', 111)" class="i">fileAsBlockBlob</span>)
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs56', 112)" onmouseover="showTip(event, 'fs56', 112)" class="i">fileAsPageBlob</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs10', 113)" onmouseover="showTip(event, 'fs10', 113)" class="i">container</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs57', 114)" onmouseover="showTip(event, 'fs57', 114)" class="f">TryGetPageBlob</span> <span class="s">&quot;file1.txt&quot;</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs30', 115)" onmouseover="showTip(event, 'fs30', 115)" class="t">Async</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs31', 116)" onmouseover="showTip(event, 'fs31', 116)" class="f">RunSynchronously</span>
-<span onmouseout="hideTip(event, 'fs14', 117)" onmouseover="showTip(event, 'fs14', 117)" class="f">printfn</span> <span class="s">&quot;Does file1.txt exist as a page blob? </span><span class="pf">%b</span><span class="s">&quot;</span> (<span onmouseout="hideTip(event, 'fs54', 118)" onmouseover="showTip(event, 'fs54', 118)" class="t">Option</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs55', 119)" onmouseover="showTip(event, 'fs55', 119)" class="f">isSome</span> <span onmouseout="hideTip(event, 'fs56', 120)" onmouseover="showTip(event, 'fs56', 120)" class="i">fileAsPageBlob</span>)
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs58', 121)" onmouseover="showTip(event, 'fs58', 121)" class="i">doesNotExist</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs10', 122)" onmouseover="showTip(event, 'fs10', 122)" class="i">container</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs53', 123)" onmouseover="showTip(event, 'fs53', 123)" class="f">TryGetBlockBlob</span> <span class="s">&quot;doesNotExist&quot;</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs30', 124)" onmouseover="showTip(event, 'fs30', 124)" class="t">Async</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs31', 125)" onmouseover="showTip(event, 'fs31', 125)" class="f">RunSynchronously</span>
-<span onmouseout="hideTip(event, 'fs14', 126)" onmouseover="showTip(event, 'fs14', 126)" class="f">printfn</span> <span class="s">&quot;Does doesNotExist exist as a block blob? </span><span class="pf">%b</span><span class="s">&quot;</span> (<span onmouseout="hideTip(event, 'fs54', 127)" onmouseover="showTip(event, 'fs54', 127)" class="t">Option</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs55', 128)" onmouseover="showTip(event, 'fs55', 128)" class="f">isSome</span> <span onmouseout="hideTip(event, 'fs58', 129)" onmouseover="showTip(event, 'fs58', 129)" class="i">doesNotExist</span>)
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">fileAsBlockBlob</span> <span class="o">=</span> <span class="i">container</span><span class="o">.</span><span class="i">TryGetBlockBlob</span> <span class="s">&quot;file1.txt&quot;</span> <span class="o">|&gt;</span> <span class="i">Async</span><span class="o">.</span><span class="i">RunSynchronously</span>
+<span class="i">printfn</span> <span class="s">&quot;Does file1.txt exist as a block blob? %b&quot;</span> (<span class="i">Option</span><span class="o">.</span><span class="i">isSome</span> <span class="i">fileAsBlockBlob</span>)
+<span class="k">let</span> <span class="i">fileAsPageBlob</span> <span class="o">=</span> <span class="i">container</span><span class="o">.</span><span class="i">TryGetPageBlob</span> <span class="s">&quot;file1.txt&quot;</span> <span class="o">|&gt;</span> <span class="i">Async</span><span class="o">.</span><span class="i">RunSynchronously</span>
+<span class="i">printfn</span> <span class="s">&quot;Does file1.txt exist as a page blob? %b&quot;</span> (<span class="i">Option</span><span class="o">.</span><span class="i">isSome</span> <span class="i">fileAsPageBlob</span>)
+<span class="k">let</span> <span class="i">doesNotExist</span> <span class="o">=</span> <span class="i">container</span><span class="o">.</span><span class="i">TryGetBlockBlob</span> <span class="s">&quot;doesNotExist&quot;</span> <span class="o">|&gt;</span> <span class="i">Async</span><span class="o">.</span><span class="i">RunSynchronously</span>
+<span class="i">printfn</span> <span class="s">&quot;Does doesNotExist exist as a block blob? %b&quot;</span> (<span class="i">Option</span><span class="o">.</span><span class="i">isSome</span> <span class="i">doesNotExist</span>)
 </code></pre></td>
 </tr>
 </table>
@@ -268,10 +268,10 @@ an Azure SDK exception.</p>
 <span class="l">3: </span>
 <span class="l">4: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs59', 130)" onmouseover="showTip(event, 'fs59', 130)" class="i">newBlob</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs10', 131)" onmouseover="showTip(event, 'fs10', 131)" class="i">container</span><span class="o">.</span>[<span class="s">&quot;doesNotExist&quot;</span>]
-<span onmouseout="hideTip(event, 'fs59', 132)" onmouseover="showTip(event, 'fs59', 132)" class="i">newBlob</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs60', 133)" onmouseover="showTip(event, 'fs60', 133)" class="f">AsCloudBlockBlob</span>()<span class="o">.</span><span class="f">UploadText</span> <span class="s">&quot;hello&quot;</span>
-<span onmouseout="hideTip(event, 'fs14', 134)" onmouseover="showTip(event, 'fs14', 134)" class="f">printfn</span> <span class="s">&quot;Contents of blob: </span><span class="pf">%s</span><span class="s">&quot;</span> (<span onmouseout="hideTip(event, 'fs59', 135)" onmouseover="showTip(event, 'fs59', 135)" class="i">newBlob</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs26', 136)" onmouseover="showTip(event, 'fs26', 136)" class="f">Read</span>())
-<span onmouseout="hideTip(event, 'fs59', 137)" onmouseover="showTip(event, 'fs59', 137)" class="i">newBlob</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs60', 138)" onmouseover="showTip(event, 'fs60', 138)" class="f">AsCloudBlockBlob</span>()<span class="o">.</span><span class="f">Delete</span>()
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">newBlob</span> <span class="o">=</span> <span class="i">container</span><span class="o">.</span>[<span class="s">&quot;doesNotExist&quot;</span>]
+<span class="i">newBlob</span><span class="o">.</span><span class="i">AsCloudBlockBlob</span>()<span class="o">.</span><span class="i">UploadText</span> <span class="s">&quot;hello&quot;</span>
+<span class="i">printfn</span> <span class="s">&quot;Contents of blob: %s&quot;</span> (<span class="i">newBlob</span><span class="o">.</span><span class="i">Read</span>())
+<span class="i">newBlob</span><span class="o">.</span><span class="i">AsCloudBlockBlob</span>()<span class="o">.</span><span class="i">Delete</span>()
 </code></pre></td>
 </tr>
 </table>
@@ -291,16 +291,16 @@ an Azure SDK exception.</p>
 <span class="l">11: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// Access the &#39;samples&#39; container using the raw SDK.</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs61', 139)" onmouseover="showTip(event, 'fs61', 139)" class="i">rawContainer</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 140)" onmouseover="showTip(event, 'fs8', 140)" class="t">Azure</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs11', 141)" onmouseover="showTip(event, 'fs11', 141)" class="i">Containers</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 142)" onmouseover="showTip(event, 'fs12', 142)" class="i">samples</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs62', 143)" onmouseover="showTip(event, 'fs62', 143)" class="f">AsCloudBlobContainer</span>()
+<span class="k">let</span> <span class="i">rawContainer</span> <span class="o">=</span> <span class="i">Azure</span><span class="o">.</span><span class="i">Containers</span><span class="o">.</span><span class="i">samples</span><span class="o">.</span><span class="i">AsCloudBlobContainer</span>()
 
 <span class="c">// All blobs can be referred to as an ICloudBlob</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs63', 144)" onmouseover="showTip(event, 'fs63', 144)" class="i">iCloudBlob</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 145)" onmouseover="showTip(event, 'fs8', 145)" class="t">Azure</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs11', 146)" onmouseover="showTip(event, 'fs11', 146)" class="i">Containers</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 147)" onmouseover="showTip(event, 'fs12', 147)" class="i">samples</span><span class="o">.</span><span class="i">``file1.txt``</span><span class="o">.</span><span class="f">AsICloudBlob</span>()
+<span class="k">let</span> <span class="i">iCloudBlob</span> <span class="o">=</span> <span class="i">Azure</span><span class="o">.</span><span class="i">Containers</span><span class="o">.</span><span class="i">samples</span><span class="o">.</span><span class="i">``file1.txt``</span><span class="o">.</span><span class="i">AsICloudBlob</span>()
 
 <span class="c">// Only available to CloudBlockBlobs.</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs64', 148)" onmouseover="showTip(event, 'fs64', 148)" class="i">blockBlob</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 149)" onmouseover="showTip(event, 'fs8', 149)" class="t">Azure</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs11', 150)" onmouseover="showTip(event, 'fs11', 150)" class="i">Containers</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 151)" onmouseover="showTip(event, 'fs12', 151)" class="i">samples</span><span class="o">.</span><span class="i">``file1.txt``</span><span class="o">.</span><span class="f">AsCloudBlockBlob</span>()
+<span class="k">let</span> <span class="i">blockBlob</span> <span class="o">=</span> <span class="i">Azure</span><span class="o">.</span><span class="i">Containers</span><span class="o">.</span><span class="i">samples</span><span class="o">.</span><span class="i">``file1.txt``</span><span class="o">.</span><span class="i">AsCloudBlockBlob</span>()
 
 <span class="c">// Only available to PageBlockBlobs.</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs65', 152)" onmouseover="showTip(event, 'fs65', 152)" class="i">pageBlob</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 153)" onmouseover="showTip(event, 'fs8', 153)" class="t">Azure</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs11', 154)" onmouseover="showTip(event, 'fs11', 154)" class="i">Containers</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 155)" onmouseover="showTip(event, 'fs12', 155)" class="i">samples</span><span class="o">.</span><span class="i">``pageData.bin``</span><span class="o">.</span><span class="f">AsCloudPageBlob</span>()
+<span class="k">let</span> <span class="i">pageBlob</span> <span class="o">=</span> <span class="i">Azure</span><span class="o">.</span><span class="i">Containers</span><span class="o">.</span><span class="i">samples</span><span class="o">.</span><span class="i">``pageData.bin``</span><span class="o">.</span><span class="i">AsCloudPageBlob</span>()
 </code></pre></td>
 </tr>
 </table>
@@ -310,7 +310,7 @@ an Azure SDK exception.</p>
 <span class="l">2: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// download file1.txt asynchronously into &quot;C:\temp\files&quot;</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs66', 156)" onmouseover="showTip(event, 'fs66', 156)" class="i">asyncFileDownload</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs10', 157)" onmouseover="showTip(event, 'fs10', 157)" class="i">container</span><span class="o">.</span><span class="i">``file1.txt``</span><span class="o">.</span><span class="f">Download</span>(<span class="s">@&quot;C:\temp\files\&quot;</span>)
+<span class="k">let</span> <span class="i">asyncFileDownload</span> <span class="o">=</span> <span class="i">container</span><span class="o">.</span><span class="i">``file1.txt``</span><span class="o">.</span><span class="i">Download</span>(<span class="s">@&quot;C:\temp\files\&quot;</span>)
 </code></pre></td>
 </tr>
 </table>
@@ -323,91 +323,18 @@ single files.</p>
 <span class="l">4: </span>
 <span class="l">5: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs67', 158)" onmouseover="showTip(event, 'fs67', 158)" class="i">duration</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs68', 159)" onmouseover="showTip(event, 'fs68', 159)" class="t">TimeSpan</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs69', 160)" onmouseover="showTip(event, 'fs69', 160)" class="f">FromMinutes</span> <span class="n">37.</span>
-<span onmouseout="hideTip(event, 'fs14', 161)" onmouseover="showTip(event, 'fs14', 161)" class="f">printfn</span> <span class="s">&quot;Current time: </span><span class="pf">%O</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs70', 162)" onmouseover="showTip(event, 'fs70', 162)" class="t">DateTime</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs71', 163)" onmouseover="showTip(event, 'fs71', 163)" class="i">UtcNow</span>
-<span onmouseout="hideTip(event, 'fs14', 164)" onmouseover="showTip(event, 'fs14', 164)" class="f">printfn</span> <span class="s">&quot;SAS expiry: </span><span class="pf">%O</span><span class="s">&quot;</span> (<span onmouseout="hideTip(event, 'fs70', 165)" onmouseover="showTip(event, 'fs70', 165)" class="t">DateTime</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs71', 166)" onmouseover="showTip(event, 'fs71', 166)" class="i">UtcNow</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs72', 167)" onmouseover="showTip(event, 'fs72', 167)" class="f">Add</span> <span onmouseout="hideTip(event, 'fs67', 168)" onmouseover="showTip(event, 'fs67', 168)" class="i">duration</span>)
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs73', 169)" onmouseover="showTip(event, 'fs73', 169)" class="i">sasCode</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs10', 170)" onmouseover="showTip(event, 'fs10', 170)" class="i">container</span><span class="o">.</span><span class="i">``file1.txt``</span><span class="o">.</span><span class="f">GenerateSharedAccessSignature</span> <span onmouseout="hideTip(event, 'fs67', 171)" onmouseover="showTip(event, 'fs67', 171)" class="i">duration</span>
-<span onmouseout="hideTip(event, 'fs14', 172)" onmouseover="showTip(event, 'fs14', 172)" class="f">printfn</span> <span class="s">&quot;SAS URI: </span><span class="pf">%O</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs73', 173)" onmouseover="showTip(event, 'fs73', 173)" class="i">sasCode</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">duration</span> <span class="o">=</span> <span class="i">TimeSpan</span><span class="o">.</span><span class="i">FromMinutes</span> <span class="n">37.</span>
+<span class="i">printfn</span> <span class="s">&quot;Current time: %O&quot;</span> <span class="i">DateTime</span><span class="o">.</span><span class="i">UtcNow</span>
+<span class="i">printfn</span> <span class="s">&quot;SAS expiry: %O&quot;</span> (<span class="i">DateTime</span><span class="o">.</span><span class="i">UtcNow</span><span class="o">.</span><span class="i">Add</span> <span class="i">duration</span>)
+<span class="k">let</span> <span class="i">sasCode</span> <span class="o">=</span> <span class="i">container</span><span class="o">.</span><span class="i">``file1.txt``</span><span class="o">.</span><span class="i">GenerateSharedAccessSignature</span> <span class="i">duration</span>
+<span class="i">printfn</span> <span class="s">&quot;SAS URI: %O&quot;</span> <span class="i">sasCode</span>
 </code></pre></td>
 </tr>
 </table>
-<table class="pre"><tr><td><pre><code>Current time: 08/05/2017 13:52:32
-SAS expiry: 08/05/2017 14:29:32
-SAS URI: http://127.0.0.1:10000/devstoreaccount1/samples/file1.txt?sv=2015-04-05&amp;sr=b&amp;sig=EfoTAFPe6sDvxOqAa79r05SaCThrE3MN+gwDatYrTJE=&amp;se=2017-05-08T14:29:32Z&amp;sp=rwdl</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>Current time: 31/05/2017 17:50:16
+SAS expiry: 31/05/2017 18:27:16
+SAS URI: http://127.0.0.1:10000/devstoreaccount1/samples/file1.txt?sv=2015-12-11&amp;sr=b&amp;sig=MGcqf3b4C%2BXQZEABt%2BGKXckvEowqocl11XxNNB6w6AM%3D&amp;se=2017-05-31T18:27:16Z&amp;sp=rwdl</code></pre></td></tr></table>
 
-<div class="tip" id="fs1">Multiple items<br />namespace FSharp<br /><br />--------------------<br />namespace Microsoft.FSharp</div>
-<div class="tip" id="fs2">namespace FSharp.Azure</div>
-<div class="tip" id="fs3">namespace FSharp.Azure.StorageTypeProvider</div>
-<div class="tip" id="fs4">namespace FSharp.Azure.StorageTypeProvider.Blob</div>
-<div class="tip" id="fs5">namespace System</div>
-<div class="tip" id="fs6">namespace System.Xml</div>
-<div class="tip" id="fs7">namespace System.Xml.Linq</div>
-<div class="tip" id="fs8">type Azure = AzureTypeProvider&lt;...&gt;<br /><br />Full name: Blobs.Azure</div>
-<div class="tip" id="fs9">type AzureTypeProvider<br /><br />Full name: FSharp.Azure.StorageTypeProvider.AzureTypeProvider<br /><em><br /><br />The entry type to connect to Azure Storage assets.</em></div>
-<div class="tip" id="fs10">val container : AzureTypeProvider&lt;...&gt;.Domain.samplesContainer<br /><br />Full name: Blobs.container</div>
-<div class="tip" id="fs11">property AzureTypeProvider&lt;...&gt;.Containers: AzureTypeProvider&lt;...&gt;.Domain.Containers<br /><em><br /><br />Gets the list of all containers in this storage account.</em></div>
-<div class="tip" id="fs12">property AzureTypeProvider&lt;...&gt;.Domain.Containers.samples: AzureTypeProvider&lt;...&gt;.Domain.samplesContainer<br /><em><br /><br />Provides access to the &#39;samples&#39; container.</em></div>
-<div class="tip" id="fs13">val theBlob : AzureTypeProvider&lt;...&gt;.Domain.BlockBlob<br /><br />Full name: Blobs.theBlob</div>
-<div class="tip" id="fs14">val printfn : format:Printf.TextWriterFormat&lt;&#39;T&gt; -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Core.ExtraTopLevelOperators.printfn</div>
-<div class="tip" id="fs15">property BlobFile.Name: string</div>
-<div class="tip" id="fs16">member BlobFile.Size : ?connectionString:string -&gt; int64</div>
-<div class="tip" id="fs17">val folder : AzureTypeProvider&lt;...&gt;.Domain.samples.folder2/<br /><br />Full name: Blobs.folder</div>
-<div class="tip" id="fs18">val blobs : seq&lt;BlobFile&gt;<br /><br />Full name: Blobs.blobs</div>
-<div class="tip" id="fs19">member BlobFolder.ListBlobs : ?includeSubfolders:bool * ?connectionString:string -&gt; seq&lt;BlobFile&gt;</div>
-<div class="tip" id="fs20">property BlobFolder.Path: string</div>
-<div class="tip" id="fs21">val totalSize : int64<br /><br />Full name: Blobs.totalSize</div>
-<div class="tip" id="fs22">Multiple items<br />module List<br /><br />from Microsoft.FSharp.Collections<br /><br />--------------------<br />type List&lt;&#39;T&gt; =<br />&#160;&#160;| ( [] )<br />&#160;&#160;| ( :: ) of Head: &#39;T * Tail: &#39;T list<br />&#160;&#160;interface IEnumerable<br />&#160;&#160;interface IEnumerable&lt;&#39;T&gt;<br />&#160;&#160;member GetSlice : startIndex:int option * endIndex:int option -&gt; &#39;T list<br />&#160;&#160;member Head : &#39;T<br />&#160;&#160;member IsEmpty : bool<br />&#160;&#160;member Item : index:int -&gt; &#39;T with get<br />&#160;&#160;member Length : int<br />&#160;&#160;member Tail : &#39;T list<br />&#160;&#160;static member Cons : head:&#39;T * tail:&#39;T list -&gt; &#39;T list<br />&#160;&#160;static member Empty : &#39;T list<br /><br />Full name: Microsoft.FSharp.Collections.List&lt;_&gt;</div>
-<div class="tip" id="fs23">val sumBy : projection:(&#39;T -&gt; &#39;U) -&gt; list:&#39;T list -&gt; &#39;U (requires member ( + ) and member get_Zero)<br /><br />Full name: Microsoft.FSharp.Collections.List.sumBy</div>
-<div class="tip" id="fs24">val blob : AzureTypeProvider&lt;...&gt;.Domain.BlockBlob</div>
-<div class="tip" id="fs25">val contents : string<br /><br />Full name: Blobs.contents</div>
-<div class="tip" id="fs26">member BlockBlobFile.Read : ?connectionString:string -&gt; string</div>
-<div class="tip" id="fs27">val async : AsyncBuilder<br /><br />Full name: Microsoft.FSharp.Core.ExtraTopLevelOperators.async</div>
-<div class="tip" id="fs28">val contentsAsync : string</div>
-<div class="tip" id="fs29">member BlockBlobFile.ReadAsync : ?connectionString:string -&gt; Async&lt;string&gt;</div>
-<div class="tip" id="fs30">Multiple items<br />module Async<br /><br />--------------------<br />type Async<br />static member AsBeginEnd : computation:(&#39;Arg -&gt; Async&lt;&#39;T&gt;) -&gt; (&#39;Arg * AsyncCallback * obj -&gt; IAsyncResult) * (IAsyncResult -&gt; &#39;T) * (IAsyncResult -&gt; unit)<br />static member AwaitEvent : event:IEvent&lt;&#39;Del,&#39;T&gt; * ?cancelAction:(unit -&gt; unit) -&gt; Async&lt;&#39;T&gt; (requires delegate and &#39;Del :&gt; Delegate)<br />static member AwaitIAsyncResult : iar:IAsyncResult * ?millisecondsTimeout:int -&gt; Async&lt;bool&gt;<br />static member AwaitTask : task:Task -&gt; Async&lt;unit&gt;<br />static member AwaitTask : task:Task&lt;&#39;T&gt; -&gt; Async&lt;&#39;T&gt;<br />static member AwaitWaitHandle : waitHandle:WaitHandle * ?millisecondsTimeout:int -&gt; Async&lt;bool&gt;<br />static member CancelDefaultToken : unit -&gt; unit<br />static member Catch : computation:Async&lt;&#39;T&gt; -&gt; Async&lt;Choice&lt;&#39;T,exn&gt;&gt;<br />static member FromBeginEnd : beginAction:(AsyncCallback * obj -&gt; IAsyncResult) * endAction:(IAsyncResult -&gt; &#39;T) * ?cancelAction:(unit -&gt; unit) -&gt; Async&lt;&#39;T&gt;<br />static member FromBeginEnd : arg:&#39;Arg1 * beginAction:(&#39;Arg1 * AsyncCallback * obj -&gt; IAsyncResult) * endAction:(IAsyncResult -&gt; &#39;T) * ?cancelAction:(unit -&gt; unit) -&gt; Async&lt;&#39;T&gt;<br />static member FromBeginEnd : arg1:&#39;Arg1 * arg2:&#39;Arg2 * beginAction:(&#39;Arg1 * &#39;Arg2 * AsyncCallback * obj -&gt; IAsyncResult) * endAction:(IAsyncResult -&gt; &#39;T) * ?cancelAction:(unit -&gt; unit) -&gt; Async&lt;&#39;T&gt;<br />static member FromBeginEnd : arg1:&#39;Arg1 * arg2:&#39;Arg2 * arg3:&#39;Arg3 * beginAction:(&#39;Arg1 * &#39;Arg2 * &#39;Arg3 * AsyncCallback * obj -&gt; IAsyncResult) * endAction:(IAsyncResult -&gt; &#39;T) * ?cancelAction:(unit -&gt; unit) -&gt; Async&lt;&#39;T&gt;<br />static member FromContinuations : callback:((&#39;T -&gt; unit) * (exn -&gt; unit) * (OperationCanceledException -&gt; unit) -&gt; unit) -&gt; Async&lt;&#39;T&gt;<br />static member Ignore : computation:Async&lt;&#39;T&gt; -&gt; Async&lt;unit&gt;<br />static member OnCancel : interruption:(unit -&gt; unit) -&gt; Async&lt;IDisposable&gt;<br />static member Parallel : computations:seq&lt;Async&lt;&#39;T&gt;&gt; -&gt; Async&lt;&#39;T []&gt;<br />static member RunSynchronously : computation:Async&lt;&#39;T&gt; * ?timeout:int * ?cancellationToken:CancellationToken -&gt; &#39;T<br />static member Sleep : millisecondsDueTime:int -&gt; Async&lt;unit&gt;<br />static member Start : computation:Async&lt;unit&gt; * ?cancellationToken:CancellationToken -&gt; unit<br />static member StartAsTask : computation:Async&lt;&#39;T&gt; * ?taskCreationOptions:TaskCreationOptions * ?cancellationToken:CancellationToken -&gt; Task&lt;&#39;T&gt;<br />static member StartChild : computation:Async&lt;&#39;T&gt; * ?millisecondsTimeout:int -&gt; Async&lt;Async&lt;&#39;T&gt;&gt;<br />static member StartChildAsTask : computation:Async&lt;&#39;T&gt; * ?taskCreationOptions:TaskCreationOptions -&gt; Async&lt;Task&lt;&#39;T&gt;&gt;<br />static member StartImmediate : computation:Async&lt;unit&gt; * ?cancellationToken:CancellationToken -&gt; unit<br />static member StartWithContinuations : computation:Async&lt;&#39;T&gt; * continuation:(&#39;T -&gt; unit) * exceptionContinuation:(exn -&gt; unit) * cancellationContinuation:(OperationCanceledException -&gt; unit) * ?cancellationToken:CancellationToken -&gt; unit<br />static member SwitchToContext : syncContext:SynchronizationContext -&gt; Async&lt;unit&gt;<br />static member SwitchToNewThread : unit -&gt; Async&lt;unit&gt;<br />static member SwitchToThreadPool : unit -&gt; Async&lt;unit&gt;<br />static member TryCancelled : computation:Async&lt;&#39;T&gt; * compensation:(OperationCanceledException -&gt; unit) -&gt; Async&lt;&#39;T&gt;<br />static member CancellationToken : Async&lt;CancellationToken&gt;<br />static member DefaultCancellationToken : CancellationToken<br /><br />Full name: Microsoft.FSharp.Control.Async<br /><br />--------------------<br />type Async&lt;&#39;T&gt;<br /><br />Full name: Microsoft.FSharp.Control.Async&lt;_&gt;</div>
-<div class="tip" id="fs31">static member Async.RunSynchronously : computation:Async&lt;&#39;T&gt; * ?timeout:int * ?cancellationToken:Threading.CancellationToken -&gt; &#39;T</div>
-<div class="tip" id="fs32">val contentsAsText : string<br /><br />Full name: Blobs.contentsAsText</div>
-<div class="tip" id="fs33">Multiple items<br />val string : value:&#39;T -&gt; string<br /><br />Full name: Microsoft.FSharp.Core.Operators.string<br /><br />--------------------<br />type string = String<br /><br />Full name: Microsoft.FSharp.Core.string</div>
-<div class="tip" id="fs34">val contentsAsXml : XDocument<br /><br />Full name: Blobs.contentsAsXml</div>
-<div class="tip" id="fs35">Multiple items<br />type XDocument =<br />&#160;&#160;inherit XContainer<br />&#160;&#160;new : unit -&gt; XDocument + 3 overloads<br />&#160;&#160;member Declaration : XDeclaration with get, set<br />&#160;&#160;member DocumentType : XDocumentType<br />&#160;&#160;member NodeType : XmlNodeType<br />&#160;&#160;member Root : XElement<br />&#160;&#160;member Save : fileName:string -&gt; unit + 6 overloads<br />&#160;&#160;member WriteTo : writer:XmlWriter -&gt; unit<br />&#160;&#160;static member Load : uri:string -&gt; XDocument + 7 overloads<br />&#160;&#160;static member Parse : text:string -&gt; XDocument + 1 overload<br /><br />Full name: System.Xml.Linq.XDocument<br /><br />--------------------<br />XDocument() : unit<br />XDocument([&lt;ParamArray&gt;] content: obj []) : unit<br />XDocument(other: XDocument) : unit<br />XDocument(declaration: XDeclaration, [&lt;ParamArray&gt;] content: obj []) : unit</div>
-<div class="tip" id="fs36">val streamReader : IO.StreamReader<br /><br />Full name: Blobs.streamReader</div>
-<div class="tip" id="fs37">val not : value:bool -&gt; bool<br /><br />Full name: Microsoft.FSharp.Core.Operators.not</div>
-<div class="tip" id="fs38">property IO.StreamReader.EndOfStream: bool</div>
-<div class="tip" id="fs39">IO.StreamReader.ReadLine() : string</div>
-<div class="tip" id="fs40">val lines : seq&lt;string&gt;<br /><br />Full name: Blobs.lines</div>
-<div class="tip" id="fs41">module Seq<br /><br />from Microsoft.FSharp.Collections</div>
-<div class="tip" id="fs42">val collect : mapping:(&#39;T -&gt; #seq&lt;&#39;U&gt;) -&gt; source:seq&lt;&#39;T&gt; -&gt; seq&lt;&#39;U&gt;<br /><br />Full name: Microsoft.FSharp.Collections.Seq.collect</div>
-<div class="tip" id="fs43">val file : AzureTypeProvider&lt;...&gt;.Domain.BlockBlob</div>
-<div class="tip" id="fs44">member BlobFile.ReadLines : ?connectionString:string -&gt; seq&lt;string&gt;</div>
-<div class="tip" id="fs45">val line : string</div>
-<div class="tip" id="fs46">type BlobSchema = AzureTypeProvider&lt;...&gt;<br /><br />Full name: Blobs.BlobSchema</div>
-<div class="tip" id="fs47">val fileFromSchema : AzureTypeProvider&lt;...&gt;.Domain.PageBlob<br /><br />Full name: Blobs.fileFromSchema</div>
-<div class="tip" id="fs48">val blobSchemaValue : string<br /><br />Full name: Blobs.blobSchemaValue</div>
-<div class="tip" id="fs49">namespace System.IO</div>
-<div class="tip" id="fs50">type File =<br />&#160;&#160;static member AppendAllLines : path:string * contents:IEnumerable&lt;string&gt; -&gt; unit + 1 overload<br />&#160;&#160;static member AppendAllText : path:string * contents:string -&gt; unit + 1 overload<br />&#160;&#160;static member AppendText : path:string -&gt; StreamWriter<br />&#160;&#160;static member Copy : sourceFileName:string * destFileName:string -&gt; unit + 1 overload<br />&#160;&#160;static member Create : path:string -&gt; FileStream + 3 overloads<br />&#160;&#160;static member CreateText : path:string -&gt; StreamWriter<br />&#160;&#160;static member Decrypt : path:string -&gt; unit<br />&#160;&#160;static member Delete : path:string -&gt; unit<br />&#160;&#160;static member Encrypt : path:string -&gt; unit<br />&#160;&#160;static member Exists : path:string -&gt; bool<br />&#160;&#160;...<br /><br />Full name: System.IO.File</div>
-<div class="tip" id="fs51">IO.File.ReadAllText(path: string) : string<br />IO.File.ReadAllText(path: string, encoding: Text.Encoding) : string</div>
-<div class="tip" id="fs52">val fileAsBlockBlob : BlockBlobFile option<br /><br />Full name: Blobs.fileAsBlockBlob</div>
-<div class="tip" id="fs53">member BlobContainer.TryGetBlockBlob : path:string * ?connectionString:string -&gt; Async&lt;BlockBlobFile option&gt;</div>
-<div class="tip" id="fs54">Multiple items<br />module Option<br /><br />--------------------<br />module Option<br /><br />from Microsoft.FSharp.Core</div>
-<div class="tip" id="fs55">val isSome : option:&#39;T option -&gt; bool<br /><br />Full name: Microsoft.FSharp.Core.Option.isSome</div>
-<div class="tip" id="fs56">val fileAsPageBlob : PageBlobFile option<br /><br />Full name: Blobs.fileAsPageBlob</div>
-<div class="tip" id="fs57">member BlobContainer.TryGetPageBlob : path:string * ?connectionString:string -&gt; Async&lt;PageBlobFile option&gt;</div>
-<div class="tip" id="fs58">val doesNotExist : BlockBlobFile option<br /><br />Full name: Blobs.doesNotExist</div>
-<div class="tip" id="fs59">val newBlob : BlockBlobFile<br /><br />Full name: Blobs.newBlob</div>
-<div class="tip" id="fs60">member BlockBlobFile.AsCloudBlockBlob : ?connectionString:string -&gt; WindowsAzure.Storage.Blob.CloudBlockBlob</div>
-<div class="tip" id="fs61">val rawContainer : WindowsAzure.Storage.Blob.CloudBlobContainer<br /><br />Full name: Blobs.rawContainer</div>
-<div class="tip" id="fs62">member BlobContainer.AsCloudBlobContainer : ?connectionString:string -&gt; WindowsAzure.Storage.Blob.CloudBlobContainer</div>
-<div class="tip" id="fs63">val iCloudBlob : WindowsAzure.Storage.Blob.ICloudBlob<br /><br />Full name: Blobs.iCloudBlob</div>
-<div class="tip" id="fs64">val blockBlob : WindowsAzure.Storage.Blob.CloudBlockBlob<br /><br />Full name: Blobs.blockBlob</div>
-<div class="tip" id="fs65">val pageBlob : WindowsAzure.Storage.Blob.CloudPageBlob<br /><br />Full name: Blobs.pageBlob</div>
-<div class="tip" id="fs66">val asyncFileDownload : Async&lt;unit&gt;<br /><br />Full name: Blobs.asyncFileDownload</div>
-<div class="tip" id="fs67">val duration : TimeSpan<br /><br />Full name: Blobs.duration</div>
-<div class="tip" id="fs68">Multiple items<br />type TimeSpan =<br />&#160;&#160;struct<br />&#160;&#160;&#160;&#160;new : ticks:int64 -&gt; TimeSpan + 3 overloads<br />&#160;&#160;&#160;&#160;member Add : ts:TimeSpan -&gt; TimeSpan<br />&#160;&#160;&#160;&#160;member CompareTo : value:obj -&gt; int + 1 overload<br />&#160;&#160;&#160;&#160;member Days : int<br />&#160;&#160;&#160;&#160;member Duration : unit -&gt; TimeSpan<br />&#160;&#160;&#160;&#160;member Equals : value:obj -&gt; bool + 1 overload<br />&#160;&#160;&#160;&#160;member GetHashCode : unit -&gt; int<br />&#160;&#160;&#160;&#160;member Hours : int<br />&#160;&#160;&#160;&#160;member Milliseconds : int<br />&#160;&#160;&#160;&#160;member Minutes : int<br />&#160;&#160;&#160;&#160;...<br />&#160;&#160;end<br /><br />Full name: System.TimeSpan<br /><br />--------------------<br />TimeSpan()<br />TimeSpan(ticks: int64) : unit<br />TimeSpan(hours: int, minutes: int, seconds: int) : unit<br />TimeSpan(days: int, hours: int, minutes: int, seconds: int) : unit<br />TimeSpan(days: int, hours: int, minutes: int, seconds: int, milliseconds: int) : unit</div>
-<div class="tip" id="fs69">TimeSpan.FromMinutes(value: float) : TimeSpan</div>
-<div class="tip" id="fs70">Multiple items<br />type DateTime =<br />&#160;&#160;struct<br />&#160;&#160;&#160;&#160;new : ticks:int64 -&gt; DateTime + 10 overloads<br />&#160;&#160;&#160;&#160;member Add : value:TimeSpan -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddDays : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddHours : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddMilliseconds : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddMinutes : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddMonths : months:int -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddSeconds : value:float -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddTicks : value:int64 -&gt; DateTime<br />&#160;&#160;&#160;&#160;member AddYears : value:int -&gt; DateTime<br />&#160;&#160;&#160;&#160;...<br />&#160;&#160;end<br /><br />Full name: System.DateTime<br /><br />--------------------<br />DateTime()<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(ticks: int64) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(ticks: int64, kind: DateTimeKind) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, calendar: Globalization.Calendar) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int, kind: DateTimeKind) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int, calendar: Globalization.Calendar) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int, millisecond: int) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em><br />DateTime(year: int, month: int, day: int, hour: int, minute: int, second: int, millisecond: int, kind: DateTimeKind) : unit<br />&#160;&#160;&#160;<em>(+0 other overloads)</em></div>
-<div class="tip" id="fs71">property DateTime.UtcNow: DateTime</div>
-<div class="tip" id="fs72">DateTime.Add(value: TimeSpan) : DateTime</div>
-<div class="tip" id="fs73">val sasCode : Uri<br /><br />Full name: Blobs.sasCode</div>
 
             </div>
             <div class="span3">
