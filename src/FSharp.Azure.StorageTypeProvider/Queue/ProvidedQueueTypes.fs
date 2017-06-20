@@ -95,6 +95,7 @@ type ProvidedQueue(defaultConnectionString, name) =
     member __.Dequeue(visibilityTimeout) = __.Dequeue(defaultConnectionString, visibilityTimeout)
 
     ///Generates a shared access signature, defaulting to start from now. Do not pass 'permissions' for full-access.
+    member __.GenerateSharedAccessSignature(duration, ?start, ?connectionString, ?permissions) =
         let permissions = defaultArg permissions (QueuePermission.Peek ||| QueuePermission.Enqueue ||| QueuePermission.UpdateMessage ||| QueuePermission.DequeueAndDeleteMessageAndClear)
         let typeMap = 
             [ QueuePermission.Peek, SharedAccessQueuePermissions.Read;
