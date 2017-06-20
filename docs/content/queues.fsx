@@ -85,6 +85,21 @@ async {
 (*** include-output: queue2 ***)
 
 (**
+##Shared Access Signature generation
+
+The type provider exposes a simple method for generating time-dependant SAS codes for
+queues. Omit permissions parameter to get full-access SAS token.
+*)
+
+(*** define-output: sas ***)
+let duration = TimeSpan.FromMinutes 37.
+printfn "Current time: %O" DateTime.UtcNow
+printfn "SAS expiry: %O" (DateTime.UtcNow.Add duration)
+let sasCode = queue.GenerateSharedAccessSignature(duration, permissions = (QueuePermission.Peek ||| QueuePermission.Enqueue ||| QueuePermission.DequeueAndDeleteMessageAndClear)) 
+printfn "SAS URI: %O" sasCode
+(*** include-output: sas ***)
+
+(**
 ## Peeking the queue
 The Queue Provider allows you to preview messages on the queue directly in intellisense. Simply
 dot into the "Peek" property on the queue, and the first 32 messages on the queue will appear.
