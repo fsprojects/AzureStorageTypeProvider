@@ -30,6 +30,14 @@ type ProvidedQueueMessage =
       /// Gets the contest of the message as a string.
       AsString : Lazy<string> }
 
+/// Represents the set of possible permissions for a shared access queue policy.
+[<FlagsAttribute>]
+type QueuePermission =
+    | Peek = 1
+    | Enqueue = 2 
+    | UpdateMessage = 4
+    | DequeueAndDeleteMessageAndClear = 8
+
 module internal Factory = 
     let unpackId messageId =
         let (ProvidedMessageId(MessageId messageId, PopReceipt popReceipt)) = messageId
@@ -86,9 +94,21 @@ type ProvidedQueue(defaultConnectionString, name) =
     /// Dequeues the next message using the default connection string and sets the visibility timeout (i.e. how long you can work with the message before it reappears in the queue)
     member __.Dequeue(visibilityTimeout) = __.Dequeue(defaultConnectionString, visibilityTimeout)
 
-    /// Generates a full-access shared access signature, defaulting to start from now.
-    member __.GenerateSharedAccessSignature(duration, ?start, ?connectionString) = 
-        getQueue connectionString |> generateSas start duration
+    ///Generates a shared access signature, defaulting to start from now. Do not pass 'permissions' for full-access.
+    member __.GenerateSharedAccessSignature(duration, ?start, ?connectionString, ?permissions) =
+        let permissions = defaultArg permissions (QueuePermission.Peek ||| QueuePermission.Enqueue ||| QueuePermission.UpdateMessage ||| QueuePermission.DequeueAndDeleteMessageAndClear)
+        let typeMap = 
+            [ QueuePermission.Peek, SharedAccessQueuePermissions.Read;
+              QueuePermission.Enqueue, SharedAccessQueuePermissions.Add;
+              QueuePermission.UpdateMessage, SharedAccessQueuePermissions.Update;
+              QueuePermission.DequeueAndDeleteMessageAndClear, SharedAccessQueuePermissions.ProcessMessages;
+            ] |> Map.ofList
+
+        let sharedAccessQueuePermissions = 
+            typeMap
+            |> Map.fold (fun s k v -> if permissions.HasFlag(k) then s ||| v else s) SharedAccessQueuePermissions.None 
+
+        getQueue connectionString |> generateSas start duration sharedAccessQueuePermissions
     
     /// Enqueues a new message.
     member __.Enqueue(content : string, ?connectionString) =

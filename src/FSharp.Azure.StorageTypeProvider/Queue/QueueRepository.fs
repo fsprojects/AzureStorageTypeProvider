@@ -16,11 +16,8 @@ let getQueueRef name = getQueueClient >> (fun q -> q.GetQueueReference name)
 
 let peekMessages connectionString name = getQueueRef name connectionString |> (fun x -> x.PeekMessages)
 
-let generateSas start duration (queue:CloudQueue) =
-    let policy = SharedAccessQueuePolicy(Permissions = (SharedAccessQueuePermissions.Add |||
-                                                        SharedAccessQueuePermissions.ProcessMessages |||
-                                                        SharedAccessQueuePermissions.Read |||
-                                                        SharedAccessQueuePermissions.Update),
+let generateSas start duration queuePermissions (queue:CloudQueue) =
+    let policy = SharedAccessQueuePolicy(Permissions = queuePermissions,
                                          SharedAccessStartTime = (start |> Option.map(fun start -> DateTimeOffset start) |> Option.toNullable),
                                          SharedAccessExpiryTime = Nullable(DateTimeOffset.UtcNow.Add duration))
     queue.GetSharedAccessSignature(policy, null)
