@@ -46,14 +46,12 @@ type BlobFile internal (defaultConnectionString, container, file, getBlobRef : _
     /// Gets a handle to the Azure SDK client for this blob.
     member this.AsICloudBlob(?connectionString) = this.BlobRef(connectionString)
 
-    /// Generates a full-access shared-access signature for the supplied duration.
-    member this.GenerateSharedAccessSignature(duration, ?connectionString) = 
+    /// Generates a shared access signature for the supplied duration and permissions. Do not pass permissions for full-access.
+    member this.GenerateSharedAccessSignature(duration, ?connectionString, ?permissions) =
         let expiry = Nullable(DateTimeOffset.UtcNow.Add(duration))
-        let policy = 
-            SharedAccessBlobPolicy
-                (SharedAccessExpiryTime = expiry,
-                 Permissions = (SharedAccessBlobPermissions.Read ||| SharedAccessBlobPermissions.Write |||
-                                SharedAccessBlobPermissions.Delete ||| SharedAccessBlobPermissions.List))
+        let permissions = defaultArg permissions (SharedAccessBlobPermissions.Read ||| SharedAccessBlobPermissions.Write |||
+                                                  SharedAccessBlobPermissions.Delete ||| SharedAccessBlobPermissions.List)
+        let policy = SharedAccessBlobPolicy (SharedAccessExpiryTime = expiry, Permissions = permissions)
         let blobRef = this.BlobRef connectionString
         let sas = blobRef.GetSharedAccessSignature policy
         Uri(sprintf "%s%s" (blobRef.Uri.ToString()) sas)

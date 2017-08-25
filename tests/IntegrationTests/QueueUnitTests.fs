@@ -120,3 +120,15 @@ let detailedQueueTests =
             Expect.isNone message "Should be no message" })
     ]
 
+[<Tests>]
+let sasTokenTests =
+    testList "SAS Token Tests" [
+        testCase "Generates token with default (full-access) queue permissions" (fun _ ->
+            let sas = queue.GenerateSharedAccessSignature(TimeSpan.FromDays 7.)
+            Expect.stringContains sas "sp=raup" "Invalid permissions"
+        )
+        testCase "Generates token with specific queue permissions" (fun _ ->
+            let sas = queue.GenerateSharedAccessSignature(TimeSpan.FromDays 7., permissions = (QueuePermission.Enqueue ||| QueuePermission.UpdateMessage))
+            Expect.stringContains sas "sp=au" "Invalid permissions"
+        )
+    ]

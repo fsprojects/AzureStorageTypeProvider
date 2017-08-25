@@ -2,6 +2,7 @@
 
 open FSharp.Azure.StorageTypeProvider
 open Microsoft.WindowsAzure.Storage.Blob
+open System
 open System.Linq
 open System.IO
 open FSharp.Azure.StorageTypeProvider.Blob
@@ -223,4 +224,18 @@ let blobProgrammaticTests =
         testCase "Safe handle to the wrong blob type returns None" <| fun _ -> 
             let blob = Local.Containers.samples.``folder/``.TryGetPageBlob "childFile.txt" |> Async.RunSynchronously
             Expect.isNone blob ""
+    ]
+
+[<Tests>]
+let sasTokenTests =
+    testList "SAS Token Tests" [
+        testCase "Generates token with default (full-access) blob permissions" (fun _ ->
+            let sas = container.``file1.txt``.GenerateSharedAccessSignature (TimeSpan.FromDays 7.)
+            Expect.stringContains (sas.ToString()) "sp=rwdl" "Invalid permissions"
+        )
+
+        testCase "Generates token with specific blob permissions" (fun _ ->
+            let sas = container.``file1.txt``.GenerateSharedAccessSignature(TimeSpan.FromDays 7., permissions = (SharedAccessBlobPermissions.Read ||| SharedAccessBlobPermissions.List))
+            Expect.stringContains (sas.ToString()) "sp=rl" "Invalid permissions"
+        )
     ]
