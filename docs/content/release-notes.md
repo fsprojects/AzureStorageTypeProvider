@@ -81,3 +81,7 @@
 * Support for MIME type assignment on blob upload.
 * Support for blob file and container properties
 * Upgrade to Azure Storage 7.2.1
+
+### 1.9.3 - 25th August 2017
+* Blob and Queue SAS tokens are now configurable.
+* Ability to supply a prefix when listing blobs.
