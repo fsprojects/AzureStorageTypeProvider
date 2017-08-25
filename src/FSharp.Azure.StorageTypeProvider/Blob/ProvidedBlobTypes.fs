@@ -167,12 +167,12 @@ module BlobBuilder =
                 | _ -> false
                 -> return None }
 
-    let listBlobs defaultConnectionString container file includeSubfolders connectionString =
+    let listBlobs defaultConnectionString container file includeSubfolders prefix connectionString =
         let connectionString = connectionString |> defaultArg <| defaultConnectionString
-        let includeSubfolders = defaultArg includeSubfolders false
+        let includeSubfolders = includeSubfolders |> defaultArg <| false
         let container = getContainerRef (connectionString, container)
-        
-        listBlobs includeSubfolders container file
+        let prefix = file + (prefix |> Option.toObj)
+        listBlobs includeSubfolders container prefix
         |> Seq.choose (function
             | Blob(path, _, blobType, _) -> 
                 match blobType with
@@ -197,7 +197,7 @@ type BlobFolder internal (defaultConnectionString, container, file) =
     member __.Path with get() = file
 
     /// Lists all blobs contained in this folder
-    member __.ListBlobs(?includeSubfolders, ?connectionString) = listBlobs includeSubfolders connectionString
+    member __.ListBlobs(?includeSubfolders, ?prefix, ?connectionString) = listBlobs includeSubfolders prefix connectionString
     /// Allows unsafe navigation to a blob by name.
     member __.Item with get(path) = BlobBuilder.createBlockBlobFile defaultConnectionString container (Path.Combine(file, path))
     /// Safely retrieves a reference to a block blob asynchronously.
@@ -240,7 +240,7 @@ type BlobContainer internal (defaultConnectionString, container) =
     /// Safely retrieves a reference to a page blob asynchronously.
     member __.TryGetPageBlob(path, ?connectionString) = getSafe BlobBuilder.createPageBlobFile connectionString path
     /// Lists all blobs contained in this container.
-    member __.ListBlobs(?includeSubfolders, ?connectionString) = listBlobs includeSubfolders connectionString
+    member __.ListBlobs(?includeSubfolders, ?prefix, ?connectionString) = listBlobs includeSubfolders prefix connectionString
     /// Fetches the latest metadata for the blob container.
     member __.GetProperties(?connectionString) = async {
         let containerRef = getBlobContainerRef connectionString

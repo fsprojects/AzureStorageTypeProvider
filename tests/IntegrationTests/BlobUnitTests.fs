@@ -136,6 +136,14 @@ let blobMainTests =
             testContent "txt" "text/plain"
             testContent "swf" "application/x-shockwave-flash"
             testContent "jpg" "image/jpeg")
+
+        testCase "Retrieves blobs with prefix" (fun _ ->
+            let blobs = Local.Containers.samples.``folder2/``.ListBlobs(prefix = "child/grandchild2/") |> Seq.map(fun b -> b.Name) |> Seq.toArray
+            blobs |> shouldEqual [| "folder2/child/grandchild2/descedant3.txt" |])
+
+        testCase "Retrieves blobs with prefix and subfolders" (fun _ ->
+            let blobs = Local.Containers.samples.``folder2/``.ListBlobs(includeSubfolders = true, prefix = "child/") |> Seq.map(fun b -> b.Name) |> Seq.sort |> Seq.toArray 
+            blobs.Length |> shouldEqual 4)
          ]
 
 [<Tests>]
