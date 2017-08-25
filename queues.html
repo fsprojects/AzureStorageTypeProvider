@@ -97,12 +97,12 @@ Enqueuing a message!
 Queue length is 1.
 {Id =
   ProvidedMessageId
-    (MessageId "2ac206a6-2827-468f-a80e-5ad016d0164e",
-     PopReceipt "wMJglE2o1AgBAAAA");
+    (MessageId "c0dec0d8-c2dc-4cb1-8ea9-76c2814a050d",
+     PopReceipt "sFs0Ccrr1AgBAAAA");
  DequeueCount = 1;
- InsertionTime = Some 31/05/2017 17:50:22 +00:00;
- ExpirationTime = Some 07/06/2017 17:50:22 +00:00;
- NextVisibleTime = Some 31/05/2017 17:50:52 +00:00;
+ InsertionTime = Some 25/08/2017 15:00:03 +00:00;
+ ExpirationTime = Some 01/09/2017 15:00:03 +00:00;
+ NextVisibleTime = Some 25/08/2017 15:00:33 +00:00;
  AsBytes = Value is not created.;
  AsString = Value is not created.;}
 Deleting the message.
@@ -168,12 +168,32 @@ evaluated and as such are exposed as Lazy<T>.</p>
 <table class="pre"><tr><td><pre><code>Enqueuing a message!
 Dequeuing it.
 Message ProvidedMessageId
-  (MessageId "175b904b-c9af-4be1-8bf9-760a7a36ed0e",
-   PopReceipt "0GqKlE2o1AgBAAAA") with body 'Hello from Azure Type Provider' has been dequeued 1 times.
+  (MessageId "644a094a-832c-4d6d-9934-42029eac0402",
+   PopReceipt "EDhhCcrr1AgBAAAA") with body 'Hello from Azure Type Provider' has been dequeued 1 times.
 Updating it and dequeuing it again.
 Message ProvidedMessageId
-  (MessageId "175b904b-c9af-4be1-8bf9-760a7a36ed0e",
-   PopReceipt "cLWVlE2o1AgCAAAA") with body 'Goodbye from Azure Type Provider' has been dequeued 2 times.</code></pre></td></tr></table>
+  (MessageId "644a094a-832c-4d6d-9934-42029eac0402",
+   PopReceipt "4GhvCcrr1AgCAAAA") with body 'Goodbye from Azure Type Provider' has been dequeued 2 times.</code></pre></td></tr></table>
+<h2><a name="Shared-Access-Signature-generation" class="anchor" href="#Shared-Access-Signature-generation">Shared Access Signature generation</a></h2>
+<p>The type provider exposes a simple method for generating time-dependant SAS codes for
+queues. Omit permissions parameter to get full-access SAS token.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">duration</span> <span class="o">=</span> <span class="i">TimeSpan</span><span class="o">.</span><span class="i">FromMinutes</span> <span class="n">37.</span>
+<span class="i">printfn</span> <span class="s">&quot;Current time: %O&quot;</span> <span class="i">DateTime</span><span class="o">.</span><span class="i">UtcNow</span>
+<span class="i">printfn</span> <span class="s">&quot;SAS expiry: %O&quot;</span> (<span class="i">DateTime</span><span class="o">.</span><span class="i">UtcNow</span><span class="o">.</span><span class="i">Add</span> <span class="i">duration</span>)
+<span class="k">let</span> <span class="i">sasCode</span> <span class="o">=</span> <span class="i">queue</span><span class="o">.</span><span class="i">GenerateSharedAccessSignature</span>(<span class="i">duration</span>, <span class="i">permissions</span> <span class="o">=</span> (<span class="i">QueuePermission</span><span class="o">.</span><span class="i">Peek</span> <span class="o">|||</span> <span class="i">QueuePermission</span><span class="o">.</span><span class="i">Enqueue</span> <span class="o">|||</span> <span class="i">QueuePermission</span><span class="o">.</span><span class="i">DequeueAndDeleteMessageAndClear</span>)) 
+<span class="i">printfn</span> <span class="s">&quot;SAS URI: %O&quot;</span> <span class="i">sasCode</span>
+</code></pre></td>
+</tr>
+</table>
+<table class="pre"><tr><td><pre><code>Current time: 25/08/2017 15:00:04
+SAS expiry: 25/08/2017 15:37:04
+SAS URI: ?sv=2015-12-11&amp;sig=MnX78bnW8U9zKuLCsV4H1s4QiBCsJxbrqVUz2zpbbeA%3D&amp;se=2017-08-25T15%3A37%3A04Z&amp;sp=rap</code></pre></td></tr></table>
 <h2><a name="Peeking-the-queue" class="anchor" href="#Peeking-the-queue">Peeking the queue</a></h2>
 <p>The Queue Provider allows you to preview messages on the queue directly in intellisense. Simply
 dot into the "Peek" property on the queue, and the first 32 messages on the queue will appear.

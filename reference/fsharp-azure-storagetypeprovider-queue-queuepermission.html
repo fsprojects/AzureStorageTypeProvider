@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>ProvidedStaticParameter - Azure Storage Type Provider</title>
+    <title>QueuePermission - Azure Storage Type Provider</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="" />
     <meta name="author" content="Isaac Abraham" />
@@ -36,85 +36,94 @@
 
 
 
-<h1>ProvidedStaticParameter</h1>
+<h1>QueuePermission</h1>
 <p>
-  <span>Namespace: ProviderImplementation.ProvidedTypes</span><br />
+  <span>Namespace: FSharp.Azure.StorageTypeProvider.Queue</span><br />
 </p>
 <div class="xmldoc">
-<p>Represents a provided static parameter.</p>
+<p>Represents the set of possible permissions for a shared access queue policy.</p>
 
 </div>
-  <h3>Constructors</h3>
+  <h3>Record Fields</h3>
   <table class="table table-bordered member-list">
     <thead>
-      <tr><td>Constructor</td><td>Description</td></tr>
+      <tr><td>Record Field</td><td>Description</td></tr>
     </thead>
     <tbody>
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '196', 196)" onmouseover="showTip(event, '196', 196)">
-            new(...)
+          <code onmouseout="hideTip(event, '88', 88)" onmouseover="showTip(event, '88', 88)">
+            DequeueAndDeleteMessageAndClear
           </code>
-          <div class="tip" id="196">
-            <strong>Signature:</strong> (parameterName:string * parameterType:Type * parameterDefaultValue:obj option) -&gt; ProvidedStaticParameter<br />
+          <div class="tip" id="88">
+            <strong>Signature:</strong> QueuePermission<br />
+              <strong>Modifiers:</strong> static<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1259-1259" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L39-39" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
           
-              <p>CompiledName: <code>.ctor</code></p>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  <h3>Instance members</h3>
-  <table class="table table-bordered member-list">
-    <thead>
-      <tr><td>Instance member</td><td>Description</td></tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td class="member-name">
-
-          <code onmouseout="hideTip(event, '197', 197)" onmouseover="showTip(event, '197', 197)">
-            AddXmlDoc(xmlDoc)
-          </code>
-          <div class="tip" id="197">
-            <strong>Signature:</strong> xmlDoc:string -&gt; unit<br />
-                      </div>
-        </td>
-        <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1266-1266" class="github-link">
-              <img src="../content/img/github.png" class="normal" />
-              <img src="../content/img/github-blue.png" class="hover" />
-            </a>
-          <p>Add XML documentation information to this provided constructor</p>
-
-
         </td>
       </tr>
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '198', 198)" onmouseover="showTip(event, '198', 198)">
-            AddXmlDocDelayed(xmlDocFunction)
+          <code onmouseout="hideTip(event, '89', 89)" onmouseover="showTip(event, '89', 89)">
+            Enqueue
           </code>
-          <div class="tip" id="198">
-            <strong>Signature:</strong> (xmlDocFunction:(unit -&gt; string)) -&gt; unit<br />
+          <div class="tip" id="89">
+            <strong>Signature:</strong> QueuePermission<br />
+              <strong>Modifiers:</strong> static<br />
                       </div>
         </td>
         <td class="xmldoc">
-            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/paket-files/fsprojects/FSharp.TypeProviders.StarterPack/src/ProvidedTypes.fs#L1264-1264" class="github-link">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L37-37" class="github-link">
               <img src="../content/img/github.png" class="normal" />
               <img src="../content/img/github-blue.png" class="hover" />
             </a>
-          <p>Add XML documentation information to this provided constructor, where the computation of the documentation is delayed until necessary</p>
+          
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
 
+          <code onmouseout="hideTip(event, '90', 90)" onmouseover="showTip(event, '90', 90)">
+            Peek
+          </code>
+          <div class="tip" id="90">
+            <strong>Signature:</strong> QueuePermission<br />
+              <strong>Modifiers:</strong> static<br />
+                      </div>
+        </td>
+        <td class="xmldoc">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L36-36" class="github-link">
+              <img src="../content/img/github.png" class="normal" />
+              <img src="../content/img/github-blue.png" class="hover" />
+            </a>
+          
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
 
+          <code onmouseout="hideTip(event, '91', 91)" onmouseover="showTip(event, '91', 91)">
+            UpdateMessage
+          </code>
+          <div class="tip" id="91">
+            <strong>Signature:</strong> QueuePermission<br />
+              <strong>Modifiers:</strong> static<br />
+                      </div>
+        </td>
+        <td class="xmldoc">
+            <a href="http://github.com/fsprojects/AzureStorageTypeProvider/tree/master/src/FSharp.Azure.StorageTypeProvider/Queue/ProvidedQueueTypes.fs#L38-38" class="github-link">
+              <img src="../content/img/github.png" class="normal" />
+              <img src="../content/img/github-blue.png" class="hover" />
+            </a>
+          
         </td>
       </tr>
     </tbody>

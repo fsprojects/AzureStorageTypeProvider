@@ -115,7 +115,7 @@ well as help query data. Let's look at the schema of the row <code>fred.1</code>
 </tr>
 </table>
 <table class="pre"><tr><td><pre><code>Fred has Partition Key of men and Row Key of 1
-Fred has Name 'fred', Years Working '10', Dob '01/05/1990 0:00:00', Salary '0.000000' and Is Manager 'true'.</code></pre></td></tr></table>
+Fred has Name 'fred', Years Working '10', Dob '01/05/1990 00:00:00', Salary '0.000000' and Is Manager 'true'.</code></pre></td></tr></table>
 <h3><a name="Optional-type-generation" class="anchor" href="#Optional-type-generation">Optional type generation</a></h3>
 <p>The Storage Type Provider will also intelligently map fields which are not always populated in the table.
 For example, given the following rows, we can see that two columns are not always populated.</p>
@@ -136,8 +136,8 @@ For example, given the following rows, we can see that two columns are not alway
 <tbody>
 <tr class="odd">
 <td><p>partition.1</p></td>
-<td><p>31/05/2017 17:50:25 +00:00</p></td>
-<td><p>01/05/1990 0:00:00</p></td>
+<td><p>25/08/2017 15:00:08 +00:00</p></td>
+<td><p>01/05/1990 00:00:00</p></td>
 <td><p>True</p></td>
 <td><p> ... </p></td>
 <td><p>0</p></td>
@@ -146,8 +146,8 @@ For example, given the following rows, we can see that two columns are not alway
 </tr>
 <tr class="even">
 <td><p>partition.2</p></td>
-<td><p>31/05/2017 17:50:26 +00:00</p></td>
-<td><p>01/05/1990 0:00:00</p></td>
+<td><p>25/08/2017 15:00:08 +00:00</p></td>
+<td><p>01/05/1990 00:00:00</p></td>
 <td><p>True</p></td>
 <td><p> ... </p></td>
 <td><p>0</p></td>
@@ -212,32 +212,32 @@ in a key/value collection - this is useful for binding scenarios or e.g. mapping
 <thead>
 <tr class="header">
 <th></th>
+<th><p>Timestamp</p></th>
 <th><p>Dob</p></th>
 <th><p>IsManager</p></th>
 <th><p>Name</p></th>
 <th><p>Salary</p></th>
 <th><p>YearsWorking</p></th>
-<th><p>Timestamp</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td><p>women.1</p></td>
-<td><p>30/04/2005 0:00:00</p></td>
+<td><p>25/08/2017 15:00:08 +00:00</p></td>
+<td><p>30/04/2005 00:00:00</p></td>
 <td><p>True</p></td>
 <td><p>sara</p></td>
 <td><p>3.5</p></td>
 <td><p>35</p></td>
-<td><p>31/05/2017 17:50:25 +00:00</p></td>
 </tr>
 <tr class="even">
 <td><p>women.2</p></td>
-<td><p>20/08/1965 0:00:00</p></td>
+<td><p>25/08/2017 15:00:08 +00:00</p></td>
+<td><p>20/08/1965 00:00:00</p></td>
 <td><p>False</p></td>
 <td><p>rachel</p></td>
 <td><p>5.5</p></td>
 <td><p>20</p></td>
-<td><p>31/05/2017 17:50:25 +00:00</p></td>
 </tr>
 </tbody>
 </table>
