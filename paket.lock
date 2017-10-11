@@ -1,5 +1,5 @@
 REDIRECTS: ON
-FRAMEWORK: NET452
+RESTRICTION: == net452
 NUGET
   remote: https://www.nuget.org/api/v2
     Argu (3.7)
@@ -36,5 +36,5 @@ NUGET
       Newtonsoft.Json (>= 6.0.8)
 GITHUB
   remote: fsprojects/FSharp.TypeProviders.StarterPack
-    src/ProvidedTypes.fs (1dab4f94411500794342f61f877feab772e5a754)
-    src/ProvidedTypes.fsi (1dab4f94411500794342f61f877feab772e5a754)
+    src/ProvidedTypes.fs (fad427ef0dfd7d50a5457a726eda0fe46bace662)
+    src/ProvidedTypes.fsi (fad427ef0dfd7d50a5457a726eda0fe46bace662)

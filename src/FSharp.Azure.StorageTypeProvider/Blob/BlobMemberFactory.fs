@@ -6,16 +6,16 @@ open ProviderImplementation.ProvidedTypes
 open System
 open Microsoft.WindowsAzure.Storage.Blob
 
-let rec private createBlobItem (domainType : ProvidedTypeDefinition) connectionString containerName fileItem = 
+let rec private createBlobItem (domainType : ProvidedTypeDefinition) (ctx:ProvidedTypesContext) connectionString containerName fileItem = 
     match fileItem with
     | Folder(path, name, contents) ->
-        let folderProp = ProvidedTypeDefinition((sprintf "%s.%s" containerName path), Some typeof<BlobFolder>, HideObjectMethods = true)
+        let folderProp = ctx.ProvidedTypeDefinition((sprintf "%s.%s" containerName path), Some typeof<BlobFolder>, hideObjectMethods = true)
         domainType.AddMember(folderProp)
         folderProp.AddMembersDelayed(fun _ -> 
             (contents.Value
-             |> Array.choose (createBlobItem domainType connectionString containerName)
+             |> Array.choose (createBlobItem domainType ctx connectionString containerName)
              |> Array.toList))
-        Some <| ProvidedProperty(name, folderProp, GetterCode = fun _ -> <@@ ContainerBuilder.createBlobFolder connectionString containerName path @@>)
+        Some <| ctx.ProvidedProperty(name, folderProp, getterCode = fun _ -> <@@ ContainerBuilder.createBlobFolder connectionString containerName path @@>)
     | Blob(path, name, blobType, length) -> 
         let fileTypeDefinition = 
             match blobType, path with
@@ -26,29 +26,29 @@ let rec private createBlobItem (domainType : ProvidedTypeDefinition) connectionS
 
         match blobType, length with
         | _, Some 0L -> None
-        | BlobType.PageBlob, _ -> Some <| ProvidedProperty(name, fileTypeDefinition, GetterCode = fun _ -> <@@ BlobBuilder.createPageBlobFile connectionString containerName path @@>)
-        | BlobType.BlockBlob, _ -> Some <| ProvidedProperty(name, fileTypeDefinition, GetterCode = fun _ -> <@@ BlobBuilder.createBlockBlobFile connectionString containerName path @@>)
+        | BlobType.PageBlob, _ -> Some <| ctx.ProvidedProperty(name, fileTypeDefinition, getterCode = fun _ -> <@@ BlobBuilder.createPageBlobFile connectionString containerName path @@>)
+        | BlobType.BlockBlob, _ -> Some <| ctx.ProvidedProperty(name, fileTypeDefinition, getterCode = fun _ -> <@@ BlobBuilder.createBlockBlobFile connectionString containerName path @@>)
         | _ -> None
 
-let private createContainerType (domainType : ProvidedTypeDefinition) connectionString (container : LightweightContainer) = 
-    let individualContainerType = ProvidedTypeDefinition(container.Name + "Container", Some typeof<BlobContainer>, HideObjectMethods = true)
+let private createContainerType (domainType : ProvidedTypeDefinition) (ctx:ProvidedTypesContext) connectionString (container : LightweightContainer) = 
+    let individualContainerType = ctx.ProvidedTypeDefinition(container.Name + "Container", Some typeof<BlobContainer>, hideObjectMethods = true)
     individualContainerType.AddXmlDoc <| sprintf "Provides access to the '%s' container." container.Name
     individualContainerType.AddMembersDelayed(fun _ -> 
         (container.Contents.Value
-         |> Seq.choose (createBlobItem domainType connectionString container.Name)
+         |> Seq.choose (createBlobItem domainType ctx connectionString container.Name)
          |> Seq.toList))
     domainType.AddMember(individualContainerType)
     // this local binding is required for the quotation.
     let containerName = container.Name
     let containerProp = 
-        ProvidedProperty(container.Name, individualContainerType, GetterCode = fun _ -> <@@ ContainerBuilder.createContainer connectionString containerName @@>)
+        ctx.ProvidedProperty(container.Name, individualContainerType, getterCode = fun _ -> <@@ ContainerBuilder.createContainer connectionString containerName @@>)
     containerProp.AddXmlDocDelayed(fun () -> sprintf "Provides access to the '%s' container." containerName)
     containerProp
 
 /// Builds up the Blob Storage container members
-let getBlobStorageMembers staticSchema (connectionString, domainType : ProvidedTypeDefinition) = 
-    let containerListingType = ProvidedTypeDefinition("Containers", Some typeof<obj>, HideObjectMethods = true)
-    let createContainerType = createContainerType domainType connectionString
+let getBlobStorageMembers staticSchema (connectionString, domainType : ProvidedTypeDefinition, ctx:ProvidedTypesContext) = 
+    let containerListingType = ctx.ProvidedTypeDefinition("Containers", Some typeof<obj>, hideObjectMethods = true)
+    let createContainerType = createContainerType domainType ctx connectionString
     
     match staticSchema with
     | [] -> containerListingType.AddMembersDelayed(fun _ -> connectionString |> getBlobStorageAccountManifest |> List.map createContainerType)
@@ -56,10 +56,10 @@ let getBlobStorageMembers staticSchema (connectionString, domainType : ProvidedT
     
     domainType.AddMember containerListingType
 
-    let cbcProp = ProvidedProperty("CloudBlobClient", typeof<CloudBlobClient>, GetterCode = (fun _ -> <@@ ContainerBuilder.createBlobClient connectionString @@>))
+    let cbcProp = ctx.ProvidedProperty("CloudBlobClient", typeof<CloudBlobClient>, getterCode = (fun _ -> <@@ ContainerBuilder.createBlobClient connectionString @@>))
     cbcProp.AddXmlDoc "Gets a handle to the Blob Azure SDK client for this storage account."
     containerListingType.AddMember(cbcProp)
 
-    let containerListingProp = ProvidedProperty("Containers", containerListingType, GetterCode = (fun _ -> <@@ () @@>), IsStatic = true)
+    let containerListingProp = ctx.ProvidedProperty("Containers", containerListingType, isStatic = true, getterCode = (fun _ -> <@@ () @@>))
     containerListingProp.AddXmlDoc "Gets the list of all containers in this storage account."
     containerListingProp
