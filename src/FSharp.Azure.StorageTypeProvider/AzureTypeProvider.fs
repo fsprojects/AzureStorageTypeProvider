@@ -18,7 +18,7 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
 
     let namespaceName = "FSharp.Azure.StorageTypeProvider"
     let thisAssembly = Assembly.GetExecutingAssembly()
-    let ctx = ProvidedTypesContext.Create(config)
+    let ctx = ProvidedTypesContext.Create config
     let azureAccountType = ctx.ProvidedTypeDefinition(thisAssembly, namespaceName, "AzureTypeProvider", baseType = Some typeof<obj>)
 
     let buildConnectionString (args : obj []) =
