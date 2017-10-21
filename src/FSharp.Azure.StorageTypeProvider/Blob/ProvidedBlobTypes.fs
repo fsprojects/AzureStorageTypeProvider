@@ -246,11 +246,11 @@ type BlobContainer internal (defaultConnectionString, container) =
         return BlobContainerMetadata containerRef.Properties }
 
 module internal ProvidedTypeGenerator = 
-    let generateTypes(ctx:ProvidedTypesContext) = 
-        [ ctx.ProvidedTypeDefinition("BlobFile", Some typeof<BlobFile>, hideObjectMethods = true)
-          ctx.ProvidedTypeDefinition("BlockBlob", Some typeof<BlockBlobFile>, hideObjectMethods = true)
-          ctx.ProvidedTypeDefinition("PageBlob", Some typeof<PageBlobFile>, hideObjectMethods = true)
-          ctx.ProvidedTypeDefinition("XmlBlob", Some typeof<XmlFile>, hideObjectMethods = true) ]
+    let coreBlobTypes = 
+        [ ProvidedTypeDefinition("BlobFile", Some typeof<BlobFile>, hideObjectMethods = true)
+          ProvidedTypeDefinition("BlockBlob", Some typeof<BlockBlobFile>, hideObjectMethods = true)
+          ProvidedTypeDefinition("PageBlob", Some typeof<PageBlobFile>, hideObjectMethods = true)
+          ProvidedTypeDefinition("XmlBlob", Some typeof<XmlFile>, hideObjectMethods = true) ]
 
 /// Builder methods to construct blobs etc..
 /// [omit]

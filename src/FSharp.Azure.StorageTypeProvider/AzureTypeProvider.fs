@@ -14,12 +14,11 @@ open System.Reflection
 [<TypeProvider>]
 /// [omit]
 type public AzureTypeProvider(config : TypeProviderConfig) as this = 
-    inherit TypeProviderForNamespaces()
+    inherit TypeProviderForNamespaces(config)
 
     let namespaceName = "FSharp.Azure.StorageTypeProvider"
     let thisAssembly = Assembly.GetExecutingAssembly()
-    let ctx = ProvidedTypesContext.Create config
-    let azureAccountType = ctx.ProvidedTypeDefinition(thisAssembly, namespaceName, "AzureTypeProvider", baseType = Some typeof<obj>)
+    let azureAccountType = ProvidedTypeDefinition(thisAssembly, namespaceName, "AzureTypeProvider", baseType = Some typeof<obj>)
 
     let buildConnectionString (args : obj []) =
         let (|ConnectionString|TwoPart|DevelopmentStorage|) (args:obj []) =
@@ -42,8 +41,8 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
             
     let buildTypes (typeName : string) (args : obj []) = 
         // Create the top level property
-        let typeProviderForAccount = ctx.ProvidedTypeDefinition(thisAssembly, namespaceName, typeName, baseType = Some typeof<obj>)
-        typeProviderForAccount.AddMember(ctx.ProvidedConstructor([], fun _ -> <@@ null @@>))
+        let typeProviderForAccount = ProvidedTypeDefinition(thisAssembly, namespaceName, typeName, baseType = Some typeof<obj>)
+        typeProviderForAccount.AddMember(ProvidedConstructor([], fun _ -> <@@ null @@>))
         
         let connectionString = buildConnectionString args
         let staticBlobSchema = args.[6] :?> string |> Option.ofString
@@ -59,8 +58,8 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
         match connectionStringValidation, parsedBlobSchema, parsedTableSchema with
         | Some (Success _), Success blobSchema, Success tableSchema
         | None, Success blobSchema, Success tableSchema ->
-            let domainTypes = ctx.ProvidedTypeDefinition("Domain", Some typeof<obj>)
-            domainTypes.AddMembers <| ProvidedTypeGenerator.generateTypes(ctx)
+            let domainTypes = ProvidedTypeDefinition("Domain", Some typeof<obj>)
+            domainTypes.AddMembers ProvidedTypeGenerator.coreBlobTypes
             typeProviderForAccount.AddMember(domainTypes)
 
             let schemaInferenceRowCount = args.[4] :?> int
@@ -72,7 +71,7 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
                    (TableMemberFactory.getTableStorageMembers tableSchema schemaInferenceRowCount humanizeColumns, "tables")
                    (QueueMemberFactory.getQueueStorageMembers, "queues") ]
                 |> List.map (fun (builder, name) ->
-                    try builder(connectionString, domainTypes, ctx)
+                    try builder(connectionString, domainTypes)
                     with ex -> failwithf "An error occurred during initial type generation for %s: %O" name ex))
             typeProviderForAccount
         | Some (Failure ex), _, _ -> failwithf "Unable to validate connection string (%s)" ex.Message
@@ -80,7 +79,7 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
         | _, _, Failure ex -> failwithf "Unable to parse table schema file (%s)" ex.Message
     
     let createParam (name, defaultValue:'a, help) =
-        let providedParameter = ctx.ProvidedStaticParameter(name, typeof<'a>, defaultValue)
+        let providedParameter = ProvidedStaticParameter(name, typeof<'a>, defaultValue)
         providedParameter.AddXmlDoc help
         providedParameter
     
