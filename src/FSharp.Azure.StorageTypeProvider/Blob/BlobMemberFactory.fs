@@ -17,17 +17,15 @@ let rec private createBlobItem (domainType : ProvidedTypeDefinition) connectionS
              |> Array.toList))
         Some <| ProvidedProperty(name, folderProp, GetterCode = fun _ -> <@@ ContainerBuilder.createBlobFolder connectionString containerName path @@>)
     | Blob(path, name, blobType, length) -> 
-        let fileTypeDefinition = 
-            match blobType, path with
-            | BlobType.PageBlob, _ -> "PageBlob"
-            | _, BlobBuilder.XML -> "XmlBlob"
-            | _, BlobBuilder.Binary | _, BlobBuilder.Text -> "BlockBlob"
-            |> fun typeName -> domainType.GetMember(typeName).[0] :?> ProvidedTypeDefinition
-
         match blobType, length with
         | _, Some 0L -> None
-        | BlobType.PageBlob, _ -> Some <| ProvidedProperty(name, fileTypeDefinition, GetterCode = fun _ -> <@@ BlobBuilder.createPageBlobFile connectionString containerName path @@>)
-        | BlobType.BlockBlob, _ -> Some <| ProvidedProperty(name, fileTypeDefinition, GetterCode = fun _ -> <@@ BlobBuilder.createBlockBlobFile connectionString containerName path @@>)
+        | BlobType.PageBlob, _ -> Some <| ProvidedProperty(name, typeof<PageBlobFile>, GetterCode = fun _ -> <@@ BlobBuilder.createPageBlobFile connectionString containerName path @@>)
+        | BlobType.BlockBlob, _ ->
+            let blobType =
+                match path with
+                | BlobBuilder.XML -> typeof<XmlFile>
+                | BlobBuilder.Binary | BlobBuilder.Text -> typeof<BlockBlobFile>            
+            Some <| ProvidedProperty(name, blobType, GetterCode = fun _ -> <@@ BlobBuilder.createBlockBlobFile connectionString containerName path @@>)
         | _ -> None
 
 let private createContainerType (domainType : ProvidedTypeDefinition) connectionString (container : LightweightContainer) = 

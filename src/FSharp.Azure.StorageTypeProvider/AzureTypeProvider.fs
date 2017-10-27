@@ -59,7 +59,6 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
         | Some (Success _), Success blobSchema, Success tableSchema
         | None, Success blobSchema, Success tableSchema ->
             let domainTypes = ProvidedTypeDefinition("Domain", Some typeof<obj>)
-            domainTypes.AddMembers <| ProvidedTypeGenerator.generateTypes()
             typeProviderForAccount.AddMember(domainTypes)
 
             let schemaInferenceRowCount = args.[4] :?> int
