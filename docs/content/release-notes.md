@@ -87,4 +87,4 @@
 * Ability to supply a prefix when listing blobs.
 
 ### 1.9.4 - 29th October 2017
-* Hot Reload mode.
+* Hot Schema Loading.
