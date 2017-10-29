@@ -49,7 +49,6 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
                     this.Invalidate()
             } |> Async.Start
         | _ -> ()
-        
             
     let buildTypes (typeName : string) (args : obj []) = 
         // Create the top level property

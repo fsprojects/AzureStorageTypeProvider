@@ -85,3 +85,6 @@
 ### 1.9.3 - 25th August 2017
 * Blob and Queue SAS tokens are now configurable.
 * Ability to supply a prefix when listing blobs.
+
+### 1.9.4 - 29th October 2017
+* Hot Reload mode.

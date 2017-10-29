@@ -7,7 +7,7 @@ open System
 type Azure = AzureTypeProvider<"UseDevelopmentStorage=true">
 (**
 Working with Queues
-==================
+===================
 
 For more information on Queues in general, please see some of the many articles on
 [MSDN](https://msdn.microsoft.com/en-us/library/microsoft.windowsazure.storage.queue.aspx) or the [Azure](http://azure.microsoft.com/en-us/documentation/services/storage/) [documentation](http://azure.microsoft.com/en-us/documentation/articles/storage-dotnet-how-to-use-queues/). Some of the core features of the Queue provider are: -
@@ -103,6 +103,7 @@ printfn "SAS URI: %O" sasCode
 ## Peeking the queue
 The Queue Provider allows you to preview messages on the queue directly in intellisense. Simply
 dot into the "Peek" property on the queue, and the first 32 messages on the queue will appear.
-Properties on them can be bound with their values.
+Properties on them can be bound with their values. This is particularly useful when using the
+[hot schema loading](hot-schema-loading.html#Working-with-Queues) feature of the type provider.
 *)
 

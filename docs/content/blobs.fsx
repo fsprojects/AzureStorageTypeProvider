@@ -38,6 +38,8 @@ printfn "Folder '%s' has the following blobs: %A" folder.Path blobs
 (*** include-output: folders ***)
 
 (**
+Also note that blobs support [hot schema loading](hot-schema-loading.html#Working-with-Blobs) to allow schema updates to occur as your storage account contents change.
+
 ## Shared types
 Individual files, folders and containers share a common base type so list operations are possible e.g.   
 *)
