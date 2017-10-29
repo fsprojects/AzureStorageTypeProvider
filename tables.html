@@ -136,7 +136,7 @@ For example, given the following rows, we can see that two columns are not alway
 <tbody>
 <tr class="odd">
 <td><p>partition.1</p></td>
-<td><p>25/08/2017 15:00:08 +00:00</p></td>
+<td><p>29/10/2017 15:22:26 +00:00</p></td>
 <td><p>01/05/1990 00:00:00</p></td>
 <td><p>True</p></td>
 <td><p> ... </p></td>
@@ -146,7 +146,7 @@ For example, given the following rows, we can see that two columns are not alway
 </tr>
 <tr class="even">
 <td><p>partition.2</p></td>
-<td><p>25/08/2017 15:00:08 +00:00</p></td>
+<td><p>29/10/2017 15:22:26 +00:00</p></td>
 <td><p>01/05/1990 00:00:00</p></td>
 <td><p>True</p></td>
 <td><p> ... </p></td>
@@ -182,6 +182,8 @@ storage account for development purposes, you can probably manually generate a f
 </code></pre></td>
 </tr>
 </table>
+<p>This feature is especially useful when working with <a href="hot-schema-loading.html#Working-with-Tables">hot schema loading</a>. If
+new rows are added within the bounds of the schema size, they will be used to re-evaluate the optimal schema automatically.</p>
 <h3><a name="Data-Frame-interoperability" class="anchor" href="#Data-Frame-interoperability">Data Frame interoperability</a></h3>
 <p>In addition, an extra "Values" property is available which exposes all properties on the entity
 in a key/value collection - this is useful for binding scenarios or e.g. mapping in Deedle frames.</p>
@@ -223,7 +225,7 @@ in a key/value collection - this is useful for binding scenarios or e.g. mapping
 <tbody>
 <tr class="odd">
 <td><p>women.1</p></td>
-<td><p>25/08/2017 15:00:08 +00:00</p></td>
+<td><p>29/10/2017 15:22:26 +00:00</p></td>
 <td><p>30/04/2005 00:00:00</p></td>
 <td><p>True</p></td>
 <td><p>sara</p></td>
@@ -232,7 +234,7 @@ in a key/value collection - this is useful for binding scenarios or e.g. mapping
 </tr>
 <tr class="even">
 <td><p>women.2</p></td>
-<td><p>25/08/2017 15:00:08 +00:00</p></td>
+<td><p>29/10/2017 15:22:26 +00:00</p></td>
 <td><p>20/08/1965 00:00:00</p></td>
 <td><p>False</p></td>
 <td><p>rachel</p></td>
@@ -598,6 +600,7 @@ Entity (Partition "North America", Row "1") was ignored as part of a failed batc
                     <li><a href="./blobs.html">Using Azure Blobs</a></li>
                     <li><a href="./tables.html">Using Azure Tables</a></li>
                     <li><a href="./queues.html">Using Azure Storage Queues</a></li>
+                    <li><a href="./hot-schema-loading.html">Hot Schema Loading</a></li>
 
                     <li class="nav-header">Documentation</li>
                     <li><a href="./reference/index.html">API Reference</a></li>

@@ -68,6 +68,7 @@ page and block blobs.</p>
   [folder2/child/descedant4.txt; folder2/child/grandchild1/descedant1.txt;
    folder2/child/grandchild1/descedant2.txt;
    folder2/child/grandchild2/descedant3.txt]</code></pre></td></tr></table>
+<p>Also note that blobs support <a href="hot-schema-loading.html#Working-with-Blobs">hot schema loading</a> to allow schema updates to occur as your storage account contents change.</p>
 <h2><a name="Shared-types" class="anchor" href="#Shared-types">Shared types</a></h2>
 <p>Individual files, folders and containers share a common base type so list operations are possible e.g.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
@@ -331,9 +332,9 @@ single files.</p>
 </code></pre></td>
 </tr>
 </table>
-<table class="pre"><tr><td><pre><code>Current time: 25/08/2017 14:59:57
-SAS expiry: 25/08/2017 15:36:57
-SAS URI: http://127.0.0.1:10000/devstoreaccount1/samples/file1.txt?sv=2015-12-11&amp;sr=b&amp;sig=DlAK57Is8oF1BihArsPICg5JU6HEZ6ddZAchMnGrudQ%3D&amp;se=2017-08-25T15:36:57Z&amp;sp=rwdl</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>Current time: 29/10/2017 15:22:15
+SAS expiry: 29/10/2017 15:59:15
+SAS URI: http://127.0.0.1:10000/devstoreaccount1/samples/file1.txt?sv=2015-12-11&amp;sr=b&amp;sig=1vN6rLnJpPCGEFVXa04yCzISONOBVJoFtBvtccX%2Bp5s%3D&amp;se=2017-10-29T15:59:15Z&amp;sp=rwdl</code></pre></td></tr></table>
 
 
             </div>
@@ -353,6 +354,7 @@ SAS URI: http://127.0.0.1:10000/devstoreaccount1/samples/file1.txt?sv=2015-12-11
                     <li><a href="./blobs.html">Using Azure Blobs</a></li>
                     <li><a href="./tables.html">Using Azure Tables</a></li>
                     <li><a href="./queues.html">Using Azure Storage Queues</a></li>
+                    <li><a href="./hot-schema-loading.html">Hot Schema Loading</a></li>
 
                     <li class="nav-header">Documentation</li>
                     <li><a href="./reference/index.html">API Reference</a></li>

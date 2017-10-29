@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Hot Schema Loading
+</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Stuff" />
+    <meta name="author" content="Isaac Abraham" />
+
+    <script src="https://code.jquery.com/jquery-1.8.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.8.23/jquery-ui.js"></script>
+    <script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
+    <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet" />
+
+    <link type="text/css" rel="stylesheet" href="./content/style.css" />
+    <link type="text/css" rel="stylesheet" href="deedle.css" />
+    <script type="text/javascript" src="./content/tips.js"></script>
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+    <div class="container">
+        <div class="masthead">
+            <ul class="nav nav-pills pull-right">
+                <li><a href="http://fsharp.org">fsharp.org</a></li>
+                <li><a href="http://github.com/fsprojects/AzureStorageTypeProvider">github page</a></li>
+            </ul>
+            <h3 class="muted"><a href="./index.html">Azure Storage Type Provider</a></h3>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="span9" id="main">
+                
+<h1><a name="Hot-Schema-Loading" class="anchor" href="#Hot-Schema-Loading">Hot Schema Loading</a></h1>
+<p>As of 1.9.4, the type provider has support for "hot schema loading" of types. This is extremely useful when working
+in an exploratory mode on top of a storage account, particularly when adding and removing data at the same time.</p>
+<p>When Hot Schema Loading is activated, the type provider will on a regular basis "refresh" any types used in your scripts or
+F# files based on the latest schema in real time - that is, either any schema files or the live data source used.</p>
+<h2><a name="Activating-Hot-Schema-Loading" class="anchor" href="#Activating-Hot-Schema-Loading">Activating Hot Schema Loading</a></h2>
+<p>To turn on Hot Schema Loading, simply provide a value for the <code>autoRefresh</code> argument in the type provider. This argument
+represents the number of <em>seconds</em> between refreshes.</p>
+<p>Note that Hot Schema Loading is <strong>not</strong> turned on by default.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">/// A handle to local development storage whose schema refreshes every 5 seconds.</span>
+<span class="k">type</span> <span class="i">Azure</span> <span class="o">=</span> <span class="i">AzureTypeProvider</span><span class="o">&lt;</span><span class="s">&quot;UseDevelopmentStorage=true&quot;</span>, <span class="i">autoRefresh</span> <span class="o">=</span> <span class="n">5</span><span class="o">&gt;</span>
+</code></pre></td>
+</tr>
+</table>
+<h2><a name="Hot-Schema-Loading-in-practice" class="anchor" href="#Hot-Schema-Loading-in-practice">Hot Schema Loading in practice</a></h2>
+<p>This section outlines some of the uses of Hot Schema Loading across the different types of services in Azure Storage.</p>
+<h3><a name="Working-with-Blobs" class="anchor" href="#Working-with-Blobs">Working with Blobs</a></h3>
+<ul>
+<li>
+As containers or blobs are renamed, added or deleted, the type system will automatically show compiler errors if your code references
+a blob that no longer exists. There's no need to reload your IDE; it will happen automatically.
+</li>
+<li>From F# 4.1 onwards, the compiler will automatically suggest potential renames for closely matching blobs.</li>
+</ul>
+<h3><a name="Working-with-Tables" class="anchor" href="#Working-with-Tables">Working with Tables</a></h3>
+<ul>
+<li>As Tables are created or deleted, they will update within your code.</li>
+<li>
+As data changes within your tables, schema inference will automatically re-evaluate your code - new properties will show, removed properties
+will cause compiler errors and optional parameters will appear / remove as needed.
+</li>
+</ul>
+<h3><a name="Working-with-Queues" class="anchor" href="#Working-with-Queues">Working with Queues</a></h3>
+<ul>
+<li>As Queues are created or deleted, they will update within your code.</li>
+<li>The <code>Peek</code> member will automatically refresh with the latest contents on the queue.</li>
+</ul>
+<h2><a name="Costs-with-Hot-Schema-Loading" class="anchor" href="#Costs-with-Hot-Schema-Loading">Costs with Hot Schema Loading</a></h2>
+<p>Be aware that Hot Schema Loading makes repeated requests to your Azure Storage accounts to keep your schema up-to-date, and
+you should factor in costs associated with this. Whilst Azure Storage costs for storage, ingress and egress are very competitive,
+consider the following points to ensure that you do not end up with an unexpected bill.</p>
+<h3><a name="Use-the-local-development-emulator" class="anchor" href="#Use-the-local-development-emulator">Use the local development emulator</a></h3>
+<p>If you do not need to use a live account for development purposes, consider installing the Azure Storage Development emulator.
+This does not cost anything and allows you to seamlessly switch from local to live storage accounts.</p>
+<h3><a name="Set-auto-refresh-at-a-high-value" class="anchor" href="#Set-auto-refresh-at-a-high-value">Set auto refresh at a high value</a></h3>
+<p>Consider setting a relatively high schema refresh timeout e.g. 5 minutes to avoid repeated requests on a regular basis.</p>
+<h2><a name="Working-with-scripts" class="anchor" href="#Working-with-scripts">Working with scripts</a></h2>
+<p>When working with scripts, bear in mind that the <strong>running FSI session</strong> <em>does not auto-refresh</em>. It is <em>only</em> the IDE itself e.g. Visual Studio,
+Code or Rider etc. that benefits from hot schema loading. This can leave the IDE and FSI out of sync, and you may wish to occasionally
+reset / reload FSI if schema changes occur in order to re-load the latest schema into FSI.</p>
+
+
+            </div>
+            <div class="span3">
+                <img src="./img/logo.png" alt="F# Project" style="width:150px;margin:10px" />
+                <ul class="nav nav-list" id="menu" style="margin-top: 20px;">
+                    <li class="nav-header">Azure Storage Type Provider</li>
+                    <li><a href="./index.html">Home page</a></li>
+                    <li class="divider"></li>
+                    <li><a href="http://www.nuget.org/packages/FSharp.Azure.StorageTypeProvider">Get Library via NuGet</a></li>
+                    <li><a href="http://github.com/fsprojects/AzureStorageTypeProvider">Source Code on GitHub</a></li>
+                    <li><a href="http://github.com/fsprojects/AzureStorageTypeProvider/blob/master/LICENSE.txt">License</a></li>
+                    <li><a href="http://github.com/fsprojects/AzureStorageTypeProvider/blob/master/RELEASE_NOTES.md">Release Notes</a></li>
+
+                    <li class="nav-header">Getting started</li>
+                    <li><a href="./quickstart.html">Quick start</a></li>
+                    <li><a href="./blobs.html">Using Azure Blobs</a></li>
+                    <li><a href="./tables.html">Using Azure Tables</a></li>
+                    <li><a href="./queues.html">Using Azure Storage Queues</a></li>
+                    <li><a href="./hot-schema-loading.html">Hot Schema Loading</a></li>
+
+                    <li class="nav-header">Documentation</li>
+                    <li><a href="./reference/index.html">API Reference</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <a href="http://github.com/fsprojects/AzureStorageTypeProvider"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub" /></a>
+</body>
+</html>
