@@ -38,11 +38,24 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
         | DevelopmentStorage -> "UseDevelopmentStorage=true"
         | ConnectionString conn -> conn
         | TwoPart (name, key) -> sprintf "DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;" name key
+
+    let startLiveRefresh : obj -> _ =
+        function
+        | :? int as seconds when seconds >= 1 ->
+            let seconds = seconds * 1000
+            async {
+                while true do
+                    do! Async.Sleep seconds
+                    this.Invalidate()
+            } |> Async.Start
+        | _ -> ()
             
     let buildTypes (typeName : string) (args : obj []) = 
         // Create the top level property
         let typeProviderForAccount = ProvidedTypeDefinition(thisAssembly, namespaceName, typeName, baseType = Some typeof<obj>)
         typeProviderForAccount.AddMember(ProvidedConstructor([], fun _ -> <@@ null @@>))
+        
+        startLiveRefresh args.[8]
         
         let connectionString = buildConnectionString args
         let staticBlobSchema = args.[6] :?> string |> Option.ofString
@@ -58,8 +71,7 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
         match connectionStringValidation, parsedBlobSchema, parsedTableSchema with
         | Some (Success _), Success blobSchema, Success tableSchema
         | None, Success blobSchema, Success tableSchema ->
-            let domainTypes = ProvidedTypeDefinition("Domain", Some typeof<obj>)
-            domainTypes.AddMembers ProvidedTypeGenerator.coreBlobTypes
+            let domainTypes = ProvidedTypeDefinition("Domain", Some typeof<obj>)            
             typeProviderForAccount.AddMember(domainTypes)
 
             let schemaInferenceRowCount = args.[4] :?> int
@@ -92,7 +104,8 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
           createParam("schemaSize", 10, "The maximum number of rows to read per table, from which to infer schema. Defaults to 10.")
           createParam("humanize", false, "Whether to humanize table column names. Defaults to false.")
           createParam("blobSchema", String.Empty, "Provide a path to a local file containing a fixed schema to eagerly use, instead of lazily generating the blob schema from a live storage account.")
-          createParam("tableSchema", String.Empty, "Provide a path to a local file containing a fixed schema to eagerly use, instead of lazily generating the table schema from a live storage account.") ]
+          createParam("tableSchema", String.Empty, "Provide a path to a local file containing a fixed schema to eagerly use, instead of lazily generating the table schema from a live storage account.")
+          createParam("autoRefresh", 0, "Optionally provide the number of seconds to wait before refreshing the schema. Defaults to 0 (never).") ]
     
     let memoize func =
         let cache = Dictionary()

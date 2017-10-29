@@ -245,13 +245,6 @@ type BlobContainer internal (defaultConnectionString, container) =
         do! containerRef.FetchAttributesAsync() |> Async.AwaitTask
         return BlobContainerMetadata containerRef.Properties }
 
-module internal ProvidedTypeGenerator = 
-    let coreBlobTypes = 
-        [ ProvidedTypeDefinition("BlobFile", Some typeof<BlobFile>, hideObjectMethods = true)
-          ProvidedTypeDefinition("BlockBlob", Some typeof<BlockBlobFile>, hideObjectMethods = true)
-          ProvidedTypeDefinition("PageBlob", Some typeof<PageBlobFile>, hideObjectMethods = true)
-          ProvidedTypeDefinition("XmlBlob", Some typeof<XmlFile>, hideObjectMethods = true) ]
-
 /// Builder methods to construct blobs etc..
 /// [omit]
 module ContainerBuilder = 

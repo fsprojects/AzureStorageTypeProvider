@@ -103,6 +103,9 @@ storage account for development purposes, you can probably manually generate a f
 type FirstTwentyRows = AzureTypeProvider<"UseDevelopmentStorage=true", schemaSize = 20>
 
 (** 
+This feature is especially useful when working with [hot schema loading](hot-schema-loading.html#Working-with-Tables). If
+new rows are added within the bounds of the schema size, they will be used to re-evaluate the optimal schema automatically.
+
 ### Data Frame interoperability
 
 In addition, an extra "Values" property is available which exposes all properties on the entity
