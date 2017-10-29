@@ -97,12 +97,12 @@ Enqueuing a message!
 Queue length is 1.
 {Id =
   ProvidedMessageId
-    (MessageId "d1165d9f-9fbd-4440-baed-bd005be4beee",
-     PopReceipt "EJin6+Ae1QgBAAAA");
+    (MessageId "0001bd2d-3a80-4105-8e8a-471a533d4059",
+     PopReceipt "EIxKM+ke1QgBAAAA");
  DequeueCount = 1;
- InsertionTime = Some 29/10/2017 15:22:21 +00:00;
- ExpirationTime = Some 05/11/2017 15:22:21 +00:00;
- NextVisibleTime = Some 29/10/2017 15:22:51 +00:00;
+ InsertionTime = Some 29/10/2017 16:21:37 +00:00;
+ ExpirationTime = Some 05/11/2017 16:21:37 +00:00;
+ NextVisibleTime = Some 29/10/2017 16:22:07 +00:00;
  AsBytes = Value is not created.;
  AsString = Value is not created.;}
 Deleting the message.
@@ -168,12 +168,12 @@ evaluated and as such are exposed as Lazy<T>.</p>
 <table class="pre"><tr><td><pre><code>Enqueuing a message!
 Dequeuing it.
 Message ProvidedMessageId
-  (MessageId "166570ad-268e-4034-af93-af5b3f985161",
-   PopReceipt "YNzR6+Ae1QgBAAAA") with body 'Hello from Azure Type Provider' has been dequeued 1 times.
+  (MessageId "9d8f6a78-bf37-40d5-b425-574572765f37",
+   PopReceipt "MFt0M+ke1QgBAAAA") with body 'Hello from Azure Type Provider' has been dequeued 1 times.
 Updating it and dequeuing it again.
 Message ProvidedMessageId
-  (MessageId "166570ad-268e-4034-af93-af5b3f985161",
-   PopReceipt "AJjf6+Ae1QgCAAAA") with body 'Goodbye from Azure Type Provider' has been dequeued 2 times.</code></pre></td></tr></table>
+  (MessageId "9d8f6a78-bf37-40d5-b425-574572765f37",
+   PopReceipt "0BaCM+ke1QgCAAAA") with body 'Goodbye from Azure Type Provider' has been dequeued 2 times.</code></pre></td></tr></table>
 <h2><a name="Shared-Access-Signature-generation" class="anchor" href="#Shared-Access-Signature-generation">Shared Access Signature generation</a></h2>
 <p>The type provider exposes a simple method for generating time-dependant SAS codes for
 queues. Omit permissions parameter to get full-access SAS token.</p>
@@ -191,9 +191,9 @@ queues. Omit permissions parameter to get full-access SAS token.</p>
 </code></pre></td>
 </tr>
 </table>
-<table class="pre"><tr><td><pre><code>Current time: 29/10/2017 15:22:22
-SAS expiry: 29/10/2017 15:59:22
-SAS URI: ?sv=2015-12-11&amp;sig=J28t%2BM4dSFvby3Y9JoK3G0vFXj41t7tx4z8k7819AHA%3D&amp;se=2017-10-29T15%3A59%3A22Z&amp;sp=rap</code></pre></td></tr></table>
+<table class="pre"><tr><td><pre><code>Current time: 29/10/2017 16:21:38
+SAS expiry: 29/10/2017 16:58:38
+SAS URI: ?sv=2015-12-11&amp;sig=CxnZnMxPNT6q0VAjO5aOIn0cYpWZKhsyQo00mz0oOy0%3D&amp;se=2017-10-29T16%3A58%3A38Z&amp;sp=rap</code></pre></td></tr></table>
 <h2><a name="Peeking-the-queue" class="anchor" href="#Peeking-the-queue">Peeking the queue</a></h2>
 <p>The Queue Provider allows you to preview messages on the queue directly in intellisense. Simply
 dot into the "Peek" property on the queue, and the first 32 messages on the queue will appear.
