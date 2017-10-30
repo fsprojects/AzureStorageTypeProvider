@@ -36,5 +36,5 @@ NUGET
       Newtonsoft.Json (>= 6.0.8)
 GITHUB
   remote: fsprojects/FSharp.TypeProviders.StarterPack
-    src/ProvidedTypes.fs (27232ac95fa6f91f136e01b23f38dda34d0f3dc4)
-    src/ProvidedTypes.fsi (27232ac95fa6f91f136e01b23f38dda34d0f3dc4)
+    src/ProvidedTypes.fs (35b5f0b0e1c9f58ce5e970971a329c99975be2c0)
+    src/ProvidedTypes.fsi (35b5f0b0e1c9f58ce5e970971a329c99975be2c0)
