@@ -44,7 +44,7 @@ let getTableStorageMembers optionalStaticSchema schemaInferenceRowCount humanize
 
                 for (period, theLocation, service, tableName) in metrics do
                     let schema = TableEntityMemberFactory.generateSchema tableName schemaInferenceRowCount connectionString
-                    createTableType [] connectionString tableName (sprintf "%s %s metrics (%s)" period service theLocation)
+                    createTableType schema connectionString tableName (sprintf "%s %s metrics (%s)" period service theLocation)
                     |> metricsTablesType.AddMember
 
                 let metricsTablesProp = ProvidedProperty("Azure Metrics", metricsTablesType, GetterCode = (fun _ -> <@@ () @@>))
