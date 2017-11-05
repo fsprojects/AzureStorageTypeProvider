@@ -11,21 +11,22 @@ open System.Text.RegularExpressions
 
 let private queryComparisons = 
     typeof<QueryComparisons>.GetFields()
-    |> Seq.map(fun f -> f.Name, f.GetValue(null) :?> string)
-    |> Seq.map(fun (f, n) -> (if f.EndsWith("Equal") then f + "To" else f), n)
+    |> Seq.map(fun field ->
+        let name = field.Name
+        (if name.EndsWith("Equal") then name + "To" else name), field.GetValue(null) :?> string)
     |> Seq.cache
     
 let private splitOnCaps text =
     Regex.Replace(text, "((?<=[a-z])[A-Z]|[A-Z](?=[a-z]))", " $1").Trim()
 
-let private buildGenericProp<'a> (propertyOperatorsType: ProvidedTypeDefinition) parentQueryType propertyName = 
+let private buildGenericProp<'a> parentQueryType propertyName = 
     [ for compName, compValue in queryComparisons ->
           let invokeCode = fun (args: Expr list) -> <@@ buildFilter(propertyName, compValue, (%%args.[1]: 'a)) :: ((%%args.[0]: obj) :?> string list) @@>
           let providedMethod = ProvidedMethod(compName |> splitOnCaps, [ ProvidedParameter(propertyName.ToLower(), typeof<'a>) ], parentQueryType, InvokeCode = invokeCode)
           providedMethod.AddXmlDocDelayed <| fun _ -> sprintf "Compares the %s property against the supplied value using the '%s' operator" propertyName compValue
           providedMethod ]
 
-let private buildCustomProp (propertyOperatorsType: ProvidedTypeDefinition) parentQueryType propertyName methodName documentation exectedResult = 
+let private buildCustomProp parentQueryType propertyName methodName documentation exectedResult = 
     let invoker = fun (args: Expr list) -> <@@ buildFilter(propertyName, QueryComparisons.Equal, exectedResult) :: ((%%args.[0]: obj) :?> string list) @@>
     let providedMethod = ProvidedMethod(methodName, [], parentQueryType, InvokeCode = invoker)
     providedMethod.AddXmlDocDelayed <| fun _ -> documentation
@@ -36,16 +37,16 @@ let private buildPropertyOperatorsType tableName propertyName propertyType paren
     let propertyOperatorsType = ProvidedTypeDefinition(sprintf "%s.%sQueryOperators" tableName propertyName, Some typeof<obj>, HideObjectMethods = true)
     propertyOperatorsType.AddMembersDelayed(fun () -> 
         match propertyType with
-        | EdmType.String -> buildGenericProp<string> propertyOperatorsType parentQueryType propertyName
+        | EdmType.String -> buildGenericProp<string> parentQueryType propertyName
         | EdmType.Boolean -> 
             let buildDescription = sprintf "Tests whether %s is %s." propertyName
-            [ buildCustomProp propertyOperatorsType parentQueryType propertyName "True" (buildDescription "true") true
-              buildCustomProp propertyOperatorsType parentQueryType propertyName "False" (buildDescription "false") false ]
-        | EdmType.DateTime -> buildGenericProp<DateTime> propertyOperatorsType parentQueryType propertyName
-        | EdmType.Double -> buildGenericProp<float> propertyOperatorsType parentQueryType propertyName
-        | EdmType.Int32 -> buildGenericProp<int> propertyOperatorsType parentQueryType propertyName
-        | EdmType.Int64 -> buildGenericProp<int64> propertyOperatorsType parentQueryType propertyName
-        | EdmType.Guid -> buildGenericProp<Guid> propertyOperatorsType parentQueryType propertyName
+            [ buildCustomProp parentQueryType propertyName "True" (buildDescription "true") true
+              buildCustomProp parentQueryType propertyName "False" (buildDescription "false") false ]
+        | EdmType.DateTime -> buildGenericProp<DateTime> parentQueryType propertyName
+        | EdmType.Double -> buildGenericProp<float> parentQueryType propertyName
+        | EdmType.Int32 -> buildGenericProp<int> parentQueryType propertyName
+        | EdmType.Int64 -> buildGenericProp<int64> parentQueryType propertyName
+        | EdmType.Guid -> buildGenericProp<Guid> parentQueryType propertyName
         | _ -> [])
     propertyOperatorsType
 
