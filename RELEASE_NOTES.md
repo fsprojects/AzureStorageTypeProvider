@@ -88,3 +88,6 @@
 
 ### 1.9.4 - 29th October 2017
 * Hot Schema Loading.
+
+### 1.9.5 - 9th November 2017
+* Re-enable storage metrics support.
