@@ -22,19 +22,19 @@ let private splitOnCaps text =
 let private buildGenericProp<'a> parentQueryType propertyName = 
     [ for compName, compValue in queryComparisons ->
           let invokeCode = fun (args: Expr list) -> <@@ buildFilter(propertyName, compValue, (%%args.[1]: 'a)) :: ((%%args.[0]: obj) :?> string list) @@>
-          let providedMethod = ProvidedMethod(compName |> splitOnCaps, [ ProvidedParameter(propertyName.ToLower(), typeof<'a>) ], parentQueryType, InvokeCode = invokeCode)
+          let providedMethod = ProvidedMethod(compName |> splitOnCaps, [ ProvidedParameter(propertyName.ToLower(), typeof<'a>) ], parentQueryType, invokeCode = invokeCode)
           providedMethod.AddXmlDocDelayed <| fun _ -> sprintf "Compares the %s property against the supplied value using the '%s' operator" propertyName compValue
           providedMethod ]
 
 let private buildCustomProp parentQueryType propertyName methodName documentation exectedResult = 
     let invoker = fun (args: Expr list) -> <@@ buildFilter(propertyName, QueryComparisons.Equal, exectedResult) :: ((%%args.[0]: obj) :?> string list) @@>
-    let providedMethod = ProvidedMethod(methodName, [], parentQueryType, InvokeCode = invoker)
+    let providedMethod = ProvidedMethod(methodName, [], parentQueryType, invokeCode = invoker)
     providedMethod.AddXmlDocDelayed <| fun _ -> documentation
     providedMethod
 
 /// Generates strongly-type query provided properties for an entity property e.g. Equal, GreaterThan etc. etc.
 let private buildPropertyOperatorsType tableName propertyName propertyType parentQueryType = 
-    let propertyOperatorsType = ProvidedTypeDefinition(sprintf "%s.%sQueryOperators" tableName propertyName, Some typeof<obj>, HideObjectMethods = true)
+    let propertyOperatorsType = ProvidedTypeDefinition(sprintf "%s.%sQueryOperators" tableName propertyName, Some typeof<obj>, hideObjectMethods = true)
     propertyOperatorsType.AddMembersDelayed(fun () -> 
         match propertyType with
         | EdmType.String -> buildGenericProp<string> parentQueryType propertyName
@@ -52,7 +52,7 @@ let private buildPropertyOperatorsType tableName propertyName propertyType paren
 
 /// Creates a query property (and child methods etc.) for a given entity
 let createTableQueryType (tableEntityType: ProvidedTypeDefinition) connection tableName (columnDefinitions: ColumnDefinition seq) =
-    let tableQueryType = ProvidedTypeDefinition(tableName + "QueryBuilder", Some typeof<obj>, HideObjectMethods = true)
+    let tableQueryType = ProvidedTypeDefinition(tableName + "QueryBuilder", Some typeof<obj>, hideObjectMethods = true)
     let operatorTypes = [ "PartitionKey", buildPropertyOperatorsType tableName "PartitionKey" EdmType.String tableQueryType
                           "RowKey", buildPropertyOperatorsType tableName "RowKey" EdmType.String tableQueryType
                           "Timestamp", buildPropertyOperatorsType tableName "Timestamp" EdmType.DateTime tableQueryType ] @
@@ -64,7 +64,7 @@ let createTableQueryType (tableEntityType: ProvidedTypeDefinition) connection ta
                 ("ExecuteAsync", [ ProvidedParameter("maxResults", typeof<int>, optionalValue = 0)
                                    ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ],
                  typeof<Async<_>>.GetGenericTypeDefinition().MakeGenericType(tableEntityType.MakeArrayType()),
-                 InvokeCode = (fun args -> <@@ executeQueryAsync (%%args.[2] : string) tableName %%args.[1] (composeAllFilters((%%args.[0]: obj) :?> string list)) @@>))
+                 invokeCode = (fun args -> <@@ executeQueryAsync (%%args.[2] : string) tableName %%args.[1] (composeAllFilters((%%args.[0]: obj) :?> string list)) @@>))
         executeQueryMethodAsync.AddXmlDocDelayed <| fun _ -> "Executes the current query asynchronously."
 
         let executeQueryMethod =
@@ -72,12 +72,12 @@ let createTableQueryType (tableEntityType: ProvidedTypeDefinition) connection ta
                 ("Execute", [ ProvidedParameter("maxResults", typeof<int>, optionalValue = 0)
                               ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ],
                  tableEntityType.MakeArrayType(), 
-                 InvokeCode = (fun args -> <@@ executeQuery (%%args.[2] : string) tableName %%args.[1] (composeAllFilters((%%args.[0]: obj) :?> string list)) @@>))
+                 invokeCode = (fun args -> <@@ executeQuery (%%args.[2] : string) tableName %%args.[1] (composeAllFilters((%%args.[0]: obj) :?> string list)) @@>))
         executeQueryMethod.AddXmlDocDelayed <| fun _ -> "Executes the current query."
         
         let customQueryProperties = 
             [ for (name, operatorType) in operatorTypes -> 
-                  let queryProperty = ProvidedProperty("Where" + name + "Is" |> splitOnCaps, operatorType, GetterCode = (fun args -> <@@ (%%args.[0]: obj) :?> string list @@>))
+                  let queryProperty = ProvidedProperty("Where" + name + "Is" |> splitOnCaps, operatorType, getterCode = (fun args -> <@@ (%%args.[0]: obj) :?> string list @@>))
                   queryProperty.AddXmlDocDelayed <| fun _ -> sprintf "Creates a query part for the %s property." name
                   queryProperty :> MemberInfo ]
 

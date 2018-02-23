@@ -14,7 +14,7 @@ open System.Reflection
 [<TypeProvider>]
 /// [omit]
 type public AzureTypeProvider(config : TypeProviderConfig) as this = 
-    inherit TypeProviderForNamespaces()
+    inherit TypeProviderForNamespaces(config)
 
     let namespaceName = "FSharp.Azure.StorageTypeProvider"
     let thisAssembly = Assembly.GetExecutingAssembly()
@@ -53,7 +53,7 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
     let buildTypes (typeName : string) (args : obj []) = 
         // Create the top level property
         let typeProviderForAccount = ProvidedTypeDefinition(thisAssembly, namespaceName, typeName, baseType = Some typeof<obj>)
-        typeProviderForAccount.AddMember(ProvidedConstructor(parameters = [], InvokeCode = (fun _ -> <@@ null @@>)))
+        typeProviderForAccount.AddMember(ProvidedConstructor([], fun _ -> <@@ null @@>))
         
         startLiveRefresh args.[8]
         
