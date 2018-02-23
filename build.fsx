@@ -19,7 +19,7 @@ let project = "FSharp.Azure.StorageTypeProvider"
 // (used as description in AssemblyInfo and as a short summary for NuGet package)
 let summary = "Allows easy access to Azure Storage assets through F# scripts."
 // Pattern specifying assemblies to be tested using XUnit
-let testAssemblies = "tests/**/bin/Release/*Tests*.exe"
+let testAssemblies = "tests/**/bin/Release/net452/*Tests*.exe"
 
 // Git configuration (used for publishing documentation in gh-pages branch)
 // The profile where the project is posted
@@ -94,9 +94,10 @@ Target "NuGet"
                 Dependencies = [ "WindowsAzure.Storage", "9.0.0" ]
                 References = [ "FSharp.Azure.StorageTypeProvider.dll" ]
                 Files = 
-                    ([ "FSharp.Azure.StorageTypeProvider.xml"; "FSharp.Azure.StorageTypeProvider.dll";
-                       "Microsoft.WindowsAzure.Storage.dll"; "Newtonsoft.Json.dll" ] 
-                     |> List.map (fun file -> @"..\bin\" + file, Some "lib/net452", None))
+                    ([ "FSharp.Azure.StorageTypeProvider.xml"; "FSharp.Azure.StorageTypeProvider.dll"
+                       "Microsoft.WindowsAzure.Storage.dll"; "Microsoft.Azure.KeyVault.Core.dll"
+                       "Newtonsoft.Json.dll" ] 
+                     |> List.map (fun file -> "../bin/net452/" + file, Some "lib/net452", None))
                      @ [ "StorageTypeProvider.fsx", None, None ] }) 
               ("nuget/" + project + ".nuspec"))
 
