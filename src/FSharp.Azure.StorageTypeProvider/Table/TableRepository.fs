@@ -182,18 +182,18 @@ let private splitIntoBatches createTableOp entities =
                     partitionKey, entityBatch, batchForPartition))
 
 let private processErrorResp entityBatch buildEntityId (ex:StorageException) =
-    let requestInformation = ex.RequestInformation
-    match requestInformation.ExtendedErrorInformation.ErrorMessage.Split('\n').[0].Split(':') with
+    let requestResult = ex.RequestInformation
+    match requestResult.ExtendedErrorInformation.ErrorMessage.Split('\n').[0].Split(':') with
     | [|index; _|] ->
         match Int32.TryParse(index) with
         | true, index ->
             entityBatch
             |> Seq.mapi(fun entityIndex entity ->
-                if entityIndex = index then EntityError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode)
+                if entityIndex = index then EntityError(buildEntityId entity, requestResult.HttpStatusCode, requestResult.ExtendedErrorInformation.ErrorCode)
                 else BatchOperationFailedError(buildEntityId entity))
-        | _ -> entityBatch |> Seq.map(fun entity -> BatchError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
-    | [| _ |] -> entityBatch |> Seq.map(fun entity -> EntityError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
-    | _ -> entityBatch |> Seq.map(fun entity -> BatchError(buildEntityId entity, requestInformation.HttpStatusCode, requestInformation.ExtendedErrorInformation.ErrorCode))
+        | _ -> entityBatch |> Seq.map(fun entity -> BatchError(buildEntityId entity, requestResult.HttpStatusCode, requestResult.ExtendedErrorInformation.ErrorCode))
+    | [| _ |] -> entityBatch |> Seq.map(fun entity -> EntityError(buildEntityId entity, requestResult.HttpStatusCode, requestResult.ExtendedErrorInformation.ErrorCode))
+    | _ -> entityBatch |> Seq.map(fun entity -> BatchError(buildEntityId entity, requestResult.HttpStatusCode, requestResult.ExtendedErrorInformation.ErrorCode))
 
 let (|AsyncSuccess|AggregationError|) (asyncComputation:Choice<_,exn>) =
     match asyncComputation with

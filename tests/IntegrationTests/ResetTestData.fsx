@@ -1,5 +1,6 @@
 ﻿// This script sets up local azure storage to a well-known state for integration tests.
-#r @"..\..\packages\WindowsAzure.Storage\lib\net40\Microsoft.WindowsAzure.Storage.dll"
+#r @"..\..\packages\WindowsAzure.Storage\lib\net45\Microsoft.WindowsAzure.Storage.dll"
+#r @"..\..\packages\Newtonsoft.Json\lib\net45\Newtonsoft.Json.dll"
 
 open Microsoft.WindowsAzure.Storage
 open System.Text
@@ -43,7 +44,6 @@ let createData _ =
     createBlockBlob "folder/pageDataChild.txt" "hello from child page blob"
     createPageBlob "pageData.bin" "hello from page blob"
     
-
 createData |> logWith "blob"
 
 #load "TableHelpers.fs"

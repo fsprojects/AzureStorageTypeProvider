@@ -91,3 +91,6 @@
 
 ### 1.9.5 - 9th November 2017
 * Re-enable storage metrics support.
+
+### 1.9.6 - 23rd February 2018
+* Upgrade Azure Storage to v9

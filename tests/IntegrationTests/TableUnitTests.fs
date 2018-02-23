@@ -129,7 +129,7 @@ let tableWriteTests =
             table.GetPartition("men").Length |> shouldEqual 0 })
         
         testCase "Deleting a non-existant row raises an error" <| tableSafe (fun _ ->
-            let deleteResponse = table.Delete [ Partition "blah", Row "500"]
+            let deleteResponse = table.Delete [ Partition "blah", Row "500" ]
             deleteResponse |> shouldEqual [| "blah", [| EntityError((Partition "blah", Row "500"), 404, "ResourceNotFound") |] |])
         
         testCaseAsync "Deleting a non-existant row asynchronously raises an error" <| tableSafeAsync (async {

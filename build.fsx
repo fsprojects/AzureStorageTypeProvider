@@ -130,12 +130,11 @@ Target "NuGet"
                      ReleaseNotes = release.Notes |> String.concat Environment.NewLine
                      Tags = tags
                      OutputPath = "bin"
-                     Dependencies = [ "WindowsAzure.Storage", "7.2.1" ]
+                     Dependencies = [ "WindowsAzure.Storage", "9.0.0" ]
                      References = [ "FSharp.Azure.StorageTypeProvider.dll" ]
                      Files = 
-                         ([ "FSharp.Azure.StorageTypeProvider.xml"; "FSharp.Azure.StorageTypeProvider.dll"; "Microsoft.Azure.KeyVault.Core.dll"
-                            "Microsoft.Data.Edm.dll"; "Microsoft.Data.OData.dll"; "Microsoft.Data.Services.Client.dll";
-                            "Microsoft.WindowsAzure.Storage.dll"; "Newtonsoft.Json.dll"; "System.Spatial.dll" ] 
+                         ([ "FSharp.Azure.StorageTypeProvider.xml"; "FSharp.Azure.StorageTypeProvider.dll";
+                            "Microsoft.WindowsAzure.Storage.dll"; "Newtonsoft.Json.dll" ] 
                           |> List.map (fun file -> @"..\bin\" + file, Some "lib/net452", None))
                           @ [ "StorageTypeProvider.fsx", None, None ] }) 
               ("nuget/" + project + ".nuspec"))
