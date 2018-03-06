@@ -5,6 +5,7 @@ open FSharp.Azure.StorageTypeProvider.Table.TableRepository
 open Microsoft.WindowsAzure.Storage
 open Microsoft.WindowsAzure.Storage.Table
 open System
+open System.Reflection
 
 /// Represents a Table in Azure.
 type AzureTable internal (defaultConnection, tableName) = 
@@ -20,7 +21,7 @@ type AzureTable internal (defaultConnection, tableName) =
         let insertOp = createInsertOperation insertMode
 
         let propBuilders = 
-            typeof<'b>.GetProperties(Reflection.BindingFlags.Public ||| Reflection.BindingFlags.Instance)
+            typeof<'b>.GetProperties(BindingFlags.Public ||| BindingFlags.Instance)
             |> Seq.map (fun prop entity -> prop.Name, prop.GetValue(entity, null))
             |> Seq.toArray
 
@@ -38,7 +39,7 @@ type AzureTable internal (defaultConnection, tableName) =
                         | :? Option<bool> as value -> safeGetOption name value
                         | :? Option<DateTime> as value -> safeGetOption name value
                         | :? Option<double> as value -> safeGetOption name value
-                        | :? Option<System.Guid> as value -> safeGetOption name value
+                        | :? Option<Guid> as value -> safeGetOption name value
                         | :? Option<int64> as value -> safeGetOption name value
                         | _ -> Some (name, value))
                     |> Map.ofSeq
@@ -53,12 +54,12 @@ type AzureTable internal (defaultConnection, tableName) =
     member __.AsCloudTable(?connectionString) = getTableForConnection (defaultArg connectionString defaultConnection)
 
     /// Inserts a batch of entities into the table, using all public properties on the object as fields.
-    member __.Insert(entities : seq<Partition * Row * 'b>, ?insertMode, ?connectionString) =
+    member __.Insert(entities : seq<Partition * Row * _>, ?insertMode, ?connectionString) =
         let tblEntities, insertOp, table  = buildInsertParams insertMode connectionString entities
         tblEntities |> executeBatchOperation insertOp table
 
     /// Inserts a batch of entities into the table, using all public properties on the object as fields.
-    member __.InsertAsync(entities : seq<Partition * Row * 'b>, ?insertMode, ?connectionString) = async{
+    member __.InsertAsync(entities : seq<Partition * Row * _>, ?insertMode, ?connectionString) = async {
         let tblEntities, insertOp, table  = buildInsertParams insertMode connectionString entities
         return! tblEntities |> executeBatchOperationAsync insertOp table }
     
@@ -71,7 +72,7 @@ type AzureTable internal (defaultConnection, tableName) =
         |> Seq.head
 
     /// Inserts a single entity into the table asynchronously, using public properties on the object as fields.
-    member this.InsertAsync(partitionKey, rowKey, entity, ?insertMode, ?connectionString) = async{
+    member this.InsertAsync(partitionKey, rowKey, entity, ?insertMode, ?connectionString) = async {
         let insertMode, connectionString = getConnectionDetails (insertMode, connectionString)
         let! insertRes = this.InsertAsync([ partitionKey, rowKey, entity ], insertMode, connectionString)
         return
