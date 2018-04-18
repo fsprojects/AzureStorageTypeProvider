@@ -68,7 +68,11 @@ let internal getTable tableName connection =
 /// Gets all tables
 let internal getTables connection = 
     let client = getTableClient connection
-    client.ListTables() |> Seq.map(fun table -> table.Name)
+    try
+    client.ListTables() |> Seq.toArray |> Array.map(fun table -> table.Name)
+    with
+    | :? StorageException as ex when ex.RequestInformation.HttpStatusCode = 501 -> Array.empty
+    | _ -> reraise()
 
 let internal getMetricsTables connection =
     let client = getTableClient connection
