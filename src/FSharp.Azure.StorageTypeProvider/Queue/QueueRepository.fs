@@ -8,9 +8,13 @@ open System
 let internal getQueueClient connectionString = CloudStorageAccount.Parse(connectionString).CreateCloudQueueClient()
 
 let getQueues connectionString = 
+    try
     getQueueClient(connectionString).ListQueues()
     |> Seq.map (fun q -> q.Name)
     |> Seq.toList
+    with
+    | :? StorageException as ex when ex.RequestInformation.HttpStatusCode = 501 -> List.empty
+    | _ -> reraise()
 
 let getQueueRef name = getQueueClient >> (fun q -> q.GetQueueReference name)
 
