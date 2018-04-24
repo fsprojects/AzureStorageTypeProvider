@@ -332,7 +332,7 @@ NUGET
       System.Xml.ReaderWriter (>= 4.3)
     Unquote (4.0)
       FSharp.Core (>= 4.2.3)
-    WindowsAzure.Storage (9.0)
+    WindowsAzure.Storage (9.1.1)
       NETStandard.Library (>= 1.6.1)
       Newtonsoft.Json (>= 10.0.2)
 GITHUB

@@ -55,7 +55,8 @@ module ConnectionValidation =
                 .Parse(connectionString)
                 .CreateCloudTableClient()
                 .GetTableReference("a")
-                .Exists() //throws an exception if attempted with an invalid connection string
+                .ExistsAsync()
+                .Result //throws an exception if attempted with an invalid connection string
                 |> ignore
             Success()
         with | ex -> Failure ex

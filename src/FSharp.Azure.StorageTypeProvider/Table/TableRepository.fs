@@ -68,7 +68,7 @@ let internal getTable tableName connection =
 /// Gets all tables
 let internal getTables connection = 
     let client = getTableClient connection
-    client.ListTables() |> Seq.map(fun table -> table.Name)
+    client.ListTablesSegmentedAsync(null).Result |> fun t -> t.Results |> Seq.map(fun table -> table.Name)
 
 let internal getMetricsTables connection =
     let client = getTableClient connection
@@ -81,14 +81,15 @@ let internal getMetricsTables connection =
             for location in locations do
                 for service in services do
                     let tableName = sprintf "$Metrics%s%sTransactions%s" period location service
-                    if (client.GetTableReference(tableName).Exists()) then
+                    if (client.GetTableReference(tableName).ExistsAsync().Result) then
                         yield description, location, service, tableName }
 
 type private DynamicQuery = TableQuery<DynamicTableEntity>
 
 let internal getRowsForSchema (rowCount: int) connection tableName = 
     let table = getTable tableName connection
-    table.ExecuteQuery(DynamicQuery().Take(Nullable rowCount))
+    table.ExecuteQuerySegmentedAsync(DynamicQuery().Take(Nullable rowCount), null).Result
+    |> fun t -> t.Results
     |> Seq.truncate rowCount
     |> Seq.toArray
 
@@ -132,7 +133,8 @@ let executeQuery connection tableName maxResults filterString =
     let query = DynamicQuery().Where(filterString)
     let query = if maxResults > 0 then query.Take(Nullable maxResults) else query
 
-    (getTable tableName connection).ExecuteQuery(query)
+    (getTable tableName connection).ExecuteQuerySegmentedAsync(query, null).Result
+    |> fun t -> t.Results
     |> Seq.map(toLightweightTableEntity)
     |> Seq.toArray
 
@@ -218,7 +220,8 @@ let internal executeBatchAsynchronously batchOp entityBatch buildEntityId (table
 let internal executeBatchSyncronously batchOp entityBatch buildEntityId (table:CloudTable) =
     try 
     batchOp
-    |> table.ExecuteBatch
+    |> table.ExecuteBatchAsync
+    |> fun t -> t.Result
     |> Seq.zip entityBatch
     |> Seq.map(fun (entity, res) -> SuccessfulResponse(buildEntityId entity, res.HttpStatusCode))
     with :? StorageException as ex -> processErrorResp entityBatch buildEntityId ex

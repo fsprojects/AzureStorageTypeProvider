@@ -26,7 +26,8 @@ let private getItemName (item : string) (parent : CloudBlobDirectory) =
     | parent -> item.Substring(parent.Prefix.Length)
 
 let rec private getContainerStructure wildcard (container : CloudBlobContainer) = 
-    container.ListBlobs(prefix = wildcard)
+    container.ListBlobsSegmentedAsync(prefix = wildcard, currentToken = null).Result
+    |> fun s -> s.Results
     |> Seq.distinctBy (fun b -> b.Uri.AbsoluteUri)
     |> Seq.choose (function
        | :? CloudBlobDirectory as directory -> 
@@ -39,7 +40,8 @@ let rec private getContainerStructure wildcard (container : CloudBlobContainer) 
     |> Seq.toArray
 
 let listBlobs incSubDirs (container:CloudBlobContainer) prefix = 
-    container.ListBlobs(prefix, incSubDirs)
+    container.ListBlobsSegmentedAsync(prefix = prefix, useFlatBlobListing = incSubDirs, blobListingDetails = BlobListingDetails.All, maxResults = Nullable(), currentToken = null, options = BlobRequestOptions(), operationContext = null).Result
+    |> fun s -> s.Results
     |> Seq.choose(function
         | :? ICloudBlob as blob -> 
             let path, name = getItemName blob.Name blob.Parent
@@ -47,7 +49,8 @@ let listBlobs incSubDirs (container:CloudBlobContainer) prefix =
         | _ -> None)    //can safely ignore folder types as we have a flat structure if & only if we want to include items from sub directories
 
 let getBlobStorageAccountManifest connection = 
-    (getBlobClient connection).ListContainers()
+    (getBlobClient connection).ListContainersSegmentedAsync(null).Result
+    |> fun s -> s.Results
     |> Seq.toList
     |> List.map (fun container -> 
         { Name = container.Name
@@ -65,7 +68,8 @@ let downloadFolder (connectionDetails, path) =
 
     let connection, container, folderPath = connectionDetails
     let containerRef = (getBlobClient connection).GetContainerReference(container)
-    containerRef.ListBlobs(prefix = folderPath, useFlatBlobListing = true)
+    containerRef.ListBlobsSegmentedAsync(prefix = folderPath, useFlatBlobListing = true, blobListingDetails = BlobListingDetails.All, maxResults = Nullable(), currentToken = null, options = BlobRequestOptions(), operationContext = null).Result
+    |> fun s -> s.Results
     |> Seq.choose (function
         | :? ICloudBlob as b -> Some b
         | _ -> None)

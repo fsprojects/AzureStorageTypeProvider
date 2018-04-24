@@ -1,9 +1,7 @@
 ﻿namespace FSharp.Azure.StorageTypeProvider.Queue
 
 open FSharp.Azure.StorageTypeProvider.Queue.QueueRepository
-open Microsoft.WindowsAzure.Storage
 open Microsoft.WindowsAzure.Storage.Queue
-open ProviderImplementation.ProvidedTypes
 open System
 
 /// The unique identifier for this Azure queue message.
@@ -76,7 +74,7 @@ type ProvidedQueue(defaultConnectionString, name) =
     /// Gets the queue length.
     member __.GetCurrentLength(?connectionString) = 
         let queueRef = getQueue connectionString
-        queueRef.FetchAttributes()
+        queueRef.FetchAttributesAsync() |> Async.AwaitTask |> Async.RunSynchronously
         queueRef.ApproximateMessageCount
         |> Option.ofNullable
         |> defaultArg <| 0
@@ -112,10 +110,6 @@ type ProvidedQueue(defaultConnectionString, name) =
     
     /// Enqueues a new message.
     member __.Enqueue(content : string, ?connectionString) =
-        connectionString |> enqueue (CloudQueueMessage(content))
-    
-    /// Enqueues a new message.
-    member __.Enqueue(content : byte array, ?connectionString) = 
         connectionString |> enqueue (CloudQueueMessage(content))
     
     /// Deletes an existing message.

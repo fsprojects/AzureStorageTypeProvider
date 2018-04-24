@@ -1,4 +1,5 @@
 WindowsAzure.Storage
 FSharp.Core
+System.Configuration.ConfigurationManager
 File:ProvidedTypes.fsi
 File:ProvidedTypes.fs

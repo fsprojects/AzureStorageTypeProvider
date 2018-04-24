@@ -3,7 +3,6 @@
 open FSharp.Azure.StorageTypeProvider.Blob.BlobRepository
 open Microsoft.WindowsAzure.Storage
 open Microsoft.WindowsAzure.Storage.Blob
-open ProviderImplementation.ProvidedTypes
 open System
 open System.IO
 open System.Xml.Linq
@@ -63,7 +62,7 @@ type BlobFile internal (defaultConnectionString, container, file, getBlobRef : _
         this.BlobRef(connectionString).DownloadToFileAsync(path, FileMode.Create) |> Async.AwaitTask
     
     /// Opens this file as a stream for reading.
-    member this.OpenStream(?connectionString:string) = this.BlobRef(connectionString).OpenRead()
+    member this.OpenStream(?connectionString:string) = this.BlobRef(connectionString).OpenReadAsync(AccessCondition(), BlobRequestOptions(), null).Result
     
     /// Opens this file as a text stream for reading.
     member this.OpenStreamAsText(?connectionString) =
@@ -109,7 +108,7 @@ type BlockBlobFile internal (defaultConnectionString, container, file) =
     member __.AsCloudBlockBlob(?connectionString) = getBlobRef connectionString
 
     /// Reads this file as a string.
-    member __.Read(?connectionString) = (getBlobRef connectionString).DownloadText()
+    member __.Read(?connectionString) = (getBlobRef connectionString).DownloadTextAsync().Result
     
     /// Reads this file as a string asynchronously.
     member __.ReadAsync(?connectionString) = getBlobRef(connectionString).DownloadTextAsync() |> Async.AwaitTask

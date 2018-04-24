@@ -104,8 +104,9 @@ type AzureTable internal (defaultConnection, tableName) =
         let table = getTableForConnection (defaultArg connectionString defaultConnection)
         let filter = Table.TableQuery.GenerateFilterCondition ("PartitionKey", Table.QueryComparisons.Equal, partitionKey)
 
-        (new Table.TableQuery<Table.DynamicTableEntity>()).Where(filter).Select [| "RowKey" |]
-        |> table.ExecuteQuery
+        let query = (new Table.TableQuery<Table.DynamicTableEntity>()).Where(filter).Select [| "RowKey" |]
+        table.ExecuteQuerySegmentedAsync(query, null).Result
+        |> fun r -> r.Results
         |> Seq.map(fun e -> (Partition e.PartitionKey, Row e.RowKey))
         |> __.Delete
         |> getSinglePartitionResult partitionKey

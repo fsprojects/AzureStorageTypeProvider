@@ -2,19 +2,19 @@
 
 open Microsoft.WindowsAzure.Storage
 open Microsoft.WindowsAzure.Storage.Queue
-open Microsoft.WindowsAzure.Storage.Queue.Protocol
 open System
 
 let internal getQueueClient connectionString = CloudStorageAccount.Parse(connectionString).CreateCloudQueueClient()
 
 let getQueues connectionString = 
-    getQueueClient(connectionString).ListQueues()
+    getQueueClient(connectionString).ListQueuesSegmentedAsync(null).Result
+    |> fun s -> s.Results
     |> Seq.map (fun q -> q.Name)
     |> Seq.toList
 
 let getQueueRef name = getQueueClient >> (fun q -> q.GetQueueReference name)
 
-let peekMessages connectionString name = getQueueRef name connectionString |> (fun x -> x.PeekMessages)
+let peekMessages connectionString name = getQueueRef name connectionString |> (fun x -> x.PeekMessagesAsync >> fun t -> t.Result)
 
 let generateSas start duration queuePermissions (queue:CloudQueue) =
     let policy = SharedAccessQueuePolicy(Permissions = queuePermissions,
