@@ -45,7 +45,7 @@ type AlternativeEntity() =
     member val IsManager = false with get, set
     member val IsAnimal = true with get, set
 
-let saveRow (table:CloudTable) = TableOperation.Insert >> table.Execute >> ignore
+let saveRow (table:CloudTable) = TableOperation.Insert >> table.ExecuteAsync >> Async.AwaitTask >> Async.RunSynchronously >> ignore
 
 let insertRow (pk, rk, name, yearsWorking, dob, salary, isManager) table = 
     RandomEntity(Name = name, YearsWorking = yearsWorking, Salary = salary, Dob = dob, PartitionKey = pk, RowKey = rk.ToString(), IsManager = isManager)
@@ -62,8 +62,8 @@ let resetData() =
                 .DevelopmentStorageAccount
                 .CreateCloudTableClient()
                 .GetTableReference table
-        if table.Exists() then table.Delete()
-        table.Create()
+        if table.ExistsAsync().Result then table.DeleteAsync() |> Async.AwaitTask |> Async.RunSynchronously
+        table.CreateAsync() |> Async.AwaitTask |> Async.RunSynchronously
         table
 
     let largeTable = recreateTable "large"

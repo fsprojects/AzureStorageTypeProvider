@@ -1,12 +1,12 @@
 ﻿module BlobTests
 
+open Expecto
 open FSharp.Azure.StorageTypeProvider
+open FSharp.Azure.StorageTypeProvider.Blob
 open Microsoft.WindowsAzure.Storage.Blob
 open System
 open System.Linq
 open System.IO
-open FSharp.Azure.StorageTypeProvider.Blob
-open Expecto
 
 type Local = AzureTypeProvider<"DevStorageAccount", "">
 

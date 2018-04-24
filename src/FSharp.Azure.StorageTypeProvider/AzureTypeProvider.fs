@@ -86,9 +86,9 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
                     try builder(connectionString, domainTypes)
                     with ex -> failwithf "An error occurred during initial type generation for %s: %O" name ex))
             typeProviderForAccount
-        | Some (Failure ex), _, _ -> failwithf "Unable to validate connection string (%s)" ex.Message
-        | _, Failure ex, _ -> failwithf "Unable to parse blob schema file (%s)" ex.Message
-        | _, _, Failure ex -> failwithf "Unable to parse table schema file (%s)" ex.Message
+        | Some (Failure ex), _, _ -> failwithf "Unable to validate connection string (%O)" ex
+        | _, Failure ex, _ -> failwithf "Unable to parse blob schema file (%O)" ex
+        | _, _, Failure ex -> failwithf "Unable to parse table schema file (%O)" ex
     
     let createParam (name, defaultValue:'a, help) =
         let providedParameter = ProvidedStaticParameter(name, typeof<'a>, defaultValue)

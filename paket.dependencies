@@ -12,6 +12,7 @@ nuget FSharp.Core
 nuget Newtonsoft.Json 10.0.2
 nuget Nuget.CommandLine
 nuget Unquote
+nuget System.Net.Http
 
 github fsprojects/FSharp.TypeProviders.StarterPack src/ProvidedTypes.fsi
 github fsprojects/FSharp.TypeProviders.StarterPack src/ProvidedTypes.fs
