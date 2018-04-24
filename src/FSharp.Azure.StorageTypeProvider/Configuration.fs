@@ -32,7 +32,6 @@ let getConnectionString(connectionName: string, resolutionFolder, requestedConfi
         | NoConfigRequested, DefaultConfigExists configPath -> configPath
         | RequestedConfigDoesNotExist, _ -> raise <| FileNotFoundException(sprintf "Could not find config file '%s' in path '%s'." requestedConfig resolutionFolder)
         | NoConfigRequested, NoDefaultConfigFound -> failwithf "Cannot find either app.config or web.config in path '%s'." resolutionFolder
-
     let map = ExeConfigurationFileMap(ExeConfigFilename = configPath)
     let configSection = ConfigurationManager.OpenMappedExeConfiguration(map, ConfigurationUserLevel.None).ConnectionStrings.ConnectionStrings
 

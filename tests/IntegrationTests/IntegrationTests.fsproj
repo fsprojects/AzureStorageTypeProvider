@@ -1,10 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>UnitTests</RootNamespace>
     <Name>UnitTests</Name>
     <AssemblyName>IntegrationTests</AssemblyName>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <OutputType>Exe</OutputType>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ExpectoHelpers.fs" />
@@ -25,6 +27,5 @@
       <HintPath>..\..\bin\net452\FSharp.Azure.StorageTypeProvider.dll</HintPath>
     </Reference>
   </ItemGroup>
-  
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>
