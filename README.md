@@ -7,6 +7,8 @@ The goal is to create a provider which allows lightweight access to your Azure s
 
 Support exists reading and writing from Blobs, Tables and Queues, as well as fallback to the standard .NET Azure SDK.
 
+The provider currently does not support .NET Core for the reasons specified [here](https://github.com/fsprojects/AzureStorageTypeProvider/issues/111#issuecomment-417208922).
+
 [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/fsprojects/AzureStorageTypeProvider?svg=true)](https://ci.appveyor.com/project/fsprojectsgit/azurestoragetypeprovider)
 
 ### Maintainer(s)
