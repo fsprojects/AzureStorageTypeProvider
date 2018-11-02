@@ -8,7 +8,7 @@ open Fake
 open Fake.AppVeyor
 open Fake.Git
 open Fake.AssemblyInfoFile
-open Fake.ReleaseNotesHelper
+open Fake.Core
 open System
 open System.IO
 
@@ -38,7 +38,7 @@ let buildDir = "bin"
 
 let release =
     File.ReadAllLines "RELEASE_NOTES.md"
-    |> parseAllReleaseNotes
+    |> ReleaseNotes.parseAll
     |> List.head
 
 // Generate assembly info files with the right version & up-to-date information
