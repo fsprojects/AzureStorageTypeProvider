@@ -3,7 +3,6 @@
 // --------------------------------------------------------------------------------------
 
 #r @"packages/FAKE/tools/FakeLib.dll"
-
 open Fake.AppVeyor
 open Fake.Git
 open Fake.Core.TargetOperators
@@ -14,7 +13,10 @@ open Fake.IO.Globbing.Operators
 open System
 open System.IO
 open Fake.IO
-
+open Fake.Azure
+open Fake.DotNet.NuGet
+open Fake.FSIHelper
+open Fake.Tools.Git
 // The name of the project
 // (used by attributes in AssemblyInfo, name of a NuGet package and directory in 'src')
 let project = "FSharp.Azure.StorageTypeProvider"
@@ -37,6 +39,12 @@ Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
 
 let buildDir = "bin"
 
+
+// TypeProvider path
+let projectPath = Path.getFullName "./src/FSharp.Azure.StorageTypeProvider"
+
+// Test path
+let testPath = Path.getFullName "./tests"
 // Read additional information from the release notes document
 
 let release =
@@ -68,29 +76,45 @@ Target.create "Clean" (fun _ -> Shell.cleanDirs [ "bin"; "temp"; "tests/integrat
 Target.create "CleanDocs" (fun _ -> Shell.cleanDirs ["docs/output"])
 
 // --------------------------------------------------------------------------------------
+// Restore project
+Target.create "RestoreProject" (fun _ ->
+    runDotNet "restore" projectPath
+)
+
+// --------------------------------------------------------------------------------------
 // Build library project
 Target.create "Build" (fun _ ->
-    DotNet.publish (fun p -> { p with Project = "FSharp.Azure.StorageTypeProvider.sln" }))
+    runDotNet "build" projectPath
+)
+
+
 
 // --------------------------------------------------------------------------------------
 // Run the unit tests using test runner
 Target.create "ResetTestData" (fun _ ->
-    AzureHelper.StartStorageEmulator()
-    FSIHelper.executeFSI (__SOURCE_DIRECTORY__ </> @"tests\IntegrationTests") "ResetTestData.fsx" []
+    let fsiExe = "path/to/fsi.exe"
+    let script =  "ResetTestData.fsx"
+    Emulators.startStorageEmulator()
+    Fsi.exec (fun p -> 
+        { p with 
+            TargetProfile = Fsi.Profile.NetStandard
+            WorkingDirectory = testPath
+            ToolPath = Fsi.FsiTool.External fsiExe
+        }) script [""]
     |> snd
-    |> Seq.iter(fun x -> printfn "%s" x.Message))
+    |> Seq.iter(fun x -> printfn "%s" x))  ///ToBeFixed
 
 // Run integration tests
 Target.create "RunTests" (fun _ ->
-    DotNetCli.Build (fun p -> { p with Project = "UnitTests.sln" })
-    FileHelper.CreateDir "TestOutput"
+    runDotNet "build" testPath
+    Directory.create "TestOutput"
     !!(testAssemblies) |> Fake.Testing.Expecto.Expecto id)
 
 // --------------------------------------------------------------------------------------
 // Build a NuGet package
 Target.create "NuGet" 
     (fun _ -> 
-        NuGet (fun p ->
+        NuGet.NuGet (fun p ->
             { p with
                 Authors = [ "Isaac Abraham" ]
                 Project = project
@@ -114,13 +138,13 @@ Target.create "NuGet"
 module AppVeyorHelpers =
   let execOnAppveyor arguments =
     let result =
-        ExecProcess
-            (fun info ->
-                info.FileName <- "appveyor"
-                info.Arguments <- arguments)
+        Process.execSimple(fun info ->
+            { info with
+                FileName = "appveyor"
+                Arguments = arguments})
             (TimeSpan.FromMinutes 2.0)
     if result <> 0 then failwith (sprintf "Failed to execute appveyor command: %s" arguments)
-    trace "Published packages"
+    Trace.trace "Published packages"
 
   let publishOnAppveyor folder =
     !! (folder + "*.nupkg")
@@ -139,45 +163,46 @@ let generateHelp fail debug =
           yield "--define:HELP"]
 
     if executeFSIWithArgs "docs/tools" "generate.fsx" args [] then
-        traceImportant "Help generated"
+        Trace.traceImportant "Help generated"
     else
         if fail then failwith "generating help documentation failed"
-        else traceImportant "generating help documentation failed"
+        else Trace.traceImportant "generating help documentation failed"
 
 Target.create "GenerateHelp" (fun _ ->
-    DeleteFile "docs/content/release-notes.md"
-    CopyFile "docs/content/" "RELEASE_NOTES.md"
-    Rename "docs/content/release-notes.md" "docs/content/RELEASE_NOTES.md"
+    File.delete "docs/content/release-notes.md"
+    Shell.copyFile "docs/content/" "RELEASE_NOTES.md"
+    Shell.rename "docs/content/release-notes.md" "docs/content/RELEASE_NOTES.md"
 
-    DeleteFile "docs/content/license.md"
-    CopyFile "docs/content/" "LICENSE.txt"
-    Rename "docs/content/license.md" "docs/content/LICENSE.txt"
+    File.delete  "docs/content/license.md"
+    Shell.copyFile "docs/content/" "LICENSE.txt"
+    Shell.rename "docs/content/license.md" "docs/content/LICENSE.txt"
 
-    CopyFile buildDir "packages/FSharp.Core/lib/net40/FSharp.Core.sigdata"
-    CopyFile buildDir "packages/FSharp.Core/lib/net40/FSharp.Core.optdata"
+    Shell.copyFile buildDir "packages/FSharp.Core/lib/net40/FSharp.Core.sigdata"
+    Shell.copyFile buildDir "packages/FSharp.Core/lib/net40/FSharp.Core.optdata"
 
     generateHelp false false)
 
 Target.create "GenerateHelpDebug" (fun _ ->
-    DeleteFile "docs/content/release-notes.md"
-    CopyFile "docs/content/" "RELEASE_NOTES.md"
-    Rename "docs/content/release-notes.md" "docs/content/RELEASE_NOTES.md"
+    File.delete "docs/content/release-notes.md"
+    Shell.copyFile "docs/content/" "RELEASE_NOTES.md"
+    Shell.rename "docs/content/release-notes.md" "docs/content/RELEASE_NOTES.md"
 
-    DeleteFile "docs/content/license.md"
-    CopyFile "docs/content/" "LICENSE.txt"
-    Rename "docs/content/license.md" "docs/content/LICENSE.txt"
+    File.delete "docs/content/license.md"
+    Shell.copyFile "docs/content/" "LICENSE.txt"
+
+    Shell.rename "docs/content/license.md" "docs/content/LICENSE.txt"
 
     generateHelp true true)
 
 Target.create "KeepRunning" (fun _ ->    
-    use watcher = !! "docs/content/**/*.*" |> WatchChanges (fun changes ->
+    use watcher = !! "docs/content/**/*.*" |> ChangeWatcher.run (fun changes ->
          generateHelp false false)
 
-    traceImportant "Waiting for help edits. Press any key to stop."
+    Trace.traceImportant "Waiting for help edits. Press any key to stop."
     System.Console.ReadKey() |> ignore
     watcher.Dispose())
 
-Target.create "GenerateDocs" DoNothing
+Target.create "GenerateDocs" ignore
 
 // --------------------------------------------------------------------------------------
 // Release Scripts
@@ -187,40 +212,40 @@ Target.create "ReleaseDocs" (fun _ ->
     Shell.cleanDir tempDocsDir
     Repository.cloneSingleBranch "" (gitHome + "/" + gitName + ".git") "gh-pages" tempDocsDir
 
-    Git.CommandHelper.runSimpleGitCommand tempDocsDir "rm . -f -r" |> ignore
-    CopyRecursive "docs/output" tempDocsDir true |> tracefn "%A"
+    CommandHelper.runSimpleGitCommand tempDocsDir "rm . -f -r" |> ignore
+    Shell.copyRecursive "docs/output" tempDocsDir true |> Trace.tracefn "%A"
     
-    StageAll tempDocsDir
-    Git.Commit.Commit tempDocsDir (sprintf "Update generated documentation for version %s" release.NugetVersion)
+    Staging.stageAll tempDocsDir
+    Commit tempDocsDir (sprintf "Update generated documentation for version %s" release.NugetVersion)
     Branches.push tempDocsDir)
 
 Target.create "Release" (fun _ ->
     let user =
-        match getBuildParam "github-user" with
+        match Environment.environVar "github-user" with
         | s when not (String.IsNullOrWhiteSpace s) -> s
-        | _ -> getUserInput "Username: "
+        | _ -> UserInput.getUserInput "Username: "
     let pw =
-        match getBuildParam "github-pw" with
+        match Environment.environVar "github-pw" with
         | s when not (String.IsNullOrWhiteSpace s) -> s
-        | _ -> getUserPassword "Password: "
+        | _ -> UserInput.getUserPassword "Password: "
     let remote =
-        Git.CommandHelper.getGitResult "" "remote -v"
+        CommandHelper.getGitResult "" "remote -v"
         |> Seq.filter (fun (s: string) -> s.EndsWith("(push)"))
         |> Seq.tryFind (fun (s: string) -> s.Contains(gitOwner + "/" + gitName))
         |> function None -> gitHome + "/" + gitName | Some (s: string) -> s.Split().[0]
 
-    StageAll ""
-    Git.Commit.Commit "" (sprintf "Bump version to %s" release.NugetVersion)
+    Staging.stageAll ""
+    Commit "" (sprintf "Bump version to %s" release.NugetVersion)
     Branches.pushBranch "" remote (Information.getBranchName "")
 
     Branches.tag "" release.NugetVersion
     Branches.pushTag "" remote release.NugetVersion)
 
 Target.create "LocalDeploy" (fun _ ->
-    directoryInfo @"bin"
-    |> filesInDirMatching "*.nupkg"
+    DirectoryInfo @"bin"
+    |> DirectoryInfo.getMatchingFiles "*.nupkg"
     |> Seq.map(fun x -> x.FullName)
-    |> CopyFiles @"..\..\LocalPackages")
+    |> Shell.copyFiles @"..\..\LocalPackages")
 
 Target.create "BuildServerDeploy" (fun _ -> publishOnAppveyor buildDir)
 
@@ -238,8 +263,8 @@ Target.create "All" ignore
   ==> "Nuget"
   ==> "ResetTestData"
   ==> "RunTests"
-  =?> ("LocalDeploy", buildServer = LocalBuild)
-  =?> ("BuildServerDeploy", buildServer = AppVeyor)
+  =?> ("LocalDeploy", BuildServer.buildServer = LocalBuild)
+  =?> ("BuildServerDeploy", BuildServer.buildServer = AppVeyor)
 
 "CleanDocs"
   ==> "GenerateHelp"
