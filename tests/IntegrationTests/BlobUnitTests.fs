@@ -80,7 +80,10 @@ let blobMainTests =
 
         testCase "Cloud Blob Container relates to the same data as the type provider" (fun _ ->
             let client = container.AsCloudBlobContainer()
-            let blobs = client.ListBlobs() |> Seq.choose(function | :? CloudBlockBlob as b -> Some b | _ -> None) |> Seq.map(fun c -> c.Name) |> Seq.toList
+            let blobs = 
+                client.ListBlobsSegmentedAsync(null).Result
+                |> fun s -> s.Results
+                |> Seq.choose(function | :? CloudBlockBlob as b -> Some b | _ -> None) |> Seq.map(fun c -> c.Name) |> Seq.toList
             blobs |> shouldEqual [ "data.xml"; "file1.txt"; "file2.txt"; "file3.txt"; "sample.txt" ])
 
         testCase "CloudBlockBlob relates to the same data as the type provider" (fun _ ->
