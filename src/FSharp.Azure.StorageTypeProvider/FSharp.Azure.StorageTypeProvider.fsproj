@@ -36,7 +36,6 @@
     <Compile Include="Queue/ProvidedQueueTypes.fs" />
     <Compile Include="Queue/QueueMemberFactory.fs" />
     <Compile Include="AzureTypeProvider.fs" />
-    <None Include="App.config" />
     <Content Include="paket.references" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
