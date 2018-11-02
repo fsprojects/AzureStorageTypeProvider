@@ -44,7 +44,7 @@ let buildDir = "bin"
 let projectPath = Path.getFullName "./src/FSharp.Azure.StorageTypeProvider"
 
 // Test path
-let testPath = Path.getFullName "./tests"
+let testPath = Path.getFullName "./tests/IntegrationTests"
 // Read additional information from the release notes document
 
 let release =
@@ -84,7 +84,7 @@ Target.create "RestoreProject" (fun _ ->
 // --------------------------------------------------------------------------------------
 // Build library project
 Target.create "Build" (fun _ ->
-    runDotNet "build" projectPath
+    runDotNet "publish" projectPath
 )
 
 
@@ -92,8 +92,8 @@ Target.create "Build" (fun _ ->
 // --------------------------------------------------------------------------------------
 // Run the unit tests using test runner
 Target.create "ResetTestData" (fun _ ->
-    let fsiExe = "path/to/fsi.exe"
-    let script =  "ResetTestData.fsx"
+    let fsiExe = @"C:\Program Files (x86)\Microsoft SDKs\F#\10.1\Framework\v4.0\fsi.exe"
+    let script = Path.GetFullPath (testPath + @"\ResetTestData.fsx")
     Emulators.startStorageEmulator()
     Fsi.exec (fun p -> 
         { p with 
@@ -249,8 +249,8 @@ Target.create "LocalDeploy" (fun _ ->
 
 Target.create "BuildServerDeploy" (fun _ -> publishOnAppveyor buildDir)
 
-Target.createFinal "PublishTestsResultsToAppveyor" (fun _ ->
-    UploadTestResultsXml TestResultsType.Xunit "TestOutput")
+// Target.createFinal "PublishTestsResultsToAppveyor" (fun _ ->
+//     UploadTestResultsXml TestResultsType.Xunit "TestOutput")
 
 // --------------------------------------------------------------------------------------
 // Run all targets by default. Invoke 'build <Target>' to override
@@ -282,5 +282,5 @@ Target.create "All" ignore
 "GenerateHelp"
   ==> "KeepRunning"
 
-Target.activateFinal "PublishTestsResultsToAppveyor"
+// Target.activateFinal "PublishTestsResultsToAppveyor"
 Target.runOrDefault "RunTests"

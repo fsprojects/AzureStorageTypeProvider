@@ -20,7 +20,6 @@
     <Content Include="BlobSchema.json" />
     <None Include="ResetTestData.fsx" />
     <None Include="paket.references" />
-    <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Azure.StorageTypeProvider">
