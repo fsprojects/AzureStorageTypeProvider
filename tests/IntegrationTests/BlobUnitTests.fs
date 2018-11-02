@@ -98,7 +98,7 @@ let blobMainTests =
 
         testCase "Correctly transforms metadata for a blob container" (fun _ ->
             let underlyingContainer = container.AsCloudBlobContainer()
-            underlyingContainer.FetchAttributes()
+            underlyingContainer.FetchAttributesAsync() |> Async.AwaitTask |> Async.RunSynchronously
             
             let metadata = container.GetProperties() |> Async.RunSynchronously
             metadata.LastModified |> shouldEqual (underlyingContainer.Properties.LastModified |> Option.ofNullable)
