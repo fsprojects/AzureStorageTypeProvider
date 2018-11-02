@@ -5,11 +5,11 @@ framework: netstandard2.0
 nuget FAKE
 nuget Deedle
 nuget Expecto
-nuget WindowsAzure.Storage 9.1.1
+nuget WindowsAzure.Storage
 nuget FSharp.Charting
 nuget FSharp.Formatting
 nuget FSharp.Core
-nuget Newtonsoft.Json 10.0.2
+nuget Newtonsoft.Json
 nuget Nuget.CommandLine
 nuget Unquote
 nuget System.Net.Http
