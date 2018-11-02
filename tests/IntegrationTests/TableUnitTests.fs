@@ -90,7 +90,10 @@ let tableReadOnlyTests =
             baseQuery.``Not Equal To``("fred").ToString()             |> shouldEqual "[Name ne 'fred']")
         testCase "Query restricts maximum results" (fun _ -> table.Query().Execute(maxResults = 1).Length |> shouldEqual 1)
         testCase "Cloud Table Client relates to the same data as the type provider" (fun _ ->
-            Expect.contains (Local.Tables.CloudTableClient.ListTables() |> Seq.map(fun c -> c.Name)) "employee" "")
+            Expect.contains (
+                Local.Tables.CloudTableClient.ListTablesSegmentedAsync(null).Result
+                |> fun s -> s.Results
+                |> Seq.map(fun c -> c.Name)) "employee" "")
         testCaseAsync "Async query without arguments brings back all rows" <| async {
             let! results = table.Query().ExecuteAsync()
             return results.Length |> shouldEqual 5 }
