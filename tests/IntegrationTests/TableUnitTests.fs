@@ -271,7 +271,7 @@ let tableStaticSchemaTests =
             ())
         testCase "Can read and write data to a storage account" <| (fun _ ->
             let table1 = StaticSchema.Tables.MyTable
-            table1.AsCloudTable().CreateIfNotExists() |> ignore
+            table1.AsCloudTable().CreateIfNotExistsAsync() |> Async.AwaitTask |> Async.RunSynchronously |> ignore
             let response = table1.Insert(StaticSchema.Domain.MyTableEntity(Partition "A", Row "1", true, Some "Test", Some (DateTime(2000,1,1))))
             let rows = table1.Query().``Where Partition Key Is``.``Equal To``("A").Execute()
             rows.Length |> shouldEqual 1
