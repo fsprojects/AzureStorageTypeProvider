@@ -73,7 +73,10 @@ let blobMainTests =
             value |> shouldEqual "thing")
 
         testCase "Cloud Blob Client relates to the same data as the type provider" (fun _ ->
-            Expect.contains (Local.Containers.CloudBlobClient.ListContainers() |> Seq.map(fun c -> c.Name)) "samples" "")
+            Expect.contains (
+                Local.Containers.CloudBlobClient.ListContainersSegmentedAsync(null).Result
+                |> fun s -> s.Results
+                |> Seq.map(fun c -> c.Name)) "samples" "")
 
         testCase "Cloud Blob Container relates to the same data as the type provider" (fun _ ->
             let client = container.AsCloudBlobContainer()
