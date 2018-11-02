@@ -2,18 +2,17 @@ redirects: force
 source https://www.nuget.org/api/v2/
 framework: netstandard2.0
 
-nuget FAKE
-nuget Fake.IO.FileSystem 
+nuget FAKE prerelease
 nuget Deedle
 nuget Expecto
-nuget WindowsAzure.Storage
+nuget WindowsAzure.Storage 9.1.1
 nuget FSharp.Charting
 nuget FSharp.Formatting
 nuget FSharp.Core
-nuget Newtonsoft.Json
+nuget Newtonsoft.Json 10.0.2
 nuget Nuget.CommandLine
 nuget Unquote
 nuget System.Net.Http
-
+nuget FSharp.Compiler.Tools
 github fsprojects/FSharp.TypeProviders.StarterPack src/ProvidedTypes.fsi
 github fsprojects/FSharp.TypeProviders.StarterPack src/ProvidedTypes.fs

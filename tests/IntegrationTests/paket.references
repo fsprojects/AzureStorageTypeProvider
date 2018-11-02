@@ -1,3 +1,5 @@
 Unquote
 WindowsAzure.Storage
 Expecto
+FSharp.Compiler.Tools
+Newtonsoft.Json

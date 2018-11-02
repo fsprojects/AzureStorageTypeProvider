@@ -5,9 +5,14 @@
     <Name>FSharp.Azure.StorageTypeProvider</Name>
     <AssemblyName>FSharp.Azure.StorageTypeProvider</AssemblyName>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <AllowCrossTargeting>true</AllowCrossTargeting>
     <OutputPath>..\..\bin\</OutputPath>
     <DocumentationFile>..\..\bin\FSharp.Azure.StorageTypeProvider.XML</DocumentationFile>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup>
+    <FscToolPath>..\..\packages\FSharp.Compiler.Tools\tools</FscToolPath>
+    <FscToolExe>fsc.exe</FscToolExe>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\paket-files\fsprojects\FSharp.TypeProviders.StarterPack\src\ProvidedTypes.fsi">
