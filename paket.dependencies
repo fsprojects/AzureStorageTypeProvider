@@ -3,6 +3,7 @@ source https://www.nuget.org/api/v2/
 framework: netstandard2.0
 
 nuget FAKE
+nuget Fake.IO.FileSystem 
 nuget Deedle
 nuget Expecto
 nuget WindowsAzure.Storage
