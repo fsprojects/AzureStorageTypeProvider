@@ -30,7 +30,10 @@ let readOnlyQueueTests =
     testList "Queue Tests Read Only" [
         testCase "Cloud Queue Client gives same results as the Type Provider" (fun _ ->
             let queues = Local.Queues
-            let queueNames = queues.CloudQueueClient.ListQueues() |> Seq.map(fun q -> q.Name) |> Set.ofSeq
+            let queueNames = 
+                queues.CloudQueueClient.ListQueuesSegmentedAsync(null).Result
+                |> fun s -> s.Results
+                |> Seq.map(fun q -> q.Name) |> Set.ofSeq
             Expect.containsAll queueNames [ queues.``sample-queue``.Name; queues.``second-sample``.Name;  queues.``third-sample``.Name ] "")
         testCase "Cloud Queue is the same queue as the Type Provider" (fun _ ->  (queue.AsCloudQueue().Name) |> shouldEqual queue.Name)
         testCaseAsync "Dequeue with nothing on the queue returns None" <| async {
