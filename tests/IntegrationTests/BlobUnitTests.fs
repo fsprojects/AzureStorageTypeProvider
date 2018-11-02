@@ -135,8 +135,8 @@ let blobMainTests =
                 File.Delete filename
 
                 let blob = Local.Containers.samples.[filename].AsCloudBlockBlob()
-                blob.FetchAttributes()
-                blob.Delete()
+                blob.FetchAttributesAsync() |> Async.AwaitTask |> Async.RunSynchronously
+                blob.DeleteAsync() |> Async.AwaitTask |> Async.RunSynchronously
 
                 blob.Properties.ContentType |> shouldEqual mimeType
             testContent "txt" "text/plain"
