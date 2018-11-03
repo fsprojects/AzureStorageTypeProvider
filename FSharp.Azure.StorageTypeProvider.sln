@@ -1,0 +1,55 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{94066CAA-4417-4C43-A286-40182E920E43}"
+	ProjectSection(SolutionItems) = preProject
+		paket.dependencies = paket.dependencies
+		paket.lock = paket.lock
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B7A3503A-B8A9-4C26-8DCD-8E66425AFC91}"
+	ProjectSection(SolutionItems) = preProject
+		build.fsx = build.fsx
+		docs\tools\generate.fsx = docs\tools\generate.fsx
+		README.md = README.md
+		RELEASE_NOTES.md = RELEASE_NOTES.md
+	EndProjectSection
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Azure.StorageTypeProvider", "src\FSharp.Azure.StorageTypeProvider\FSharp.Azure.StorageTypeProvider.fsproj", "{FB7CA8F3-C158-49E9-B816-501741E2921F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{7CAF8D38-6250-41CB-A65B-ABD760B09281}"
+	ProjectSection(SolutionItems) = preProject
+		docs\tools\references.fsx = docs\tools\references.fsx
+		docs\tools\templates\template.cshtml = docs\tools\templates\template.cshtml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "content", "content", "{15350981-90B9-44A0-B356-776735ACC7F1}"
+	ProjectSection(SolutionItems) = preProject
+		docs\content\blobs.fsx = docs\content\blobs.fsx
+		docs\content\BlobSchema.json = docs\content\BlobSchema.json
+		docs\content\index.fsx = docs\content\index.fsx
+		docs\content\queues.fsx = docs\content\queues.fsx
+		docs\content\quickstart.fsx = docs\content\quickstart.fsx
+		docs\content\sample.config = docs\content\sample.config
+		docs\content\tables.fsx = docs\content\tables.fsx
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FB7CA8F3-C158-49E9-B816-501741E2921F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB7CA8F3-C158-49E9-B816-501741E2921F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB7CA8F3-C158-49E9-B816-501741E2921F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB7CA8F3-C158-49E9-B816-501741E2921F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{15350981-90B9-44A0-B356-776735ACC7F1} = {7CAF8D38-6250-41CB-A65B-ABD760B09281}
+	EndGlobalSection
+EndGlobal
