@@ -106,7 +106,7 @@ Target.create "ResetTestData" (fun _ ->
 
 // Run integration tests
 Target.create "RunTests" (fun _ ->
-    runDotNet "build" testPath
+    runDotNet "build -r" testPath
     Directory.create "TestOutput"
     !!(testAssemblies) |> Fake.Testing.Expecto.Expecto id)
 
