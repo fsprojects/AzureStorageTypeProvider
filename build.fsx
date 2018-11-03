@@ -3,7 +3,7 @@
 // --------------------------------------------------------------------------------------
 
 #r @"packages/FAKE/tools/FakeLib.dll"
-open Fake.AppVeyor
+open Fake.BuildServer
 open Fake.Git
 open Fake.Core.TargetOperators
 open Fake.AssemblyInfoFile
@@ -249,8 +249,9 @@ Target.create "LocalDeploy" (fun _ ->
 
 Target.create "BuildServerDeploy" (fun _ -> publishOnAppveyor buildDir)
 
-// Target.createFinal "PublishTestsResultsToAppveyor" (fun _ ->
-//     UploadTestResultsXml TestResultsType.Xunit "TestOutput")
+Target.createFinal "PublishTestsResultsToAppveyor" (fun _ ->
+    Trace.publish ImportData.BuildArtifact "TestOutput"
+)
 
 // --------------------------------------------------------------------------------------
 // Run all targets by default. Invoke 'build <Target>' to override
