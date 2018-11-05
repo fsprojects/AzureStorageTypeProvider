@@ -4,7 +4,6 @@
 
 #r @"packages/FAKE/tools/FakeLib.dll"
 open Fake.BuildServer
-open Fake.Git
 open Fake.Core.TargetOperators
 open Fake.AssemblyInfoFile
 open Fake.Core
@@ -17,6 +16,8 @@ open Fake.Azure
 open Fake.DotNet.NuGet
 open Fake.FSIHelper
 open Fake.Tools.Git
+// open Fake.Git
+open Fake.DotNet.Testing
 // The name of the project
 // (used by attributes in AssemblyInfo, name of a NuGet package and directory in 'src')
 let project = "FSharp.Azure.StorageTypeProvider"
@@ -46,6 +47,10 @@ let projectPath = Path.getFullName "./src/FSharp.Azure.StorageTypeProvider"
 // Test path
 let testPath = Path.getFullName "./tests/IntegrationTests"
 // Read additional information from the release notes document
+
+// Test Output Dir
+let testOutPutDir = "TestOutput"
+
 
 let release =
     File.ReadAllLines "RELEASE_NOTES.md"
@@ -104,11 +109,30 @@ Target.create "ResetTestData" (fun _ ->
     |> snd
     |> Seq.iter(fun x -> printfn "%s" x))  ///ToBeFixed
 
+
+let build project framework =
+    DotNet.build (fun p ->
+        { p with Framework = Some framework } ) project
+
 // Run integration tests
+
 Target.create "RunTests" (fun _ ->
-    runDotNet "build -r" testPath
-    Directory.create "TestOutput"
-    !!(testAssemblies) |> Fake.Testing.Expecto.Expecto id)
+///    runDotNet "build --configuration Release" testPath
+    // runDotNet (sprintf "publish -c Release -r win10-x64 -o  \"" + Fake.IO.Path.getFullName testOutPutDir + "\"") testPath
+    // build "UnitTests.sln" "netcoreapp2.0"
+    
+    let dotnetOpts = install.Value (DotNet.Options.Create())
+    let result =
+        Process.execSimple  (fun info -> 
+            { info with
+                FileName = dotnetOpts.DotNetCliPath
+                WorkingDirectory = testPath
+                Arguments = "publish --self-contained -c Release -r win10-x64 -o  \"" + Fake.IO.Path.getFullName testOutPutDir + "\""
+            }) TimeSpan.MaxValue
+    if result <> 0 then failwith "Publish failed"
+    printfn "!!(testAssemblies)): %A" !!(testAssemblies)
+    Expecto.run id !!(testAssemblies))
+        // Fake.Testing.Expecto.run id)
 
 // --------------------------------------------------------------------------------------
 // Build a NuGet package
@@ -216,7 +240,7 @@ Target.create "ReleaseDocs" (fun _ ->
     Shell.copyRecursive "docs/output" tempDocsDir true |> Trace.tracefn "%A"
     
     Staging.stageAll tempDocsDir
-    Commit tempDocsDir (sprintf "Update generated documentation for version %s" release.NugetVersion)
+    Commit.exec tempDocsDir (sprintf "Update generated documentation for version %s" release.NugetVersion)
     Branches.push tempDocsDir)
 
 Target.create "Release" (fun _ ->
@@ -235,7 +259,7 @@ Target.create "Release" (fun _ ->
         |> function None -> gitHome + "/" + gitName | Some (s: string) -> s.Split().[0]
 
     Staging.stageAll ""
-    Commit "" (sprintf "Bump version to %s" release.NugetVersion)
+    Commit.exec "" (sprintf "Bump version to %s" release.NugetVersion)
     Branches.pushBranch "" remote (Information.getBranchName "")
 
     Branches.tag "" release.NugetVersion

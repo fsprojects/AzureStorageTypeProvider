@@ -1,6 +1,6 @@
 redirects: force
 source https://www.nuget.org/api/v2/
-framework: netstandard2.0
+framework: netstandard2.0, netcoreapp2.0
 
 nuget FAKE
 nuget Deedle
@@ -14,5 +14,7 @@ nuget Nuget.CommandLine
 nuget Unquote
 nuget System.Net.Http
 nuget FSharp.Compiler.Tools
-github fsprojects/FSharp.TypeProviders.StarterPack src/ProvidedTypes.fsi
-github fsprojects/FSharp.TypeProviders.StarterPack src/ProvidedTypes.fs
+github fsprojects/FSharp.TypeProviders.SDK src/ProvidedTypes.fsi
+github fsprojects/FSharp.TypeProviders.SDK src/ProvidedTypes.fs
+nuget Microsoft.NETCore.Runtime.CoreCLR
+nuget Microsoft.NET.Test.Sdk
