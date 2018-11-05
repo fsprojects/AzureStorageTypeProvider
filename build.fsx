@@ -5,7 +5,6 @@
 #r @"packages/FAKE/tools/FakeLib.dll"
 open Fake.BuildServer
 open Fake.Core.TargetOperators
-open Fake.AssemblyInfoFile
 open Fake.Core
 open Fake.DotNet
 open Fake.IO.Globbing.Operators
@@ -18,14 +17,14 @@ open Fake.FSIHelper
 open Fake.Tools.Git
 // open Fake.Git
 open Fake.DotNet.Testing
+open Fake.IO.FileSystemOperators
+
 // The name of the project
 // (used by attributes in AssemblyInfo, name of a NuGet package and directory in 'src')
 let project = "FSharp.Azure.StorageTypeProvider"
 // Short summary of the project
 // (used as description in AssemblyInfo and as a short summary for NuGet package)
 let summary = "Allows easy access to Azure Storage assets through F# scripts."
-// Pattern specifying assemblies to be tested using XUnit
-let testAssemblies = "tests/**/bin/Release/netstandard2.0/*Tests*.exe"
 
 // Git configuration (used for publishing documentation in gh-pages branch)
 // The profile where the project is posted
@@ -92,19 +91,16 @@ Target.create "Build" (fun _ ->
     runDotNet "publish" projectPath
 )
 
-
-
 // --------------------------------------------------------------------------------------
 // Run the unit tests using test runner
 Target.create "ResetTestData" (fun _ ->
-    let fsiExe = @"C:\Program Files (x86)\Microsoft SDKs\F#\10.1\Framework\v4.0\fsi.exe"
     let script = Path.GetFullPath (testPath + @"\ResetTestData.fsx")
     Emulators.startStorageEmulator()
     Fsi.exec (fun p -> 
         { p with 
             TargetProfile = Fsi.Profile.NetStandard
             WorkingDirectory = testPath
-            ToolPath = Fsi.FsiTool.External fsiExe
+            ToolPath = Fsi.FsiTool.Internal
         }) script [""]
     |> snd
     |> Seq.iter(fun x -> printfn "%s" x))  ///ToBeFixed
@@ -115,24 +111,23 @@ let build project framework =
         { p with Framework = Some framework } ) project
 
 // Run integration tests
+let root = __SOURCE_DIRECTORY__
+let testNetCoreDir = root </> "tests"  </> "IntegrationTests" </> "bin" </> "Release" </> "netcoreapp2.0" </> "win10-x64" </> "publish"
 
 Target.create "RunTests" (fun _ ->
-///    runDotNet "build --configuration Release" testPath
-    // runDotNet (sprintf "publish -c Release -r win10-x64 -o  \"" + Fake.IO.Path.getFullName testOutPutDir + "\"") testPath
-    // build "UnitTests.sln" "netcoreapp2.0"
-    
     let dotnetOpts = install.Value (DotNet.Options.Create())
     let result =
         Process.execSimple  (fun info -> 
             { info with
                 FileName = dotnetOpts.DotNetCliPath
                 WorkingDirectory = testPath
-                Arguments = "publish --self-contained -c Release -r win10-x64 -o  \"" + Fake.IO.Path.getFullName testOutPutDir + "\""
+                Arguments = "publish --self-contained -c Release -r win10-x64"
             }) TimeSpan.MaxValue
     if result <> 0 then failwith "Publish failed"
-    printfn "!!(testAssemblies)): %A" !!(testAssemblies)
-    Expecto.run id !!(testAssemblies))
-        // Fake.Testing.Expecto.run id)
+    printfn "Dkr: %s" testNetCoreDir
+    let result = DotNet.exec (withWorkDir testNetCoreDir) "" "IntegrationTests.dll"
+    if not result.OK then failwithf "Expecto for netcore tests failed."
+    )
 
 // --------------------------------------------------------------------------------------
 // Build a NuGet package
