@@ -18,3 +18,4 @@ github fsprojects/FSharp.TypeProviders.SDK src/ProvidedTypes.fsi
 github fsprojects/FSharp.TypeProviders.SDK src/ProvidedTypes.fs
 nuget Microsoft.NETCore.Runtime.CoreCLR
 nuget Microsoft.NET.Test.Sdk
+nuget Taskbuilder.fs

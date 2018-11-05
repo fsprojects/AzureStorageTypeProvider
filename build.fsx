@@ -302,5 +302,5 @@ Target.create "All" ignore
 "GenerateHelp"
   ==> "KeepRunning"
 
-// Target.activateFinal "PublishTestsResultsToAppveyor"
+Target.activateFinal "PublishTestsResultsToAppveyor"
 Target.runOrDefault "RunTests"

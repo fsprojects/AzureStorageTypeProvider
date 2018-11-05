@@ -7,6 +7,8 @@ open Microsoft.WindowsAzure.Storage.Blob
 open System
 open System.Linq
 open System.IO
+open FSharp.Control.Tasks.ContextInsensitive
+open System.Threading.Tasks
 type Local = AzureTypeProvider<"UseDevelopmentStorage=true", "">
 
 type BlobSchema = AzureTypeProvider<blobSchema = "BlobSchema.json">
