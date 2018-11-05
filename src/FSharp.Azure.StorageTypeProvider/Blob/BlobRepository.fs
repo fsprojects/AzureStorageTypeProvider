@@ -25,7 +25,7 @@ let private getItemName (item : string) (parent : CloudBlobDirectory) =
     | null -> item
     | parent -> item.Substring(parent.Prefix.Length)
 
-let rec private getContainerStructure wildcard (container : CloudBlobContainer) = 
+let rec private getContainerStructure wildcard (container : CloudBlobContainer) =
     container.ListBlobsSegmentedAsync(prefix = wildcard, currentToken = null).Result
     |> fun s -> s.Results
     |> Seq.distinctBy (fun b -> b.Uri.AbsoluteUri)
