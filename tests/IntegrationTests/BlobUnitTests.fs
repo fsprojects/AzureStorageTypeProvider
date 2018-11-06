@@ -14,6 +14,22 @@ type Local = AzureTypeProvider<"UseDevelopmentStorage=true", "">
 type BlobSchema = AzureTypeProvider<blobSchema = "BlobSchema.json">
 
 let container = Local.Containers.samples
+
+
+let containerResult = task {
+    let rec getResults token = task {
+        let! blobsSeqmented = Local.Containers.CloudBlobClient.ListContainersSegmentedAsync(token)
+        let token =  blobsSeqmented.ContinuationToken
+        let result = blobsSeqmented.Results |> Seq.toList
+        if isNull token then
+            return result
+        else
+            let! others = getResults token
+            return result @ others }
+    let! results = getResults null
+    return results |> Seq.map(fun c -> c.Name)
+}
+
 [<Tests>]
 let blobCompilationTests =
     testList "Blob Compilation Tests" [
@@ -74,11 +90,10 @@ let blobMainTests =
                                 .Value
             value |> shouldEqual "thing")
 
-        testCase "Cloud Blob Client relates to the same data as the type provider" (fun _ ->
-            Expect.contains (
-                Local.Containers.CloudBlobClient.ListContainersSegmentedAsync(null).Result
-                |> fun s -> s.Results
-                |> Seq.map(fun c -> c.Name)) "samples" "")
+        testTask "Cloud Blob Client relates to the same data as the type provider" {
+          let! r = containerResult
+          Expect.contains r "samples" ""
+        }
 
         testCase "Cloud Blob Container relates to the same data as the type provider" (fun _ ->
             let client = container.AsCloudBlobContainer()
