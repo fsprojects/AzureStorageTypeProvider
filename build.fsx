@@ -64,7 +64,7 @@ Target.create  "AssemblyInfo" (fun _ ->
                                                 AssemblyInfo.Description summary
                                                 AssemblyInfo.Version release.AssemblyVersion
                                                 AssemblyInfo.FileVersion release.AssemblyVersion ])
-let install = lazy DotNet.install DotNet.Versions.FromGlobalJson
+let install = lazy DotNet.install DotNet.Versions.Release_2_1_402
 
 let inline withWorkDir wd =
     DotNet.Options.lift install.Value
