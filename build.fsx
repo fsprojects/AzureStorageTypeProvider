@@ -64,11 +64,9 @@ Target.create  "AssemblyInfo" (fun _ ->
                                                 AssemblyInfo.Description summary
                                                 AssemblyInfo.Version release.AssemblyVersion
                                                 AssemblyInfo.FileVersion release.AssemblyVersion ])
-let install = lazy DotNet.install DotNet.Versions.Release_2_1_402
 
-let inline withWorkDir wd =
-    DotNet.Options.lift install.Value
-    >> DotNet.Options.withWorkingDirectory wd
+let inline withWorkDir wd = 
+    DotNet.Options.withWorkingDirectory wd
 let runDotNet cmd workingDir =
     let result =
         DotNet.exec (withWorkDir workingDir) cmd ""
@@ -115,15 +113,8 @@ let root = __SOURCE_DIRECTORY__
 let testNetCoreDir = root </> "tests"  </> "IntegrationTests" </> "bin" </> "Release" </> "netcoreapp2.0" </> "win10-x64" </> "publish"
 
 Target.create "RunTests" (fun _ ->
-    let dotnetOpts = install.Value (DotNet.Options.Create())
-    let result =
-        Process.execSimple  (fun info -> 
-            { info with
-                FileName = dotnetOpts.DotNetCliPath
-                WorkingDirectory = testPath
-                Arguments = "publish --self-contained -c Release -r win10-x64"
-            }) TimeSpan.MaxValue
-    if result <> 0 then failwith "Publish failed"
+    let result = DotNet.exec (withWorkDir testPath) "publish --self-contained -c Release -r win10-x64" ""
+    if result.OK = false then failwith "Publish failed"
     printfn "Dkr: %s" testNetCoreDir
     let result = DotNet.exec (withWorkDir testNetCoreDir) "" "IntegrationTests.dll"
     if result.OK then
