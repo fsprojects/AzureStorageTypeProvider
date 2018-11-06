@@ -51,7 +51,7 @@ let getTableResult = task {
     let rec getResults token = task {
         let! tableResultSeqment = Local.Tables.CloudTableClient.ListTablesSegmentedAsync(token)
         let token =  tableResultSeqment.ContinuationToken
-        let result = tableResultSeqment.Results |> Seq.toList
+        let result = tableResultSeqment |> Seq.toList
         if isNull token then
             return result
         else
@@ -104,7 +104,7 @@ let tableReadOnlyTests =
             baseQuery.``Less Than Or Equal To``("fred").ToString()    |> shouldEqual "[Name le 'fred']" 
             baseQuery.``Not Equal To``("fred").ToString()             |> shouldEqual "[Name ne 'fred']")
         testCase "Query restricts maximum results" (fun _ -> table.Query().Execute(maxResults = 1).Length |> shouldEqual 1)
-        
+
         testTask "Cloud Table Client relates to the same data as the type provider" {
             let! t = getTableResult
             Expect.contains t "employee" ""
