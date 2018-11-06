@@ -4,11 +4,13 @@ open FSharp.Azure.StorageTypeProvider
 open FSharp.Azure.StorageTypeProvider.Queue
 open Swensen.Unquote
 open Swensen.Unquote.Operators
+open Microsoft.WindowsAzure.Storage.Queue
 open System
 open System.Linq
 open System.Net
 open System.Text
 open Expecto
+open FSharp.Control.Tasks.ContextSensitive
 
 type Local = AzureTypeProvider<"DevStorageAccount">
 
@@ -25,16 +27,29 @@ let queue = Local.Queues.``sample-queue``
 
 let queueSafeAsync = beforeAfterAsync QueueHelpers.resetData QueueHelpers.resetData
 
+let getQueues (queueClient:CloudQueueClient) = task {
+    let rec getResults token = task {
+        let! blobsSeqmented = queueClient.ListQueuesSegmentedAsync(token)
+        let token =  blobsSeqmented.ContinuationToken
+        let result = blobsSeqmented.Results |> Seq.toList
+        if isNull token then
+            return result
+        else
+            let! others = getResults token
+            return result @ others }
+    let! results = getResults null
+    return results |> Seq.map(fun c -> c.Name) |> Set.ofSeq
+}
+
+
 [<Tests>]
 let readOnlyQueueTests =
     testList "Queue Tests Read Only" [
-        testCase "Cloud Queue Client gives same results as the Type Provider" (fun _ ->
+        testTask "Cloud Queue Client gives same results as the Type Provider" {
             let queues = Local.Queues
-            let queueNames = 
-                queues.CloudQueueClient.ListQueuesSegmentedAsync(null).Result
-                |> fun s -> s.Results
-                |> Seq.map(fun q -> q.Name) |> Set.ofSeq
-            Expect.containsAll queueNames [ queues.``sample-queue``.Name; queues.``second-sample``.Name;  queues.``third-sample``.Name ] "")
+            let! q = getQueues queues.CloudQueueClient
+            Expect.containsAll q [ queues.``sample-queue``.Name; queues.``second-sample``.Name;  queues.``third-sample``.Name ] ""
+        }        
         testCase "Cloud Queue is the same queue as the Type Provider" (fun _ ->  (queue.AsCloudQueue().Name) |> shouldEqual queue.Name)
         testCaseAsync "Dequeue with nothing on the queue returns None" <| async {
             let! msg = queue.Dequeue()
