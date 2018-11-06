@@ -8,7 +8,6 @@ open System
 open System.Linq
 open System.IO
 open FSharp.Control.Tasks.ContextInsensitive
-open System.Threading.Tasks
 type Local = AzureTypeProvider<"UseDevelopmentStorage=true", "">
 
 type BlobSchema = AzureTypeProvider<blobSchema = "BlobSchema.json">
@@ -107,7 +106,7 @@ let blobMainTests =
           let! r = getContainerResult
           Expect.contains r "samples" ""
         }
-        
+
         testTask "Cloud Blob Container relates to the same data as the type provider" {
             let blobContainer = container.AsCloudBlobContainer()
             let! blobs = getBlobs blobContainer

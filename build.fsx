@@ -126,7 +126,10 @@ Target.create "RunTests" (fun _ ->
     if result <> 0 then failwith "Publish failed"
     printfn "Dkr: %s" testNetCoreDir
     let result = DotNet.exec (withWorkDir testNetCoreDir) "" "IntegrationTests.dll"
-    if not result.OK then failwithf "Expecto for netcore tests failed."
+    if result.OK then
+        printfn "Expecto for netcore finished without Errors"
+    else 
+        printfn "Expecto for netcore finished with Errors"
     )
 
 // --------------------------------------------------------------------------------------
