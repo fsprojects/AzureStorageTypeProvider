@@ -53,8 +53,11 @@ let getQueueStorageMembers (connectionString, domainType : ProvidedTypeDefinitio
     queueListingType.AddMembersDelayed(fun () ->
         connectionString
         |> getQueues
-        |> List.map (createQueueMember >> fun (name, queueType) ->
-            ProvidedProperty(name, queueType, getterCode = fun _ -> <@@ ProvidedQueue(connectionString, name) @@> )))
+        |> Async.RunSynchronously
+        |> Array.map (createQueueMember >> fun (name, queueType) ->
+            ProvidedProperty(name, queueType, getterCode = fun _ -> <@@ ProvidedQueue(connectionString, name) @@> ))
+        |> Array.toList)
+
     domainType.AddMember queueListingType
     queueListingType.AddMember(ProvidedProperty("CloudQueueClient", typeof<CloudQueueClient>, getterCode = (fun _ -> <@@ QueueBuilder.getQueueClient connectionString @@>)))
     let queueListingProp = ProvidedProperty("Queues", queueListingType, isStatic = true, getterCode = (fun _ -> <@@ () @@>))

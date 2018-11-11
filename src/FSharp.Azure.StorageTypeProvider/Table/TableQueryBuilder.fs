@@ -72,7 +72,7 @@ let createTableQueryType (tableEntityType: ProvidedTypeDefinition) connection ta
                 ("Execute", [ ProvidedParameter("maxResults", typeof<int>, optionalValue = 0)
                               ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ],
                  tableEntityType.MakeArrayType(), 
-                 invokeCode = (fun args -> <@@ executeQuery (%%args.[2] : string) tableName %%args.[1] (composeAllFilters((%%args.[0]: obj) :?> string list)) @@>))
+                 invokeCode = (fun args -> <@@ executeQueryAsync (%%args.[2] : string) tableName %%args.[1] (composeAllFilters((%%args.[0]: obj) :?> string list)) |> Async.RunSynchronously @@>))
         executeQueryMethod.AddXmlDocDelayed <| fun _ -> "Executes the current query."
         
         let customQueryProperties = 

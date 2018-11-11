@@ -5,8 +5,6 @@ open System.Configuration
 open System.IO
 open Microsoft.WindowsAzure.Storage
 
-type Result<'T> = Success of result:'T | Failure of exn
-
 let private doesFileExist folder file =
     let fullPath = Path.Combine(folder, file) 
     if fullPath |> File.Exists then Some fullPath else None
@@ -56,8 +54,9 @@ module ConnectionValidation =
                 .CreateCloudTableClient()
                 .GetTableReference("a")
                 .ExistsAsync()
-                .Result //throws an exception if attempted with an invalid connection string
+                |> Async.AwaitTask
+                |> Async.RunSynchronously //throws an exception if attempted with an invalid connection string
                 |> ignore
-            Success()
-        with | ex -> Failure ex
+            Ok()
+        with | ex -> Error ex
     let validateConnectionString = memoize checkConnectionString

@@ -5,7 +5,7 @@ framework: netstandard2.0, netcoreapp2.0
 nuget FAKE
 nuget Deedle
 nuget Expecto
-nuget WindowsAzure.Storage 9.1.1
+nuget WindowsAzure.Storage
 nuget FSharp.Charting
 nuget FSharp.Formatting
 nuget FSharp.Core

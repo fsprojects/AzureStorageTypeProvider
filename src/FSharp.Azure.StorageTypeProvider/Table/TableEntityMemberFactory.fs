@@ -16,7 +16,7 @@ let private getPropsForEntity (entity:DynamicTableEntity) =
 
 let private toDistinctColumnDefinitions tableEntities = 
     let optionalProperties, mandatoryProperties, _ =
-        ((Set [], Set [], true), tableEntities)
+        ((Set.empty, Set.empty, true), tableEntities)
         ||> Seq.fold(fun (optionals, mandatory, initialRun) entity ->
             if initialRun then
                 optionals, entity, false
@@ -119,11 +119,12 @@ let setPropertiesForEntity humanize (entityType : ProvidedTypeDefinition) column
 
                 <@@ buildTableEntity (%%args.[0] : Partition) (%%args.[1] : Row) fieldNames (%%(Expr.NewArray(typeof<obj>, fieldValues))) @@>))
 
-let generateSchema tableName schemaInferenceRowCount connection =
-    let sampleEntities = tableName |> getRowsForSchema schemaInferenceRowCount connection
-    sampleEntities
-    |> Seq.map getPropsForEntity
-    |> toDistinctColumnDefinitions
+let generateSchema tableName schemaInferenceRowCount connection = async {
+    let! sampleEntities = tableName |> getRowsForSchema schemaInferenceRowCount connection
+    return
+        sampleEntities
+        |> Seq.map getPropsForEntity
+        |> toDistinctColumnDefinitions }
 
 /// Gets all the members for a Table Entity type
 let buildTableEntityMembers columnDefinitions humanize (parentTableType:ProvidedTypeDefinition, parentTableEntityType:ProvidedTypeDefinition, domainType:ProvidedTypeDefinition, connection, tableName) = 
@@ -138,7 +139,7 @@ let buildTableEntityMembers columnDefinitions humanize (parentTableType:Provided
                     ("GetPartition", 
                      [ ProvidedParameter("key", typeof<string>)
                        ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], parentTableEntityType.MakeArrayType(), 
-                     invokeCode = (fun args -> <@@ getPartitionRows %%args.[1] %%args.[2] tableName @@>))
+                     invokeCode = (fun args -> <@@ getPartitionRowsAsync %%args.[1] %%args.[2] tableName |> Async.RunSynchronously @@>))
             getPartition.AddXmlDocDelayed <| fun _ -> "Eagerly retrieves all entities in a table partition by its key."
             
             let getPartitionAsync = 
@@ -156,7 +157,7 @@ let buildTableEntityMembers columnDefinitions humanize (parentTableType:Provided
                     ("Query", 
                      [ ProvidedParameter("rawQuery", typeof<string>)
                        ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], (parentTableEntityType.MakeArrayType()), 
-                     invokeCode = (fun args -> <@@ executeQuery (%%args.[2] : string) tableName 0 (%%args.[1] : string) @@>))
+                     invokeCode = (fun args -> <@@ executeQueryAsync (%%args.[2] : string) tableName 0 (%%args.[1] : string) |> Async.RunSynchronously @@>))
             executeQuery.AddXmlDocDelayed <| fun _ -> "Executes a weakly-type query and returns the results in the shape for this table."
             let buildQuery = ProvidedMethod("Query", [], queryBuilderType, invokeCode = (fun args -> <@@ ([] : string list) @@>))
             buildQuery.AddXmlDocDelayed <| fun _ -> "Creates a strongly-typed query against the table."
@@ -167,7 +168,7 @@ let buildTableEntityMembers columnDefinitions humanize (parentTableType:Provided
                        ProvidedParameter("partitionKey", typeof<Partition>)
                        ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], 
                      (typeof<Option<_>>).GetGenericTypeDefinition().MakeGenericType(parentTableEntityType), 
-                     invokeCode = (fun args -> <@@ getEntity (%%args.[1] : Row) (%%args.[2] : Partition) (%%args.[3] : string) tableName @@>))
+                     invokeCode = (fun args -> <@@ getEntityAsync (%%args.[1] : Row) (%%args.[2] : Partition) (%%args.[3] : string) tableName |> Async.RunSynchronously @@>))
             getEntity.AddXmlDocDelayed <| fun _ -> "Gets a single entity based on the row and partition key."
             let getEntityAsync = 
                 let returnType =
@@ -186,7 +187,7 @@ let buildTableEntityMembers columnDefinitions humanize (parentTableType:Provided
                     ("Delete", 
                      [ ProvidedParameter("entity", parentTableEntityType)
                        ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], returnType = typeof<TableResponse>, 
-                     invokeCode = (fun args -> <@@ deleteEntity %%args.[2] tableName %%args.[1] @@>))
+                     invokeCode = (fun args -> <@@ deleteEntityAsync %%args.[2] tableName %%args.[1] |> Async.RunSynchronously @@>))
             deleteEntity.AddXmlDocDelayed <| fun _ -> "Deletes a single entity from the table."
             let deleteEntityAsync = 
                 ProvidedMethod
@@ -215,7 +216,7 @@ let buildTableEntityMembers columnDefinitions humanize (parentTableType:Provided
                      [ ProvidedParameter("entity", parentTableEntityType)
                        ProvidedParameter("insertMode", typeof<TableInsertMode>, optionalValue = TableInsertMode.Insert)
                        ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], returnType = typeof<TableResponse>, 
-                     invokeCode = (fun args -> <@@ insertEntity (%%args.[3] : string) tableName %%args.[2] (%%args.[1] : LightweightTableEntity) @@>))
+                     invokeCode = (fun args -> <@@ insertEntityAsync (%%args.[3] : string) tableName %%args.[2] (%%args.[1] : LightweightTableEntity) |> Async.RunSynchronously @@>))
             insertEntity.AddXmlDocDelayed <| fun _ -> "Inserts a single entity with the inferred table schema into the table."
             let insertEntityAsync = 
                 ProvidedMethod
@@ -231,7 +232,7 @@ let buildTableEntityMembers columnDefinitions humanize (parentTableType:Provided
                      [ ProvidedParameter("entities", parentTableEntityType.MakeArrayType())
                        ProvidedParameter("insertMode", typeof<TableInsertMode>, optionalValue = TableInsertMode.Insert)
                        ProvidedParameter("connectionString", typeof<string>, optionalValue = connection) ], returnType = typeof<(string * TableResponse [])[]>, 
-                     invokeCode = (fun args -> <@@ insertEntityBatch (%%args.[3] : string) tableName %%args.[2] (%%args.[1] : LightweightTableEntity []) @@>))
+                     invokeCode = (fun args -> <@@ insertEntityBatchAsync (%%args.[3] : string) tableName %%args.[2] (%%args.[1] : LightweightTableEntity []) |> Async.RunSynchronously @@>))
             insertEntities.AddXmlDocDelayed <| fun _ -> "Inserts a batch of entities with the inferred table schema into the table."
             let insertEntitiesAsync = 
                 ProvidedMethod

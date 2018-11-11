@@ -164,19 +164,22 @@ module BlobBuilder =
                 | _ -> false
                 -> return None }
 
-    let listBlobs defaultConnectionString container file includeSubfolders prefix connectionString =
+    let listBlobs defaultConnectionString container file includeSubfolders prefix connectionString = async {
         let connectionString = connectionString |> defaultArg <| defaultConnectionString
         let includeSubfolders = includeSubfolders |> defaultArg <| false
         let container = getContainerRef (connectionString, container)
         let prefix = file + (prefix |> Option.toObj)
-        listBlobs includeSubfolders container prefix
-        |> Seq.choose (function
-            | Blob(path, _, blobType, _) -> 
-                match blobType with
-                | BlobType.PageBlob -> (createPageBlobFile connectionString container.Name path) :> BlobFile 
-                | _ -> (createBlockBlobFile connectionString container.Name path) :> BlobFile 
-                |> Some
-            | _ -> None)
+        let! blobs = listBlobs includeSubfolders container prefix
+
+        return
+            blobs
+            |> Array.choose (function
+                | Blob(path, _, blobType, _) -> 
+                    match blobType with
+                    | BlobType.PageBlob -> (createPageBlobFile connectionString container.Name path) :> BlobFile 
+                    | _ -> (createBlockBlobFile connectionString container.Name path) :> BlobFile 
+                    |> Some
+                | _ -> None) }
 
 /// Represents a pseudo-folder in blob storage.
 type BlobFolder internal (defaultConnectionString, container, file) = 

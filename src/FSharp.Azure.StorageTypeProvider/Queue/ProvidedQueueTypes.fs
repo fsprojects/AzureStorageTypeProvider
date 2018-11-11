@@ -54,19 +54,16 @@ module internal Factory =
         let messageId, popReceipt = providedMessageId |> unpackId
         CloudQueueMessage(messageId, popReceipt)
 
-module internal Async = 
-    let AwaitTaskUnit = Async.AwaitIAsyncResult >> Async.Ignore
-
 /// Represents an Azure Storage Queue.
 type ProvidedQueue(defaultConnectionString, name) = 
     let getConnectionString connection = defaultArg connection defaultConnectionString
     let getQueue = getConnectionString >> getQueueRef name
-    let enqueue message = getQueue >> (fun q -> q.AddMessageAsync message |> Async.AwaitTaskUnit)
+    let enqueue message = getQueue >> (fun q -> q.AddMessageAsync message |> Async.AwaitTask)
     let updateMessage fields connectionString newTimeout message =
         let newTimeout = defaultArg newTimeout TimeSpan.Zero
         connectionString
         |> getQueue
-        |> (fun queue -> queue.UpdateMessageAsync(message, newTimeout, fields) |> Async.AwaitTaskUnit)
+        |> (fun queue -> queue.UpdateMessageAsync(message, newTimeout, fields) |> Async.AwaitTask)
 
     /// Gets a handle to the Azure SDK client for this queue.
     member __.AsCloudQueue(?connectionString) = getQueue connectionString
@@ -115,7 +112,7 @@ type ProvidedQueue(defaultConnectionString, name) =
     /// Deletes an existing message.
     member __.DeleteMessage(providedMessageId, ?connectionString) = 
         let messageId, popReceipt = providedMessageId |> Factory.unpackId
-        (connectionString |> getQueue).DeleteMessageAsync(messageId, popReceipt) |> Async.AwaitTaskUnit
+        (connectionString |> getQueue).DeleteMessageAsync(messageId, popReceipt) |> Async.AwaitTask
     
     /// Updates the visibility of an existing message.
     member __.UpdateMessage(messageId, newTimeout, ?connectionString) = 
@@ -139,7 +136,7 @@ type ProvidedQueue(defaultConnectionString, name) =
         connectionString
         |> getQueue
         |> (fun q -> q.ClearAsync())
-        |> Async.AwaitTaskUnit
+        |> Async.AwaitTask
 
     /// Gets the name of the queue.
     member __.Name = (None |> getQueue).Name

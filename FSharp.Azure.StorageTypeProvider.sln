@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2046
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{94066CAA-4417-4C43-A286-40182E920E43}"
 	ProjectSection(SolutionItems) = preProject
@@ -16,7 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		RELEASE_NOTES.md = RELEASE_NOTES.md
 	EndProjectSection
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Azure.StorageTypeProvider", "src\FSharp.Azure.StorageTypeProvider\FSharp.Azure.StorageTypeProvider.fsproj", "{FB7CA8F3-C158-49E9-B816-501741E2921F}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharp.Azure.StorageTypeProvider", "src\FSharp.Azure.StorageTypeProvider\FSharp.Azure.StorageTypeProvider.fsproj", "{FB7CA8F3-C158-49E9-B816-501741E2921F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{7CAF8D38-6250-41CB-A65B-ABD760B09281}"
 	ProjectSection(SolutionItems) = preProject
@@ -51,5 +51,8 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{15350981-90B9-44A0-B356-776735ACC7F1} = {7CAF8D38-6250-41CB-A65B-ABD760B09281}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C68560AB-A7F2-49A3-BEED-B56A8D7074D2}
 	EndGlobalSection
 EndGlobal
