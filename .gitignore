@@ -187,3 +187,4 @@ testoutput/
 /.vs/FSharp.Azure.StorageTypeProvider/DesignTimeBuild/.dtbcache
 /.vs/UnitTests/DesignTimeBuild/.dtbcache
 /tests/IntegrationTests/.ionide/symbolCache.db
+/src/FSharp.Azure.StorageTypeProvider/.ionide/symbolCache.db
