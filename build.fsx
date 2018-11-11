@@ -155,7 +155,7 @@ module AppVeyorHelpers =
             { info with
                 FileName = "appveyor"
                 Arguments = arguments})
-            (TimeSpan.FromMinutes 2.0)
+            (TimeSpan.FromMinutes 2.)
     if result <> 0 then failwith (sprintf "Failed to execute appveyor command: %s" arguments)
     Trace.trace "Published packages"
 

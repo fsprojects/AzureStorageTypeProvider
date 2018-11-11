@@ -143,12 +143,12 @@ let blobMainTests =
 
         testCase "ListBlobs method returns correct number of blobs" (fun _ -> 
             let childFolder = Local.Containers.samples.``folder2/``.``child/``
-            let allBlobs = childFolder.ListBlobs()
+            let allBlobs = childFolder.ListBlobs() |> Async.RunSynchronously
             Seq.length allBlobs |> shouldEqual 1)
 
         testCase "Can access List blobs method on a folder" (fun _ -> 
             let childFolder = Local.Containers.samples.``folder2/``.``child/``
-            let allBlobs = childFolder.ListBlobs(true)
+            let allBlobs = childFolder.ListBlobs true |> Async.RunSynchronously
             let count = allBlobs |> Seq.length
             count |> shouldEqual 4)
 
@@ -171,11 +171,11 @@ let blobMainTests =
             testContent "jpg" "image/jpeg")
 
         testCase "Retrieves blobs with prefix" (fun _ ->
-            let blobs = Local.Containers.samples.``folder2/``.ListBlobs(prefix = "child/grandchild2/") |> Seq.map(fun b -> b.Name) |> Seq.toArray
+            let blobs = Local.Containers.samples.``folder2/``.ListBlobs(prefix = "child/grandchild2/")  |> Async.RunSynchronously |> Seq.map(fun b -> b.Name) |> Seq.toArray
             blobs |> shouldEqual [| "folder2/child/grandchild2/descedant3.txt" |])
 
         testCase "Retrieves blobs with prefix and subfolders" (fun _ ->
-            let blobs = Local.Containers.samples.``folder2/``.ListBlobs(includeSubfolders = true, prefix = "child/") |> Seq.map(fun b -> b.Name) |> Seq.sort |> Seq.toArray 
+            let blobs = Local.Containers.samples.``folder2/``.ListBlobs(includeSubfolders = true, prefix = "child/")  |> Async.RunSynchronously|> Seq.map(fun b -> b.Name) |> Seq.sort |> Seq.toArray 
             blobs.Length |> shouldEqual 4)
          ]
 
@@ -183,7 +183,7 @@ let blobMainTests =
 let blobContainerTests =
     testList "Blob Container Tests" [
         testCase "Can list all blobs in a container" (fun _ ->
-            let blobs = Local.Containers.samples.ListBlobs(true) |> Seq.length
+            let blobs = Local.Containers.samples.ListBlobs true |> Async.RunSynchronously |> Seq.length
             blobs |> shouldEqual 12)
         testCase "Container supports unsafe blob access" (fun _ ->
             let b = Local.Containers.samples.["file1.txt"]
