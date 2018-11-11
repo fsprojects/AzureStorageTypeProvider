@@ -6,7 +6,7 @@ NUGET
       FSharp.Core (>= 4.3.2)
       System.Configuration.ConfigurationManager (>= 4.4)
     Deedle (1.2.5)
-    Expecto (8.4.3)
+    Expecto (8.5)
       Argu (>= 5.1)
       Mono.Cecil (>= 0.10)
       System.Diagnostics.FileVersionInfo (>= 4.3)
