@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>FSharp.Azure.StorageTypeProvider</id>
+        <version>1.9.6</version>
+        <title>F# Azure Storage Type Provider</title>
+        <authors>Isaac Abraham</authors>
+        <owners>Isaac Abraham</owners>
+        <projectUrl>https://github.com/fsprojects/AzureStorageTypeProvider</projectUrl>
+        <iconUrl>http://fsprojects.github.io/AzureStorageTypeProvider/img/logo.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>The F# Azure Storage Type Provider allows simple access to Blob, Table and Queue assets, using Azure Storage metadata to intelligently infer schema where possible, whilst providing a simple API for common tasks.</description>
+        <tags>azure, f#, fsharp, type provider, blob, table, queue, script</tags>
+        <summary>Allows easy access to Azure Storage assets through F# scripts.</summary>
+        <releaseNotes>Upgrade Azure Storage to v9</releaseNotes>
+        <dependencies><group><dependency id="WindowsAzure.Storage" version="9.1.1" /></group></dependencies>
+        <references><group><reference file="FSharp.Azure.StorageTypeProvider.dll" /></group></references>
+    </metadata>
+    <files><file src="../bin/netstandard2.0/publish/FSharp.Azure.StorageTypeProvider.xml" target="lib/netstandard2.0" />
+<file src="../bin/netstandard2.0/publish/FSharp.Azure.StorageTypeProvider.dll" target="lib/netstandard2.0" />
+<file src="../bin/netstandard2.0/publish/Microsoft.WindowsAzure.Storage.dll" target="lib/netstandard2.0" />
+<file src="../bin/netstandard2.0/publish/Newtonsoft.Json.dll" target="lib/netstandard2.0" />
+<file src="StorageTypeProvider.fsx" /></files>
+</package>

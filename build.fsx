@@ -41,7 +41,7 @@ let buildDir = "bin"
 
 
 // TypeProvider path
-let projectPath = Path.getFullName "./src/FSharp.Azure.StorageTypeProvider"
+let projectPath = Path.getFullName "./src/FSharp.Azure.StorageTypeProvider.DesignTime"
 
 // Test path
 let testPath = Path.getFullName "./tests/IntegrationTests"
@@ -86,7 +86,7 @@ Target.create "RestoreProject" (fun _ ->
 // --------------------------------------------------------------------------------------
 // Build library project
 Target.create "Build" (fun _ ->
-    runDotNet "publish" projectPath
+    runDotNet "publish --framework netcoreapp2.1" projectPath
 )
 
 // --------------------------------------------------------------------------------------
