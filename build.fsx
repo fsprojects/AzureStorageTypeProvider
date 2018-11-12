@@ -21,7 +21,7 @@ open Fake.IO.FileSystemOperators
 
 // The name of the project
 // (used by attributes in AssemblyInfo, name of a NuGet package and directory in 'src')
-let project = "FSharp.Azure.StorageTypeProvider"
+let project = "FSharp.Azure.StorageTypeProvider.DesignTime"
 // Short summary of the project
 // (used as description in AssemblyInfo and as a short summary for NuGet package)
 let summary = "Allows easy access to Azure Storage assets through F# scripts."
