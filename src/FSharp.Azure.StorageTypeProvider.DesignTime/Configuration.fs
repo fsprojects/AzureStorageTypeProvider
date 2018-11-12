@@ -25,7 +25,7 @@ let private (|DefaultConfigExists|NoDefaultConfigFound|) resolutionFolder =
     |> Option.map(fun config -> DefaultConfigExists config)
     |> defaultArg <| NoDefaultConfigFound
 
-let getConnectionString(connectionName: string, resolutionFolder, requestedConfig) =
+let getConnectionString(connectionName: string, resolutionFolder:string, requestedConfig:string) =
     let configPath =
         match (requestedConfig, resolutionFolder), resolutionFolder with
         | RequestedConfigExists configPath, _

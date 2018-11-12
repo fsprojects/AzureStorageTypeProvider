@@ -24,7 +24,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Azure.StorageTypeProvider">
-      <HintPath>..\..\bin\netcoreapp2.1\publish\FSharp.Azure.StorageTypeProvider.DesignTime.dll</HintPath>
+      <HintPath>..\..\bin\netcoreapp2.1\publish\FSharp.Azure.StorageTypeProvider.RunTime.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />

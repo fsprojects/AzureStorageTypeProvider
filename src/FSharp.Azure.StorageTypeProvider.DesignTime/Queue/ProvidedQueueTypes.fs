@@ -109,7 +109,7 @@ type ProvidedQueue(defaultConnectionString, name) =
         getQueue connectionString |> generateSas start duration sharedAccessQueuePermissions
     
     /// Enqueues a new message.
-    member __.Enqueue(content, ?connectionString) =
+    member __.Enqueue(content:string, connectionString:string option) =
         connectionString |> enqueue (CloudQueueMessage(content))
     
     /// Deletes an existing message.

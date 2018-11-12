@@ -6,7 +6,7 @@
     <Name>FSharp.Azure.StorageTypeProvider</Name>
     <AssemblyName>FSharp.Azure.StorageTypeProvider.DesignTime</AssemblyName>
     <OutputPath>..\..\bin\</OutputPath>
-    <TargetFrameworks>netstandard2.0;netcoreapp2.1;net47</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netcoreapp2.1;net472</TargetFrameworks>
     <Optimize>true</Optimize>
     <Tailcalls>true</Tailcalls>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
@@ -41,10 +41,13 @@
     <Compile Include="Queue/QueueMemberFactory.fs" />
     <Compile Include="..\FSharp.Azure.StorageTypeProvider.Runtime\FSharp.Azure.StorageTypeProvider.Runtime.fs" />
     <Compile Include="FSharp.Azure.StorageTypeProvider.DesignTime.fs" />
-    <Content Include="paket.references" />
-    <None Include="..\..\packages\NETStandard.Library.NETFramework\build\net461\lib\netstandard.dll" Condition="'$(TargetFramework)' == 'net45'">
+    <None Include="paket.references" />
+    <None Include="..\..\packages\NETStandard.Library.NETFramework\build\net461\lib\netstandard.dll" Condition="'$(TargetFramework)' == 'net472'">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

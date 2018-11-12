@@ -5,7 +5,7 @@
   <Import Project="..\..\netfx.props" />
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFrameworks>netstandard2.0; net45</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netcoreapp2.1;net47</TargetFrameworks>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
   </PropertyGroup>
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
@@ -22,22 +22,18 @@
     <Compile Include="FSharp.Azure.StorageTypeProvider.Runtime.fs" />
     <None Include="paket.references" />
   </ItemGroup>
-  <ItemGroup>
-    <!-- Be explicit about the version of FSharp.Core since we mention it in the manual nuget package spec -->
-    <PackageReference Include="FSharp.Core" Version="4.3.4" />
-  </ItemGroup>
   <Target Name="BeforeBuild">
     <MSBuild Projects="..\FSharp.Azure.StorageTypeProvider.DesignTime\FSharp.Azure.StorageTypeProvider.DesignTime.fsproj" Targets="Restore" />
-    <MSBuild Projects="..\FSharp.Azure.StorageTypeProvider.DesignTime\FSharp.Azure.StorageTypeProvider.DesignTime.fsproj" Targets="Build" Properties="Configuration=$(Configuration);TargetFramework=netcoreapp2.0" />
+    <MSBuild Projects="..\FSharp.Azure.StorageTypeProvider.DesignTime\FSharp.Azure.StorageTypeProvider.DesignTime.fsproj" Targets="Build" Properties="Configuration=$(Configuration);TargetFramework=netcoreapp2.1" />
     <MSBuild Projects="..\FSharp.Azure.StorageTypeProvider.DesignTime\FSharp.Azure.StorageTypeProvider.DesignTime.fsproj" Targets="Build" Properties="Configuration=$(Configuration);TargetFramework=netstandard2.0" />
-    <MSBuild Projects="..\FSharp.Azure.StorageTypeProvider.DesignTime\FSharp.Azure.StorageTypeProvider.DesignTime.fsproj" Targets="Build" Properties="Configuration=$(Configuration);TargetFramework=net45" />
+    <MSBuild Projects="..\FSharp.Azure.StorageTypeProvider.DesignTime\FSharp.Azure.StorageTypeProvider.DesignTime.fsproj" Targets="Build" Properties="Configuration=$(Configuration);TargetFramework=net47" />
   </Target>
   <Target Name="AfterBuild">
-    <CreateItem Include="..\FSharp.Azure.StorageTypeProvider.DesignTime\bin\$(Configuration)\netcoreapp2.0\*.dll;..\FSharp.Azure.StorageTypeProvider.DesignTime\bin\$(Configuration)\netcoreapp2.0\*.pdb">
+    <CreateItem Include="..\FSharp.Azure.StorageTypeProvider.DesignTime\bin\$(Configuration)\netcoreapp2.1\*.dll;..\FSharp.Azure.StorageTypeProvider.DesignTime\bin\$(Configuration)\netcoreapp2.1\*.pdb">
       <Output TaskParameter="Include" ItemName="DesignTimeBinaries1" />
     </CreateItem>
-    <Copy SourceFiles="@(DesignTimeBinaries1)" DestinationFolder="$(OutputPath)/../typeproviders/fsharp41/netcoreapp2.0" />
-    <CreateItem Include="..\FSharp.Azure.StorageTypeProvider.DesignTime\bin\$(Configuration)\net45\*.dll;..\FSharp.Azure.StorageTypeProvider.DesignTime\bin\$(Configuration)\net45\*.pdb">
+    <Copy SourceFiles="@(DesignTimeBinaries1)" DestinationFolder="$(OutputPath)/../typeproviders/fsharp41/netcoreapp2.1" />
+    <CreateItem Include="..\FSharp.Azure.StorageTypeProvider.DesignTime\bin\$(Configuration)\net47\*.dll;..\FSharp.Azure.StorageTypeProvider.DesignTime\bin\$(Configuration)\net47\*.pdb">
       <Output TaskParameter="Include" ItemName="DesignTimeBinaries2" />
     </CreateItem>
     <Copy SourceFiles="@(DesignTimeBinaries2)" DestinationFolder="$(OutputPath)/../typeproviders/fsharp41/net45" />
