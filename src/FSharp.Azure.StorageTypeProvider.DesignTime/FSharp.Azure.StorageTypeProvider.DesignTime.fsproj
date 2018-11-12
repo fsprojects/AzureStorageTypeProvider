@@ -4,7 +4,8 @@
     <OutputType>Library</OutputType>
     <RootNamespace>FSharp.Azure.StorageTypeProvider</RootNamespace>
     <Name>FSharp.Azure.StorageTypeProvider</Name>
-    <AssemblyName>FSharp.Azure.StorageTypeProvider</AssemblyName>
+    <AssemblyName>FSharp.Azure.StorageTypeProvider.DesignTime</AssemblyName>
+    <OutputPath>..\..\bin\</OutputPath>
     <TargetFrameworks>netstandard2.0;netcoreapp2.1;net47</TargetFrameworks>
     <Optimize>true</Optimize>
     <Tailcalls>true</Tailcalls>

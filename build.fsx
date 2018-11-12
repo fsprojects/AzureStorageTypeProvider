@@ -21,7 +21,7 @@ open Fake.IO.FileSystemOperators
 
 // The name of the project
 // (used by attributes in AssemblyInfo, name of a NuGet package and directory in 'src')
-let project = "FSharp.Azure.StorageTypeProvider.DesignTime"
+let project = "FSharp.Azure.StorageTypeProvider"
 // Short summary of the project
 // (used as description in AssemblyInfo and as a short summary for NuGet package)
 let summary = "Allows easy access to Azure Storage assets through F# scripts."
@@ -139,11 +139,11 @@ Target.create "NuGet"
                 Tags = "azure, f#, fsharp, type provider, blob, table, queue, script"
                 OutputPath = "bin"
                 Dependencies = [ "WindowsAzure.Storage", "9.1.1" ]
-                References = [ "FSharp.Azure.StorageTypeProvider.dll" ]
+                References = [ "FSharp.Azure.StorageTypeProvider.DesignTime.dll" ]
                 Files = 
                     ([ "FSharp.Azure.StorageTypeProvider.xml"; "FSharp.Azure.StorageTypeProvider.DesignTime.dll"
                        "Microsoft.WindowsAzure.Storage.dll"; "Newtonsoft.Json.dll" ] 
-                     |> List.map (fun file -> "../bin/netcooreapp2.1/publish/" + file, Some "lib/netcooreapp2.1", None))
+                     |> List.map (fun file -> "../bin/netcoreapp2.1/publish/" + file, Some "lib/netcoreapp2.1", None))
                      @ [ "StorageTypeProvider.fsx", None, None ] }) 
               ("nuget/" + project + ".nuspec"))
 
