@@ -16,9 +16,9 @@
         <dependencies><group><dependency id="WindowsAzure.Storage" version="9.1.1" /></group></dependencies>
         <references><group><reference file="FSharp.Azure.StorageTypeProvider.dll" /></group></references>
     </metadata>
-    <files><file src="../bin/netstandard2.0/publish/FSharp.Azure.StorageTypeProvider.xml" target="lib/netstandard2.0" />
-<file src="../bin/netstandard2.0/publish/FSharp.Azure.StorageTypeProvider.dll" target="lib/netstandard2.0" />
-<file src="../bin/netstandard2.0/publish/Microsoft.WindowsAzure.Storage.dll" target="lib/netstandard2.0" />
-<file src="../bin/netstandard2.0/publish/Newtonsoft.Json.dll" target="lib/netstandard2.0" />
+    <files><file src="../bin/netcooreapp2.1/publish/FSharp.Azure.StorageTypeProvider.xml" target="lib/netcooreapp2.1" />
+<file src="../bin/netcooreapp2.1/publish/FSharp.Azure.StorageTypeProvider.DesignTime.dll" target="lib/netcooreapp2.1" />
+<file src="../bin/netcooreapp2.1/publish/Microsoft.WindowsAzure.Storage.dll" target="lib/netcooreapp2.1" />
+<file src="../bin/netcooreapp2.1/publish/Newtonsoft.Json.dll" target="lib/netcooreapp2.1" />
 <file src="StorageTypeProvider.fsx" /></files>
 </package>

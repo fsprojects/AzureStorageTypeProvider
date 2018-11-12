@@ -183,3 +183,4 @@ paket-files/
 .fake
 testoutput/
 .paket/load/
+.ionide
