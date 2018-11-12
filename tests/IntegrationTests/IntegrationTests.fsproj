@@ -7,7 +7,8 @@
     <OutputType>Exe</OutputType>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetLibraryFramework Condition="'$(TargetFramework)' == 'netcoreapp2.0'">netstandard2.0</TargetLibraryFramework>
-    <RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>    
+    <RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>
+    <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ExpectoHelpers.fs" />

@@ -5,13 +5,13 @@ open System.Reflection
 [<assembly: AssemblyTitleAttribute("FSharp.Azure.StorageTypeProvider")>]
 [<assembly: AssemblyProductAttribute("FSharp.Azure.StorageTypeProvider")>]
 [<assembly: AssemblyDescriptionAttribute("Allows easy access to Azure Storage assets through F# scripts.")>]
-[<assembly: AssemblyVersionAttribute("1.9.6")>]
-[<assembly: AssemblyFileVersionAttribute("1.9.6")>]
+[<assembly: AssemblyVersionAttribute("2.0.0")>]
+[<assembly: AssemblyFileVersionAttribute("2.0.0")>]
 do ()
 
 module internal AssemblyVersionInformation =
     let [<Literal>] AssemblyTitle = "FSharp.Azure.StorageTypeProvider"
     let [<Literal>] AssemblyProduct = "FSharp.Azure.StorageTypeProvider"
     let [<Literal>] AssemblyDescription = "Allows easy access to Azure Storage assets through F# scripts."
-    let [<Literal>] AssemblyVersion = "1.9.6"
-    let [<Literal>] AssemblyFileVersion = "1.9.6"
+    let [<Literal>] AssemblyVersion = "2.0.0"
+    let [<Literal>] AssemblyFileVersion = "2.0.0"

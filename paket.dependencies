@@ -2,20 +2,25 @@ redirects: force
 source https://www.nuget.org/api/v2/
 framework: netstandard2.0, netcoreapp2.0
 
-nuget FAKE
-nuget Deedle
-nuget Expecto
-nuget WindowsAzure.Storage
-nuget FSharp.Charting
-nuget FSharp.Formatting
 nuget FSharp.Core
+nuget WindowsAzure.Storage 9.3.2
 nuget Newtonsoft.Json 10.0.2
-nuget Nuget.CommandLine
-nuget Unquote
 nuget System.Net.Http
 nuget FSharp.Compiler.Tools
-github fsprojects/FSharp.TypeProviders.SDK src/ProvidedTypes.fsi
-github fsprojects/FSharp.TypeProviders.SDK src/ProvidedTypes.fs
-nuget Microsoft.NETCore.Runtime.CoreCLR
+
+nuget FAKE
+nuget Nuget.CommandLine
+
+nuget Deedle
+nuget FSharp.Charting
+nuget FSharp.Formatting
+
+nuget Expecto
+nuget Unquote
 nuget Microsoft.NET.Test.Sdk
 nuget Taskbuilder.fs
+
+github fsprojects/FSharp.TypeProviders.SDK src/ProvidedTypes.fsi
+github fsprojects/FSharp.TypeProviders.SDK src/ProvidedTypes.fs
+nuget FSharp.Compiler.Tools
+nuget Microsoft.NETCore.Runtime.CoreCLR

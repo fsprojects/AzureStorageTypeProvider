@@ -94,3 +94,8 @@
 
 ### 1.9.6 - 23rd February 2018
 * Upgrade Azure Storage to v9
+
+### 2.0.0 - 12th November 2018
+* Upgrade to NET Standard 2.0
+* Upgrade many dependencies
+* Rationalise many API implementations
