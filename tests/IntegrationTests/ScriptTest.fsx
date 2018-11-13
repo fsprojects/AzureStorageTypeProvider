@@ -1,5 +1,4 @@
-#r @"..\..\bin\netstandard2.0\publish\FSharp.Azure.StorageTypeProvider.dll"
-#r @"..\..\packages\FSharp.Compiler.Tools\tools\netcoreapp1.0\FSharp.Build.dll"
+#r @"..\..\src\FSharp.Azure.StorageTypeProvider.RunTime\bin\Debug\netstandard2.0\FSharp.Azure.StorageTypeProvider.RunTime.dll"
 open FSharp.Azure.StorageTypeProvider
 
 // Get a handle to my local storage emulator

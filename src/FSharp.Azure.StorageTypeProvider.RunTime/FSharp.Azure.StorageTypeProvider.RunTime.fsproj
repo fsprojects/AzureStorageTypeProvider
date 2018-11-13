@@ -22,6 +22,10 @@
     <Compile Include="FSharp.Azure.StorageTypeProvider.Runtime.fs" />
     <None Include="paket.references" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- Be explicit about the version of FSharp.Core since we mention it in the manual nuget package spec -->
+    <PackageReference Include="FSharp.Core" Version="4.3.4" />
+  </ItemGroup>
   <Target Name="BeforeBuild">
     <MSBuild Projects="..\FSharp.Azure.StorageTypeProvider.DesignTime\FSharp.Azure.StorageTypeProvider.DesignTime.fsproj" Targets="Restore" />
     <MSBuild Projects="..\FSharp.Azure.StorageTypeProvider.DesignTime\FSharp.Azure.StorageTypeProvider.DesignTime.fsproj" Targets="Build" Properties="Configuration=$(Configuration);TargetFramework=netcoreapp2.1" />
@@ -36,7 +40,7 @@
     <CreateItem Include="..\FSharp.Azure.StorageTypeProvider.DesignTime\bin\$(Configuration)\net472\*.dll;..\FSharp.Azure.StorageTypeProvider.DesignTime\bin\$(Configuration)\net472\*.pdb">
       <Output TaskParameter="Include" ItemName="DesignTimeBinaries2" />
     </CreateItem>
-    <Copy SourceFiles="@(DesignTimeBinaries2)" DestinationFolder="$(OutputPath)/../typeproviders/fsharp41/net47" />
+    <Copy SourceFiles="@(DesignTimeBinaries2)" DestinationFolder="$(OutputPath)/../typeproviders/fsharp41/net472" />
     <CreateItem Include="..\FSharp.Azure.StorageTypeProvider.DesignTime\bin\$(Configuration)\netstandard2.0\*.dll;..\FSharp.Azure.StorageTypeProvider.DesignTime\bin\$(Configuration)\netstandard2.0\*.pdb">
       <Output TaskParameter="Include" ItemName="DesignTimeBinaries3" />
     </CreateItem>

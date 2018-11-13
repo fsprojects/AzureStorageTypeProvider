@@ -8,7 +8,7 @@ nuget Expecto
 nuget WindowsAzure.Storage 9.1.1
 nuget FSharp.Charting
 nuget FSharp.Formatting
-nuget FSharp.Core
+nuget FSharp.Core 4.3.4
 nuget Newtonsoft.Json 10.0.2
 nuget Nuget.CommandLine
 nuget Unquote

@@ -1,13 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\netfx.props" />
   <PropertyGroup>
     <RootNamespace>UnitTests</RootNamespace>
     <Name>UnitTests</Name>
     <AssemblyName>IntegrationTests</AssemblyName>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-    <OutputType>Exe</OutputType>
+    <TargetFrameworks>netcoreapp2.1;net472</TargetFrameworks>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <TargetLibraryFramework Condition="'$(TargetFramework)' == 'netcoreapp2.0'">netstandard2.0</TargetLibraryFramework>
-    <RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>    
+    <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ExpectoHelpers.fs" />
@@ -23,9 +22,11 @@
     <None Include="paket.references" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="FSharp.Azure.StorageTypeProvider">
-      <HintPath>..\..\bin\netcoreapp2.1\publish\FSharp.Azure.StorageTypeProvider.RunTime.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\..\src\FSharp.Azure.StorageTypeProvider.Runtime\FSharp.Azure.StorageTypeProvider.Runtime.fsproj">
+      <Name>FSharp.Azure.StorageTypeProvider.Runtime</Name>
+      <Project>{7e90d6ce-a10b-4858-a5bc-41df7250cbca}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

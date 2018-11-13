@@ -10,15 +10,18 @@ open ProviderImplementation.ProvidedTypes
 open System
 open System.Collections.Generic
 open System.Reflection
+open MyNamespace
 
 [<TypeProvider>]
 /// [omit]
 type public AzureTypeProvider(config : TypeProviderConfig) as this = 
-    inherit TypeProviderForNamespaces(config)
+    inherit TypeProviderForNamespaces(config, assemblyReplacementMap=[("FSharp.Azure.StorageTypeProvider.DesignTime", "FSharp.Azure.StorageTypeProvider.Runtime")], addDefaultProbingLocation=true)
 
     let namespaceName = "FSharp.Azure.StorageTypeProvider"
     let thisAssembly = Assembly.GetExecutingAssembly()
-    let azureAccountType = ProvidedTypeDefinition(thisAssembly, namespaceName, "AzureTypeProvider", baseType = Some typeof<obj>)
+    // check we contain a copy of runtime files, and are not referencing the runtime DLL
+    do assert (typeof<DataSource>.Assembly.GetName().Name = thisAssembly.GetName().Name)  
+    let azureAccountType = ProvidedTypeDefinition(thisAssembly, namespaceName, "AzureTypeProvider", baseType = Some typeof<obj>, isErased=true)
 
     let buildConnectionString (args : obj []) =
         let (|ConnectionString|TwoPart|DevelopmentStorage|) (args:obj []) =
