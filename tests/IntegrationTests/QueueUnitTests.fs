@@ -50,7 +50,7 @@ let detailedQueueTests =
         testCaseAsync "Dequeues a message" <| queueSafeAsync (async {
             do! queue.Enqueue "Foo"
             let! message = queue.Dequeue()
-            message.Value.AsString.Value |> shouldEqual "Foo" })
+            message.Value.Contents.Value |> shouldEqual "Foo" })
 
         testCaseAsync "Safely supports lazy evaluation of 'bad data'" <| queueSafeAsync (async {
             let uri =
@@ -66,7 +66,7 @@ let detailedQueueTests =
 
             let! msg = queue.Dequeue()
             Expect.isSome msg "No message was returned"
-            Expect.throws (fun _ -> msg.Value.AsString.Value |> ignore) "Value shouldn't have been string parseable" })       
+            Expect.throws (fun _ -> msg.Value.Contents.Value |> ignore) "Value shouldn't have been string parseable" })       
         testCaseAsync "Deletes a message" <| queueSafeAsync (async {
             do! queue.Enqueue "Foo"
             let! message = queue.Dequeue()
@@ -79,7 +79,7 @@ let detailedQueueTests =
             do! queue.UpdateMessage(message.Value.Id, "Bar", TimeSpan.FromSeconds 0.)
             do! Async.Sleep 100
             let! message = queue.Dequeue()
-            message.Value.AsString.Value |> shouldEqual "Bar"  })
+            message.Value.Contents.Value |> shouldEqual "Bar"  })
         testCaseAsync "Dequeue Count is correctly emitted" <| queueSafeAsync (async {
             do! queue.Enqueue("Foo")
             do! Async.Sleep 100
