@@ -74,7 +74,7 @@ let runDotNet cmd workingDir =
 
 // --------------------------------------------------------------------------------------
 // Clean build results
-Target.create "Clean" (fun _ -> Shell.cleanDirs [ "bin"; "temp"; "tests/integrationtests/bin" ])
+Target.create "Clean" (fun _ -> try Shell.cleanDirs [ "bin"; "temp"; "tests/integrationtests/bin" ] with _ -> () )
 Target.create "CleanDocs" (fun _ -> Shell.cleanDirs ["docs/output"])
 
 // --------------------------------------------------------------------------------------
