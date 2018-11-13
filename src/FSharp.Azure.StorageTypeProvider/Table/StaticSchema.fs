@@ -47,14 +47,14 @@ let internal createSchema resolutionFolder path =
     |> Option.map(fun path ->
         let paths = [ path; Path.Combine(resolutionFolder, path) ]
         match paths |> List.tryFind File.Exists with
-        | None -> Failure (exn (sprintf "Could not locate schema file. Searched: %A " paths))
+        | None -> Error (exn (sprintf "Could not locate schema file. Searched: %A " paths))
         | Some file ->
             try
             file
             |> File.ReadAllText
             |> buildTableSchema
             |> Some
-            |> Success
-            with ex -> Failure ex)
-    |> defaultArg <| Success None
+            |> Ok
+            with ex -> Error ex)
+    |> defaultArg <| Ok None
 

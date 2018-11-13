@@ -3,8 +3,12 @@
     <RootNamespace>UnitTests</RootNamespace>
     <Name>UnitTests</Name>
     <AssemblyName>IntegrationTests</AssemblyName>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <OutputType>Exe</OutputType>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetLibraryFramework Condition="'$(TargetFramework)' == 'netcoreapp2.0'">netstandard2.0</TargetLibraryFramework>
+    <RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>
+    <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ExpectoHelpers.fs" />
@@ -18,13 +22,11 @@
     <Content Include="BlobSchema.json" />
     <None Include="ResetTestData.fsx" />
     <None Include="paket.references" />
-    <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Azure.StorageTypeProvider">
-      <HintPath>..\..\bin\net452\FSharp.Azure.StorageTypeProvider.dll</HintPath>
+      <HintPath>..\..\bin\netstandard2.0\publish\FSharp.Azure.StorageTypeProvider.dll</HintPath>
     </Reference>
   </ItemGroup>
-  
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

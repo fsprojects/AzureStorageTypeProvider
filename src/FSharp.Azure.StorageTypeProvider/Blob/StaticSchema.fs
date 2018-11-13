@@ -23,7 +23,7 @@ let rec buildBlobItem prevPath (elementName, contents) =
         Blob (prevPath + elementName, elementName, blobType, None)
     | Folder, Json.ObjectOrNull children ->
         let path = prevPath + elementName
-        Folder (path, elementName, lazy (children |> Array.map (buildBlobItem path)))
+        Folder (path, elementName, async { return children |> Array.map (buildBlobItem path) })
     | _ -> failInvalidJson()
 
 let buildBlobSchema (json:Json.Json) =
@@ -31,10 +31,11 @@ let buildBlobSchema (json:Json.Json) =
     |> Array.map (fun (containerName, containerElements) ->
         { Name = containerName
           Contents =
-              lazy
-                  match containerElements with
-                  | Json.ObjectOrNull elements -> elements |> Seq.map (buildBlobItem "")
-                  | _ -> failInvalidJson() })
+            async {
+                return
+                    match containerElements with
+                    | Json.ObjectOrNull elements -> elements |> Array.map (buildBlobItem "")
+                    | _ -> failInvalidJson() } } )
     |> Array.toList
 
 let createSchema resolutionFolder path =
@@ -42,7 +43,7 @@ let createSchema resolutionFolder path =
     |> Option.map(fun path ->
         let paths = [ path; Path.Combine(resolutionFolder, path) ]
         match paths |> List.tryFind File.Exists with
-        | None -> Failure (exn (sprintf "Could not locate schema file. Searched: %A " paths))
+        | None -> Error (exn (sprintf "Could not locate schema file. Searched: %A " paths))
         | Some file ->
             try
             file
@@ -50,6 +51,6 @@ let createSchema resolutionFolder path =
             |> JToken.Parse
             |> Json.ofJToken
             |> buildBlobSchema
-            |> Success
-            with ex -> Failure ex)
-    |> defaultArg <| Success []
+            |> Ok
+            with ex -> Error ex)
+    |> defaultArg <| Ok []

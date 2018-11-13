@@ -5,6 +5,7 @@ open FSharp.Azure.StorageTypeProvider.Table
 open Swensen.Unquote
 open System
 open Expecto
+open FSharp.Control.Tasks.ContextSensitive
 
 type Local = AzureTypeProvider<"DevStorageAccount">
 type Humanized = AzureTypeProvider<"DevStorageAccount", humanize = true>
@@ -45,6 +46,20 @@ type MatchingTableRow =
     { Name : string
       YearsWorking : int 
       Dob : DateTime }
+
+let getTableResult = task {
+    let rec getResults token = task {
+        let! tableResultSeqment = Local.Tables.CloudTableClient.ListTablesSegmentedAsync(token)
+        let token =  tableResultSeqment.ContinuationToken
+        let result = tableResultSeqment |> Seq.toList
+        if isNull token then
+            return result
+        else
+            let! others = getResults token
+            return result @ others }
+    let! results = getResults null
+    return results |> Seq.map(fun c -> c.Name)
+}
 
 [<Tests>]
 let tableReadOnlyTests =
@@ -89,8 +104,12 @@ let tableReadOnlyTests =
             baseQuery.``Less Than Or Equal To``("fred").ToString()    |> shouldEqual "[Name le 'fred']" 
             baseQuery.``Not Equal To``("fred").ToString()             |> shouldEqual "[Name ne 'fred']")
         testCase "Query restricts maximum results" (fun _ -> table.Query().Execute(maxResults = 1).Length |> shouldEqual 1)
-        testCase "Cloud Table Client relates to the same data as the type provider" (fun _ ->
-            Expect.contains (Local.Tables.CloudTableClient.ListTables() |> Seq.map(fun c -> c.Name)) "employee" "")
+
+        testTask "Cloud Table Client relates to the same data as the type provider" {
+            let! t = getTableResult
+            Expect.contains t "employee" ""
+        }
+        
         testCaseAsync "Async query without arguments brings back all rows" <| async {
             let! results = table.Query().ExecuteAsync()
             return results.Length |> shouldEqual 5 }
@@ -268,7 +287,7 @@ let tableStaticSchemaTests =
             ())
         testCase "Can read and write data to a storage account" <| (fun _ ->
             let table1 = StaticSchema.Tables.MyTable
-            table1.AsCloudTable().CreateIfNotExists() |> ignore
+            table1.AsCloudTable().CreateIfNotExistsAsync() |> Async.AwaitTask |> Async.RunSynchronously |> ignore
             let response = table1.Insert(StaticSchema.Domain.MyTableEntity(Partition "A", Row "1", true, Some "Test", Some (DateTime(2000,1,1))))
             let rows = table1.Query().``Where Partition Key Is``.``Equal To``("A").Execute()
             rows.Length |> shouldEqual 1

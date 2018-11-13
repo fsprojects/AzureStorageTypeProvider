@@ -1,6 +1,5 @@
 ﻿// This script sets up local azure storage to a well-known state for integration tests.
 #I @"..\..\packages\WindowsAzure.Storage\lib\net45\"
-#I @"..\..\packages\Newtonsoft.Json\lib\net45\"
 #r @"Microsoft.WindowsAzure.Storage.dll"
 #r @"Newtonsoft.Json.dll"
 

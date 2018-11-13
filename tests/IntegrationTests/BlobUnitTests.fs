@@ -1,18 +1,19 @@
 ﻿module BlobTests
 
+open Expecto
 open FSharp.Azure.StorageTypeProvider
+open FSharp.Azure.StorageTypeProvider.Blob
 open Microsoft.WindowsAzure.Storage.Blob
 open System
 open System.Linq
 open System.IO
-open FSharp.Azure.StorageTypeProvider.Blob
-open Expecto
-
-type Local = AzureTypeProvider<"DevStorageAccount", "">
+open FSharp.Control.Tasks.ContextInsensitive
+type Local = AzureTypeProvider<"UseDevelopmentStorage=true", "">
 
 type BlobSchema = AzureTypeProvider<blobSchema = "BlobSchema.json">
 
 let container = Local.Containers.samples
+
 [<Tests>]
 let blobCompilationTests =
     testList "Blob Compilation Tests" [
@@ -74,11 +75,15 @@ let blobMainTests =
             value |> shouldEqual "thing")
 
         testCase "Cloud Blob Client relates to the same data as the type provider" (fun _ ->
-            Expect.contains (Local.Containers.CloudBlobClient.ListContainers() |> Seq.map(fun c -> c.Name)) "samples" "")
+            Expect.contains (Local.Containers.CloudBlobClient.ListContainersSegmentedAsync(null)
+            |> Async.AwaitTask
+            |> Async.RunSynchronously
+            |> fun r -> r.Results
+            |> Seq.map(fun c -> c.Name)) "samples" "")
 
-        testCase "Cloud Blob Container relates to the same data as the type provider" (fun _ ->
+        testCase "Cloud Blob Container relates to the same data as the type provider" (fun _ -> 
             let client = container.AsCloudBlobContainer()
-            let blobs = client.ListBlobs() |> Seq.choose(function | :? CloudBlockBlob as b -> Some b | _ -> None) |> Seq.map(fun c -> c.Name) |> Seq.toList
+            let blobs = client.ListBlobsSegmentedAsync(null) |> Async.AwaitTask |> Async.RunSynchronously |> fun x -> x.Results |> Seq.choose(function | :? CloudBlockBlob as b -> Some b | _ -> None) |> Seq.map(fun c -> c.Name) |> Seq.toList
             blobs |> shouldEqual [ "data.xml"; "file1.txt"; "file2.txt"; "file3.txt"; "sample.txt" ])
 
         testCase "CloudBlockBlob relates to the same data as the type provider" (fun _ ->
@@ -93,7 +98,7 @@ let blobMainTests =
 
         testCase "Correctly transforms metadata for a blob container" (fun _ ->
             let underlyingContainer = container.AsCloudBlobContainer()
-            underlyingContainer.FetchAttributes()
+            underlyingContainer.FetchAttributesAsync() |> Async.AwaitTask |> Async.RunSynchronously
             
             let metadata = container.GetProperties() |> Async.RunSynchronously
             metadata.LastModified |> shouldEqual (underlyingContainer.Properties.LastModified |> Option.ofNullable)
@@ -111,12 +116,12 @@ let blobMainTests =
 
         testCase "ListBlobs method returns correct number of blobs" (fun _ -> 
             let childFolder = Local.Containers.samples.``folder2/``.``child/``
-            let allBlobs = childFolder.ListBlobs()
+            let allBlobs = childFolder.ListBlobs() |> Async.RunSynchronously
             Seq.length allBlobs |> shouldEqual 1)
 
         testCase "Can access List blobs method on a folder" (fun _ -> 
             let childFolder = Local.Containers.samples.``folder2/``.``child/``
-            let allBlobs = childFolder.ListBlobs(true)
+            let allBlobs = childFolder.ListBlobs true |> Async.RunSynchronously
             let count = allBlobs |> Seq.length
             count |> shouldEqual 4)
 
@@ -130,8 +135,8 @@ let blobMainTests =
                 File.Delete filename
 
                 let blob = Local.Containers.samples.[filename].AsCloudBlockBlob()
-                blob.FetchAttributes()
-                blob.Delete()
+                blob.FetchAttributesAsync() |> Async.AwaitTask |> Async.RunSynchronously
+                blob.DeleteAsync() |> Async.AwaitTask |> Async.RunSynchronously
 
                 blob.Properties.ContentType |> shouldEqual mimeType
             testContent "txt" "text/plain"
@@ -139,11 +144,11 @@ let blobMainTests =
             testContent "jpg" "image/jpeg")
 
         testCase "Retrieves blobs with prefix" (fun _ ->
-            let blobs = Local.Containers.samples.``folder2/``.ListBlobs(prefix = "child/grandchild2/") |> Seq.map(fun b -> b.Name) |> Seq.toArray
+            let blobs = Local.Containers.samples.``folder2/``.ListBlobs(prefix = "child/grandchild2/")  |> Async.RunSynchronously |> Seq.map(fun b -> b.Name) |> Seq.toArray
             blobs |> shouldEqual [| "folder2/child/grandchild2/descedant3.txt" |])
 
         testCase "Retrieves blobs with prefix and subfolders" (fun _ ->
-            let blobs = Local.Containers.samples.``folder2/``.ListBlobs(includeSubfolders = true, prefix = "child/") |> Seq.map(fun b -> b.Name) |> Seq.sort |> Seq.toArray 
+            let blobs = Local.Containers.samples.``folder2/``.ListBlobs(includeSubfolders = true, prefix = "child/")  |> Async.RunSynchronously|> Seq.map(fun b -> b.Name) |> Seq.sort |> Seq.toArray 
             blobs.Length |> shouldEqual 4)
          ]
 
@@ -151,7 +156,7 @@ let blobMainTests =
 let blobContainerTests =
     testList "Blob Container Tests" [
         testCase "Can list all blobs in a container" (fun _ ->
-            let blobs = Local.Containers.samples.ListBlobs(true) |> Seq.length
+            let blobs = Local.Containers.samples.ListBlobs true |> Async.RunSynchronously |> Seq.length
             blobs |> shouldEqual 12)
         testCase "Container supports unsafe blob access" (fun _ ->
             let b = Local.Containers.samples.["file1.txt"]

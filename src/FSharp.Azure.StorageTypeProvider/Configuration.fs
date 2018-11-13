@@ -5,8 +5,6 @@ open System.Configuration
 open System.IO
 open Microsoft.WindowsAzure.Storage
 
-type Result<'T> = Success of result:'T | Failure of exn
-
 let private doesFileExist folder file =
     let fullPath = Path.Combine(folder, file) 
     if fullPath |> File.Exists then Some fullPath else None
@@ -32,7 +30,6 @@ let getConnectionString(connectionName: string, resolutionFolder, requestedConfi
         | NoConfigRequested, DefaultConfigExists configPath -> configPath
         | RequestedConfigDoesNotExist, _ -> raise <| FileNotFoundException(sprintf "Could not find config file '%s' in path '%s'." requestedConfig resolutionFolder)
         | NoConfigRequested, NoDefaultConfigFound -> failwithf "Cannot find either app.config or web.config in path '%s'." resolutionFolder
-
     let map = ExeConfigurationFileMap(ExeConfigFilename = configPath)
     let configSection = ConfigurationManager.OpenMappedExeConfiguration(map, ConfigurationUserLevel.None).ConnectionStrings.ConnectionStrings
 
@@ -56,8 +53,10 @@ module ConnectionValidation =
                 .Parse(connectionString)
                 .CreateCloudTableClient()
                 .GetTableReference("a")
-                .Exists() //throws an exception if attempted with an invalid connection string
+                .ExistsAsync()
+                |> Async.AwaitTask
+                |> Async.RunSynchronously //throws an exception if attempted with an invalid connection string
                 |> ignore
-            Success()
-        with | ex -> Failure ex
+            Ok()
+        with | ex -> Error ex
     let validateConnectionString = memoize checkConnectionString

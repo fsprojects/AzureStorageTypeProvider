@@ -4,11 +4,13 @@ open FSharp.Azure.StorageTypeProvider
 open FSharp.Azure.StorageTypeProvider.Queue
 open Swensen.Unquote
 open Swensen.Unquote.Operators
+open Microsoft.WindowsAzure.Storage.Queue
 open System
 open System.Linq
 open System.Net
 open System.Text
 open Expecto
+open FSharp.Control.Tasks.ContextSensitive
 
 type Local = AzureTypeProvider<"DevStorageAccount">
 
@@ -28,10 +30,11 @@ let queueSafeAsync = beforeAfterAsync QueueHelpers.resetData QueueHelpers.resetD
 [<Tests>]
 let readOnlyQueueTests =
     testList "Queue Tests Read Only" [
-        testCase "Cloud Queue Client gives same results as the Type Provider" (fun _ ->
+        testCase "Cloud Queue Client gives same results as the Type Provider" (fun _ ->           
             let queues = Local.Queues
-            let queueNames = queues.CloudQueueClient.ListQueues() |> Seq.map(fun q -> q.Name) |> Set.ofSeq
+            let queueNames = queues.CloudQueueClient.ListQueuesSegmentedAsync(null) |> Async.AwaitTask |> Async.RunSynchronously |> fun r -> r.Results |> Seq.map(fun q -> q.Name) |> Set.ofSeq
             Expect.containsAll queueNames [ queues.``sample-queue``.Name; queues.``second-sample``.Name;  queues.``third-sample``.Name ] "")
+
         testCase "Cloud Queue is the same queue as the Type Provider" (fun _ ->  (queue.AsCloudQueue().Name) |> shouldEqual queue.Name)
         testCaseAsync "Dequeue with nothing on the queue returns None" <| async {
             let! msg = queue.Dequeue()
@@ -47,11 +50,8 @@ let detailedQueueTests =
         testCaseAsync "Dequeues a message" <| queueSafeAsync (async {
             do! queue.Enqueue "Foo"
             let! message = queue.Dequeue()
-            message.Value.AsString.Value |> shouldEqual "Foo" })
-        testCaseAsync "Dequeues a message of bytes" <| queueSafeAsync (async {
-            do! queue.Enqueue [| 0uy; 1uy; 2uy; |]
-            let! message = queue.Dequeue()
-            message.Value.AsBytes.Value |> shouldEqual [| 0uy; 1uy; 2uy; |] })
+            message.Value.Contents.Value |> shouldEqual "Foo" })
+
         testCaseAsync "Safely supports lazy evaluation of 'bad data'" <| queueSafeAsync (async {
             let uri =
                 let sas = queue.GenerateSharedAccessSignature(TimeSpan.FromDays 7.)
@@ -66,7 +66,7 @@ let detailedQueueTests =
 
             let! msg = queue.Dequeue()
             Expect.isSome msg "No message was returned"
-            Expect.throws (fun _ -> msg.Value.AsString.Value |> ignore) "Value shouldn't have been string parseable" })       
+            Expect.throws (fun _ -> msg.Value.Contents.Value |> ignore) "Value shouldn't have been string parseable" })       
         testCaseAsync "Deletes a message" <| queueSafeAsync (async {
             do! queue.Enqueue "Foo"
             let! message = queue.Dequeue()
@@ -79,15 +79,7 @@ let detailedQueueTests =
             do! queue.UpdateMessage(message.Value.Id, "Bar", TimeSpan.FromSeconds 0.)
             do! Async.Sleep 100
             let! message = queue.Dequeue()
-            message.Value.AsString.Value |> shouldEqual "Bar"  })
-        testCaseAsync "Update Message affects the bytes message body" <| queueSafeAsync (async {
-            do! queue.Enqueue [| 0uy; 1uy; 2uy |]
-            do! Async.Sleep 100
-            let! message = queue.Dequeue()
-            do! queue.UpdateMessage(message.Value.Id, [| 2uy; 1uy; 0uy |], TimeSpan.FromSeconds 0.)
-            do! Async.Sleep 100
-            let! message = queue.Dequeue()
-            message.Value.AsBytes.Value |> shouldEqual [| 2uy; 1uy; 0uy |] })
+            message.Value.Contents.Value |> shouldEqual "Bar"  })
         testCaseAsync "Dequeue Count is correctly emitted" <| queueSafeAsync (async {
             do! queue.Enqueue("Foo")
             do! Async.Sleep 100

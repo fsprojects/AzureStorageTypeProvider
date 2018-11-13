@@ -54,9 +54,13 @@ type AzureTable internal (defaultConnection, tableName) =
     member __.AsCloudTable(?connectionString) = getTableForConnection (defaultArg connectionString defaultConnection)
 
     /// Inserts a batch of entities into the table, using all public properties on the object as fields.
-    member __.Insert(entities : seq<Partition * Row * _>, ?insertMode, ?connectionString) =
-        let tblEntities, insertOp, table  = buildInsertParams insertMode connectionString entities
-        tblEntities |> executeBatchOperation insertOp table
+    member this.Insert(entities : seq<Partition * Row * _>, ?insertMode, ?connectionString) =
+        match insertMode, connectionString with
+        | Some insertMode, Some connectionString -> this.InsertAsync(entities, insertMode, connectionString)
+        | Some insertMode, None -> this.InsertAsync(entities, insertMode)
+        | None, Some connectionString -> this.InsertAsync(entities, connectionString = connectionString)
+        | None, None -> this.InsertAsync(entities)
+        |> Async.RunSynchronously
 
     /// Inserts a batch of entities into the table, using all public properties on the object as fields.
     member __.InsertAsync(entities : seq<Partition * Row * _>, ?insertMode, ?connectionString) = async {
@@ -65,11 +69,12 @@ type AzureTable internal (defaultConnection, tableName) =
     
     /// Inserts a single entity into the table, using public properties on the object as fields.
     member this.Insert(partitionKey, rowKey, entity, ?insertMode, ?connectionString) = 
-        let insertMode, connectionString = getConnectionDetails (insertMode, connectionString)
-        this.Insert([ partitionKey, rowKey, entity ], insertMode, connectionString)
-        |> Seq.head
-        |> snd
-        |> Seq.head
+        match insertMode, connectionString with
+        | Some insertMode, Some connectionString -> this.InsertAsync(partitionKey, rowKey, entity, insertMode, connectionString)
+        | Some insertMode, None -> this.InsertAsync(partitionKey, rowKey, entity, insertMode)
+        | None, Some connectionString -> this.InsertAsync(partitionKey, rowKey, entity, connectionString = connectionString)
+        | None, None -> this.InsertAsync(partitionKey, rowKey, entity)
+        |> Async.RunSynchronously
 
     /// Inserts a single entity into the table asynchronously, using public properties on the object as fields.
     member this.InsertAsync(partitionKey, rowKey, entity, ?insertMode, ?connectionString) = async {
@@ -82,13 +87,11 @@ type AzureTable internal (defaultConnection, tableName) =
             |> Seq.head }
     
     /// Deletes a batch of entities from the table using the supplied pairs of Partition and Row keys.  
-    member __.Delete(entities, ?connectionString) = 
-        let table = getTableForConnection (defaultArg connectionString defaultConnection)
-        entities
-        |> Seq.map (fun entityId -> 
-            let Partition(partitionKey), Row(rowKey) = entityId
-            DynamicTableEntity(partitionKey, rowKey, ETag = "*"))
-        |> executeBatchOperation TableOperation.Delete table
+    member this.Delete(entities, ?connectionString) =
+        match connectionString with
+        | Some connectionString -> this.DeleteAsync(entities, connectionString)
+        | None -> this.DeleteAsync entities
+        |> Async.RunSynchronously
 
     /// Asynchronously deletes a batch of entities from the table using the supplied pairs of Partition and Row keys.
     member __.DeleteAsync(entities, ?connectionString) = async {
@@ -98,17 +101,13 @@ type AzureTable internal (defaultConnection, tableName) =
             let Partition(partitionKey), Row(rowKey) = entityId
             DynamicTableEntity(partitionKey, rowKey, ETag = "*"))
         |> executeBatchOperationAsync TableOperation.Delete table }
-       
+    
     /// Deletes an entire partition from the table
-    member __.DeletePartition(partitionKey, ?connectionString) = 
-        let table = getTableForConnection (defaultArg connectionString defaultConnection)
-        let filter = Table.TableQuery.GenerateFilterCondition ("PartitionKey", Table.QueryComparisons.Equal, partitionKey)
-
-        (new Table.TableQuery<Table.DynamicTableEntity>()).Where(filter).Select [| "RowKey" |]
-        |> table.ExecuteQuery
-        |> Seq.map(fun e -> (Partition e.PartitionKey, Row e.RowKey))
-        |> __.Delete
-        |> getSinglePartitionResult partitionKey
+    member this.DeletePartition(partitionKey, ?connectionString) = 
+        match connectionString with
+        | Some connectionString -> this.DeletePartitionAsync(partitionKey, connectionString)
+        | None -> this.DeletePartitionAsync(partitionKey)
+        |> Async.RunSynchronously
  
     /// Asynchronously deletes an entire partition from the table
     member __.DeletePartitionAsync(partitionKey, ?connectionString) = async {

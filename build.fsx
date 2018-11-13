@@ -3,14 +3,21 @@
 // --------------------------------------------------------------------------------------
 
 #r @"packages/FAKE/tools/FakeLib.dll"
-
-open Fake
-open Fake.AppVeyor
-open Fake.Git
-open Fake.AssemblyInfoFile
-open Fake.ReleaseNotesHelper
+open Fake.BuildServer
+open Fake.Core.TargetOperators
+open Fake.Core
+open Fake.DotNet
+open Fake.IO.Globbing.Operators
 open System
 open System.IO
+open Fake.IO
+open Fake.Azure
+open Fake.DotNet.NuGet
+open Fake.FSIHelper
+open Fake.Tools.Git
+// open Fake.Git
+open Fake.DotNet.Testing
+open Fake.IO.FileSystemOperators
 
 // The name of the project
 // (used by attributes in AssemblyInfo, name of a NuGet package and directory in 'src')
@@ -18,8 +25,6 @@ let project = "FSharp.Azure.StorageTypeProvider"
 // Short summary of the project
 // (used as description in AssemblyInfo and as a short summary for NuGet package)
 let summary = "Allows easy access to Azure Storage assets through F# scripts."
-// Pattern specifying assemblies to be tested using XUnit
-let testAssemblies = "tests/**/bin/Release/net452/*Tests*.exe"
 
 // Git configuration (used for publishing documentation in gh-pages branch)
 // The profile where the project is posted
@@ -34,53 +39,95 @@ Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
 
 let buildDir = "bin"
 
+
+// TypeProvider path
+let projectPath = Path.getFullName "./src/FSharp.Azure.StorageTypeProvider"
+
+// Test path
+let testPath = Path.getFullName "./tests/IntegrationTests"
 // Read additional information from the release notes document
+
+// Test Output Dir
+let testOutPutDir = "TestOutput"
+
 
 let release =
     File.ReadAllLines "RELEASE_NOTES.md"
-    |> parseAllReleaseNotes
+    |> ReleaseNotes.parseAll
     |> List.head
 
 // Generate assembly info files with the right version & up-to-date information
-Target "AssemblyInfo" (fun _ ->
+Target.create  "AssemblyInfo" (fun _ ->
     let fileName = "src/" + project + "/AssemblyInfo.fs"
-    CreateFSharpAssemblyInfo fileName [ Attribute.Title project
-                                        Attribute.Product project
-                                        Attribute.Description summary
-                                        Attribute.Version release.AssemblyVersion
-                                        Attribute.FileVersion release.AssemblyVersion ])
+    AssemblyInfoFile.createFSharp fileName [    AssemblyInfo.Title project
+                                                AssemblyInfo.Product project
+                                                AssemblyInfo.Description summary
+                                                AssemblyInfo.Version release.AssemblyVersion
+                                                AssemblyInfo.FileVersion release.AssemblyVersion ])
+
+let inline withWorkDir wd = 
+    DotNet.Options.withWorkingDirectory wd
+let runDotNet cmd workingDir =
+    let result =
+        DotNet.exec (withWorkDir workingDir) cmd ""
+    if result.ExitCode <> 0 then failwithf "'dotnet %s' failed in %s" cmd workingDir
 
 // --------------------------------------------------------------------------------------
 // Clean build results
-Target "Clean" (fun _ -> CleanDirs [ "bin"; "temp"; "tests/integrationtests/bin" ])
-Target "CleanDocs" (fun _ -> CleanDirs ["docs/output"])
+Target.create "Clean" (fun _ -> try Shell.cleanDirs [ "bin"; "temp"; "tests/integrationtests/bin" ] with _ -> () )
+Target.create "CleanDocs" (fun _ -> Shell.cleanDirs ["docs/output"])
 
 // --------------------------------------------------------------------------------------
-// Build library & test project
-Target "Build" (fun _ ->
-    !!("FSharp.Azure.StorageTypeProvider.sln")
-    |> MSBuildRelease "" "Rebuild"
-    |> ignore)
+// Restore project
+Target.create "RestoreProject" (fun _ ->
+    runDotNet "restore" projectPath
+)
+
+// --------------------------------------------------------------------------------------
+// Build library project
+Target.create "Build" (fun _ ->
+    runDotNet "publish" projectPath
+)
 
 // --------------------------------------------------------------------------------------
 // Run the unit tests using test runner
-Target "ResetTestData" (fun _ ->
-    AzureHelper.StartStorageEmulator()
-    FSIHelper.executeFSI (__SOURCE_DIRECTORY__ </> @"tests\IntegrationTests") "ResetTestData.fsx" []
+Target.create "ResetTestData" (fun _ ->
+    let script = Path.GetFullPath (testPath + @"\ResetTestData.fsx")
+    Emulators.startStorageEmulator()
+    Fsi.exec (fun p -> 
+        { p with 
+            TargetProfile = Fsi.Profile.NetStandard
+            WorkingDirectory = testPath
+            ToolPath = Fsi.FsiTool.Internal
+        }) script [""]
     |> snd
-    |> Seq.iter(fun x -> printfn "%s" x.Message))
+    |> Seq.iter(fun x -> printfn "%s" x))  ///ToBeFixed
+
+
+let build project framework =
+    DotNet.build (fun p ->
+        { p with Framework = Some framework } ) project
 
 // Run integration tests
-Target "RunTests" (fun _ ->
-    !!("UnitTests.sln") |> MSBuildRelease "" "Rebuild" |> ignore
-    FileHelper.CreateDir "TestOutput"
-    !!(testAssemblies) |> Fake.Testing.Expecto.Expecto id)
+let root = __SOURCE_DIRECTORY__
+let testNetCoreDir = root </> "tests"  </> "IntegrationTests" </> "bin" </> "Release" </> "netcoreapp2.0" </> "win10-x64" </> "publish"
+
+Target.create "RunTests" (fun _ ->
+    let result = DotNet.exec (withWorkDir testPath) "publish --self-contained -c Release -r win10-x64" ""
+    if result.OK = false then failwith "Publish failed"
+    printfn "Dkr: %s" testNetCoreDir
+    let result = DotNet.exec (withWorkDir testNetCoreDir) "" "IntegrationTests.dll"
+    if result.OK then
+        printfn "Expecto for netcore finished without Errors"
+    else 
+        printfn "Expecto for netcore finished with Errors"
+    )
 
 // --------------------------------------------------------------------------------------
 // Build a NuGet package
-Target "NuGet" 
+Target.create "NuGet" 
     (fun _ -> 
-        NuGet (fun p ->
+        NuGet.NuGet (fun p ->
             { p with
                 Authors = [ "Isaac Abraham" ]
                 Project = project
@@ -91,13 +138,13 @@ Target "NuGet"
                 ReleaseNotes = release.Notes |> String.concat Environment.NewLine
                 Tags = "azure, f#, fsharp, type provider, blob, table, queue, script"
                 OutputPath = "bin"
-                Dependencies = [ "WindowsAzure.Storage", "9.0.0" ]
+                Dependencies = [ "WindowsAzure.Storage", "9.3.2"
+                                 "FSharp.Compiler.Tools", "10.2.1" ]
                 References = [ "FSharp.Azure.StorageTypeProvider.dll" ]
                 Files = 
                     ([ "FSharp.Azure.StorageTypeProvider.xml"; "FSharp.Azure.StorageTypeProvider.dll"
-                       "Microsoft.WindowsAzure.Storage.dll"; "Microsoft.Azure.KeyVault.Core.dll"
-                       "Newtonsoft.Json.dll" ] 
-                     |> List.map (fun file -> "../bin/net452/" + file, Some "lib/net452", None))
+                       "Microsoft.WindowsAzure.Storage.dll"; "Newtonsoft.Json.dll" ] 
+                     |> List.map (fun file -> "../bin/netstandard2.0/publish/" + file, Some "lib/netstandard2.0", None))
                      @ [ "StorageTypeProvider.fsx", None, None ] }) 
               ("nuget/" + project + ".nuspec"))
 
@@ -105,13 +152,13 @@ Target "NuGet"
 module AppVeyorHelpers =
   let execOnAppveyor arguments =
     let result =
-        ExecProcess
-            (fun info ->
-                info.FileName <- "appveyor"
-                info.Arguments <- arguments)
-            (TimeSpan.FromMinutes 2.0)
+        Process.execSimple(fun info ->
+            { info with
+                FileName = "appveyor"
+                Arguments = arguments})
+            (TimeSpan.FromMinutes 2.)
     if result <> 0 then failwith (sprintf "Failed to execute appveyor command: %s" arguments)
-    trace "Published packages"
+    Trace.trace "Published packages"
 
   let publishOnAppveyor folder =
     !! (folder + "*.nupkg")
@@ -120,7 +167,7 @@ module AppVeyorHelpers =
 // --------------------------------------------------------------------------------------
 // Generate the documentation
 
-Target "GenerateReferenceDocs" (fun _ ->
+Target.create "GenerateReferenceDocs" (fun _ ->
     if not <| executeFSIWithArgs "docs/tools" "generate.fsx" ["--define:RELEASE"; "--define:REFERENCE"] [] then
       failwith "generating reference documentation failed")
 
@@ -130,98 +177,100 @@ let generateHelp fail debug =
           yield "--define:HELP"]
 
     if executeFSIWithArgs "docs/tools" "generate.fsx" args [] then
-        traceImportant "Help generated"
+        Trace.traceImportant "Help generated"
     else
         if fail then failwith "generating help documentation failed"
-        else traceImportant "generating help documentation failed"
+        else Trace.traceImportant "generating help documentation failed"
 
-Target "GenerateHelp" (fun _ ->
-    DeleteFile "docs/content/release-notes.md"
-    CopyFile "docs/content/" "RELEASE_NOTES.md"
-    Rename "docs/content/release-notes.md" "docs/content/RELEASE_NOTES.md"
+Target.create "GenerateHelp" (fun _ ->
+    File.delete "docs/content/release-notes.md"
+    Shell.copyFile "docs/content/" "RELEASE_NOTES.md"
+    Shell.rename "docs/content/release-notes.md" "docs/content/RELEASE_NOTES.md"
 
-    DeleteFile "docs/content/license.md"
-    CopyFile "docs/content/" "LICENSE.txt"
-    Rename "docs/content/license.md" "docs/content/LICENSE.txt"
+    File.delete  "docs/content/license.md"
+    Shell.copyFile "docs/content/" "LICENSE.txt"
+    Shell.rename "docs/content/license.md" "docs/content/LICENSE.txt"
 
-    CopyFile buildDir "packages/FSharp.Core/lib/net40/FSharp.Core.sigdata"
-    CopyFile buildDir "packages/FSharp.Core/lib/net40/FSharp.Core.optdata"
+    Shell.copyFile buildDir "packages/FSharp.Core/lib/net40/FSharp.Core.sigdata"
+    Shell.copyFile buildDir "packages/FSharp.Core/lib/net40/FSharp.Core.optdata"
 
     generateHelp false false)
 
-Target "GenerateHelpDebug" (fun _ ->
-    DeleteFile "docs/content/release-notes.md"
-    CopyFile "docs/content/" "RELEASE_NOTES.md"
-    Rename "docs/content/release-notes.md" "docs/content/RELEASE_NOTES.md"
+Target.create "GenerateHelpDebug" (fun _ ->
+    File.delete "docs/content/release-notes.md"
+    Shell.copyFile "docs/content/" "RELEASE_NOTES.md"
+    Shell.rename "docs/content/release-notes.md" "docs/content/RELEASE_NOTES.md"
 
-    DeleteFile "docs/content/license.md"
-    CopyFile "docs/content/" "LICENSE.txt"
-    Rename "docs/content/license.md" "docs/content/LICENSE.txt"
+    File.delete "docs/content/license.md"
+    Shell.copyFile "docs/content/" "LICENSE.txt"
+
+    Shell.rename "docs/content/license.md" "docs/content/LICENSE.txt"
 
     generateHelp true true)
 
-Target "KeepRunning" (fun _ ->    
-    use watcher = !! "docs/content/**/*.*" |> WatchChanges (fun changes ->
+Target.create "KeepRunning" (fun _ ->    
+    use watcher = !! "docs/content/**/*.*" |> ChangeWatcher.run (fun changes ->
          generateHelp false false)
 
-    traceImportant "Waiting for help edits. Press any key to stop."
+    Trace.traceImportant "Waiting for help edits. Press any key to stop."
     System.Console.ReadKey() |> ignore
     watcher.Dispose())
 
-Target "GenerateDocs" DoNothing
+Target.create "GenerateDocs" ignore
 
 // --------------------------------------------------------------------------------------
 // Release Scripts
 
-Target "ReleaseDocs" (fun _ ->
+Target.create "ReleaseDocs" (fun _ ->
     let tempDocsDir = "temp/gh-pages"
-    CleanDir tempDocsDir
+    Shell.cleanDir tempDocsDir
     Repository.cloneSingleBranch "" (gitHome + "/" + gitName + ".git") "gh-pages" tempDocsDir
 
-    Git.CommandHelper.runSimpleGitCommand tempDocsDir "rm . -f -r" |> ignore
-    CopyRecursive "docs/output" tempDocsDir true |> tracefn "%A"
+    CommandHelper.runSimpleGitCommand tempDocsDir "rm . -f -r" |> ignore
+    Shell.copyRecursive "docs/output" tempDocsDir true |> Trace.tracefn "%A"
     
-    StageAll tempDocsDir
-    Git.Commit.Commit tempDocsDir (sprintf "Update generated documentation for version %s" release.NugetVersion)
+    Staging.stageAll tempDocsDir
+    Commit.exec tempDocsDir (sprintf "Update generated documentation for version %s" release.NugetVersion)
     Branches.push tempDocsDir)
 
-Target "Release" (fun _ ->
+Target.create "Release" (fun _ ->
     let user =
-        match getBuildParam "github-user" with
+        match Environment.environVar "github-user" with
         | s when not (String.IsNullOrWhiteSpace s) -> s
-        | _ -> getUserInput "Username: "
+        | _ -> UserInput.getUserInput "Username: "
     let pw =
-        match getBuildParam "github-pw" with
+        match Environment.environVar "github-pw" with
         | s when not (String.IsNullOrWhiteSpace s) -> s
-        | _ -> getUserPassword "Password: "
+        | _ -> UserInput.getUserPassword "Password: "
     let remote =
-        Git.CommandHelper.getGitResult "" "remote -v"
+        CommandHelper.getGitResult "" "remote -v"
         |> Seq.filter (fun (s: string) -> s.EndsWith("(push)"))
         |> Seq.tryFind (fun (s: string) -> s.Contains(gitOwner + "/" + gitName))
         |> function None -> gitHome + "/" + gitName | Some (s: string) -> s.Split().[0]
 
-    StageAll ""
-    Git.Commit.Commit "" (sprintf "Bump version to %s" release.NugetVersion)
+    Staging.stageAll ""
+    Commit.exec "" (sprintf "Bump version to %s" release.NugetVersion)
     Branches.pushBranch "" remote (Information.getBranchName "")
 
     Branches.tag "" release.NugetVersion
     Branches.pushTag "" remote release.NugetVersion)
 
-Target "LocalDeploy" (fun _ ->
-    directoryInfo @"bin"
-    |> filesInDirMatching "*.nupkg"
+Target.create "LocalDeploy" (fun _ ->
+    DirectoryInfo @"bin"
+    |> DirectoryInfo.getMatchingFiles "*.nupkg"
     |> Seq.map(fun x -> x.FullName)
-    |> CopyFiles @"..\..\LocalPackages")
+    |> Shell.copyFiles @"..\..\LocalPackages")
 
-Target "BuildServerDeploy" (fun _ -> publishOnAppveyor buildDir)
+Target.create "BuildServerDeploy" (fun _ -> publishOnAppveyor buildDir)
 
-FinalTarget "PublishTestsResultsToAppveyor" (fun _ ->
-    UploadTestResultsXml TestResultsType.Xunit "TestOutput")
+Target.createFinal "PublishTestsResultsToAppveyor" (fun _ ->
+    Trace.publish ImportData.BuildArtifact "TestOutput"
+)
 
 // --------------------------------------------------------------------------------------
 // Run all targets by default. Invoke 'build <Target>' to override
 
-Target "All" DoNothing
+Target.create "All" ignore
 
 "Clean"
   ==> "AssemblyInfo"
@@ -229,8 +278,8 @@ Target "All" DoNothing
   ==> "Nuget"
   ==> "ResetTestData"
   ==> "RunTests"
-  =?> ("LocalDeploy", buildServer = LocalBuild)
-  =?> ("BuildServerDeploy", buildServer = AppVeyor)
+  =?> ("LocalDeploy", BuildServer.buildServer = LocalBuild)
+  =?> ("BuildServerDeploy", BuildServer.buildServer = AppVeyor)
 
 "CleanDocs"
   ==> "GenerateHelp"
@@ -248,5 +297,5 @@ Target "All" DoNothing
 "GenerateHelp"
   ==> "KeepRunning"
 
-ActivateFinalTarget "PublishTestsResultsToAppveyor"
-RunTargetOrDefault "RunTests"
+Target.activateFinal "PublishTestsResultsToAppveyor"
+Target.runOrDefault "RunTests"

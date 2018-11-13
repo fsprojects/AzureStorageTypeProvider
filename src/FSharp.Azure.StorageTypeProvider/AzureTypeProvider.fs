@@ -69,8 +69,8 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
         let parsedTableSchema = Table.StaticSchema.createSchema config.ResolutionFolder staticTableSchema
 
         match connectionStringValidation, parsedBlobSchema, parsedTableSchema with
-        | Some (Success _), Success blobSchema, Success tableSchema
-        | None, Success blobSchema, Success tableSchema ->
+        | Some (Ok ()), Ok blobSchema, Ok tableSchema
+        | None, Ok blobSchema, Ok tableSchema ->
             let domainTypes = ProvidedTypeDefinition("Domain", Some typeof<obj>)            
             typeProviderForAccount.AddMember(domainTypes)
 
@@ -86,9 +86,9 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
                     try builder(connectionString, domainTypes)
                     with ex -> failwithf "An error occurred during initial type generation for %s: %O" name ex))
             typeProviderForAccount
-        | Some (Failure ex), _, _ -> failwithf "Unable to validate connection string (%s)" ex.Message
-        | _, Failure ex, _ -> failwithf "Unable to parse blob schema file (%s)" ex.Message
-        | _, _, Failure ex -> failwithf "Unable to parse table schema file (%s)" ex.Message
+        | Some (Error ex), _, _ -> failwithf "Unable to validate connection string (%O)" ex
+        | _, Error ex, _ -> failwithf "Unable to parse blob schema file (%O)" ex
+        | _, _, Error ex -> failwithf "Unable to parse table schema file (%O)" ex
     
     let createParam (name, defaultValue:'a, help) =
         let providedParameter = ProvidedStaticParameter(name, typeof<'a>, defaultValue)
