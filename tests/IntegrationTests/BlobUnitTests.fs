@@ -14,34 +14,6 @@ type BlobSchema = AzureTypeProvider<blobSchema = "BlobSchema.json">
 
 let container = Local.Containers.samples
 
-
-let getContainerResult = task {
-    let rec getResults token = task {
-        let! blobsSeqmented = Local.Containers.CloudBlobClient.ListContainersSegmentedAsync(token)
-        let token =  blobsSeqmented.ContinuationToken
-        let result = blobsSeqmented.Results |> Seq.toList
-        if isNull token then
-            return result
-        else
-            let! others = getResults token
-            return result @ others }
-    let! results = getResults null
-    return results |> Seq.map(fun c -> c.Name)
-}
-
-let getBlobs (container:CloudBlobContainer) = task {
-    let rec getResults token = task {
-        let! blobsSeqmented = container.ListBlobsSegmentedAsync(token)
-        let token =  blobsSeqmented.ContinuationToken
-        let result = blobsSeqmented.Results |> Seq.toList
-        if isNull token then
-            return result
-        else
-            let! others = getResults token
-            return result @ others }
-    let! results = getResults null
-    return results |> Seq.choose(function | :? CloudBlockBlob as b -> Some b | _ -> None) |> Seq.map(fun c -> c.Name) |> Seq.toList
-}
 [<Tests>]
 let blobCompilationTests =
     testList "Blob Compilation Tests" [
@@ -102,16 +74,17 @@ let blobMainTests =
                                 .Value
             value |> shouldEqual "thing")
 
-        testTask "Cloud Blob Client relates to the same data as the type provider" {
-          let! r = getContainerResult
-          Expect.contains r "samples" ""
-        }
+        testCase "Cloud Blob Client relates to the same data as the type provider" (fun _ ->
+            Expect.contains (Local.Containers.CloudBlobClient.ListContainersSegmentedAsync(null)
+            |> Async.AwaitTask
+            |> Async.RunSynchronously
+            |> fun r -> r.Results
+            |> Seq.map(fun c -> c.Name)) "samples" "")
 
-        testTask "Cloud Blob Container relates to the same data as the type provider" {
-            let blobContainer = container.AsCloudBlobContainer()
-            let! blobs = getBlobs blobContainer
-            blobs |> shouldEqual [ "data.xml"; "file1.txt"; "file2.txt"; "file3.txt"; "sample.txt" ]
-        }
+        testCase "Cloud Blob Container relates to the same data as the type provider" (fun _ -> 
+            let client = container.AsCloudBlobContainer()
+            let blobs = client.ListBlobsSegmentedAsync(null) |> Async.AwaitTask |> Async.RunSynchronously |> fun x -> x.Results |> Seq.choose(function | :? CloudBlockBlob as b -> Some b | _ -> None) |> Seq.map(fun c -> c.Name) |> Seq.toList
+            blobs |> shouldEqual [ "data.xml"; "file1.txt"; "file2.txt"; "file3.txt"; "sample.txt" ])
 
         testCase "CloudBlockBlob relates to the same data as the type provider" (fun _ ->
             let blob = container.``data.xml``.AsCloudBlockBlob()

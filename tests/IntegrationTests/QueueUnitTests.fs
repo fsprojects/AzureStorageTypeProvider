@@ -27,29 +27,14 @@ let queue = Local.Queues.``sample-queue``
 
 let queueSafeAsync = beforeAfterAsync QueueHelpers.resetData QueueHelpers.resetData
 
-let getQueues (queueClient:CloudQueueClient) = task {
-    let rec getResults token = task {
-        let! blobsSeqmented = queueClient.ListQueuesSegmentedAsync(token)
-        let token =  blobsSeqmented.ContinuationToken
-        let result = blobsSeqmented.Results |> Seq.toList
-        if isNull token then
-            return result
-        else
-            let! others = getResults token
-            return result @ others }
-    let! results = getResults null
-    return results |> Seq.map(fun c -> c.Name) |> Set.ofSeq
-}
-
-
 [<Tests>]
 let readOnlyQueueTests =
     testList "Queue Tests Read Only" [
-        testTask "Cloud Queue Client gives same results as the Type Provider" {
+        testCase "Cloud Queue Client gives same results as the Type Provider" (fun _ ->           
             let queues = Local.Queues
-            let! q = getQueues queues.CloudQueueClient
-            Expect.containsAll q [ queues.``sample-queue``.Name; queues.``second-sample``.Name;  queues.``third-sample``.Name ] ""
-        }        
+            let queueNames = queues.CloudQueueClient.ListQueuesSegmentedAsync(null) |> Async.AwaitTask |> Async.RunSynchronously |> fun r -> r.Results |> Seq.map(fun q -> q.Name) |> Set.ofSeq
+            Expect.containsAll queueNames [ queues.``sample-queue``.Name; queues.``second-sample``.Name;  queues.``third-sample``.Name ] "")
+
         testCase "Cloud Queue is the same queue as the Type Provider" (fun _ ->  (queue.AsCloudQueue().Name) |> shouldEqual queue.Name)
         testCaseAsync "Dequeue with nothing on the queue returns None" <| async {
             let! msg = queue.Dequeue()
@@ -66,10 +51,7 @@ let detailedQueueTests =
             do! queue.Enqueue "Foo"
             let! message = queue.Dequeue()
             message.Value.AsString.Value |> shouldEqual "Foo" })
-        // testCaseAsync "Dequeues a message of bytes" <| queueSafeAsync (async {
-        //     do! queue.Enqueue [| 0uy; 1uy; 2uy; |]
-        //     let! message = queue.Dequeue()
-        //     message.Value.AsBytes.Value |> shouldEqual [| 0uy; 1uy; 2uy; |] }) ///Has to be fixed
+
         testCaseAsync "Safely supports lazy evaluation of 'bad data'" <| queueSafeAsync (async {
             let uri =
                 let sas = queue.GenerateSharedAccessSignature(TimeSpan.FromDays 7.)
@@ -98,14 +80,6 @@ let detailedQueueTests =
             do! Async.Sleep 100
             let! message = queue.Dequeue()
             message.Value.AsString.Value |> shouldEqual "Bar"  })
-        // testCaseAsync "Update Message affects the bytes message body" <| queueSafeAsync (async {
-        //     do! queue.Enqueue [| 0uy; 1uy; 2uy |]
-        //     do! Async.Sleep 100
-        //     let! message = queue.Dequeue()
-        //     do! queue.UpdateMessage(message.Value.Id, [| 2uy; 1uy; 0uy |], TimeSpan.FromSeconds 0.)
-        //     do! Async.Sleep 100
-        //     let! message = queue.Dequeue()
-        //     message.Value.AsBytes.Value |> shouldEqual [| 2uy; 1uy; 0uy |] }) ///Has to be fixed
         testCaseAsync "Dequeue Count is correctly emitted" <| queueSafeAsync (async {
             do! queue.Enqueue("Foo")
             do! Async.Sleep 100

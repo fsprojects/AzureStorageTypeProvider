@@ -5,11 +5,11 @@ open Microsoft.WindowsAzure.Storage.Queue
 open System
 
 /// The unique identifier for this Azure queue message.
-type MessageId = | MessageId of string
+type MessageId = MessageId of string
 /// The unique identifier for this request of this Azure queue message.
-type PopReceipt = | PopReceipt of string
+type PopReceipt = PopReceipt of string
 /// The composite identifier of this Azure queue message.
-type ProvidedMessageId = | ProvidedMessageId of MessageId : MessageId * PopReceipt : PopReceipt
+type ProvidedMessageId = ProvidedMessageId of MessageId : MessageId * PopReceipt : PopReceipt
 
 /// Represents a single message that has been dequeued.
 type ProvidedQueueMessage =
@@ -23,10 +23,8 @@ type ProvidedQueueMessage =
       ExpirationTime : DateTimeOffset option
       /// The time that this message will next become visible.
       NextVisibleTime : DateTimeOffset option
-      /// Gets the contents of the message as a byte array.
-      AsBytes : Lazy<byte array>
       /// Gets the contest of the message as a string.
-      AsString : Lazy<string> }
+      Contents : Lazy<string> }
 
 /// Represents the set of possible permissions for a shared access queue policy.
 [<FlagsAttribute>]
@@ -47,8 +45,7 @@ module internal Factory =
           InsertionTime = message.InsertionTime |> Option.ofNullable
           ExpirationTime = message.ExpirationTime |> Option.ofNullable
           NextVisibleTime = message.NextVisibleTime |> Option.ofNullable
-          AsBytes = lazy message.AsBytes
-          AsString = lazy message.AsString }
+          Contents = lazy message.AsString }
     
     let toAzureQueueMessage providedMessageId = 
         let messageId, popReceipt = providedMessageId |> unpackId
@@ -77,14 +74,12 @@ type ProvidedQueue(defaultConnectionString, name) =
         |> defaultArg <| 0
     
     /// Dequeues the next message and optionally sets the visibility timeout (i.e. how long you can work with the message before it reappears in the queue)
-    member __.Dequeue(?connectionString, ?visibilityTimeout) = 
-        async { 
-            let! message = (getQueue connectionString).GetMessageAsync(visibilityTimeout |> Option.toNullable, null, null) |> Async.AwaitTask
-            return
-                match message with
-                | null -> None
-                | _ -> Some(message |> Factory.toProvidedQueueMessage)
-        }
+    member __.Dequeue(?connectionString, ?visibilityTimeout) = async { 
+        let! message = (getQueue connectionString).GetMessageAsync(visibilityTimeout |> Option.toNullable, null, null) |> Async.AwaitTask
+        return
+            match message with
+            | null -> None
+            | _ -> Some(message |> Factory.toProvidedQueueMessage) }
 
     /// Dequeues the next message using the default connection string and sets the visibility timeout (i.e. how long you can work with the message before it reappears in the queue)
     member __.Dequeue(visibilityTimeout) = __.Dequeue(defaultConnectionString, visibilityTimeout)
@@ -101,13 +96,13 @@ type ProvidedQueue(defaultConnectionString, name) =
 
         let sharedAccessQueuePermissions = 
             typeMap
-            |> Map.fold (fun s k v -> if permissions.HasFlag(k) then s ||| v else s) SharedAccessQueuePermissions.None 
+            |> Map.fold (fun s k v -> if permissions.HasFlag k then s ||| v else s) SharedAccessQueuePermissions.None 
 
         getQueue connectionString |> generateSas start duration sharedAccessQueuePermissions
     
     /// Enqueues a new message.
     member __.Enqueue(content, ?connectionString) =
-        connectionString |> enqueue (CloudQueueMessage(content))
+        connectionString |> enqueue (CloudQueueMessage content)
     
     /// Deletes an existing message.
     member __.DeleteMessage(providedMessageId, ?connectionString) = 
