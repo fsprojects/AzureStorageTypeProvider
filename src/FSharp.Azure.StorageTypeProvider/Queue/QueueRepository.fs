@@ -17,9 +17,12 @@ module private SdkExtensions =
             Async.segmentedAzureOperation getTables
 
 let getQueues connectionString = async {
+    try
     let client = getQueueClient connectionString
     let! queues = client.ListQueuesAsync()
-    return queues |> Array.map (fun q -> q.Name) }
+    return queues |> Array.map (fun q -> q.Name)
+    with
+    | :? StorageException as ex when ex.RequestInformation.HttpStatusCode = 501 -> return Array.empty }
 
 let getQueueRef name = getQueueClient >> (fun q -> q.GetQueueReference name)
 

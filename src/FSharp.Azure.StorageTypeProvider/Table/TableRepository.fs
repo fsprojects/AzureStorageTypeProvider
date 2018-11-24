@@ -91,8 +91,11 @@ module private SdkExtensions =
 /// Gets all tables
 let internal getTables connection = async {
     let client = getTableClient connection
+    try
     let! results = client.ListTablesAsync()
-    return results |> Array.map(fun table -> table.Name) }
+    return results |> Array.map(fun table -> table.Name)
+    with
+    | :? StorageException as ex when ex.RequestInformation.HttpStatusCode = 501 -> return Array.empty }
 
 let internal getMetricsTables connection =
     let client = getTableClient connection

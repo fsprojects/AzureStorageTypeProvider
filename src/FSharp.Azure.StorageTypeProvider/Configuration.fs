@@ -51,8 +51,8 @@ module ConnectionValidation =
         try
             CloudStorageAccount
                 .Parse(connectionString)
-                .CreateCloudTableClient()
-                .GetTableReference("a")
+                .CreateCloudBlobClient()
+                .GetContainerReference("abc")
                 .ExistsAsync()
                 |> Async.AwaitTask
                 |> Async.RunSynchronously //throws an exception if attempted with an invalid connection string
