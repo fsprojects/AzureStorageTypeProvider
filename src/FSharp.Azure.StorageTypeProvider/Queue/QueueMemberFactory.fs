@@ -62,4 +62,4 @@ let getQueueStorageMembers (connectionString, domainType : ProvidedTypeDefinitio
     queueListingType.AddMember(ProvidedProperty("CloudQueueClient", typeof<CloudQueueClient>, getterCode = (fun _ -> <@@ QueueBuilder.getQueueClient connectionString @@>)))
     let queueListingProp = ProvidedProperty("Queues", queueListingType, isStatic = true, getterCode = (fun _ -> <@@ () @@>))
     queueListingProp.AddXmlDoc "Gets the list of all queues in this storage account."
-    queueListingProp
+    Some queueListingProp

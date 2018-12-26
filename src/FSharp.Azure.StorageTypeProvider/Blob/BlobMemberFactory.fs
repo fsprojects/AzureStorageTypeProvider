@@ -70,4 +70,4 @@ let getBlobStorageMembers staticSchema (connectionString, domainType : ProvidedT
 
     let containerListingProp = ProvidedProperty("Containers", containerListingType, isStatic = true, getterCode = (fun _ -> <@@ () @@>))
     containerListingProp.AddXmlDoc "Gets the list of all containers in this storage account."
-    containerListingProp
+    Some containerListingProp

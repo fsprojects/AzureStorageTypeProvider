@@ -82,7 +82,7 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
                 ([ (BlobMemberFactory.getBlobStorageMembers blobSchema, "blobs")
                    (TableMemberFactory.getTableStorageMembers tableSchema schemaInferenceRowCount humanizeColumns, "tables")
                    (QueueMemberFactory.getQueueStorageMembers, "queues") ]
-                |> List.map (fun (builder, name) ->
+                |> List.choose (fun (builder, name) ->
                     try builder(connectionString, domainTypes)
                     with ex -> failwithf "An error occurred during initial type generation for %s: %O" name ex))
             typeProviderForAccount
