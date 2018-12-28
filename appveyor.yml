@@ -5,3 +5,4 @@ build_script:
 test: off
 artifacts:
   - path: bin\*.nupkg
+version: '2.0.{build}'
