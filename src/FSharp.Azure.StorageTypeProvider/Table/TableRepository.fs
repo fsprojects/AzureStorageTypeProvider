@@ -4,7 +4,6 @@ module FSharp.Azure.StorageTypeProvider.Table.TableRepository
 
 open FSharp.Azure.StorageTypeProvider.Table
 open FSharp.Azure.StorageTypeProvider
-open FSharp.Control.Tasks
 open Microsoft.WindowsAzure.Storage
 open Microsoft.WindowsAzure.Storage.Table
 open System
@@ -21,14 +20,14 @@ module private BatchCalculator =
     /// Gets the maximum size, in KB, of a single property.
     let private getMaxPropertySize (property:EntityProperty) =
         match property.PropertyType with 
-        | Table.EdmType.DateTime -> 2
-        | Table.EdmType.Binary -> 64
-        | Table.EdmType.Boolean -> 1
-        | Table.EdmType.Double -> 2
-        | Table.EdmType.Guid -> 4
-        | Table.EdmType.Int32 -> 1
-        | Table.EdmType.Int64 -> 1
-        | Table.EdmType.String -> 64
+        | EdmType.DateTime -> 2
+        | EdmType.Binary -> 64
+        | EdmType.Boolean -> 1
+        | EdmType.Double -> 2
+        | EdmType.Guid -> 4
+        | EdmType.Int32 -> 1
+        | EdmType.Int64 -> 1
+        | EdmType.String -> 64
         | unknown -> failwith (sprintf "Unknown EdmType %A" unknown)
 
     /// Calculates the maximum size of a given entity. 
@@ -50,14 +49,14 @@ let buildTableEntity partitionKey rowKey names (values: obj []) =
         |> Seq.choose(fun (name, value) ->
             match value with
             | value when value = boxedNone -> None
-            | :? Option<byte []> as option -> Some(name, box (option.Value))
-            | :? Option<string> as option -> Some(name, box (option.Value))
-            | :? Option<int> as option -> Some(name, box (option.Value))
-            | :? Option<bool> as option -> Some(name, box (option.Value))
-            | :? Option<DateTime> as option -> Some(name, box (option.Value))
-            | :? Option<double> as option -> Some(name, box (option.Value))
-            | :? Option<Guid> as option -> Some(name, box (option.Value))
-            | :? Option<int64> as option -> Some(name, box (option.Value))
+            | :? Option<byte []> as option -> option |> Option.map(fun value -> name, box value)
+            | :? Option<string> as option -> option |> Option.map(fun value -> name, box value)
+            | :? Option<int> as option -> option |> Option.map(fun value -> name, box value)
+            | :? Option<bool> as option -> option |> Option.map(fun value -> name, box value)
+            | :? Option<DateTime> as option -> option |> Option.map(fun value -> name, box value)
+            | :? Option<double> as option -> option |> Option.map(fun value -> name, box value)
+            | :? Option<Guid> as option -> option |> Option.map(fun value -> name, box value)
+            | :? Option<int64> as option -> option |> Option.map(fun value -> name, box value)
             | value -> Some(name, value))
         |> Map.ofSeq
 
@@ -91,18 +90,15 @@ module private SdkExtensions =
 /// Gets all tables
 let internal getTables connection = async {
     let client = getTableClient connection
-    try
     let! results = client.ListTablesAsync()
-    return results |> Array.map(fun table -> table.Name)
-    with
-    | :? StorageException as ex when ex.RequestInformation.HttpStatusCode = 501 -> return Array.empty }
+    return results |> Array.map(fun table -> table.Name) }
 
 let internal getMetricsTables connection =
-    let client = getTableClient connection
     let services = [ "Blob"; "Queue"; "Table"; "File" ]
     let locations = [ "Primary"; "Secondary" ]
     let periods = [ "Hourly", "Hour"; "Per Minute", "Minute" ]
 
+    let client = getTableClient connection
     seq {
         for (description, period) in periods do
             for location in locations do
@@ -118,12 +114,12 @@ let internal getRowsForSchema (rowCount: int) connection tableName = async {
 
 let toLightweightTableEntity (dte:DynamicTableEntity) = 
     LightweightTableEntity(
-                    Partition dte.PartitionKey,
-                    Row dte.RowKey,
-                    dte.Timestamp,
-                    dte.Properties
-                    |> Seq.map(fun p -> p.Key, p.Value.PropertyAsObject)
-                    |> Map.ofSeq)
+        Partition dte.PartitionKey,
+        Row dte.RowKey,
+        dte.Timestamp,
+        dte.Properties
+        |> Seq.map(fun p -> p.Key, p.Value.PropertyAsObject)
+        |> Map.ofSeq)
 
 let executeGenericQueryAsync connection tableName maxResults filterString mapToReturnEntity = async {
     let query =
@@ -195,25 +191,19 @@ let private processErrorResp entityBatch buildEntityId (ex:StorageException) =
     | [| _ |] -> entityBatch |> Seq.map(fun entity -> EntityError(buildEntityId entity, requestResult.HttpStatusCode, requestResult.ExtendedErrorInformation.ErrorCode))
     | _ -> entityBatch |> Seq.map(fun entity -> BatchError(buildEntityId entity, requestResult.HttpStatusCode, requestResult.ExtendedErrorInformation.ErrorCode))
 
-let (|AsyncSuccess|AggregationError|) (asyncComputation:Choice<_,exn>) =
-    match asyncComputation with
-    | Choice1Of2 success -> AsyncSuccess success
-    | Choice2Of2 (:? AggregateException as agg) -> AggregationError (agg.InnerExceptions |> Seq.toList)
-    | Choice2Of2 err -> AggregationError [ err ]
-
 let internal executeBatchAsynchronously batchOp entityBatch buildEntityId (table:CloudTable) =
     batchOp
     |> table.ExecuteBatchAsync
     |> Async.AwaitTask
-    |> Async.Catch
+    |> Async.toAsyncResult
     |> Async.map(function
-    | AsyncSuccess reponse -> 
+    | Ok reponse -> 
         reponse
         |> Seq.zip entityBatch
         |> Seq.map(fun (entity, res) -> SuccessfulResponse(buildEntityId entity, res.HttpStatusCode))
-    | AggregationError ([ :? StorageException as ex ]) -> processErrorResp entityBatch buildEntityId ex
-    | AggregationError [] -> failwith "An unknown error occurred."
-    | AggregationError (topException :: _) -> raise topException)
+    | Error ([ :? StorageException as ex ]) -> processErrorResp entityBatch buildEntityId ex
+    | Error [] -> failwith "An unknown error occurred."
+    | Error (topException :: _) -> raise topException)
 
 let internal executeBatchOperationAsync createTableOp (table:CloudTable) entities = async {
     return!

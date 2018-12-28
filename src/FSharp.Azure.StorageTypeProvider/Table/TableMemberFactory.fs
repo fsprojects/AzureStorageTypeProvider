@@ -2,28 +2,27 @@
 
 open FSharp.Azure.StorageTypeProvider.Table
 open FSharp.Azure.StorageTypeProvider.Table.TableRepository
+open Microsoft.WindowsAzure.Storage
 open Microsoft.WindowsAzure.Storage.Table
 open ProviderImplementation.ProvidedTypes
 
-let (|StorageExn|OtherExn|Success|) (v:_ System.Threading.Tasks.Task)=
-    try
-        Success v.Result
-    with
-    | :? System.AggregateException as ae ->
-        match ae.InnerException with
-        | :? Microsoft.WindowsAzure.Storage.StorageException as ex ->
-            StorageExn (ex.RequestInformation.HttpStatusMessage, ex.RequestInformation.HttpStatusCode, ex)
-        | ex -> OtherExn ex
-    | ex -> OtherExn ex
+let (|StorageExn|_|) (ex:exn) =
+    match ex with
+    | :? StorageException as ex -> Some(StorageExn (ex.RequestInformation.HttpStatusMessage, ex.RequestInformation.HttpStatusCode, ex :> exn))
+    | _ -> None
+
+let (|BlobOnlyAccount|FullAccount|) = function
+    | Error [ StorageExn("Not Implemented", 501, _) ] -> BlobOnlyAccount
+    | Error (ex :: _) -> raise ex
+    | Error [] -> failwith "Unknown account type"
+    | Ok _ -> FullAccount
 
 /// Builds up the Table Storage member
 let getTableStorageMembers optionalStaticSchema schemaInferenceRowCount humanize (connectionString, domainType : ProvidedTypeDefinition) =
     async {
-        match getTableClient(connectionString).ListTablesSegmentedAsync(null) with
-        | StorageExn ("Not Implemented", 501, _) -> return None
-        | StorageExn (_, _, ex) -> raise ex; return None
-        | OtherExn ex -> raise ex; return None
-        | Success _ ->
+        match! (getTableClient connectionString).GetTableReference("1").ExistsAsync() |> Async.AwaitTask |> Async.toAsyncResult with
+        | BlobOnlyAccount -> return None
+        | FullAccount ->
             let tableListingType = ProvidedTypeDefinition("Tables", Some typeof<obj>, hideObjectMethods = true)
             domainType.AddMember tableListingType
 

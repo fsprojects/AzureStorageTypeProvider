@@ -46,20 +46,32 @@ let createQueueMemberType connectionString (domainType:ProvidedTypeDefinition) q
         p)
     queueName, queueType
 
-/// Builds up the Table Storage member
-let getQueueStorageMembers (connectionString, domainType : ProvidedTypeDefinition) =
-    let queueListingType = ProvidedTypeDefinition("Queues", Some typeof<obj>, hideObjectMethods = true)
-    let createQueueMember = createQueueMemberType connectionString domainType
-    queueListingType.AddMembersDelayed(fun () ->
-        connectionString
-        |> getQueues
-        |> Async.RunSynchronously
-        |> Array.map (createQueueMember >> fun (name, queueType) ->
-            ProvidedProperty(name, queueType, getterCode = fun _ -> <@@ ProvidedQueue(connectionString, name) @@> ))
-        |> Array.toList)
+open Microsoft.WindowsAzure.Storage.RetryPolicies
 
-    domainType.AddMember queueListingType
-    queueListingType.AddMember(ProvidedProperty("CloudQueueClient", typeof<CloudQueueClient>, getterCode = (fun _ -> <@@ QueueBuilder.getQueueClient connectionString @@>)))
-    let queueListingProp = ProvidedProperty("Queues", queueListingType, isStatic = true, getterCode = (fun _ -> <@@ () @@>))
-    queueListingProp.AddXmlDoc "Gets the list of all queues in this storage account."
-    Some queueListingProp
+let private doesQueueEndpointExists connectionString = async {
+    let client = getQueueClient connectionString
+    client.DefaultRequestOptions.RetryPolicy <- NoRetry()
+    client.DefaultRequestOptions.MaximumExecutionTime <- Nullable(TimeSpan(0, 0, 5))
+    match! client.GetQueueReference("test").ExistsAsync() |> Async.AwaitTask |> Async.toAsyncResult with
+    | Ok _ -> return true
+    | Error _ -> return false }
+
+/// Builds up the Queue Storage member
+let getQueueStorageMembers (connectionString, domainType : ProvidedTypeDefinition) =
+    if not (doesQueueEndpointExists connectionString |> Async.RunSynchronously) then None
+    else
+        let queueListingType = ProvidedTypeDefinition("Queues", Some typeof<obj>, hideObjectMethods = true)
+        let createQueueMember = createQueueMemberType connectionString domainType
+        queueListingType.AddMembersDelayed(fun () ->
+            connectionString
+            |> getQueues
+            |> Async.RunSynchronously
+            |> Array.map (createQueueMember >> fun (name, queueType) ->
+                ProvidedProperty(name, queueType, getterCode = fun _ -> <@@ ProvidedQueue(connectionString, name) @@> ))
+            |> Array.toList)
+
+        domainType.AddMember queueListingType
+        queueListingType.AddMember(ProvidedProperty("CloudQueueClient", typeof<CloudQueueClient>, getterCode = (fun _ -> <@@ QueueBuilder.getQueueClient connectionString @@>)))
+        let queueListingProp = ProvidedProperty("Queues", queueListingType, isStatic = true, getterCode = (fun _ -> <@@ () @@>))
+        queueListingProp.AddXmlDoc "Gets the list of all queues in this storage account."
+        Some queueListingProp

@@ -7,10 +7,21 @@ module Option =
 
 ///[omit]
 module Async =
+    open System
+
     let map mapper workflow =
         async {
             let! result = workflow
             return mapper result }
+
+
+    let toAsyncResult workflow =
+        workflow
+        |> Async.Catch
+        |> map (function
+        | Choice1Of2 success -> Ok success
+        | Choice2Of2 (:? AggregateException as agg) -> Error (agg.InnerExceptions |> Seq.toList)
+        | Choice2Of2 err -> Error [ err ])
 
 ///[omit]
 [<RequireQualifiedAccess>]
