@@ -92,10 +92,12 @@
 ### 1.9.5 - 9th November 2017
 * Re-enable storage metrics support.
 
-### 1.9.6 - 23rd February 2018
-* Upgrade Azure Storage to v9
-
-### 2.0.0 - 12th November 2018
+### 2.0.0b - 12th November 2018
 * Upgrade to NET Standard 2.0
-* Upgrade many dependencies
+* Upgrade Azure Storage to v9
+* Upgrade many other dependencies
 * Rationalise many API implementations
+* Minor changes to API to expose Async methods on provided types
+
+### 2.0.0 - 28th December 2018
+* Support for blob-only accounts
