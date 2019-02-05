@@ -101,3 +101,6 @@
 
 ### 2.0.0 - 28th December 2018
 * Support for blob-only accounts
+
+### 2.0.1 - 05th February 2018
+* Fix #119 (Even when JSON tableSchema parameter is used Emulator required to be running)
