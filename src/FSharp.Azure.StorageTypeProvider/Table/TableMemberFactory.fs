@@ -20,30 +20,31 @@ let (|BlobOnlyAccount|FullAccount|) = function
 /// Builds up the Table Storage member
 let getTableStorageMembers optionalStaticSchema schemaInferenceRowCount humanize (connectionString, domainType : ProvidedTypeDefinition) =
     async {
-        match! (getTableClient connectionString).GetTableReference("1").ExistsAsync() |> Async.AwaitTask |> Async.toAsyncResult with
-        | BlobOnlyAccount -> return None
-        | FullAccount ->
-            let tableListingType = ProvidedTypeDefinition("Tables", Some typeof<obj>, hideObjectMethods = true)
-            domainType.AddMember tableListingType
+        let tableListingType = ProvidedTypeDefinition("Tables", Some typeof<obj>, hideObjectMethods = true)
+        domainType.AddMember tableListingType
 
-            /// Creates an individual Table member
-            let createTableType columnDefinitions connectionString tableName propertyName = 
-                let tableEntityType = ProvidedTypeDefinition(tableName + "Entity", Some typeof<LightweightTableEntity>, hideObjectMethods = true)
-                let tableType = ProvidedTypeDefinition(tableName + "Table", Some typeof<AzureTable>, hideObjectMethods = true)
-                domainType.AddMembers [ tableEntityType; tableType ]
+        /// Creates an individual Table member
+        let createTableType columnDefinitions connectionString tableName propertyName = 
+            let tableEntityType = ProvidedTypeDefinition(tableName + "Entity", Some typeof<LightweightTableEntity>, hideObjectMethods = true)
+            let tableType = ProvidedTypeDefinition(tableName + "Table", Some typeof<AzureTable>, hideObjectMethods = true)
+            domainType.AddMembers [ tableEntityType; tableType ]
 
-                TableEntityMemberFactory.buildTableEntityMembers columnDefinitions humanize (tableType, tableEntityType, domainType, connectionString, tableName)
-                let tableProp = ProvidedProperty(propertyName, tableType, getterCode = (fun _ -> <@@ TableBuilder.createAzureTable connectionString tableName @@>))
-                tableProp.AddXmlDoc <| sprintf "Provides access to the '%s' table." tableName
-                tableProp
-    
-            match optionalStaticSchema with
-            | Some (optionalStaticSchema:StaticSchema.Parsed.TableSchema) ->
-                optionalStaticSchema.Tables
-                |> Array.map(fun table -> createTableType table.Columns connectionString table.Table table.Table)
-                |> Array.toList
-                |> tableListingType.AddMembers
-            | None ->
+            TableEntityMemberFactory.buildTableEntityMembers columnDefinitions humanize (tableType, tableEntityType, domainType, connectionString, tableName)
+            let tableProp = ProvidedProperty(propertyName, tableType, getterCode = (fun _ -> <@@ TableBuilder.createAzureTable connectionString tableName @@>))
+            tableProp.AddXmlDoc <| sprintf "Provides access to the '%s' table." tableName
+            tableProp
+
+        match optionalStaticSchema with
+        | Some (optionalStaticSchema:StaticSchema.Parsed.TableSchema) ->
+            optionalStaticSchema.Tables
+            |> Array.map(fun table -> createTableType table.Columns connectionString table.Table table.Table)
+            |> Array.toList
+            |> tableListingType.AddMembers
+        | None ->
+            match! (getTableClient connectionString).GetTableReference("1").ExistsAsync() |> Async.AwaitTask |> Async.toAsyncResult with
+            | BlobOnlyAccount ->
+                ()
+            | FullAccount ->
                 tableListingType.AddMembersDelayed(fun _ ->
                     async {
                         let! tables = getTables connectionString
@@ -73,11 +74,11 @@ let getTableStorageMembers optionalStaticSchema schemaInferenceRowCount humanize
                         metricsTablesProp.AddXmlDoc "Provides access to metrics tables populated by Azure that are available on this storage account."
                         [ metricsTablesProp ])
 
-            let ctcProp = ProvidedProperty("CloudTableClient", typeof<CloudTableClient>, getterCode = (fun _ -> <@@ TableBuilder.createAzureTableRoot connectionString @@>))
-            ctcProp.AddXmlDoc "Gets a handle to the Table Azure SDK client for this storage account."
-            tableListingType.AddMember ctcProp
-      
-            let tableListingProp = ProvidedProperty("Tables", tableListingType, isStatic = true, getterCode = (fun _ -> <@@ () @@>))
-            tableListingProp.AddXmlDoc "Gets the list of all tables in this storage account."
-            return Some tableListingProp }
+        let ctcProp = ProvidedProperty("CloudTableClient", typeof<CloudTableClient>, getterCode = (fun _ -> <@@ TableBuilder.createAzureTableRoot connectionString @@>))
+        ctcProp.AddXmlDoc "Gets a handle to the Table Azure SDK client for this storage account."
+        tableListingType.AddMember ctcProp
+  
+        let tableListingProp = ProvidedProperty("Tables", tableListingType, isStatic = true, getterCode = (fun _ -> <@@ () @@>))
+        tableListingProp.AddXmlDoc "Gets the list of all tables in this storage account."
+        return Some tableListingProp }
     |> Async.RunSynchronously
