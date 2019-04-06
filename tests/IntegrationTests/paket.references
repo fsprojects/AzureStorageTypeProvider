@@ -1,7 +1,6 @@
 Unquote
 WindowsAzure.Storage
 Expecto
-FSharp.Compiler.Tools
 Newtonsoft.Json
 Microsoft.NET.Test.Sdk
 Taskbuilder.fs

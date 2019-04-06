@@ -14,7 +14,6 @@ NUGET
     FSharp.Charting (2.1)
       FSharp.Core (>= 4.0.0.1)
     FSharp.Compiler.Service (2.0.0.6)
-    FSharp.Compiler.Tools (10.2.1)
     FSharp.Core (4.5.2)
     FSharp.Formatting (2.14.4)
       FSharp.Compiler.Service (2.0.0.6)
@@ -697,5 +696,5 @@ NUGET
       Newtonsoft.Json (>= 10.0.2)
 GITHUB
   remote: fsprojects/FSharp.TypeProviders.SDK
-    src/ProvidedTypes.fs (28a24a69ada68ebd1ad25226634f4608e4875493)
-    src/ProvidedTypes.fsi (28a24a69ada68ebd1ad25226634f4608e4875493)
+    src/ProvidedTypes.fs (8cc9f9f8ca9b934e1f9d37743bc792dccc91675c)
+    src/ProvidedTypes.fsi (8cc9f9f8ca9b934e1f9d37743bc792dccc91675c)
