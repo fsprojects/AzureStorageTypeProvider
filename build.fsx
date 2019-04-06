@@ -138,8 +138,7 @@ Target.create "NuGet"
                 ReleaseNotes = release.Notes |> String.concat Environment.NewLine
                 Tags = "azure, f#, fsharp, type provider, blob, table, queue, script"
                 OutputPath = "bin"
-                Dependencies = [ "WindowsAzure.Storage", "9.3.2"
-                                 "FSharp.Compiler.Tools", "10.2.1" ]
+                Dependencies = [ "WindowsAzure.Storage", "9.3.2" ]
                 References = [ "FSharp.Azure.StorageTypeProvider.dll" ]
                 Files = 
                     ([ "FSharp.Azure.StorageTypeProvider.xml"; "FSharp.Azure.StorageTypeProvider.dll"
