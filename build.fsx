@@ -13,10 +13,7 @@ open System.IO
 open Fake.IO
 open Fake.Azure
 open Fake.DotNet.NuGet
-open Fake.FSIHelper
 open Fake.Tools.Git
-// open Fake.Git
-open Fake.DotNet.Testing
 open Fake.IO.FileSystemOperators
 
 // The name of the project
@@ -75,7 +72,6 @@ let runDotNet cmd workingDir =
 // --------------------------------------------------------------------------------------
 // Clean build results
 Target.create "Clean" (fun _ -> try Shell.cleanDirs [ "bin"; "temp"; "tests/integrationtests/bin" ] with _ -> () )
-Target.create "CleanDocs" (fun _ -> Shell.cleanDirs ["docs/output"])
 
 // --------------------------------------------------------------------------------------
 // Restore project
@@ -114,7 +110,7 @@ let testNetCoreDir = root </> "tests"  </> "IntegrationTests" </> "bin" </> "Rel
 
 Target.create "RunTests" (fun _ ->
     let result = DotNet.exec (withWorkDir testPath) "publish --self-contained -c Release -r win10-x64" ""
-    if result.OK = false then failwith "Publish failed"
+    if not result.OK then failwith "Publish failed"
     printfn "Dkr: %s" testNetCoreDir
     let result = DotNet.exec (withWorkDir testNetCoreDir) "" "IntegrationTests.dll"
     if result.OK then
@@ -125,28 +121,28 @@ Target.create "RunTests" (fun _ ->
 
 // --------------------------------------------------------------------------------------
 // Build a NuGet package
-Target.create "NuGet" 
-    (fun _ -> 
-        NuGet.NuGet (fun p ->
-            { p with
-                Authors = [ "Isaac Abraham" ]
-                Project = project
-                Title = "F# Azure Storage Type Provider"
-                Summary = summary
-                Description = "The F# Azure Storage Type Provider allows simple access to Blob, Table and Queue assets, using Azure Storage metadata to intelligently infer schema where possible, whilst providing a simple API for common tasks."
-                Version = release.NugetVersion
-                ReleaseNotes = release.Notes |> String.concat Environment.NewLine
-                Tags = "azure, f#, fsharp, type provider, blob, table, queue, script"
-                OutputPath = "bin"
-                Dependencies = [ "WindowsAzure.Storage", "9.3.2"
-                                 "FSharp.Compiler.Tools", "10.2.1" ]
-                References = [ "FSharp.Azure.StorageTypeProvider.dll" ]
-                Files = 
-                    ([ "FSharp.Azure.StorageTypeProvider.xml"; "FSharp.Azure.StorageTypeProvider.dll"
-                       "Microsoft.WindowsAzure.Storage.dll"; "Newtonsoft.Json.dll" ] 
-                     |> List.map (fun file -> "../bin/netstandard2.0/publish/" + file, Some "lib/netstandard2.0", None))
-                     @ [ "StorageTypeProvider.fsx", None, None ] }) 
-              ("nuget/" + project + ".nuspec"))
+Target.create "NuGet" (fun _ -> 
+    Fake.IO.Directory.create @"bin\package"
+    NuGet.NuGet (fun p ->
+        { p with
+            Authors = [ "Isaac Abraham" ]
+            Project = project
+            Title = "F# Azure Storage Type Provider"
+            Summary = summary
+            Description = "The F# Azure Storage Type Provider allows simple access to Blob, Table and Queue assets, using Azure Storage metadata to intelligently infer schema where possible, whilst providing a simple API for common tasks."
+            Version = release.NugetVersion
+            ReleaseNotes = release.Notes |> String.concat Environment.NewLine
+            Tags = "azure, f#, fsharp, type provider, blob, table, queue, script"
+            OutputPath = @"bin\package"
+            Dependencies = [ "WindowsAzure.Storage", "9.3.2"
+                             "FSharp.Compiler.Tools", "10.2.1" ]
+            References = [ "FSharp.Azure.StorageTypeProvider.dll" ]
+            Files = 
+                ([ "FSharp.Azure.StorageTypeProvider.xml"; "FSharp.Azure.StorageTypeProvider.dll"
+                   "Microsoft.WindowsAzure.Storage.dll"; "Newtonsoft.Json.dll" ] 
+                 |> List.map (fun file -> "../bin/netstandard2.0/publish/" + file, Some "lib/netstandard2.0", None))
+                 @ [ "StorageTypeProvider.fsx", None, None ] }) 
+          ("nuget/" + project + ".nuspec"))
 
 [<AutoOpen>]
 module AppVeyorHelpers =
@@ -165,73 +161,7 @@ module AppVeyorHelpers =
     |> Seq.iter (sprintf "PushArtifact %s" >> execOnAppveyor)
 
 // --------------------------------------------------------------------------------------
-// Generate the documentation
-
-Target.create "GenerateReferenceDocs" (fun _ ->
-    if not <| executeFSIWithArgs "docs/tools" "generate.fsx" ["--define:RELEASE"; "--define:REFERENCE"] [] then
-      failwith "generating reference documentation failed")
-
-let generateHelp fail debug =
-    let args =
-        [ if not debug then yield "--define:RELEASE"
-          yield "--define:HELP"]
-
-    if executeFSIWithArgs "docs/tools" "generate.fsx" args [] then
-        Trace.traceImportant "Help generated"
-    else
-        if fail then failwith "generating help documentation failed"
-        else Trace.traceImportant "generating help documentation failed"
-
-Target.create "GenerateHelp" (fun _ ->
-    File.delete "docs/content/release-notes.md"
-    Shell.copyFile "docs/content/" "RELEASE_NOTES.md"
-    Shell.rename "docs/content/release-notes.md" "docs/content/RELEASE_NOTES.md"
-
-    File.delete  "docs/content/license.md"
-    Shell.copyFile "docs/content/" "LICENSE.txt"
-    Shell.rename "docs/content/license.md" "docs/content/LICENSE.txt"
-
-    Shell.copyFile buildDir "packages/FSharp.Core/lib/net40/FSharp.Core.sigdata"
-    Shell.copyFile buildDir "packages/FSharp.Core/lib/net40/FSharp.Core.optdata"
-
-    generateHelp false false)
-
-Target.create "GenerateHelpDebug" (fun _ ->
-    File.delete "docs/content/release-notes.md"
-    Shell.copyFile "docs/content/" "RELEASE_NOTES.md"
-    Shell.rename "docs/content/release-notes.md" "docs/content/RELEASE_NOTES.md"
-
-    File.delete "docs/content/license.md"
-    Shell.copyFile "docs/content/" "LICENSE.txt"
-
-    Shell.rename "docs/content/license.md" "docs/content/LICENSE.txt"
-
-    generateHelp true true)
-
-Target.create "KeepRunning" (fun _ ->    
-    use watcher = !! "docs/content/**/*.*" |> ChangeWatcher.run (fun changes ->
-         generateHelp false false)
-
-    Trace.traceImportant "Waiting for help edits. Press any key to stop."
-    System.Console.ReadKey() |> ignore
-    watcher.Dispose())
-
-Target.create "GenerateDocs" ignore
-
-// --------------------------------------------------------------------------------------
 // Release Scripts
-
-Target.create "ReleaseDocs" (fun _ ->
-    let tempDocsDir = "temp/gh-pages"
-    Shell.cleanDir tempDocsDir
-    Repository.cloneSingleBranch "" (gitHome + "/" + gitName + ".git") "gh-pages" tempDocsDir
-
-    CommandHelper.runSimpleGitCommand tempDocsDir "rm . -f -r" |> ignore
-    Shell.copyRecursive "docs/output" tempDocsDir true |> Trace.tracefn "%A"
-    
-    Staging.stageAll tempDocsDir
-    Commit.exec tempDocsDir (sprintf "Update generated documentation for version %s" release.NugetVersion)
-    Branches.push tempDocsDir)
 
 Target.create "Release" (fun _ ->
     let user =
@@ -281,21 +211,8 @@ Target.create "All" ignore
   =?> ("LocalDeploy", BuildServer.buildServer = LocalBuild)
   =?> ("BuildServerDeploy", BuildServer.buildServer = AppVeyor)
 
-"CleanDocs"
-  ==> "GenerateHelp"
-
-"CleanDocs"
-  ==> "GenerateHelpDebug"
-
 "RunTests"
-  ==> "GenerateHelp"
-  ==> "GenerateReferenceDocs"
-  ==> "GenerateDocs"
-  ==> "ReleaseDocs"
   ==> "Release"
-
-"GenerateHelp"
-  ==> "KeepRunning"
 
 Target.activateFinal "PublishTestsResultsToAppveyor"
 Target.runOrDefault "RunTests"
