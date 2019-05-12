@@ -8,8 +8,8 @@ open System
 open System.Linq
 open System.IO
 open FSharp.Control.Tasks.ContextInsensitive
-type Local = AzureTypeProvider<"UseDevelopmentStorage=true", "">
 
+type Local = AzureTypeProvider<"UseDevelopmentStorage=true", "">
 type BlobSchema = AzureTypeProvider<blobSchema = "BlobSchema.json">
 
 let container = Local.Containers.samples

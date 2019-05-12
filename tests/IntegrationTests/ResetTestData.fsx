@@ -1,7 +1,8 @@
 ﻿// This script sets up local azure storage to a well-known state for integration tests.
-#I @"..\..\packages\WindowsAzure.Storage\lib\net45\"
-#r @"Microsoft.WindowsAzure.Storage.dll"
-#r @"Newtonsoft.Json.dll"
+
+#load @"..\..\.paket\load\netstandard2.0\WindowsAzure.Storage.fsx"
+#r "netstandard"
+#r "System.Text.Encoding"
 
 open Microsoft.WindowsAzure.Storage
 open System.Text
@@ -15,12 +16,12 @@ let createData _ =
     let blobClient = CloudStorageAccount.DevelopmentStorageAccount.CreateCloudBlobClient()
     let container = blobClient.GetContainerReference "samples"
 
-    if container.Exists() then container.Delete()
-    container.Create()
+    if container.ExistsAsync().Result then container.DeleteAsync().Wait()
+    container.CreateAsync().Wait()
 
     let createBlockBlob fileName contents =
         let blob = container.GetBlockBlobReference fileName
-        blob.UploadText contents
+        blob.UploadTextAsync(contents).Wait()
 
     let createPageBlob fileName (contents:string) =
         let blob = container.GetPageBlobReference fileName
@@ -30,7 +31,7 @@ let createData _ =
             let output = Array.init (data.Count - (data.Count % 512) + 512) (fun _ -> 0uy)
             data.CopyTo output
             output
-        blob.UploadFromByteArray(bytes, 0, bytes.Length)
+        blob.UploadFromByteArrayAsync(bytes, 0, bytes.Length).Wait()
 
     createBlockBlob "file1.txt" "stuff"
     createBlockBlob "file2.txt" "more stuff"

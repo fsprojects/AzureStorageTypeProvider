@@ -2,8 +2,12 @@
 // FAKE build script
 // --------------------------------------------------------------------------------------
 
-#r @"packages/FAKE/tools/FakeLib.dll"
-open Fake.BuildServer
+#r "paket: groupref build //"
+#load "./.fake/build.fsx/intellisense.fsx"
+#if !FAKE
+#r "netstandard"
+#endif
+
 open Fake.Core.TargetOperators
 open Fake.Core
 open Fake.DotNet
@@ -54,7 +58,7 @@ let release =
     |> List.head
 
 // Generate assembly info files with the right version & up-to-date information
-Target.create  "AssemblyInfo" (fun _ ->
+Target.Create  "AssemblyInfo" (fun _ ->
     let fileName = "src/" + project + "/AssemblyInfo.fs"
     AssemblyInfoFile.createFSharp fileName [    AssemblyInfo.Title project
                                                 AssemblyInfo.Product project
@@ -71,44 +75,40 @@ let runDotNet cmd workingDir =
 
 // --------------------------------------------------------------------------------------
 // Clean build results
-Target.create "Clean" (fun _ -> try Shell.cleanDirs [ "bin"; "temp"; "tests/integrationtests/bin" ] with _ -> () )
+Target.Create "Clean" (fun _ ->
+    try Shell.cleanDirs [ "bin"; "temp"; "tests/integrationtests/bin" ] with _ -> ()
+)
 
 // --------------------------------------------------------------------------------------
 // Restore project
-Target.create "RestoreProject" (fun _ ->
-    runDotNet "restore" projectPath
+Target.Create "RestoreProject" (fun _ ->
+    DotNet.restore id projectPath
 )
 
 // --------------------------------------------------------------------------------------
 // Build library project
-Target.create "Build" (fun _ ->
-    runDotNet "publish" projectPath
+Target.Create "Build" (fun _ ->
+    DotNet.publish id projectPath
 )
 
 // --------------------------------------------------------------------------------------
 // Run the unit tests using test runner
-Target.create "ResetTestData" (fun _ ->
-    let script = Path.GetFullPath (testPath + @"\ResetTestData.fsx")
+Target.Create "ResetTestData" (fun _ ->
+    let script = Path.Combine(testPath, "ResetTestData.fsx")
     Emulators.startStorageEmulator()
     Fsi.exec (fun p -> 
         { p with 
-            TargetProfile = Fsi.Profile.NetStandard
+            TargetProfile = Fsi.Profile.Netcore
             WorkingDirectory = testPath
-            ToolPath = Fsi.FsiTool.Internal
         }) script [""]
     |> snd
     |> Seq.iter(fun x -> printfn "%s" x))  ///ToBeFixed
-
-
-let build project framework =
-    DotNet.build (fun p ->
-        { p with Framework = Some framework } ) project
 
 // Run integration tests
 let root = __SOURCE_DIRECTORY__
 let testNetCoreDir = root </> "tests"  </> "IntegrationTests" </> "bin" </> "Release" </> "netcoreapp2.0" </> "win10-x64" </> "publish"
 
-Target.create "RunTests" (fun _ ->
+Target.Create "RunTests" (fun _ ->
     let result = DotNet.exec (withWorkDir testPath) "publish --self-contained -c Release -r win10-x64" ""
     if not result.OK then failwith "Publish failed"
     printfn "Dkr: %s" testNetCoreDir
@@ -121,7 +121,7 @@ Target.create "RunTests" (fun _ ->
 
 // --------------------------------------------------------------------------------------
 // Build a NuGet package
-Target.create "NuGet" (fun _ -> 
+Target.Create "NuGet" (fun _ -> 
     Fake.IO.Directory.create @"bin\package"
     NuGet.NuGet (fun p ->
         { p with
@@ -162,45 +162,18 @@ module AppVeyorHelpers =
 
 // --------------------------------------------------------------------------------------
 // Release Scripts
-
-Target.create "Release" (fun _ ->
-    let user =
-        match Environment.environVar "github-user" with
-        | s when not (String.IsNullOrWhiteSpace s) -> s
-        | _ -> UserInput.getUserInput "Username: "
-    let pw =
-        match Environment.environVar "github-pw" with
-        | s when not (String.IsNullOrWhiteSpace s) -> s
-        | _ -> UserInput.getUserPassword "Password: "
-    let remote =
-        CommandHelper.getGitResult "" "remote -v"
-        |> Seq.filter (fun (s: string) -> s.EndsWith("(push)"))
-        |> Seq.tryFind (fun (s: string) -> s.Contains(gitOwner + "/" + gitName))
-        |> function None -> gitHome + "/" + gitName | Some (s: string) -> s.Split().[0]
-
-    Staging.stageAll ""
-    Commit.exec "" (sprintf "Bump version to %s" release.NugetVersion)
-    Branches.pushBranch "" remote (Information.getBranchName "")
-
-    Branches.tag "" release.NugetVersion
-    Branches.pushTag "" remote release.NugetVersion)
-
-Target.create "LocalDeploy" (fun _ ->
+Target.Create "LocalDeploy" (fun _ ->
     DirectoryInfo @"bin"
     |> DirectoryInfo.getMatchingFiles "*.nupkg"
     |> Seq.map(fun x -> x.FullName)
     |> Shell.copyFiles @"..\..\LocalPackages")
 
-Target.create "BuildServerDeploy" (fun _ -> publishOnAppveyor buildDir)
-
-Target.createFinal "PublishTestsResultsToAppveyor" (fun _ ->
-    Trace.publish ImportData.BuildArtifact "TestOutput"
-)
+Target.Create "BuildServerDeploy" (fun _ -> publishOnAppveyor buildDir)
 
 // --------------------------------------------------------------------------------------
 // Run all targets by default. Invoke 'build <Target>' to override
 
-Target.create "All" ignore
+Target.Create "All" ignore
 
 "Clean"
   ==> "AssemblyInfo"
@@ -208,11 +181,7 @@ Target.create "All" ignore
   ==> "Nuget"
   ==> "ResetTestData"
   ==> "RunTests"
-  =?> ("LocalDeploy", BuildServer.buildServer = LocalBuild)
-  =?> ("BuildServerDeploy", BuildServer.buildServer = AppVeyor)
+  =?> ("LocalDeploy", BuildServer.isLocalBuild)
+  =?> ("BuildServerDeploy", BuildServer.buildServer = Fake.Core.BuildServer.AppVeyor)
 
-"RunTests"
-  ==> "Release"
-
-Target.activateFinal "PublishTestsResultsToAppveyor"
-Target.runOrDefault "RunTests"
+Target.RunOrDefault "RunTests"
