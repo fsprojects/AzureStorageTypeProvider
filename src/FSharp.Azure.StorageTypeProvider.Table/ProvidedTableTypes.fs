@@ -2,8 +2,8 @@
 
 open FSharp.Azure.StorageTypeProvider
 open FSharp.Azure.StorageTypeProvider.Table.TableRepository
-open Microsoft.WindowsAzure.Storage
-open Microsoft.WindowsAzure.Storage.Table
+open Microsoft.Azure.Cosmos
+open Microsoft.Azure.Cosmos.Table
 open System
 open System.Reflection
 

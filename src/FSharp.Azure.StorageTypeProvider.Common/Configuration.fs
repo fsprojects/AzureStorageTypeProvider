@@ -1,9 +1,9 @@
-﻿module internal FSharp.Azure.StorageTypeProvider.Configuration
+﻿module FSharp.Azure.StorageTypeProvider.Configuration
 
 open System.Collections.Generic
 open System.Configuration
 open System.IO
-open Microsoft.WindowsAzure.Storage
+open Microsoft.Azure.Storage
 
 let private doesFileExist folder file =
     let fullPath = Path.Combine(folder, file) 
@@ -44,18 +44,19 @@ module ConnectionValidation =
     let private memoize code =
         let cache = Dictionary()
         fun arg ->
-            if not(cache.ContainsKey arg)
-            then cache.[arg] <- code arg
-            cache.[arg]
+            let exists, value = cache.TryGetValue arg
+            if exists then value
+            else
+                let value = code arg
+                cache.[arg] <- value
+                value
+                
     let private checkConnectionString connectionString =
         try
             CloudStorageAccount
                 .Parse(connectionString)
-                .CreateCloudBlobClient()
-                .GetContainerReference("abc")
-                .ExistsAsync()
-                |> Async.AwaitTask
-                |> Async.RunSynchronously //throws an exception if attempted with an invalid connection string
+                //throws an exception if attempted with an invalid connection string
+                .GetSharedAccessSignature(new SharedAccessAccountPolicy())
                 |> ignore
             Ok()
         with | ex -> Error ex

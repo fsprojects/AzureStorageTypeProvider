@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2046
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28917.182
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{94066CAA-4417-4C43-A286-40182E920E43}"
 	ProjectSection(SolutionItems) = preProject
@@ -18,7 +18,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		sample-tables.json = sample-tables.json
 	EndProjectSection
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharp.Azure.StorageTypeProvider", "src\FSharp.Azure.StorageTypeProvider\FSharp.Azure.StorageTypeProvider.fsproj", "{FB7CA8F3-C158-49E9-B816-501741E2921F}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharp.Azure.StorageTypeProvider.Common", "src\FSharp.Azure.StorageTypeProvider.Common\FSharp.Azure.StorageTypeProvider.Common.fsproj", "{FB7CA8F3-C158-49E9-B816-501741E2921F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{7CAF8D38-6250-41CB-A65B-ABD760B09281}"
 	ProjectSection(SolutionItems) = preProject
@@ -37,6 +37,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "content", "content", "{1535
 		docs\content\tables.fsx = docs\content\tables.fsx
 	EndProjectSection
 EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharp.Azure.StorageTypeProvider.Blob", "src\FSharp.Azure.StorageTypeProvider.Blob\FSharp.Azure.StorageTypeProvider.Blob.fsproj", "{9D66D199-9BCA-41B3-B005-1381589B9A2F}"
+EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharp.Azure.StorageTypeProvider.Queue", "src\FSharp.Azure.StorageTypeProvider.Queue\FSharp.Azure.StorageTypeProvider.Queue.fsproj", "{8B477649-8E69-499C-825B-992C4FA7A162}"
+EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharp.Azure.StorageTypeProvider.Table", "src\FSharp.Azure.StorageTypeProvider.Table\FSharp.Azure.StorageTypeProvider.Table.fsproj", "{6D7FEFAE-24AF-49C0-888C-68BC3EBEF123}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{08E5CE37-D346-49D6-810E-7E7AB8872E8B}"
+	ProjectSection(SolutionItems) = preProject
+		build\common.props = build\common.props
+		build\packages.props = build\packages.props
+		build\version.props = build\version.props
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +60,18 @@ Global
 		{FB7CA8F3-C158-49E9-B816-501741E2921F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB7CA8F3-C158-49E9-B816-501741E2921F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB7CA8F3-C158-49E9-B816-501741E2921F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D66D199-9BCA-41B3-B005-1381589B9A2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D66D199-9BCA-41B3-B005-1381589B9A2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D66D199-9BCA-41B3-B005-1381589B9A2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D66D199-9BCA-41B3-B005-1381589B9A2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B477649-8E69-499C-825B-992C4FA7A162}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B477649-8E69-499C-825B-992C4FA7A162}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B477649-8E69-499C-825B-992C4FA7A162}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B477649-8E69-499C-825B-992C4FA7A162}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D7FEFAE-24AF-49C0-888C-68BC3EBEF123}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D7FEFAE-24AF-49C0-888C-68BC3EBEF123}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D7FEFAE-24AF-49C0-888C-68BC3EBEF123}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D7FEFAE-24AF-49C0-888C-68BC3EBEF123}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

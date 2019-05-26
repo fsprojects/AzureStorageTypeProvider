@@ -1,4 +1,4 @@
-WindowsAzure.Storage
+Microsoft.Azure.Cosmos.Table
 FSharp.Core
 System.Configuration.ConfigurationManager
 System.Net.Http

@@ -24,8 +24,17 @@
     <None Include="paket.references" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="FSharp.Azure.StorageTypeProvider">
-      <HintPath>..\..\bin\netstandard2.0\publish\FSharp.Azure.StorageTypeProvider.dll</HintPath>
+    <Reference Include="FSharp.Azure.StorageTypeProvider.Blob">
+      <HintPath>..\..\src\FSharp.Azure.StorageTypeProvider.Blob\bin\Debug\netstandard2.0\FSharp.Azure.StorageTypeProvider.Blob.dll</HintPath>
+    </Reference>
+    <Reference Include="FSharp.Azure.StorageTypeProvider.Common">
+      <HintPath>..\..\src\FSharp.Azure.StorageTypeProvider.Common\bin\Debug\netstandard2.0\FSharp.Azure.StorageTypeProvider.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="FSharp.Azure.StorageTypeProvider.Queue">
+      <HintPath>..\..\src\FSharp.Azure.StorageTypeProvider.Queue\bin\Debug\netstandard2.0\FSharp.Azure.StorageTypeProvider.Queue.dll</HintPath>
+    </Reference>
+    <Reference Include="FSharp.Azure.StorageTypeProvider.Table">
+      <HintPath>..\..\src\FSharp.Azure.StorageTypeProvider.Table\bin\Debug\netstandard2.0\FSharp.Azure.StorageTypeProvider.Table.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />

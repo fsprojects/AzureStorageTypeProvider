@@ -2,8 +2,8 @@
 
 open FSharp.Azure.StorageTypeProvider.Table
 open FSharp.Azure.StorageTypeProvider.Table.TableRepository
-open Microsoft.WindowsAzure.Storage
-open Microsoft.WindowsAzure.Storage.Table
+open Microsoft.Azure.Storage
+open Microsoft.Azure.Cosmos.Table
 open ProviderImplementation.ProvidedTypes
 
 let (|StorageExn|_|) (ex:exn) =

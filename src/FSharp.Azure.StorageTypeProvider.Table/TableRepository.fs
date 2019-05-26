@@ -4,8 +4,8 @@ module FSharp.Azure.StorageTypeProvider.Table.TableRepository
 
 open FSharp.Azure.StorageTypeProvider.Table
 open FSharp.Azure.StorageTypeProvider
-open Microsoft.WindowsAzure.Storage
-open Microsoft.WindowsAzure.Storage.Table
+open Microsoft.Azure.Storage
+open Microsoft.Azure.Cosmos.Table
 open System
 
 /// Suggests batch sizes based on a given entity type and published EDM property type sizes (source: https://msdn.microsoft.com/en-us/library/dd179338.aspx)

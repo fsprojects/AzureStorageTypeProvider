@@ -1,7 +1,7 @@
 ﻿namespace FSharp.Azure.StorageTypeProvider.Queue
 
 open FSharp.Azure.StorageTypeProvider.Queue.QueueRepository
-open Microsoft.WindowsAzure.Storage.Queue
+open Microsoft.Azure.Storage.Queue
 open System
 
 /// The unique identifier for this Azure queue message.
@@ -115,15 +115,16 @@ type ProvidedQueue(defaultConnectionString, name) =
         message |> updateMessage MessageUpdateFields.Visibility connectionString (Some newTimeout)
 
     /// Updates the visibility and the string contents of an existing message. If no timeout is provided, the update is immediately visible.
-    member __.UpdateMessage(messageId, contents:string, ?newTimeout, ?connectionString) = 
+    /// <remarks>Pass false to isBase64Encoded if you upgrade from 2.0</remarks>
+    member __.UpdateMessage(messageId, contents:string, isBase64Encoded:bool, ?newTimeout, ?connectionString) = 
         let message = messageId |> Factory.toAzureQueueMessage
-        message.SetMessageContent contents
+        message.SetMessageContent2(contents, isBase64Encoded)
         message |> updateMessage (MessageUpdateFields.Visibility ||| MessageUpdateFields.Content) connectionString newTimeout
 
     /// Updates the visibility and the binary contents of an existing message. If no timeout is provided, the update is immediately visible.
     member __.UpdateMessage(messageId, contents:byte array, ?newTimeout, ?connectionString) = 
         let message = messageId |> Factory.toAzureQueueMessage
-        message.SetMessageContent contents
+        message.SetMessageContent2 contents
         message |> updateMessage (MessageUpdateFields.Visibility ||| MessageUpdateFields.Content) connectionString newTimeout
 
     /// Clears the queue of all messages.

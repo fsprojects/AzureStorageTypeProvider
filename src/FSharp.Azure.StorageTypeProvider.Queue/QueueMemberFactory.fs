@@ -2,7 +2,7 @@
 
 open FSharp.Azure.StorageTypeProvider.Queue
 open FSharp.Azure.StorageTypeProvider.Queue.QueueRepository
-open Microsoft.WindowsAzure.Storage.Queue
+open Microsoft.Azure.Storage.Queue
 open ProviderImplementation.ProvidedTypes
 open System
 
@@ -46,7 +46,7 @@ let createQueueMemberType connectionString (domainType:ProvidedTypeDefinition) q
         p)
     queueName, queueType
 
-open Microsoft.WindowsAzure.Storage.RetryPolicies
+open Microsoft.Azure.Storage.RetryPolicies
 
 let private doesQueueEndpointExists connectionString = async {
     let client = getQueueClient connectionString
