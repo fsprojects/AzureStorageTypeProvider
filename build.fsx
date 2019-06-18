@@ -17,7 +17,6 @@ open System.IO
 open Fake.IO
 open Fake.Azure
 open Fake.DotNet.NuGet
-open Fake.Tools.Git
 open Fake.IO.FileSystemOperators
 
 // The name of the project
@@ -26,14 +25,6 @@ let project = "FSharp.Azure.StorageTypeProvider"
 // Short summary of the project
 // (used as description in AssemblyInfo and as a short summary for NuGet package)
 let summary = "Allows easy access to Azure Storage assets through F# scripts."
-
-// Git configuration (used for publishing documentation in gh-pages branch)
-// The profile where the project is posted
-let gitOwner = "fsprojects"
-let gitHome = "https://github.com/" + gitOwner
-
-// The name of the project on GitHub
-let gitName = "AzureStorageTypeProvider"
 
 // Read additional information from the release notes document
 Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
@@ -46,10 +37,6 @@ let projectPath = Path.getFullName "./src/FSharp.Azure.StorageTypeProvider"
 
 // Test path
 let testPath = Path.getFullName "./tests/IntegrationTests"
-// Read additional information from the release notes document
-
-// Test Output Dir
-let testOutPutDir = "TestOutput"
 
 
 let release =
@@ -68,10 +55,6 @@ Target.Create  "AssemblyInfo" (fun _ ->
 
 let inline withWorkDir wd = 
     DotNet.Options.withWorkingDirectory wd
-let runDotNet cmd workingDir =
-    let result =
-        DotNet.exec (withWorkDir workingDir) cmd ""
-    if result.ExitCode <> 0 then failwithf "'dotnet %s' failed in %s" cmd workingDir
 
 // --------------------------------------------------------------------------------------
 // Clean build results
@@ -96,28 +79,22 @@ Target.Create "Build" (fun _ ->
 Target.Create "ResetTestData" (fun _ ->
     let script = Path.Combine(testPath, "ResetTestData.fsx")
     Emulators.startStorageEmulator()
-    Fsi.exec (fun p -> 
+    Fsi.exec (fun p ->
+        printfn "%A" p
         { p with 
             TargetProfile = Fsi.Profile.Netcore
             WorkingDirectory = testPath
         }) script [""]
     |> snd
-    |> Seq.iter(fun x -> printfn "%s" x))  ///ToBeFixed
+    |> Seq.iter (printfn "%s"))
 
 // Run integration tests
 let root = __SOURCE_DIRECTORY__
-let testNetCoreDir = root </> "tests"  </> "IntegrationTests" </> "bin" </> "Release" </> "netcoreapp2.0" </> "win10-x64" </> "publish"
 
 Target.Create "RunTests" (fun _ ->
-    let result = DotNet.exec (withWorkDir testPath) "publish --self-contained -c Release -r win10-x64" ""
-    if not result.OK then failwith "Publish failed"
-    printfn "Dkr: %s" testNetCoreDir
-    let result = DotNet.exec (withWorkDir testNetCoreDir) "" "IntegrationTests.dll"
-    if result.OK then
-        printfn "Expecto for netcore finished without Errors"
-    else 
-        printfn "Expecto for netcore finished with Errors"
-    )
+    let testNetCoreDir = root </> "tests"  </> "IntegrationTests" </> "bin" </> "Release" </> "netcoreapp2.0" </> "publish" </> "IntegrationTests.dll"
+    DotNet.publish (fun p -> { p with Configuration = DotNet.BuildConfiguration.Release }) testPath
+    DotNet.exec id testNetCoreDir "" |> ignore)
 
 // --------------------------------------------------------------------------------------
 // Build a NuGet package
@@ -134,8 +111,7 @@ Target.Create "NuGet" (fun _ ->
             ReleaseNotes = release.Notes |> String.concat Environment.NewLine
             Tags = "azure, f#, fsharp, type provider, blob, table, queue, script"
             OutputPath = @"bin\package"
-            Dependencies = [ "WindowsAzure.Storage", "9.3.2"
-                             "FSharp.Compiler.Tools", "10.2.1" ]
+            Dependencies = [ "WindowsAzure.Storage", "9.3.2" ]
             References = [ "FSharp.Azure.StorageTypeProvider.dll" ]
             Files = 
                 ([ "FSharp.Azure.StorageTypeProvider.xml"; "FSharp.Azure.StorageTypeProvider.dll"

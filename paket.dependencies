@@ -7,7 +7,6 @@ nuget FSharp.Core
 nuget WindowsAzure.Storage 9.3.2
 nuget Newtonsoft.Json 10.0.2
 nuget System.Net.Http
-nuget FSharp.Compiler.Tools
 
 nuget FAKE
 nuget Nuget.CommandLine
