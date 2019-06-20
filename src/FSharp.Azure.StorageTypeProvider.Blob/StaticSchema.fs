@@ -2,7 +2,7 @@
 
 open BlobRepository
 open FSharp.Azure.StorageTypeProvider.Configuration
-open Microsoft.WindowsAzure.Storage.Blob
+open Microsoft.Azure.Storage.Blob
 open Newtonsoft.Json.Linq
 open System.IO
 

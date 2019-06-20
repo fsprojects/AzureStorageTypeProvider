@@ -1,7 +1,7 @@
 ﻿module FSharp.Azure.StorageTypeProvider.QueueHelpers
 
-open Microsoft.WindowsAzure.Storage
-open Microsoft.WindowsAzure.Storage.Queue
+open Microsoft.Azure.Storage
+open Microsoft.Azure.Storage.Queue
 
 let private queueClient = CloudStorageAccount.DevelopmentStorageAccount.CreateCloudQueueClient()
 

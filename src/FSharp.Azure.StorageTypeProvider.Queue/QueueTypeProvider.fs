@@ -1,9 +1,7 @@
 ﻿namespace ProviderImplementation
 
 open FSharp.Azure.StorageTypeProvider
-open FSharp.Azure.StorageTypeProvider.Blob
 open FSharp.Azure.StorageTypeProvider.Queue
-open FSharp.Azure.StorageTypeProvider.Table
 open FSharp.Azure.StorageTypeProvider.Configuration
 open Microsoft.FSharp.Core.CompilerServices
 open ProviderImplementation.ProvidedTypes
@@ -13,12 +11,12 @@ open System.Reflection
 
 [<TypeProvider>]
 /// [omit]
-type public AzureTypeProvider(config : TypeProviderConfig) as this = 
+type public QueueTypeProvider(config : TypeProviderConfig) as this = 
     inherit TypeProviderForNamespaces(config)
 
-    let namespaceName = "FSharp.Azure.StorageTypeProvider"
-    let thisAssembly = Assembly.GetExecutingAssembly()
-    let azureAccountType = ProvidedTypeDefinition(thisAssembly, namespaceName, "AzureTypeProvider", baseType = Some typeof<obj>)
+    let namespaceName = "FSharp.Azure.StorageTypeProvider.Queue"
+    let thisAssembly = typeof<QueueTypeProvider>.Assembly
+    let azureAccountType = ProvidedTypeDefinition(thisAssembly, namespaceName, "QueueTypeProvider", baseType = Some typeof<obj>)
 
     let buildConnectionString (args : obj []) =
         let (|ConnectionString|TwoPart|DevelopmentStorage|) (args:obj []) =
@@ -65,30 +63,19 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
             | Some _, _ | _, Some _ -> None
             | _ -> Some (validateConnectionString connectionString)
             
-        let parsedBlobSchema = Blob.StaticSchema.createSchema config.ResolutionFolder staticBlobSchema
-        let parsedTableSchema = Table.StaticSchema.createSchema config.ResolutionFolder staticTableSchema
-
-        match connectionStringValidation, parsedBlobSchema, parsedTableSchema with
-        | Some (Ok ()), Ok blobSchema, Ok tableSchema
-        | None, Ok blobSchema, Ok tableSchema ->
+        match connectionStringValidation with
+        | Some (Ok ())
+        | None ->
             let domainTypes = ProvidedTypeDefinition("Domain", Some typeof<obj>)            
             typeProviderForAccount.AddMember(domainTypes)
-
-            let schemaInferenceRowCount = args.[4] :?> int
-            let humanizeColumns = args.[5] :?> bool
-
             // Now create child members e.g. containers, tables etc.
             typeProviderForAccount.AddMembers
-                ([ (BlobMemberFactory.getBlobStorageMembers blobSchema, "blobs")
-                   (TableMemberFactory.getTableStorageMembers tableSchema schemaInferenceRowCount humanizeColumns, "tables")
-                   (QueueMemberFactory.getQueueStorageMembers, "queues") ]
+                ([ (QueueMemberFactory.getQueueStorageMembers, "queues") ]
                 |> List.choose (fun (builder, name) ->
                     try builder(connectionString, domainTypes)
                     with ex -> failwithf "An error occurred during initial type generation for %s: %O" name ex))
             typeProviderForAccount
-        | Some (Error ex), _, _ -> failwithf "Unable to validate connection string (%O)" ex
-        | _, Error ex, _ -> failwithf "Unable to parse blob schema file (%O)" ex
-        | _, _, Error ex -> failwithf "Unable to parse table schema file (%O)" ex
+        | Some (Error ex) -> failwithf "Unable to validate connection string (%O)" ex
     
     let createParam (name, defaultValue:'a, help) =
         let providedParameter = ProvidedStaticParameter(name, typeof<'a>, defaultValue)

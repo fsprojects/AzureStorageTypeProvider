@@ -2,8 +2,8 @@
 module FSharp.Azure.StorageTypeProvider.Blob.BlobRepository
 
 open FSharp.Azure.StorageTypeProvider
-open Microsoft.WindowsAzure.Storage
-open Microsoft.WindowsAzure.Storage.Blob
+open Microsoft.Azure.Storage
+open Microsoft.Azure.Storage.Blob
 open System
 open System.IO
 

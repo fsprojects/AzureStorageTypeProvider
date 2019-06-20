@@ -3,14 +3,14 @@
 open Expecto
 open FSharp.Azure.StorageTypeProvider
 open FSharp.Azure.StorageTypeProvider.Blob
-open Microsoft.WindowsAzure.Storage.Blob
+open Microsoft.Azure.Storage.Blob
 open System
 open System.Linq
 open System.IO
 open FSharp.Control.Tasks.ContextInsensitive
 
-type Local = AzureTypeProvider<"UseDevelopmentStorage=true", "">
-type BlobSchema = AzureTypeProvider<blobSchema = "BlobSchema.json">
+type Local = BlobTypeProvider<"UseDevelopmentStorage=true", "">
+type BlobSchema = BlobTypeProvider<blobSchema = "BlobSchema.json">
 
 let container = Local.Containers.samples
 

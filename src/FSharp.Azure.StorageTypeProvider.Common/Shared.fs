@@ -76,7 +76,7 @@ module Json =
 
 namespace FSharp.Azure.StorageTypeProvider
 
-module internal Async =
+module Async =
     let segmentedAzureOperation getNextSegment =
         let rec doRecursiveSegmenting (getNextSegment:_ -> Async<_ * _>) (output:_ ResizeArray) token = async {
             match! getNextSegment token with

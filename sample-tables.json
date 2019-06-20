@@ -1,0 +1,21 @@
+{
+  "Employee": {
+    "Name": {
+      "Type": "String"
+    },
+    "YearsWorking": {
+      "Type": "int32"
+    },
+    "Dob": {
+      "Type": "DateTime"
+    },
+    "Salary": {
+      "Type": "double",
+      "Optional": true
+    },
+    "IsManager": {
+      "Type": "boolean",
+      "Optional": true
+    }
+  }
+}

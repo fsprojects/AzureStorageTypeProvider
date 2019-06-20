@@ -3,7 +3,7 @@
 open Deedle
 open FSharp.Azure.StorageTypeProvider
 open FSharp.Azure.StorageTypeProvider.Table
-open Microsoft.WindowsAzure.Storage.Table
+open Microsoft.Azure.Cosmos.Table
 open System
 type Azure = AzureTypeProvider<"UseDevelopmentStorage=true">
 
@@ -21,7 +21,7 @@ Working with Tables
 ===================
 
 For more information on Tables in general, please see some of the many articles on
-[MSDN](https://msdn.microsoft.com/en-us/library/microsoft.windowsazure.storage.table.aspx) or the [Azure](http://azure.microsoft.com/en-us/documentation/services/storage/) [documentation](http://azure.microsoft.com/en-us/documentation/articles/storage-dotnet-how-to-use-tables/). Some of the core features of the Tables provider are: -
+[MSDN](https://msdn.microsoft.com/en-us/library/Microsoft.Azure.Cosmos.Table.aspx) or the [Azure](http://azure.microsoft.com/en-us/documentation/services/storage/) [documentation](http://azure.microsoft.com/en-us/documentation/articles/storage-dotnet-how-to-use-tables/). Some of the core features of the Tables provider are: -
 
 ##Rapid navigation
 

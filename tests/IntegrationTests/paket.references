@@ -1,7 +1,9 @@
 Unquote
-WindowsAzure.Storage
+Microsoft.Azure.Storage.Common
+Microsoft.Azure.Storage.Blob
+Microsoft.Azure.Storage.Queue
+Microsoft.Azure.Cosmos.Table
 Expecto
-FSharp.Compiler.Tools
 Newtonsoft.Json
 Microsoft.NET.Test.Sdk
 Taskbuilder.fs

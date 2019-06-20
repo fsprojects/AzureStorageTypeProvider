@@ -5,7 +5,7 @@ open Newtonsoft.Json.Linq
 open System.IO
 
 module internal Parsed =
-    open Microsoft.WindowsAzure.Storage.Table
+    open Microsoft.Azure.Cosmos.Table
     let parseEdmType (value:string) =
         match value.ToLower() with
         | "binary" -> EdmType.Binary

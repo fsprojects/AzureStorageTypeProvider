@@ -1,6 +1,6 @@
 ﻿namespace FSharp.Azure.StorageTypeProvider.Table
 
-open Microsoft.WindowsAzure.Storage.Table
+open Microsoft.Azure.Cosmos.Table
 open System
 
 /// The different types of insertion mechanism to use.
