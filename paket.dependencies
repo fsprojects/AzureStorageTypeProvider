@@ -1,7 +1,6 @@
 redirects: force
 source https://www.nuget.org/api/v2/
-framework: netstandard2.0, netcoreapp2.0
-generate_load_scripts: true
+framework: auto-detect
 
 nuget FSharp.Core
 nuget WindowsAzure.Storage 9.3.2
@@ -28,7 +27,7 @@ nuget System.Configuration.ConfigurationManager
 group build
 
 source https://www.nuget.org/api/v2/
-framework: netstandard2.0, netcoreapp2.0
+framework: auto-detect
 storage: none
 
 nuget WindowsAzure.Storage 9.3.2

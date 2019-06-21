@@ -5,9 +5,6 @@
     <AssemblyName>IntegrationTests</AssemblyName>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <OutputType>Exe</OutputType>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <TargetLibraryFramework Condition="'$(TargetFramework)' == 'netcoreapp2.0'">netstandard2.0</TargetLibraryFramework>
-    <RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>
     <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
   <ItemGroup>
@@ -20,7 +17,6 @@
     <Compile Include="TableUnitTests.fs" />
     <Compile Include="Program.fs" />
     <Content Include="BlobSchema.json" />
-    <None Include="ResetTestData.fsx" />
     <None Include="paket.references" />
   </ItemGroup>
   <ItemGroup>
