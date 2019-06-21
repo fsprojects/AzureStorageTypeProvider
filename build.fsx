@@ -80,6 +80,7 @@ open Microsoft.WindowsAzure.Storage
 // --------------------------------------------------------------------------------------
 // Run the unit tests using test runner
 Target.Create "ResetTestData" (fun _ ->
+    Emulators.startStorageEmulator()
     Resettestdata.primeStorage())
 
 // Run integration tests
@@ -93,7 +94,7 @@ Target.Create "RunTests" (fun _ ->
 // --------------------------------------------------------------------------------------
 // Build a NuGet package
 Target.Create "NuGet" (fun _ -> 
-    Fake.IO.Directory.create @"bin\package"
+    Directory.create @"bin\package"
     NuGet.NuGet (fun p ->
         { p with
             Authors = [ "Isaac Abraham" ]
