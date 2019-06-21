@@ -74,19 +74,13 @@ Target.Create "Build" (fun _ ->
     DotNet.publish id projectPath
 )
 
+#load "tests/integrationtests/resettestdata.fsx"
+
+open Microsoft.WindowsAzure.Storage
 // --------------------------------------------------------------------------------------
 // Run the unit tests using test runner
 Target.Create "ResetTestData" (fun _ ->
-    let script = Path.Combine(testPath, "ResetTestData.fsx")
-    Emulators.startStorageEmulator()
-    Fsi.exec (fun p ->
-        printfn "%A" p
-        { p with 
-            TargetProfile = Fsi.Profile.Netcore
-            WorkingDirectory = testPath
-        }) script [""]
-    |> snd
-    |> Seq.iter (printfn "%s"))
+    Resettestdata.primeStorage())
 
 // Run integration tests
 let root = __SOURCE_DIRECTORY__
