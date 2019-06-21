@@ -1,7 +1,5 @@
 ﻿// This script sets up local azure storage to a well-known state for integration tests.
 
-#load @"..\..\.paket\load\netstandard2.0\WindowsAzure.Storage.fsx"
-
 #load "TableHelpers.fs"
       "QueueHelpers.fs"
 
