@@ -1,13 +1,13 @@
-redirects: force
-source https://www.nuget.org/api/v2/
-framework: netstandard2.0, netcoreapp2.0
+source https://api.nuget.org/v3/index.json
 generate_load_scripts: true
 
-nuget FSharp.Core
-nuget WindowsAzure.Storage 9.3.2
-nuget Newtonsoft.Json 10.0.2
-nuget System.Net.Http
-nuget FSharp.Compiler.Tools
+nuget FSharp.Core >= 4.5.2
+nuget Microsoft.Azure.Storage.Blob
+nuget Microsoft.Azure.Storage.File
+nuget Microsoft.Azure.Storage.Queue
+nuget Microsoft.Azure.Storage.Common
+nuget Microsoft.Azure.Cosmos.Table
+nuget Newtonsoft.Json
 
 nuget FAKE
 nuget Nuget.CommandLine
@@ -28,15 +28,14 @@ nuget System.Configuration.ConfigurationManager
 
 group build
 
-source https://www.nuget.org/api/v2/
-framework: netstandard2.0, netcoreapp2.0
+source https://api.nuget.org/v3/index.json
 storage: none
 
 nuget Fake.Azure.Emulators
 nuget Fake.BuildServer.AppVeyor
 nuget Fake.Core
 nuget Fake.Core.ReleaseNotes
-nuget Fake.Core.Targets
+nuget Fake.Core.Target
 nuget Fake.DotNet
 nuget Fake.DotNet.Cli
 nuget Fake.DotNet.Fsi

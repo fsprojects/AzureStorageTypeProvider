@@ -2,11 +2,11 @@
 ///Contains helper functions for accessing tables
 module FSharp.Azure.StorageTypeProvider.Table.TableRepository
 
-open FSharp.Azure.StorageTypeProvider.Table
-open FSharp.Azure.StorageTypeProvider
-open Microsoft.WindowsAzure.Storage
-open Microsoft.WindowsAzure.Storage.Table
 open System
+open Microsoft.Azure.Cosmos.Table
+
+open FSharp.Azure.StorageTypeProvider
+open FSharp.Azure.StorageTypeProvider.Table
 
 /// Suggests batch sizes based on a given entity type and published EDM property type sizes (source: https://msdn.microsoft.com/en-us/library/dd179338.aspx)
 module private BatchCalculator =
@@ -143,7 +143,7 @@ let internal buildDynamicTableEntity(entity:LightweightTableEntity) =
             | :? bool as value -> EntityProperty.GeneratePropertyForBool(Nullable value)
             | :? DateTime as value -> EntityProperty.GeneratePropertyForDateTimeOffset(Nullable(DateTimeOffset value))
             | :? double as value -> EntityProperty.GeneratePropertyForDouble(Nullable value)
-            | :? System.Guid as value -> EntityProperty.GeneratePropertyForGuid(Nullable value)
+            | :? Guid as value -> EntityProperty.GeneratePropertyForGuid(Nullable value)
             | :? int64 as value -> EntityProperty.GeneratePropertyForLong(Nullable value)
             | _ -> EntityProperty.CreateEntityPropertyFromObject(value)
     tableEntity

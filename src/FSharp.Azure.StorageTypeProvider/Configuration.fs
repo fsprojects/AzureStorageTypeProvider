@@ -3,7 +3,8 @@
 open System.Collections.Generic
 open System.Configuration
 open System.IO
-open Microsoft.WindowsAzure.Storage
+open Microsoft.Azure.Storage
+open Microsoft.Azure.Storage.Blob
 
 let private doesFileExist folder file =
     let fullPath = Path.Combine(folder, file) 

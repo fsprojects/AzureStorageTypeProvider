@@ -1,11 +1,11 @@
 ﻿namespace FSharp.Azure.StorageTypeProvider.Table
 
-open FSharp.Azure.StorageTypeProvider
-open FSharp.Azure.StorageTypeProvider.Table.TableRepository
-open Microsoft.WindowsAzure.Storage
-open Microsoft.WindowsAzure.Storage.Table
 open System
 open System.Reflection
+open Microsoft.Azure.Cosmos.Table
+
+open FSharp.Azure.StorageTypeProvider
+open FSharp.Azure.StorageTypeProvider.Table.TableRepository
 
 /// Represents a Table in Azure.
 type AzureTable internal (defaultConnection, tableName) = 
@@ -96,11 +96,12 @@ type AzureTable internal (defaultConnection, tableName) =
     /// Asynchronously deletes a batch of entities from the table using the supplied pairs of Partition and Row keys.
     member __.DeleteAsync(entities, ?connectionString) = async {
         let table = getTableForConnection (defaultArg connectionString defaultConnection)
-        return! entities
-        |> Seq.map (fun entityId -> 
-            let Partition(partitionKey), Row(rowKey) = entityId
-            DynamicTableEntity(partitionKey, rowKey, ETag = "*"))
-        |> executeBatchOperationAsync TableOperation.Delete table }
+        return!
+            entities
+            |> Seq.map (fun entityId -> 
+                let Partition(partitionKey), Row(rowKey) = entityId
+                DynamicTableEntity(partitionKey, rowKey, ETag = "*"))
+            |> executeBatchOperationAsync TableOperation.Delete table }
     
     /// Deletes an entire partition from the table
     member this.DeletePartition(partitionKey, ?connectionString) = 
@@ -113,7 +114,7 @@ type AzureTable internal (defaultConnection, tableName) =
     member __.DeletePartitionAsync(partitionKey, ?connectionString) = async {
         let table = getTableForConnection (defaultArg connectionString defaultConnection)
         let connectionString = defaultArg connectionString defaultConnection
-        let filter = Table.TableQuery.GenerateFilterCondition ("PartitionKey", Table.QueryComparisons.Equal, partitionKey)
+        let filter = TableQuery.GenerateFilterCondition ("PartitionKey", QueryComparisons.Equal, partitionKey)
         let! queryResponse = executeGenericQueryAsync connectionString table.Name Int32.MaxValue filter (fun e -> (Partition e.PartitionKey, Row e.RowKey))
         let! deleteResponse = queryResponse |> __.DeleteAsync
         return deleteResponse |> getSinglePartitionResult partitionKey }

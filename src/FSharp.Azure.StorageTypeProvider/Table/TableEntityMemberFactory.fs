@@ -3,7 +3,7 @@ module internal FSharp.Azure.StorageTypeProvider.Table.TableEntityMemberFactory
 
 open FSharp.Azure.StorageTypeProvider.Table.TableRepository
 open Microsoft.FSharp.Quotations
-open Microsoft.WindowsAzure.Storage.Table
+open Microsoft.Azure.Cosmos.Table
 open ProviderImplementation.ProvidedTypes
 open System
 open System.Text

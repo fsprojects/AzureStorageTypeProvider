@@ -1,8 +1,8 @@
 ﻿namespace FSharp.Azure.StorageTypeProvider.Blob
 
 open FSharp.Azure.StorageTypeProvider.Blob.BlobRepository
-open Microsoft.WindowsAzure.Storage
-open Microsoft.WindowsAzure.Storage.Blob
+open Microsoft.Azure.Storage
+open Microsoft.Azure.Storage.Blob
 open System
 open System.IO
 open System.Xml.Linq
@@ -257,4 +257,4 @@ module ContainerBuilder =
     let createBlobFolder connectionString containerName path = BlobFolder(connectionString, containerName, path)
 
     /// Creates a blob client.
-    let createBlobClient connectionString = BlobRepository.getBlobClient connectionString
+    let createBlobClient connectionString = getBlobClient connectionString

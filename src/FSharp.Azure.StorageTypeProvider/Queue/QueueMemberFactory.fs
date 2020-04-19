@@ -2,7 +2,8 @@
 
 open FSharp.Azure.StorageTypeProvider.Queue
 open FSharp.Azure.StorageTypeProvider.Queue.QueueRepository
-open Microsoft.WindowsAzure.Storage.Queue
+open Microsoft.Azure.Storage.Queue
+open Microsoft.Azure.Storage.RetryPolicies
 open ProviderImplementation.ProvidedTypes
 open System
 
@@ -45,8 +46,6 @@ let createQueueMemberType connectionString (domainType:ProvidedTypeDefinition) q
         p.AddXmlDoc <| sprintf "Allows you to peek at the top 32 items on the queue (as of %A)." DateTime.UtcNow
         p)
     queueName, queueType
-
-open Microsoft.WindowsAzure.Storage.RetryPolicies
 
 let private doesQueueEndpointExists connectionString = async {
     let client = getQueueClient connectionString

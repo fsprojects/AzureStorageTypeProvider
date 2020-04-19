@@ -8,12 +8,13 @@
 #r "netstandard"
 #endif
 
-open Fake.Core.TargetOperators
-open Fake.Core
-open Fake.DotNet
-open Fake.IO.Globbing.Operators
 open System
 open System.IO
+
+open Fake.Core
+open Fake.Core.TargetOperators
+open Fake.DotNet
+open Fake.IO.Globbing.Operators
 open Fake.IO
 open Fake.Azure
 open Fake.DotNet.NuGet
@@ -58,7 +59,7 @@ let release =
     |> List.head
 
 // Generate assembly info files with the right version & up-to-date information
-Target.Create  "AssemblyInfo" (fun _ ->
+Target.create  "AssemblyInfo" (fun _ ->
     let fileName = "src/" + project + "/AssemblyInfo.fs"
     AssemblyInfoFile.createFSharp fileName [    AssemblyInfo.Title project
                                                 AssemblyInfo.Product project
@@ -75,25 +76,25 @@ let runDotNet cmd workingDir =
 
 // --------------------------------------------------------------------------------------
 // Clean build results
-Target.Create "Clean" (fun _ ->
+Target.create "Clean" (fun _ ->
     try Shell.cleanDirs [ "bin"; "temp"; "tests/integrationtests/bin" ] with _ -> ()
 )
 
 // --------------------------------------------------------------------------------------
 // Restore project
-Target.Create "RestoreProject" (fun _ ->
+Target.create "RestoreProject" (fun _ ->
     DotNet.restore id projectPath
 )
 
 // --------------------------------------------------------------------------------------
 // Build library project
-Target.Create "Build" (fun _ ->
+Target.create "Build" (fun _ ->
     DotNet.publish id projectPath
 )
 
 // --------------------------------------------------------------------------------------
 // Run the unit tests using test runner
-Target.Create "ResetTestData" (fun _ ->
+Target.create "ResetTestData" (fun _ ->
     let script = Path.Combine(testPath, "ResetTestData.fsx")
     Emulators.startStorageEmulator()
     Fsi.exec (fun p -> 
@@ -106,9 +107,9 @@ Target.Create "ResetTestData" (fun _ ->
 
 // Run integration tests
 let root = __SOURCE_DIRECTORY__
-let testNetCoreDir = root </> "tests"  </> "IntegrationTests" </> "bin" </> "Release" </> "netcoreapp2.0" </> "win10-x64" </> "publish"
+let testNetCoreDir = root </> "tests"  </> "IntegrationTests" </> "bin" </> "Release" </> "netcoreapp3.1" </> "win10-x64" </> "publish"
 
-Target.Create "RunTests" (fun _ ->
+Target.create "RunTests" (fun _ ->
     let result = DotNet.exec (withWorkDir testPath) "publish --self-contained -c Release -r win10-x64" ""
     if not result.OK then failwith "Publish failed"
     printfn "Dkr: %s" testNetCoreDir
@@ -121,7 +122,7 @@ Target.Create "RunTests" (fun _ ->
 
 // --------------------------------------------------------------------------------------
 // Build a NuGet package
-Target.Create "NuGet" (fun _ -> 
+Target.create "NuGet" (fun _ -> 
     Fake.IO.Directory.create @"bin\package"
     NuGet.NuGet (fun p ->
         { p with
@@ -144,36 +145,36 @@ Target.Create "NuGet" (fun _ ->
                  @ [ "StorageTypeProvider.fsx", None, None ] }) 
           ("nuget/" + project + ".nuspec"))
 
-[<AutoOpen>]
-module AppVeyorHelpers =
-  let execOnAppveyor arguments =
-    let result =
-        Process.execSimple(fun info ->
-            { info with
-                FileName = "appveyor"
-                Arguments = arguments})
-            (TimeSpan.FromMinutes 2.)
-    if result <> 0 then failwith (sprintf "Failed to execute appveyor command: %s" arguments)
-    Trace.trace "Published packages"
+// [<AutoOpen>]
+// module AppVeyorHelpers =
+//   let execOnAppveyor arguments =
+//     let result =
+//         Process.execSimple(fun info ->
+//             { info with
+//                 FileName = "appveyor"
+//                 Arguments = arguments})
+//             (TimeSpan.FromMinutes 2.)
+//     if result <> 0 then failwith (sprintf "Failed to execute appveyor command: %s" arguments)
+//     Trace.trace "Published packages"
 
-  let publishOnAppveyor folder =
-    !! (folder + "*.nupkg")
-    |> Seq.iter (sprintf "PushArtifact %s" >> execOnAppveyor)
+//   let publishOnAppveyor folder =
+//     !! (folder + "*.nupkg")
+//     |> Seq.iter (sprintf "PushArtifact %s" >> execOnAppveyor)
 
 // --------------------------------------------------------------------------------------
 // Release Scripts
-Target.Create "LocalDeploy" (fun _ ->
-    DirectoryInfo @"bin"
-    |> DirectoryInfo.getMatchingFiles "*.nupkg"
-    |> Seq.map(fun x -> x.FullName)
-    |> Shell.copyFiles @"..\..\LocalPackages")
+// Target.create "LocalDeploy" (fun _ ->
+//     DirectoryInfo @"bin"
+//     |> DirectoryInfo.getMatchingFiles "*.nupkg"
+//     |> Seq.map(fun x -> x.FullName)
+//     |> Shell.copyFiles @"..\..\LocalPackages")
 
-Target.Create "BuildServerDeploy" (fun _ -> publishOnAppveyor buildDir)
+// Target.create "BuildServerDeploy" (fun _ -> publishOnAppveyor buildDir)
 
 // --------------------------------------------------------------------------------------
 // Run all targets by default. Invoke 'build <Target>' to override
 
-Target.Create "All" ignore
+Target.create "All" ignore
 
 "Clean"
   ==> "AssemblyInfo"
@@ -181,7 +182,7 @@ Target.Create "All" ignore
   ==> "Nuget"
   ==> "ResetTestData"
   ==> "RunTests"
-  =?> ("LocalDeploy", BuildServer.isLocalBuild)
-  =?> ("BuildServerDeploy", BuildServer.buildServer = Fake.Core.BuildServer.AppVeyor)
+//   =?> ("LocalDeploy", BuildServer.isLocalBuild)
+//   =?> ("BuildServerDeploy", BuildServer.buildServer = Fake.Core.BuildServer.AppVeyor)
 
-Target.RunOrDefault "RunTests"
+Target.runOrDefault "RunTests"

@@ -5,11 +5,7 @@
     <Name>FSharp.Azure.StorageTypeProvider</Name>
     <AssemblyName>FSharp.Azure.StorageTypeProvider</AssemblyName>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AllowCrossTargeting>true</AllowCrossTargeting>
-    <OutputPath>..\..\bin\</OutputPath>
-    <DocumentationFile>..\..\bin\FSharp.Azure.StorageTypeProvider.XML</DocumentationFile>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
