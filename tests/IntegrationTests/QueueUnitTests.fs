@@ -4,7 +4,7 @@ open FSharp.Azure.StorageTypeProvider
 open FSharp.Azure.StorageTypeProvider.Queue
 open Swensen.Unquote
 open Swensen.Unquote.Operators
-open Microsoft.WindowsAzure.Storage.Queue
+open Microsoft.Azure.Storage.Queue
 open System
 open System.Linq
 open System.Net

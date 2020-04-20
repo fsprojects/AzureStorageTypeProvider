@@ -1,8 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <RootNamespace>UnitTests</RootNamespace>
-    <Name>UnitTests</Name>
-    <AssemblyName>IntegrationTests</AssemblyName>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <OutputType>Exe</OutputType>
     <RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>
@@ -22,7 +19,7 @@
     <None Include="paket.references" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="../../src/FSharp.Azure.StorageTypeProvider.fsproj" />
+    <ProjectReference Include="..\..\src\FSharp.Azure.StorageTypeProvider.Runtime\FSharp.Azure.StorageTypeProvider.Runtime.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

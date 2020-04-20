@@ -3,7 +3,7 @@
 open Expecto
 open FSharp.Azure.StorageTypeProvider
 open FSharp.Azure.StorageTypeProvider.Blob
-open Microsoft.WindowsAzure.Storage.Blob
+open Microsoft.Azure.Storage.Blob
 open System
 open System.Linq
 open System.IO

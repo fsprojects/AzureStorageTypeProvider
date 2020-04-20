@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2046
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -16,7 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		RELEASE_NOTES.md = RELEASE_NOTES.md
 	EndProjectSection
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharp.Azure.StorageTypeProvider", "src\FSharp.Azure.StorageTypeProvider\FSharp.Azure.StorageTypeProvider.fsproj", "{FB7CA8F3-C158-49E9-B816-501741E2921F}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharp.Azure.StorageTypeProvider.DesignTime", "src\FSharp.Azure.StorageTypeProvider.DesignTime\FSharp.Azure.StorageTypeProvider.DesignTime.fsproj", "{FB7CA8F3-C158-49E9-B816-501741E2921F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{7CAF8D38-6250-41CB-A65B-ABD760B09281}"
 	ProjectSection(SolutionItems) = preProject
@@ -35,6 +35,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "content", "content", "{1535
 		docs\content\tables.fsx = docs\content\tables.fsx
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9F8608EA-1B89-41C5-9BF4-9A41C736E5FA}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Azure.StorageTypeProvider.Runtime", "src\FSharp.Azure.StorageTypeProvider.Runtime\FSharp.Azure.StorageTypeProvider.Runtime.fsproj", "{5D73633E-3D3F-4B23-8683-8D9447499690}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,12 +49,17 @@ Global
 		{FB7CA8F3-C158-49E9-B816-501741E2921F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB7CA8F3-C158-49E9-B816-501741E2921F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB7CA8F3-C158-49E9-B816-501741E2921F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D73633E-3D3F-4B23-8683-8D9447499690}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D73633E-3D3F-4B23-8683-8D9447499690}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D73633E-3D3F-4B23-8683-8D9447499690}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D73633E-3D3F-4B23-8683-8D9447499690}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{15350981-90B9-44A0-B356-776735ACC7F1} = {7CAF8D38-6250-41CB-A65B-ABD760B09281}
+		{5D73633E-3D3F-4B23-8683-8D9447499690} = {9F8608EA-1B89-41C5-9BF4-9A41C736E5FA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C68560AB-A7F2-49A3-BEED-B56A8D7074D2}

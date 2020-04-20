@@ -39,57 +39,52 @@ let gitName = "AzureStorageTypeProvider"
 // Read additional information from the release notes document
 Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
 
-let buildDir = "bin"
-
-
-// TypeProvider path
-let projectPath = Path.getFullName "./src/FSharp.Azure.StorageTypeProvider"
+let solution = Path.getFullName "FSharp.Azure.AzureStorageProvider.sln"
 
 // Test path
 let testPath = Path.getFullName "./tests/IntegrationTests"
-// Read additional information from the release notes document
 
-// Test Output Dir
-let testOutPutDir = "TestOutput"
-
+let buildConfiguration = DotNet.Custom <| Environment.environVarOrDefault "configuration" "release"
 
 let release =
     File.ReadAllLines "RELEASE_NOTES.md"
     |> ReleaseNotes.parseAll
     |> List.head
 
-// Generate assembly info files with the right version & up-to-date information
-Target.create  "AssemblyInfo" (fun _ ->
-    let fileName = "src/" + project + "/AssemblyInfo.fs"
-    AssemblyInfoFile.createFSharp fileName [    AssemblyInfo.Title project
-                                                AssemblyInfo.Product project
-                                                AssemblyInfo.Description summary
-                                                AssemblyInfo.Version release.AssemblyVersion
-                                                AssemblyInfo.FileVersion release.AssemblyVersion ])
+Target.create "AssemblyInfo" (fun _ ->
+    let getAssemblyInfoAttributes projectName =
+        [ AssemblyInfo.Title (projectName)
+          AssemblyInfo.Product project
+          AssemblyInfo.Description summary
+          AssemblyInfo.Version release.AssemblyVersion
+          AssemblyInfo.FileVersion release.AssemblyVersion ]
+
+    let getProjectDetails projectPath =
+        let projectName = Path.GetFileNameWithoutExtension(projectPath)
+        (Path.GetDirectoryName(projectPath), getAssemblyInfoAttributes projectName)
+
+    !! "src/**/*.fsproj"
+    |> Seq.map getProjectDetails
+    |> Seq.iter (fun (folderName, attributes) ->
+        AssemblyInfoFile.createFSharp (folderName </> "AssemblyInfo.fs") attributes )
+)
 
 let inline withWorkDir wd = 
     DotNet.Options.withWorkingDirectory wd
-let runDotNet cmd workingDir =
-    let result =
-        DotNet.exec (withWorkDir workingDir) cmd ""
-    if result.ExitCode <> 0 then failwithf "'dotnet %s' failed in %s" cmd workingDir
 
 // --------------------------------------------------------------------------------------
 // Clean build results
-Target.create "Clean" (fun _ ->
-    try Shell.cleanDirs [ "bin"; "temp"; "tests/integrationtests/bin" ] with _ -> ()
-)
 
-// --------------------------------------------------------------------------------------
-// Restore project
-Target.create "RestoreProject" (fun _ ->
-    DotNet.restore id projectPath
+Target.create "Clean" (fun _ ->
+    !! "**/**/bin/" |> Shell.cleanDirs
+    !! "**/**/obj/" |> Shell.cleanDirs
+    ["bin"; "temp"] |> Shell.cleanDirs
 )
 
 // --------------------------------------------------------------------------------------
 // Build library project
 Target.create "Build" (fun _ ->
-    DotNet.publish id projectPath
+    DotNet.exec id "build" "FSharp.Azure.StorageTypeProvider.sln -c Release" |> ignore
 )
 
 // --------------------------------------------------------------------------------------
@@ -179,7 +174,7 @@ Target.create "All" ignore
 "Clean"
   ==> "AssemblyInfo"
   ==> "Build"
-  ==> "Nuget"
+  //==> "Nuget"
   ==> "ResetTestData"
   ==> "RunTests"
 //   =?> ("LocalDeploy", BuildServer.isLocalBuild)
