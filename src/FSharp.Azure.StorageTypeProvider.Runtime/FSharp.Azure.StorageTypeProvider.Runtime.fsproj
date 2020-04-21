@@ -4,6 +4,9 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="FSharp.Azure.StorageTypeProvider.Runtime.fs"/>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\FSharp.Azure.StorageTypeProvider.DesignTime\FSharp.Azure.StorageTypeProvider.DesignTime.fsproj" />
   </ItemGroup>
   <Target Name="MoveDesignTimeAssembliesToTypeProviderFolder" AfterTargets="AfterBuild">

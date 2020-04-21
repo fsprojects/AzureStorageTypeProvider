@@ -1,4 +1,4 @@
-﻿namespace ProviderImplementation
+﻿namespace FSharp.Azure.StorageTypeProvider
 
 open FSharp.Azure.StorageTypeProvider
 open FSharp.Azure.StorageTypeProvider.Blob
@@ -118,3 +118,6 @@ type public AzureTypeProvider(config : TypeProviderConfig) as this =
         azureAccountType.DefineStaticParameters(parameters, memoize buildTypes)
         this.AddNamespace(namespaceName, [ azureAccountType ])
         azureAccountType.AddXmlDoc("The entry type to connect to Azure Storage assets.")
+
+// [<TypeProviderAssembly>]
+// do ()
