@@ -2,10 +2,11 @@
 // FAKE build script
 // --------------------------------------------------------------------------------------
 
-#r "paket: groupref build //"
-#load "./.fake/build.fsx/intellisense.fsx"
+#r "paket: groupref Build //"
+
 #if !FAKE
-#r "netstandard"
+#load "./.fake/build.fsx/intellisense.fsx"
+#r "netstandard" // Temp fix for https://github.com/fsharp/FAKE/issues/1985
 #endif
 
 open System
