@@ -41,6 +41,8 @@ Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
 
 let solution = Path.getFullName "FSharp.Azure.AzureStorageProvider.sln"
 
+let designTimeProject = __SOURCE_DIRECTORY__ </> "src" </> "FSharp.Azure.StorageTypeProvider.DesignTime" </> "FSharp.Azure.StorageTypeProvider.DesignTime.fsproj"
+
 // Test path
 let testPath = Path.getFullName "./tests/IntegrationTests"
 
@@ -84,6 +86,7 @@ Target.create "Clean" (fun _ ->
 // --------------------------------------------------------------------------------------
 // Build library project
 Target.create "Build" (fun _ ->
+    DotNet.publish id designTimeProject |> ignore
     DotNet.exec id "build" "FSharp.Azure.StorageTypeProvider.sln -c Release" |> ignore
 )
 

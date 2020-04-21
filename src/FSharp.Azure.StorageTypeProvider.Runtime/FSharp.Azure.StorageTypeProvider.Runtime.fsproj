@@ -10,7 +10,7 @@
     <ProjectReference Include="..\FSharp.Azure.StorageTypeProvider.DesignTime\FSharp.Azure.StorageTypeProvider.DesignTime.fsproj" />
   </ItemGroup>
   <Target Name="MoveDesignTimeAssembliesToTypeProviderFolder" AfterTargets="AfterBuild">
-    <CreateItem Include="..\FSharp.Azure.StorageTypeProvider.DesignTime\bin\$(Configuration)\netstandard2.0\*.dll;..\FSharp.Azure.StorageTypeProvider.DesignTime\bin\$(Configuration)\netstandard2.0\*.pdb">
+    <CreateItem Include="..\FSharp.Azure.StorageTypeProvider.DesignTime\bin\$(Configuration)\netstandard2.0\publish\*.dll;..\FSharp.Azure.StorageTypeProvider.DesignTime\bin\$(Configuration)\netstandard2.0\publish\*.pdb">
       <Output TaskParameter="Include" ItemName="DesignTimeBinaries" />
     </CreateItem>
     <Copy SourceFiles="@(DesignTimeBinaries)" DestinationFolder="$(OutputPath)../typeproviders/fsharp41/netstandard2.0" />
