@@ -1,4 +1,4 @@
-cls
-.paket\paket.exe restore
-packages\FAKE\tools\FAKE.exe build.fsx %*
-
+@echo off
+dotnet tool restore
+dotnet paket restore
+dotnet fake run build.fsx %*

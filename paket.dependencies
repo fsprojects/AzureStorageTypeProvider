@@ -1,16 +1,20 @@
-redirects: force
-source https://www.nuget.org/api/v2/
-framework: netstandard2.0, netcoreapp2.0
+source https://api.nuget.org/v3/index.json
 generate_load_scripts: true
+storage: none
 
-nuget FSharp.Core
-nuget WindowsAzure.Storage 9.3.2
-nuget Newtonsoft.Json 10.0.2
-nuget System.Net.Http
-nuget FSharp.Compiler.Tools
+nuget FSharp.Core >= 4.5.2
 
-nuget FAKE
-nuget Nuget.CommandLine
+github fsprojects/FSharp.TypeProviders.SDK src/ProvidedTypes.fsi
+github fsprojects/FSharp.TypeProviders.SDK src/ProvidedTypes.fs
+
+nuget Microsoft.Azure.Storage.Blob
+nuget Microsoft.Azure.Storage.File
+nuget Microsoft.Azure.Storage.Queue
+nuget Microsoft.Azure.Storage.Common
+nuget Microsoft.Azure.Cosmos.Table
+
+nuget Newtonsoft.Json
+nuget System.Configuration.ConfigurationManager
 
 nuget Deedle
 nuget FSharp.Charting
@@ -21,26 +25,23 @@ nuget Unquote
 nuget Microsoft.NET.Test.Sdk
 nuget Taskbuilder.fs
 
-github fsprojects/FSharp.TypeProviders.SDK src/ProvidedTypes.fsi
-github fsprojects/FSharp.TypeProviders.SDK src/ProvidedTypes.fs
-nuget Microsoft.NETCore.Runtime.CoreCLR
-nuget System.Configuration.ConfigurationManager
+group Build
 
-group build
+    source https://api.nuget.org/v3/index.json
+    storage: none
 
-source https://www.nuget.org/api/v2/
-framework: netstandard2.0, netcoreapp2.0
-storage: none
+    nuget FAKE
+    nuget Nuget.CommandLine
 
-nuget Fake.Azure.Emulators
-nuget Fake.BuildServer.AppVeyor
-nuget Fake.Core
-nuget Fake.Core.ReleaseNotes
-nuget Fake.Core.Targets
-nuget Fake.DotNet
-nuget Fake.DotNet.Cli
-nuget Fake.DotNet.Fsi
-nuget Fake.DotNet.AssemblyInfoFile
-nuget Fake.DotNet.NuGet
-nuget Fake.IO.FileSystem
-nuget Fake.Tools.Git
+    nuget Fake.Azure.Emulators
+    nuget Fake.BuildServer.AppVeyor
+    nuget Fake.Core
+    nuget Fake.Core.ReleaseNotes
+    nuget Fake.Core.Target
+    nuget Fake.DotNet
+    nuget Fake.DotNet.Cli
+    nuget Fake.DotNet.Fsi
+    nuget Fake.DotNet.AssemblyInfoFile
+    nuget Fake.DotNet.NuGet
+    nuget Fake.IO.FileSystem
+    nuget Fake.Tools.Git

@@ -1,7 +1,7 @@
 ﻿module FSharp.Azure.StorageTypeProvider.TableHelpers
 
-open Microsoft.WindowsAzure.Storage
-open Microsoft.WindowsAzure.Storage.Table
+open Microsoft.Azure.Storage
+open Microsoft.Azure.Cosmos.Table
 open System
 
 let bArr = [| for i in 1 .. 255 do yield i |> byte |]

@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="FSharp.Azure.StorageTypeProvider.Runtime.fs"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FSharp.Azure.StorageTypeProvider.DesignTime\FSharp.Azure.StorageTypeProvider.DesignTime.fsproj" />
+  </ItemGroup>
+  <Target Name="MoveDesignTimeAssembliesToTypeProviderFolder" AfterTargets="AfterBuild">
+    <CreateItem Include="..\FSharp.Azure.StorageTypeProvider.DesignTime\bin\$(Configuration)\netstandard2.0\publish\*.dll;..\FSharp.Azure.StorageTypeProvider.DesignTime\bin\$(Configuration)\netstandard2.0\publish\*.pdb">
+      <Output TaskParameter="Include" ItemName="DesignTimeBinaries" />
+    </CreateItem>
+    <Copy SourceFiles="@(DesignTimeBinaries)" DestinationFolder="$(OutputPath)../typeproviders/fsharp41/netstandard2.0" />
+  </Target>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
+</Project>

@@ -189,3 +189,7 @@ testoutput/
 /tests/IntegrationTests/.ionide/symbolCache.db
 /src/FSharp.Azure.StorageTypeProvider/.ionide/symbolCache.db
 /.ionide/symbolCache.db-journal
+
+.fake
+.ionide
+.vs
