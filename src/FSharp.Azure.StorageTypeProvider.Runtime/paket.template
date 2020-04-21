@@ -1,0 +1,27 @@
+type file
+id MyProvider
+authors
+    Isaac Abraham
+owners
+    Isaac Abraham
+projectUrl
+    http://fsprojects.github.io/AzureStorageTypeProvider/
+iconUrl
+    http://fsprojects.github.io/AzureStorageTypeProvider/img/logo.png
+licenseUrl
+    https://github.com/fsprojects/AzureStorageTypeProvider/blob/master/LICENSE.txt
+requireLicenseAcceptance
+    false
+summary
+    This library is for the .NET platform implementing MyProvider.
+description
+    The F# Azure Storage Type Provider allows simple access to Blob, Table and Queue assets, using Azure Storage metadata to intelligently infer schema where possible, whilst providing a simple API for common tasks.
+tags
+    azure f# fsharp typeprovider blob table queue script
+files
+    bin/Release/netstandard2.0/MyProvider.Runtime.* ==> lib/netstandard2.0
+    bin/Release/typeproviders/fsharp41/netstandard2.0/*.dll ==> typeproviders/fsharp41/netstandard2.0
+references
+    FSharp.Azure.StorageTypeProvider.Runtime.dll
+dependencies
+  FSharp.Core >= LOCKEDVERSION

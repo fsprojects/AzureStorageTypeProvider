@@ -36,17 +36,15 @@ let gitHome = "https://github.com/" + gitOwner
 // The name of the project on GitHub
 let gitName = "AzureStorageTypeProvider"
 
+let designTimeProject = __SOURCE_DIRECTORY__ </> "src" </> "FSharp.Azure.StorageTypeProvider.DesignTime" </> "FSharp.Azure.StorageTypeProvider.DesignTime.fsproj"
+
 // Read additional information from the release notes document
 Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
-
-let solution = Path.getFullName "FSharp.Azure.AzureStorageProvider.sln"
-
-let designTimeProject = __SOURCE_DIRECTORY__ </> "src" </> "FSharp.Azure.StorageTypeProvider.DesignTime" </> "FSharp.Azure.StorageTypeProvider.DesignTime.fsproj"
 
 // Test path
 let testPath = Path.getFullName "./tests/IntegrationTests"
 
-let buildConfiguration = DotNet.Custom <| Environment.environVarOrDefault "configuration" "release"
+let buildConfiguration = DotNet.Custom <| Environment.environVarOrDefault "configuration" "Debug"
 
 let release =
     File.ReadAllLines "RELEASE_NOTES.md"
@@ -84,9 +82,15 @@ Target.create "Clean" (fun _ ->
 )
 
 // --------------------------------------------------------------------------------------
-// Build library project
-Target.create "Build" (fun _ ->
-    DotNet.publish id designTimeProject |> ignore
+// Build
+
+Target.create "BuildForDev" (fun _ ->
+    DotNet.publish (fun p -> { p with Configuration = DotNet.BuildConfiguration.Debug }) designTimeProject |> ignore
+    DotNet.exec id "build" "FSharp.Azure.StorageTypeProvider.sln -c Debug" |> ignore
+)
+
+Target.create "BuildForRelease" (fun _ ->
+    DotNet.publish (fun p -> { p with Configuration = DotNet.BuildConfiguration.Release }) designTimeProject |> ignore
     DotNet.exec id "build" "FSharp.Azure.StorageTypeProvider.sln -c Release" |> ignore
 )
 
@@ -118,10 +122,17 @@ Target.create "RunTests" (fun _ ->
         printfn "Expecto for netcore finished with Errors"
     )
 
+// Update package with this stuff?
+// Microsoft.Azure.Storage.Blob
+// Microsoft.Azure.Storage.File
+// Microsoft.Azure.Storage.Queue
+// Microsoft.Azure.Storage.Common
+// Microsoft.Azure.Cosmos.Table
+
 // --------------------------------------------------------------------------------------
 // Build a NuGet package
 Target.create "NuGet" (fun _ -> 
-    Fake.IO.Directory.create @"bin\package"
+    Fake.IO.Directory.create @"pkg"
     NuGet.NuGet (fun p ->
         { p with
             Authors = [ "Isaac Abraham" ]
@@ -132,9 +143,12 @@ Target.create "NuGet" (fun _ ->
             Version = release.NugetVersion
             ReleaseNotes = release.Notes |> String.concat Environment.NewLine
             Tags = "azure, f#, fsharp, type provider, blob, table, queue, script"
-            OutputPath = @"bin\package"
-            Dependencies = [ "WindowsAzure.Storage", "9.3.2"
-                             "FSharp.Compiler.Tools", "10.2.1" ]
+            OutputPath = @"pkg"
+            Dependencies = [ "Microsoft.Azure.Storage.Blob", "11.1.3"
+                             "Microsoft.Azure.Storage.File", "11.1.3"
+                             "Microsoft.Azure.Storage.Queue", "11.1.3"
+                             "Microsoft.Azure.Storage.Common", "11.1.3"
+                             "Microsoft.Azure.Cosmos.Table", "1.0.7" ]
             References = [ "FSharp.Azure.StorageTypeProvider.dll" ]
             Files = 
                 ([ "FSharp.Azure.StorageTypeProvider.xml"; "FSharp.Azure.StorageTypeProvider.dll"
@@ -169,18 +183,17 @@ Target.create "NuGet" (fun _ ->
 
 // Target.create "BuildServerDeploy" (fun _ -> publishOnAppveyor buildDir)
 
-// --------------------------------------------------------------------------------------
-// Run all targets by default. Invoke 'build <Target>' to override
-
-Target.create "All" ignore
-
 "Clean"
   ==> "AssemblyInfo"
-  ==> "Build"
-  //==> "Nuget"
-  ==> "ResetTestData"
-  ==> "RunTests"
+  ==> "BuildForDev"
+
+"Clean"
+==> "AssemblyInfo"
+==> "BuildForRelease"
+//   ==> "Nuget"
+//   ==> "ResetTestData"
+//   ==> "RunTests"
 //   =?> ("LocalDeploy", BuildServer.isLocalBuild)
 //   =?> ("BuildServerDeploy", BuildServer.buildServer = Fake.Core.BuildServer.AppVeyor)
 
-Target.runOrDefault "RunTests"
+Target.runOrDefault "BuildForDev"
